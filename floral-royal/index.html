@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Priya &amp; Saurabh - Wedding Invitation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Floral Royal wedding invitation of Priya Singh &amp; Saurabh Singh" />
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:wght@300;400;500;600&family=Great+Vibes&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg-page: #fff8f0;
+      --bg-card: #fff7ee;
+      --bg-card-deep: #fbead9;
+      --border-gold: #d4af37;
+      --border-soft: #ecd8b6;
+      --accent-gold: #d4af37;
+      --accent-gold-soft: #f5d48a;
+      --accent-rose: #c27d88;
+      --accent-blush: #f6c1c7;
+      --accent-sage: #9bb69d;
+      --text-main: #2f2933;
+      --text-muted: #6c5b5b;
+      --button-primary: #7c2831;
+      --button-primary-hover: #651f27;
+      --shadow-soft: 0 20px 40px rgba(0, 0, 0, 0.07);
+      --radius-large: 24px;
+      --radius-medium: 18px;
+      --page-width: 1080px;
+      --section-spacing: 70px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(246, 193, 199, 0.35), transparent 60%),
+        radial-gradient(circle at bottom right, rgba(155, 182, 157, 0.35), transparent 60%),
+        var(--bg-page);
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    .page-shell {
+      max-width: var(--page-width);
+      margin: 0 auto;
+      padding: 16px 16px 80px;
+    }
+
+    /* HEADER / NAV */
+    header.site-header {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: linear-gradient(to bottom, rgba(255, 248, 240, 0.96), rgba(255, 248, 240, 0.9), transparent);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(212, 175, 55, 0.18);
+      margin: 0 -16px 8px;
+      padding: 10px 16px 6px;
+    }
+
+    .nav-inner {
+      max-width: var(--page-width);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-monogram {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1px solid rgba(212, 175, 55, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at 30% 0, #fdf3d5, #f0cd76);
+      color: #553616;
+      font-family: "Playfair Display", serif;
+      font-weight: 600;
+      font-size: 18px;
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.7);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .brand-title {
+      font-size: 13px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .brand-sub {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .nav-links {
+      display: none;
+      gap: 18px;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .nav-links a {
+      position: relative;
+      padding-bottom: 3px;
+    }
+
+    .nav-links a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 0;
+      height: 1px;
+      background: linear-gradient(90deg, var(--border-gold), var(--accent-rose));
+      transition: width 0.18s ease;
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .music-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 4px 10px;
+      border: 1px solid rgba(212, 175, 55, 0.55);
+      background: linear-gradient(to right, #fff9f0, #fce7e7);
+      font-size: 11px;
+      cursor: pointer;
+      user-select: none;
+      box-shadow: 0 10px 18px rgba(212, 175, 55, 0.18);
+    }
+
+    .music-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: #b91c1c;
+      box-shadow: 0 0 10px rgba(185, 28, 28, 0.6);
+      transition: background 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .music-dot.on {
+      background: #16a34a;
+      box-shadow: 0 0 12px rgba(22, 163, 74, 0.9);
+    }
+
+    @media (min-width: 840px) {
+      header.site-header {
+        margin-inline: 0;
+        padding-inline: 24px;
+      }
+      .page-shell {
+        padding-inline: 24px;
+      }
+      .nav-links {
+        display: inline-flex;
+      }
+    }
+
+    /* HERO */
+    .hero {
+      margin-top: 14px;
+      border-radius: 32px;
+      padding: 26px 18px 30px;
+      background:
+        radial-gradient(circle at top left, rgba(246, 193, 199, 0.35), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(155, 182, 157, 0.4), transparent 55%),
+        #fffaf4;
+      border: 1px solid rgba(212, 175, 55, 0.45);
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before,
+    .hero::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(250, 250, 250, 0.9), transparent 70%);
+      opacity: 0.9;
+      pointer-events: none;
+    }
+
+    .hero::before {
+      width: 480px;
+      height: 480px;
+      top: -240px;
+      right: -140px;
+    }
+
+    .hero::after {
+      width: 400px;
+      height: 400px;
+      bottom: -220px;
+      left: -100px;
+    }
+
+    .hero-inner {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr);
+      gap: 22px;
+      align-items: center;
+    }
+
+    @media (min-width: 900px) {
+      .hero {
+        padding: 32px 32px 36px;
+      }
+      .hero-inner {
+        grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.95fr);
+      }
+    }
+
+    .hero-eyebrow {
+      font-size: 10px;
+      letter-spacing: 0.26em;
+      text-transform: uppercase;
+      color: var(--accent-rose);
+      margin-bottom: 8px;
+    }
+
+    .hero-script {
+      font-family: "Great Vibes", cursive;
+      font-size: 24px;
+      color: var(--accent-rose);
+      margin-bottom: 4px;
+    }
+
+    .hero-names {
+      font-family: "Playfair Display", serif;
+      font-size: clamp(30px, 6vw, 40px);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .hero-amp {
+      font-family: "Great Vibes", cursive;
+      font-size: 26px;
+      margin: 0 8px;
+      color: var(--accent-rose);
+    }
+
+    .hero-sub {
+      font-size: 12px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+    }
+
+    .hero-date {
+      font-size: 13px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--button-primary);
+      margin-bottom: 4px;
+    }
+
+    .hero-location {
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .hero-divider {
+      width: 120px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-gold), transparent);
+      margin-bottom: 18px;
+    }
+
+    .hero-countdown {
+      display: inline-flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      border-radius: 999px;
+      padding: 8px 12px;
+      border: 1px solid rgba(212, 175, 55, 0.6);
+      background: linear-gradient(to right, #fff9f0, #fdf2f7);
+      margin-bottom: 18px;
+    }
+
+    .hero-count-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: #7c2831;
+    }
+
+    .hero-countdown-values {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .hero-countdown-values span {
+      font-variant-numeric: tabular-nums;
+    }
+
+    .dot-small {
+      width: 3px;
+      height: 3px;
+      border-radius: 999px;
+      background: #7c2831;
+      opacity: 0.7;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 9px 18px;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--button-primary), var(--button-primary-hover));
+      color: #fff7ef;
+      border-color: rgba(124, 40, 49, 0.8);
+      box-shadow:
+        0 16px 30px rgba(124, 40, 49, 0.35),
+        0 0 10px rgba(212, 175, 55, 0.25);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--button-primary-hover), var(--button-primary));
+      transform: translateY(-1px);
+      box-shadow:
+        0 18px 32px rgba(124, 40, 49, 0.45),
+        0 0 14px rgba(212, 175, 55, 0.35);
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.8);
+      border-color: rgba(212, 175, 55, 0.7);
+      color: var(--text-main);
+    }
+
+    .btn-ghost:hover {
+      background: #fff7eb;
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    .btn-icon {
+      font-size: 14px;
+    }
+
+    /* Hero photo card */
+    .hero-photo-card {
+      border-radius: 26px;
+      border: 1px solid rgba(212, 175, 55, 0.6);
+      background:
+        radial-gradient(circle at top, rgba(246, 193, 199, 0.35), transparent 65%),
+        #fff9f2;
+      padding: 14px 14px 16px;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-photo-frame {
+      border-radius: 22px;
+      border: 1px solid rgba(212, 175, 55, 0.9);
+      padding: 5px;
+      background: linear-gradient(145deg, #fdfaf4, #f8e6d1);
+      margin-bottom: 10px;
+    }
+
+    .hero-photo-inner {
+      border-radius: 18px;
+      overflow: hidden;
+      background: #f3d6d6;
+      aspect-ratio: 4 / 5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: rgba(88, 44, 50, 0.9);
+      padding: 6px;
+      text-align: center;
+    }
+
+    .hero-photo-inner span {
+      padding: 0 14px;
+    }
+
+    .hero-photo-caption {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .hero-photo-caption strong {
+      color: var(--accent-rose);
+      font-weight: 500;
+    }
+
+    /* GENERAL SECTIONS */
+    section {
+      margin-top: var(--section-spacing);
+    }
+
+    .section-header {
+      margin-bottom: 22px;
+      text-align: left;
+    }
+
+    .section-eyebrow {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.24em;
+      color: var(--accent-rose);
+      margin-bottom: 4px;
+    }
+
+    .section-title {
+      font-family: "Playfair Display", serif;
+      font-size: 22px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .section-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .card {
+      border-radius: var(--radius-large);
+      background: var(--bg-card);
+      border: 1px solid var(--border-soft);
+      box-shadow: var(--shadow-soft);
+      padding: 18px 16px 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before,
+    .card::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(246, 193, 199, 0.16), transparent 70%);
+      inset: auto auto 0 0;
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    .card::after {
+      inset: 0 -40px auto auto;
+      background: radial-gradient(circle, rgba(155, 182, 157, 0.2), transparent 70%);
+    }
+
+    .card-inner {
+      position: relative;
+    }
+
+    @media (min-width: 880px) {
+      .card {
+        padding: 24px 24px 26px;
+      }
+    }
+
+    /* COUPLE SECTION */
+    .couple-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 720px) {
+      .couple-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .headline {
+      font-family: "Playfair Display", serif;
+      font-size: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      margin-bottom: 8px;
+    }
+
+    .muted {
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .person-block {
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+
+    .person-role {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    .person-name {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .contact-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(212, 175, 55, 0.7);
+      background: #fff9f0;
+      font-size: 11px;
+      margin-top: 6px;
+    }
+
+    .contact-chip span.contact-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #16a34a;
+      box-shadow: 0 0 10px rgba(22, 163, 74, 0.85);
+    }
+
+    .portrait-frame {
+      margin-top: 12px;
+      border-radius: 20px;
+      border: 1px solid rgba(212, 175, 55, 0.7);
+      padding: 5px;
+      background: linear-gradient(130deg, #fdf6ec, #f7e1cf);
+      max-width: 260px;
+    }
+
+    .portrait-inner {
+      border-radius: 16px;
+      overflow: hidden;
+      background: #f3d6d6;
+      aspect-ratio: 3 / 4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      text-align: center;
+      font-size: 11px;
+      color: rgba(88, 44, 50, 0.9);
+    }
+
+    /* GALLERY SECTION */
+    .gallery-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (min-width: 780px) {
+      .gallery-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .gallery-item {
+      border-radius: var(--radius-medium);
+      border: 1px solid rgba(212, 175, 55, 0.6);
+      padding: 5px;
+      background: linear-gradient(135deg, #fdf7f0, #f7e0dd);
+      overflow: hidden;
+    }
+
+    .gallery-inner {
+      border-radius: 14px;
+      overflow: hidden;
+      background: #f4d9da;
+      aspect-ratio: 4 / 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      padding: 10px;
+      text-align: center;
+      color: rgba(88, 44, 50, 0.9);
+    }
+
+    .gallery-inner.tall {
+      aspect-ratio: 3 / 4;
+    }
+
+    /* EVENTS SECTION */
+    .event-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 14px;
+      margin-top: 4px;
+    }
+
+    @media (min-width: 720px) {
+      .event-grid {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      }
+    }
+
+    .event-day {
+      position: relative;
+      border-radius: 20px;
+      padding: 14px 14px 16px;
+      background: var(--bg-card-deep);
+      border: 1px solid rgba(212, 175, 55, 0.6);
+    }
+
+    .event-day::before {
+      content: "";
+      position: absolute;
+      inset: -1px -1px auto auto;
+      width: 52px;
+      height: 18px;
+      border-bottom-left-radius: 20px;
+      border-top-right-radius: 20px;
+      background: linear-gradient(135deg, var(--accent-blush), var(--accent-sage));
+      opacity: 0.2;
+    }
+
+    .event-date-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--accent-rose);
+      margin-bottom: 2px;
+    }
+
+    .event-date-main {
+      font-family: "Playfair Display", serif;
+      font-size: 14px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .event-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      border-top: 1px solid rgba(236, 216, 182, 0.9);
+      padding-top: 6px;
+      margin-top: 6px;
+    }
+
+    .event-item:first-of-type {
+      border-top: none;
+      margin-top: 0;
+      padding-top: 0;
+    }
+
+    .event-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .event-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--text-main);
+    }
+
+    .event-tag {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+    }
+
+    .event-time {
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+      color: var(--button-primary);
+      white-space: nowrap;
+    }
+
+    /* VENUE SECTION */
+    .venue-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+      gap: 18px;
+    }
+
+    @media (max-width: 780px) {
+      .venue-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .venue-address {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .chip {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(212, 175, 55, 0.6);
+      background: #fff8f0;
+      color: var(--button-primary);
+    }
+
+    .map-card {
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(212, 175, 55, 0.7);
+      background: #fdf7f0;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .map-embed {
+      border: 0;
+      width: 100%;
+      height: 240px;
+      display: block;
+    }
+
+    .map-footer {
+      padding: 8px 10px 10px;
+      font-size: 11px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-muted);
+    }
+
+    .map-footer a {
+      font-size: 11px;
+      color: var(--button-primary);
+    }
+
+    /* RSVP SECTION */
+    .rsvp-text {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .rsvp-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .rsvp-pill {
+      border-radius: 999px;
+      padding: 6px 10px;
+      border: 1px solid rgba(212, 175, 55, 0.7);
+      background: #fff9f2;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+    }
+
+    .rsvp-badge {
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(212, 175, 55, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--button-primary);
+      background: #fffaf2;
+    }
+
+    .small-note {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* FOOTER */
+    footer.site-footer {
+      margin-top: 50px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(212, 175, 55, 0.5);
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .footer-main {
+      font-family: "Playfair Display", serif;
+      font-size: 14px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .footer-line {
+      margin-bottom: 4px;
+    }
+
+    .footer-flowers {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--accent-rose);
+    }
+
+    .footer-mini {
+      margin-top: 8px;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <!-- Background Music -->
+  <audio id="bg-music" loop>
+    <!-- Replace "music.mp3" with your own file in the same folder -->
+    <!-- Example: <source src="your-music-file.mp3" type="audio/mpeg" /> -->
+    <source src="music.mp3" type="audio/mpeg" />
+  </audio>
+
+  <header class="site-header">
+    <div class="nav-inner">
+      <div class="brand">
+        <div class="brand-monogram">P&amp;S</div>
+        <div class="brand-text">
+          <div class="brand-title">Priya &amp; Saurabh</div>
+          <div class="brand-sub">22 &amp; 23 January 2026 · Bengaluru</div>
+        </div>
+      </div>
+
+      <nav class="nav-links">
+        <a href="#top">Home</a>
+        <a href="#couple">Couple</a>
+        <a href="#gallery">Photos</a>
+        <a href="#events">Program</a>
+        <a href="#venue">Venue</a>
+        <a href="#rsvp">RSVP</a>
+      </nav>
+
+      <div class="music-toggle" id="musicToggle">
+        <div class="music-dot" id="musicDot"></div>
+        <span>Play Music</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-shell">
+    <!-- HERO -->
+    <section class="hero" id="top">
+      <div class="hero-inner">
+        <div>
+          <div class="hero-eyebrow">The Wedding Of</div>
+          <div class="hero-script">With the blessings of our families</div>
+
+          <div class="hero-names">
+            PRIYA <span class="hero-amp">&amp;</span> SAURABH
+          </div>
+
+          <div class="hero-sub">
+            Two hearts, one destiny
+          </div>
+
+          <div class="hero-date">
+            22 &amp; 23 January 2026
+          </div>
+          <div class="hero-location">
+            Royal Lotus View Resotel · Bengaluru, Karnataka
+          </div>
+
+          <div class="hero-divider"></div>
+
+          <div class="hero-countdown">
+            <div class="hero-count-label">Countdown to Wedding</div>
+            <div class="hero-countdown-values" id="countdown">
+              <span>Loading...</span>
+            </div>
+          </div>
+
+          <div class="hero-actions">
+            <a href="#events" class="btn btn-primary">
+              View Program Details
+              <span class="btn-icon">↧</span>
+            </a>
+            <a href="#venue" class="btn btn-ghost">
+              View Venue &amp; Directions
+            </a>
+          </div>
+        </div>
+
+        <aside class="hero-photo-card">
+          <div class="hero-photo-frame">
+            <div class="hero-photo-inner">
+              <!-- HERO COUPLE PHOTO PLACEHOLDER -->
+              <!-- Replace the content of this div with an <img> tag like:
+                   <img src="images/couple-hero.jpg" alt="Priya & Saurabh" />
+              -->
+              <span>Couple Photo Placeholder<br />Recommended: Portrait, pre-wedding / favourite picture.</span>
+            </div>
+          </div>
+          <div class="hero-photo-caption">
+            A glimpse of <strong>Priya &amp; Saurabh</strong> as they begin their forever.
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- COUPLE -->
+    <section id="couple">
+      <div class="section-header">
+        <div class="section-eyebrow">Couple &amp; Families</div>
+        <div class="section-title">In Honoured Union</div>
+        <div class="section-subtitle">
+          With immense joy, the families invite you to join them in celebrating the union of their children.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-inner couple-grid">
+          <div>
+            <h3 class="headline">The Bride</h3>
+            <p class="muted">
+              <strong>Priya Singh</strong><br />
+              Daughter of <strong>Mrs. Geeta Singh</strong> &amp; <strong>Mr. Sanjay Kumar Singh</strong>.
+            </p>
+
+            <div class="person-block">
+              <div class="person-role">Mother</div>
+              <div class="person-name">Mrs. Geeta Singh</div>
+            </div>
+            <div class="person-block">
+              <div class="person-role">Father</div>
+              <div class="person-name">Mr. Sanjay Kumar Singh</div>
+            </div>
+
+            <div class="contact-chip">
+              <span class="contact-dot"></span>
+              <span>Bride's Side:</span>
+              <a href="tel:+918527476555">+91 85274 76555</a>
+            </div>
+
+            <div class="portrait-frame">
+              <div class="portrait-inner">
+                <img src="../photos/bride/1.jpeg" alt="Bride - Priya Singh" />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="headline">The Groom</h3>
+            <p class="muted">
+              <strong>Saurabh Singh</strong><br />
+              Son of <strong>Mrs. Vibha Singh</strong> &amp; <strong>Mr. Ashok Kumar Singh</strong>.
+            </p>
+
+            <div class="person-block">
+              <div class="person-role">Mother</div>
+              <div class="person-name">Mrs. Vibha Singh</div>
+            </div>
+            <div class="person-block">
+              <div class="person-role">Father</div>
+              <div class="person-name">Mr. Ashok Kumar Singh</div>
+            </div>
+
+            <p class="muted" style="margin-top: 8px;">
+              Together, Priya and Saurabh look forward to beginning this beautiful journey with your blessings and presence.
+            </p>
+
+            <div class="portrait-frame">
+              <div class="portrait-inner">
+                <img src="../photos/groom/1.jpeg" alt="Groom - Saurabh Singh" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GALLERY -->
+    <section id="gallery">
+      <div class="section-header">
+        <div class="section-eyebrow">Photo Story</div>
+        <div class="section-title">Our Journey in Moments</div>
+        <div class="section-subtitle">
+          A few glimpses from the memories and moments that bring us here today.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-inner">
+          <div class="gallery-grid">
+            <div class="gallery-item">
+              <div class="gallery-inner">
+                <!-- GALLERY PHOTO 1 PLACEHOLDER -->
+                <!-- Example: <img src="images/gallery1.jpg" alt="Couple photo 1" /> -->
+                Photo 1 Placeholder<br />Landscape / Horizontal.
+              </div>
+            </div>
+            <div class="gallery-item">
+              <div class="gallery-inner tall">
+                <!-- GALLERY PHOTO 2 PLACEHOLDER -->
+                Photo 2 Placeholder<br />Portrait / Vertical.
+              </div>
+            </div>
+            <div class="gallery-item">
+              <div class="gallery-inner">
+                <!-- GALLERY PHOTO 3 PLACEHOLDER -->
+                Photo 3 Placeholder<br />Friends / Candid moment.
+              </div>
+            </div>
+            <div class="gallery-item">
+              <div class="gallery-inner tall">
+                <!-- GALLERY PHOTO 4 PLACEHOLDER -->
+                Photo 4 Placeholder<br />Traditional attire.
+              </div>
+            </div>
+            <div class="gallery-item">
+              <div class="gallery-inner">
+                <!-- GALLERY PHOTO 5 PLACEHOLDER -->
+                Photo 5 Placeholder<br />Favourite memory together.
+              </div>
+            </div>
+            <div class="gallery-item">
+              <div class="gallery-inner">
+                <!-- GALLERY PHOTO 6 PLACEHOLDER -->
+                Photo 6 Placeholder<br />Any special capture.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EVENTS -->
+    <section id="events">
+      <div class="section-header">
+        <div class="section-eyebrow">Program Details</div>
+        <div class="section-title">The Celebrations</div>
+        <div class="section-subtitle">
+          We would be honoured by your presence at each of these moments of joy.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-inner event-grid">
+          <!-- 22 JAN -->
+          <div class="event-day">
+            <div class="event-date-label">Day One</div>
+            <div class="event-date-main">Thursday · 22 January 2026</div>
+
+            <div class="event-item">
+              <div class="event-left">
+                <div class="event-label">Tilak</div>
+                <div class="event-tag">Auspicious beginning</div>
+              </div>
+              <div class="event-time">3:00 PM</div>
+            </div>
+
+            <div class="event-item">
+              <div class="event-left">
+                <div class="event-label">Haldi</div>
+                <div class="event-tag">Turmeric &amp; traditions</div>
+              </div>
+              <div class="event-time">6:00 PM</div>
+            </div>
+
+            <div class="event-item">
+              <div class="event-left">
+                <div class="event-label">Mehandi</div>
+                <div class="event-tag">Henna &amp; happiness</div>
+              </div>
+              <div class="event-time">9:00 PM</div>
+            </div>
+          </div>
+
+          <!-- 23 JAN -->
+          <div class="event-day">
+            <div class="event-date-label">Day Two</div>
+            <div class="event-date-main">Friday · 23 January 2026</div>
+
+            <div class="event-item">
+              <div class="event-left">
+                <div class="event-label">Jaimala</div>
+                <div class="event-tag">Exchange of garlands</div>
+              </div>
+              <div class="event-time">5:00 PM</div>
+            </div>
+
+            <div class="event-item">
+              <div class="event-left">
+                <div class="event-label">Dinner</div>
+                <div class="event-tag">Feast with family &amp; friends</div>
+              </div>
+              <div class="event-time">8:00 PM</div>
+            </div>
+
+            <div class="event-item">
+              <div class="event-left">
+                <div class="event-label">Wedding</div>
+                <div class="event-tag">Sacred vows</div>
+              </div>
+              <div class="event-time">9:00 PM</div>
+            </div>
+          </div>
+        </div>
+
+        <p class="muted" style="margin-top: 14px; font-size: 12px;">
+          Your presence and blessings at these ceremonies will make our celebration truly complete.
+        </p>
+      </div>
+    </section>
+
+    <!-- VENUE -->
+    <section id="venue">
+      <div class="section-header">
+        <div class="section-eyebrow">Venue</div>
+        <div class="section-title">Where to Join Us</div>
+        <div class="section-subtitle">
+          A serene and elegant venue to witness the beginning of a lifetime of togetherness.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-inner venue-grid">
+          <div>
+            <h3 class="headline">Royal Lotus View Resotel</h3>
+            <p class="venue-address">
+              Royal Lotus View Resotel,<br />
+              Kempegowda, International Airport Road,<br />
+              PO, behind ITC Factory,<br />
+              Chikkajala, Tharabanahalli,<br />
+              Bengaluru, Karnataka 562157
+            </p>
+
+            <div class="chip-row">
+              <div class="chip">Bengaluru, Karnataka</div>
+              <div class="chip">Near Kempegowda International Airport</div>
+            </div>
+
+            <p class="muted" style="margin-bottom: 14px;">
+              Kindly arrive a little early to comfortably join us for the ceremonies.
+              Our families eagerly await to welcome you with warmth and love.
+            </p>
+
+            <a
+              class="btn btn-primary"
+              href="https://www.google.com/maps/search/?api=1&query=Royal+Lotus+View+Resotel+Chikkajala+Bengaluru+Karnataka+562157"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Open in Google Maps
+              <span class="btn-icon">➚</span>
+            </a>
+          </div>
+
+          <div class="map-card" aria-label="Venue map preview">
+            <!-- IMPORTANT:
+                 Replace YOUR_GOOGLE_MAPS_API_KEY with a real API key if you want this embed to work.
+            -->
+            <iframe
+              class="map-embed"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              src="https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=Royal+Lotus+View+Resotel+Chikkajala+Bengaluru+Karnataka+562157"
+            ></iframe>
+            <div class="map-footer">
+              <span>Tap below to open the venue in your Maps.</span>
+              <a
+                href="https://www.google.com/maps/search/?api=1&query=Royal+Lotus+View+Resotel+Chikkajala+Bengaluru+Karnataka+562157"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View full map ↗
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RSVP -->
+    <section id="rsvp">
+      <div class="section-header">
+        <div class="section-eyebrow">RSVP</div>
+        <div class="section-title">With Warm Regards</div>
+        <div class="section-subtitle">
+          Kindly confirm your presence and feel free to reach out for any assistance.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-inner">
+          <p class="rsvp-text">
+            On behalf of both families, you may contact the following for confirmations, travel details,
+            or any other queries:
+          </p>
+
+          <div class="rsvp-grid">
+            <div class="rsvp-pill">
+              <div class="rsvp-badge">RSVP</div>
+              <span>Anil Kumar Singh</span>
+            </div>
+            <div class="rsvp-pill">
+              <div class="rsvp-badge">RSVP</div>
+              <span>Arun Kumar Singh</span>
+            </div>
+            <div class="rsvp-pill">
+              <div class="rsvp-badge">RSVP</div>
+              <span>Ashok Kumar Singh</span>
+            </div>
+            <div class="rsvp-pill">
+              <div class="rsvp-badge">RSVP</div>
+              <span>Arvind Kumar Singh</span>
+            </div>
+            <div class="rsvp-pill">
+              <div class="rsvp-badge">Host</div>
+              <span>Siva Praveen Rayapudi</span>
+            </div>
+            <div class="rsvp-pill">
+              <div class="rsvp-badge">Host</div>
+              <span>Pooja Singh</span>
+            </div>
+          </div>
+
+          <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:8px;">
+            <a
+              class="btn btn-primary"
+              href="https://wa.me/?text=You%20are%20warmly%20invited%20to%20the%20wedding%20of%20Priya%20Singh%20and%20Saurabh%20Singh%20on%2022%20and%2023%20January%202026%20at%20Royal%20Lotus%20View%20Resotel%2C%20Bengaluru.%20Please%20tap%20the%20link%20to%20view%20the%20full%20invitation."
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Share Invitation on WhatsApp
+            </a>
+            <p class="small-note">
+              You may share this link with friends and family whom you wish to invite.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+      <div class="footer-main">With Best Compliments</div>
+      <div class="footer-line">From the families of Priya Singh &amp; Saurabh Singh</div>
+      <div class="footer-flowers">
+        Awaiting eyes • Blooming hearts • Cute invitations, endless memories
+      </div>
+      <div class="footer-mini">
+        We can’t wait to celebrate with you
+      </div>
+    </footer>
+  </main>
+
+  <script>
+    // Countdown to Wedding (23 Jan 2026 9:00 PM)
+    (function () {
+      const el = document.getElementById("countdown");
+      if (!el) return;
+
+      const target = new Date("2026-01-23T21:00:00");
+
+      function update() {
+        const now = new Date();
+        const diff = target - now;
+
+        if (diff <= 0) {
+          el.textContent = "Today we celebrate love.";
+          return;
+        }
+
+        const seconds = Math.floor(diff / 1000);
+        const days = Math.floor(seconds / (3600 * 24));
+        const hours = Math.floor((seconds % (3600 * 24)) / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+
+        el.innerHTML = `
+          <span>${days}d</span>
+          <span class="dot-small"></span>
+          <span>${hours}h</span>
+          <span class="dot-small"></span>
+          <span>${minutes}m</span>
+        `;
+      }
+
+      update();
+      setInterval(update, 60 * 1000);
+    })();
+
+    // Music toggle
+    (function () {
+      const audio = document.getElementById("bg-music");
+      const toggle = document.getElementById("musicToggle");
+      const dot = document.getElementById("musicDot");
+      if (!audio || !toggle || !dot) return;
+
+      let isPlaying = false;
+
+      function setState(playing) {
+        isPlaying = playing;
+        if (playing) {
+          dot.classList.add("on");
+          toggle.querySelector("span").textContent = "Pause Music";
+          audio.play().catch(() => {});
+        } else {
+          dot.classList.remove("on");
+          toggle.querySelector("span").textContent = "Play Music";
+          audio.pause();
+        }
+      }
+
+      toggle.addEventListener("click", () => {
+        setState(!isPlaying);
+      });
+    })();
+  </script>
+</body>
+</html>
