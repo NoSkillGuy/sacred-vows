@@ -683,9 +683,16 @@
     .event-day {
       position: relative;
       border-radius: 20px;
-      padding: 14px 14px 16px;
+      padding: 18px 18px 20px;
       background: var(--bg-card-deep);
       border: 1px solid rgba(212, 175, 55, 0.6);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .event-day:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
     }
 
     .event-day::before {
@@ -710,26 +717,68 @@
 
     .event-date-main {
       font-family: "Playfair Display", serif;
-      font-size: 14px;
+      font-size: 15px;
       letter-spacing: 0.14em;
       text-transform: uppercase;
-      margin-bottom: 8px;
+      margin-bottom: 14px;
+      color: var(--text-main);
+      position: relative;
+      padding-bottom: 8px;
     }
 
+    .event-date-main::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 40px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent-rose), var(--border-gold));
+      border-radius: 2px;
+    }
+
+    /* Enhanced Event Items with Images */
     .event-item {
+      position: relative;
       display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 10px;
+      align-items: flex-start;
+      gap: 12px;
       border-top: 1px solid rgba(236, 216, 182, 0.9);
-      padding-top: 6px;
-      margin-top: 6px;
+      padding-top: 8px;
+      padding-left: 50px;
+      margin-top: 8px;
+      min-height: 50px;
+      animation: fadeInUp 0.6s ease-out backwards;
     }
 
     .event-item:first-of-type {
       border-top: none;
       margin-top: 0;
       padding-top: 0;
+    }
+
+    .event-item:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+
+    .event-item:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .event-item:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    .event-item:nth-child(4) {
+      animation-delay: 0.4s;
+    }
+
+    .event-item:nth-child(5) {
+      animation-delay: 0.5s;
+    }
+
+    .event-item:nth-child(6) {
+      animation-delay: 0.6s;
     }
 
     .event-left {
@@ -757,6 +806,207 @@
       font-variant-numeric: tabular-nums;
       color: var(--button-primary);
       white-space: nowrap;
+    }
+
+    .event-icon-wrapper {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      border: 1px solid rgba(212, 175, 55, 0.7);
+      background: linear-gradient(135deg, #fff9f0, #fdf2f7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2);
+      animation: float 3s ease-in-out infinite, hinduGlow 4s ease-in-out infinite;
+    }
+
+    .event-icon-wrapper::after {
+      content: "";
+      position: absolute;
+      inset: -3px;
+      border-radius: 15px;
+      background: radial-gradient(circle, rgba(255, 215, 0, 0.3), transparent 70%);
+      opacity: 0;
+      animation: sparkle 3s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .event-item:nth-of-type(1) .event-icon-wrapper {
+      animation-delay: 0s;
+    }
+
+    .event-item:nth-of-type(2) .event-icon-wrapper {
+      animation-delay: 0.5s;
+    }
+
+    .event-item:nth-of-type(3) .event-icon-wrapper {
+      animation-delay: 1s;
+    }
+
+    .event-item:nth-of-type(4) .event-icon-wrapper {
+      animation-delay: 0.3s;
+    }
+
+    .event-item:nth-of-type(5) .event-icon-wrapper {
+      animation-delay: 0.8s;
+    }
+
+    .event-item:nth-of-type(6) .event-icon-wrapper {
+      animation-delay: 1.2s;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0px) scale(1) rotate(0deg);
+      }
+      25% {
+        transform: translateY(-4px) scale(1.02) rotate(1deg);
+      }
+      50% {
+        transform: translateY(-6px) scale(1.03) rotate(0deg);
+      }
+      75% {
+        transform: translateY(-4px) scale(1.02) rotate(-1deg);
+      }
+    }
+
+    @keyframes hinduGlow {
+      0%, 100% {
+        box-shadow: 0 4px 12px rgba(212, 175, 55, 0.2), 0 0 8px rgba(194, 125, 136, 0.15);
+      }
+      50% {
+        box-shadow: 0 4px 16px rgba(212, 175, 55, 0.4), 0 0 16px rgba(194, 125, 136, 0.3), 0 0 20px rgba(255, 215, 0, 0.2);
+      }
+    }
+
+    @keyframes sparkle {
+      0%, 100% {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.1);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .event-icon-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 11px;
+      transition: transform 0.3s ease;
+      padding: 4px;
+    }
+
+    .event-icon-wrapper:hover .event-icon-image {
+      transform: scale(1.15) rotate(5deg);
+    }
+
+    .event-icon-emoji {
+      font-size: 24px;
+      line-height: 1;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+      transition: transform 0.3s ease, filter 0.3s ease;
+      display: block;
+      position: relative;
+      z-index: 1;
+    }
+
+    .event-icon-wrapper:hover .event-icon-emoji {
+      transform: scale(1.2) rotate(8deg);
+      filter: drop-shadow(0 4px 8px rgba(212, 175, 55, 0.4)) drop-shadow(0 0 12px rgba(255, 215, 0, 0.3));
+    }
+
+    /* Hindu wedding specific icon colors */
+    .event-item:nth-of-type(1) .event-icon-wrapper {
+      background: linear-gradient(135deg, #fff9e6, #ffe5e5);
+      border-color: rgba(194, 125, 136, 0.8);
+    }
+
+    .event-item:nth-of-type(2) .event-icon-wrapper {
+      background: linear-gradient(135deg, #fff8dc, #ffe4b5);
+      border-color: rgba(255, 215, 0, 0.8);
+    }
+
+    .event-item:nth-of-type(3) .event-icon-wrapper {
+      background: linear-gradient(135deg, #fff0f5, #ffe4e1);
+      border-color: rgba(194, 125, 136, 0.8);
+    }
+
+    .event-item:nth-of-type(4) .event-icon-wrapper {
+      background: linear-gradient(135deg, #fff9e6, #ffe5e5);
+      border-color: rgba(212, 175, 55, 0.8);
+    }
+
+    .event-item:nth-of-type(5) .event-icon-wrapper {
+      background: linear-gradient(135deg, #fff8f0, #ffe4e1);
+      border-color: rgba(194, 125, 136, 0.8);
+    }
+
+    .event-item:nth-of-type(6) .event-icon-wrapper {
+      background: linear-gradient(135deg, #fff9e6, #ffe5e5);
+      border-color: rgba(212, 175, 55, 0.9);
+      box-shadow: 0 4px 16px rgba(212, 175, 55, 0.3), 0 0 20px rgba(255, 215, 0, 0.25);
+    }
+
+    .event-icon-wrapper::before {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.3), rgba(194, 125, 136, 0.3));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: -1;
+    }
+
+    .event-icon-wrapper:hover::before {
+      opacity: 1;
+    }
+
+    /* Special animation for Wedding ceremony (most important) */
+    .event-item:nth-of-type(6) .event-icon-wrapper {
+      animation: float 2.5s ease-in-out infinite, hinduGlow 3s ease-in-out infinite;
+    }
+
+    .event-item:nth-of-type(6) .event-icon-wrapper::after {
+      animation: sparkle 2s ease-in-out infinite, weddingSparkle 3s ease-in-out infinite;
+    }
+
+    @keyframes weddingSparkle {
+      0%, 100% {
+        opacity: 0.3;
+        transform: scale(0.9);
+      }
+      50% {
+        opacity: 0.8;
+        transform: scale(1.2);
+      }
+    }
+
+    .event-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      flex: 1;
     }
 
     /* VENUE SECTION */
@@ -1130,27 +1380,42 @@
             <div class="event-date-main">Thursday · 22 January 2026</div>
 
             <div class="event-item">
-              <div class="event-left">
-                <div class="event-label">Tilak</div>
-                <div class="event-tag">Auspicious beginning</div>
+              <div class="event-icon-wrapper">
+                <div class="event-icon-emoji">🪔</div>
               </div>
-              <div class="event-time">3:00 PM</div>
+              <div class="event-content">
+                <div class="event-left">
+                  <div class="event-label">Tilak</div>
+                  <div class="event-tag">Auspicious beginning</div>
+                </div>
+                <div class="event-time">3:00 PM</div>
+              </div>
             </div>
 
             <div class="event-item">
-              <div class="event-left">
-                <div class="event-label">Haldi</div>
-                <div class="event-tag">Turmeric &amp; traditions</div>
+              <div class="event-icon-wrapper">
+                <div class="event-icon-emoji">🌼</div>
               </div>
-              <div class="event-time">6:00 PM</div>
+              <div class="event-content">
+                <div class="event-left">
+                  <div class="event-label">Haldi</div>
+                  <div class="event-tag">Turmeric &amp; traditions</div>
+                </div>
+                <div class="event-time">6:00 PM</div>
+              </div>
             </div>
 
             <div class="event-item">
-              <div class="event-left">
-                <div class="event-label">Mehandi</div>
-                <div class="event-tag">Henna &amp; happiness</div>
+              <div class="event-icon-wrapper">
+                <div class="event-icon-emoji">🌺</div>
               </div>
-              <div class="event-time">9:00 PM</div>
+              <div class="event-content">
+                <div class="event-left">
+                  <div class="event-label">Mehandi</div>
+                  <div class="event-tag">Henna &amp; happiness</div>
+                </div>
+                <div class="event-time">9:00 PM</div>
+              </div>
             </div>
           </div>
 
@@ -1160,27 +1425,42 @@
             <div class="event-date-main">Friday · 23 January 2026</div>
 
             <div class="event-item">
-              <div class="event-left">
-                <div class="event-label">Jaimala</div>
-                <div class="event-tag">Exchange of garlands</div>
+              <div class="event-icon-wrapper">
+                <div class="event-icon-emoji">💐</div>
               </div>
-              <div class="event-time">5:00 PM</div>
+              <div class="event-content">
+                <div class="event-left">
+                  <div class="event-label">Jaimala</div>
+                  <div class="event-tag">Exchange of garlands</div>
+                </div>
+                <div class="event-time">5:00 PM</div>
+              </div>
             </div>
 
             <div class="event-item">
-              <div class="event-left">
-                <div class="event-label">Dinner</div>
-                <div class="event-tag">Feast with family &amp; friends</div>
+              <div class="event-icon-wrapper">
+                <div class="event-icon-emoji">🍽️</div>
               </div>
-              <div class="event-time">8:00 PM</div>
+              <div class="event-content">
+                <div class="event-left">
+                  <div class="event-label">Dinner</div>
+                  <div class="event-tag">Feast with family &amp; friends</div>
+                </div>
+                <div class="event-time">8:00 PM</div>
+              </div>
             </div>
 
             <div class="event-item">
-              <div class="event-left">
-                <div class="event-label">Wedding</div>
-                <div class="event-tag">Sacred vows</div>
+              <div class="event-icon-wrapper">
+                <img src="../photos/icons/3.jpg" alt="Wedding" class="event-icon-image" />
               </div>
-              <div class="event-time">9:00 PM</div>
+              <div class="event-content">
+                <div class="event-left">
+                  <div class="event-label">Wedding</div>
+                  <div class="event-tag">Sacred vows</div>
+                </div>
+                <div class="event-time">9:00 PM</div>
+              </div>
             </div>
           </div>
         </div>
