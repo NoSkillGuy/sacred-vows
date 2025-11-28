@@ -441,17 +441,11 @@
       overflow: hidden;
       background: #f3d6d6;
       aspect-ratio: 4 / 5;
-      display: flex;
-      align-items: center;
+      display: flex;              /* use flex so child img can stretch to fill */
+      align-items: stretch;
       justify-content: center;
-      font-size: 11px;
-      color: rgba(88, 44, 50, 0.9);
-      padding: 6px;
-      text-align: center;
-    }
-
-    .hero-photo-inner span {
-      padding: 0 14px;
+      padding: 0;
+      position: relative;
     }
 
     .hero-photo-caption {
@@ -460,9 +454,26 @@
       text-align: center;
     }
 
-    .hero-photo-caption strong {
-      color: var(--accent-rose);
-      font-weight: 500;
+    /* make images cover their frames */
+    .hero-photo-inner img,
+    .portrait-inner img,
+    .gallery-inner img {
+      width: 100%;
+      height: 100%;
+      max-width: none;        /* override global max-width */
+      object-fit: cover;
+      object-position: center;
+      display: block;
+    }
+    
+    /* remove inner padding on portrait/gallery containers so images fill available area */
+    .portrait-inner,
+    .gallery-inner {
+      padding: 0;
+      display: flex;           /* use flex to let img stretch to both width and height */
+      align-items: stretch;
+      justify-content: center;
+      position: relative;
     }
 
     /* GENERAL SECTIONS */
@@ -610,10 +621,9 @@
       overflow: hidden;
       background: #f3d6d6;
       aspect-ratio: 3 / 4;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 8px;
+      display: block;     /* allow image to stretch */
+      padding: 0;         /* remove inner gap so img fills area */
+      position: relative;
       text-align: center;
       font-size: 11px;
       color: rgba(88, 44, 50, 0.9);
@@ -645,11 +655,9 @@
       overflow: hidden;
       background: #f4d9da;
       aspect-ratio: 4 / 3;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: block;    /* allow image to fill the box */
+      padding: 0;        /* remove inner gap so img fills area */
       font-size: 11px;
-      padding: 10px;
       text-align: center;
       color: rgba(88, 44, 50, 0.9);
     }
@@ -979,11 +987,8 @@
         <aside class="hero-photo-card">
           <div class="hero-photo-frame">
             <div class="hero-photo-inner">
-              <!-- HERO COUPLE PHOTO PLACEHOLDER -->
-              <!-- Replace the content of this div with an <img> tag like:
-                   <img src="images/couple-hero.jpg" alt="Priya & Saurabh" />
-              -->
-              <span>Couple Photo Placeholder<br />Recommended: Portrait, pre-wedding / favourite picture.</span>
+              <!-- Replaced placeholder with actual hero image -->
+              <img src="../photos/couple/1.jpeg" alt="Priya &amp; Saurabh" loading="lazy" />
             </div>
           </div>
           <div class="hero-photo-caption">
@@ -1078,40 +1083,33 @@
         <div class="card-inner">
           <div class="gallery-grid">
             <div class="gallery-item">
-              <div class="gallery-inner">
-                <!-- GALLERY PHOTO 1 PLACEHOLDER -->
-                <!-- Example: <img src="images/gallery1.jpg" alt="Couple photo 1" /> -->
-                Photo 1 Placeholder<br />Landscape / Horizontal.
+              <div class="gallery-inner tall">
+                <img src="../photos/couple/2.jpeg" alt="Couple photo 1" loading="lazy" />
               </div>
             </div>
             <div class="gallery-item">
               <div class="gallery-inner tall">
-                <!-- GALLERY PHOTO 2 PLACEHOLDER -->
-                Photo 2 Placeholder<br />Portrait / Vertical.
-              </div>
-            </div>
-            <div class="gallery-item">
-              <div class="gallery-inner">
-                <!-- GALLERY PHOTO 3 PLACEHOLDER -->
-                Photo 3 Placeholder<br />Friends / Candid moment.
+                <img src="../photos/couple/1.jpeg" alt="Couple photo 2 (portrait)" loading="lazy" />
               </div>
             </div>
             <div class="gallery-item">
               <div class="gallery-inner tall">
-                <!-- GALLERY PHOTO 4 PLACEHOLDER -->
-                Photo 4 Placeholder<br />Traditional attire.
+                <img src="../photos/family/3.jpeg" alt="Friends and candid moment" loading="lazy" />
               </div>
             </div>
             <div class="gallery-item">
-              <div class="gallery-inner">
-                <!-- GALLERY PHOTO 5 PLACEHOLDER -->
-                Photo 5 Placeholder<br />Favourite memory together.
+              <div class="gallery-inner tall">
+                <img src="../photos/couple/4.jpeg" alt="Traditional attire" loading="lazy" />
               </div>
             </div>
             <div class="gallery-item">
-              <div class="gallery-inner">
-                <!-- GALLERY PHOTO 6 PLACEHOLDER -->
-                Photo 6 Placeholder<br />Any special capture.
+              <div class="gallery-inner tall">
+                <img src="../photos/couple/5.jpeg" alt="Favourite memory together" loading="lazy" />
+              </div>
+            </div>
+            <div class="gallery-item">
+              <div class="gallery-inner tall">
+                <img src="../photos/couple/6.jpeg" alt="Special capture" loading="lazy" />
               </div>
             </div>
           </div>
