@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>Priya &amp; Saurabh - Wedding Invitation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Royal wedding invitation of Captain Dr. Priya Singh &amp; Dr. Saurabh Singh" />
+  <meta name="description" content="Royal wedding invitation of Capt Dr. Priya Singh &amp; Dr. Saurabh Singh" />
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:wght@300;400;500;600&family=Great+Vibes&display=swap" rel="stylesheet" />
@@ -1121,6 +1121,126 @@
       color: var(--text-muted);
     }
 
+    /* RSVP Modal */
+    .rsvp-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .rsvp-modal.active {
+      display: flex;
+    }
+
+    .rsvp-modal-content {
+      background: var(--bg-card);
+      border-radius: var(--radius-large);
+      border: 1px solid var(--border-soft);
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
+      padding: 24px;
+      max-width: 400px;
+      width: 100%;
+      position: relative;
+    }
+
+    .rsvp-modal-header {
+      margin-bottom: 18px;
+    }
+
+    .rsvp-modal-title {
+      font-family: "Playfair Display", serif;
+      font-size: 20px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .rsvp-modal-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .rsvp-form-group {
+      margin-bottom: 16px;
+    }
+
+    .rsvp-form-label {
+      display: block;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .rsvp-form-input {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(212, 175, 55, 0.6);
+      background: #fff9f2;
+      font-size: 13px;
+      font-family: inherit;
+      color: var(--text-main);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .rsvp-form-input:focus {
+      outline: none;
+      border-color: var(--border-gold);
+      box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+    }
+
+    .rsvp-form-input[type="date"] {
+      cursor: pointer;
+    }
+
+    .rsvp-form-input[type="date"]::-webkit-calendar-picker-indicator {
+      cursor: pointer;
+      opacity: 0.7;
+      filter: invert(0.3);
+    }
+
+    .rsvp-form-input[type="date"]::-webkit-calendar-picker-indicator:hover {
+      opacity: 1;
+    }
+
+    .rsvp-modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .rsvp-modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid rgba(212, 175, 55, 0.6);
+      background: #fff9f2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--text-muted);
+      transition: all 0.2s ease;
+    }
+
+    .rsvp-modal-close:hover {
+      background: var(--accent-blush);
+      border-color: var(--accent-rose);
+      color: var(--text-main);
+    }
+
     /* FOOTER */
     footer.site-footer {
       margin-top: 50px;
@@ -1168,7 +1288,7 @@
       <div class="brand">
         <div class="brand-monogram">P&amp;S</div>
         <div class="brand-text">
-          <div class="brand-title">Captain Dr. Priya &amp; Dr. Saurabh</div>
+          <div class="brand-title">Capt Dr. Priya &amp; Dr. Saurabh</div>
           <div class="brand-sub">22 &amp; 23 January 2026 · Bengaluru</div>
         </div>
       </div>
@@ -1198,7 +1318,7 @@
           <div class="hero-script">With the blessings of our families</div>
 
           <div class="hero-names">
-            CAPTAIN DR. PRIYA <span class="hero-amp">&amp;</span> DR. SAURABH
+            CAPT DR. PRIYA <span class="hero-amp">&amp;</span> DR. SAURABH
           </div>
 
           <div class="hero-sub">
@@ -1236,11 +1356,11 @@
           <div class="hero-photo-frame">
             <div class="hero-photo-inner">
               <!-- Replaced placeholder with actual hero image -->
-              <img src="assets/photos/couple/1.jpeg" alt="Captain Dr. Priya &amp; Dr. Saurabh" loading="lazy" />
+              <img src="assets/photos/couple/1.jpeg" alt="Capt Dr. Priya &amp; Dr. Saurabh" loading="lazy" />
             </div>
           </div>
           <div class="hero-photo-caption">
-            A glimpse of <strong>Captain Dr. Priya &amp; Dr. Saurabh</strong> as they begin their forever.
+            A glimpse of <strong>Capt Dr. Priya &amp; Dr. Saurabh</strong> as they begin their forever.
           </div>
         </aside>
       </div>
@@ -1259,13 +1379,13 @@
       <div class="card">
         <div class="card-inner">
           <p class="muted" style="margin-bottom: 20px; text-align: center;">
-            Together, Captain Dr. Priya and Dr. Saurabh look forward to beginning this beautiful journey with your blessings and presence.
+            Together, Capt Dr. Priya and Dr. Saurabh look forward to beginning this beautiful journey with your blessings and presence.
           </p>
           <div class="couple-grid">
           <div>
             <h3 class="headline">The Bride</h3>
             <p class="muted">
-              <strong>Captain Dr. Priya Singh</strong><br />
+              <strong>Capt Dr. Priya Singh</strong><br />
               Daughter of <strong>Mrs. Geeta Singh</strong> &amp; <strong>Mr. Sanjay Kumar Singh</strong>.
             </p>
 
@@ -1280,7 +1400,7 @@
 
             <div class="portrait-frame">
               <div class="portrait-inner">
-                <img src="assets/photos/bride/1.jpeg" alt="Bride - Captain Dr. Priya Singh" />
+                <img src="assets/photos/bride/1.jpeg" alt="Bride - Capt Dr. Priya Singh" />
               </div>
             </div>
           </div>
@@ -1579,8 +1699,15 @@
           </div>
 
           <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:8px;">
-            <a
+            <button
               class="btn btn-primary"
+              id="rsvpButton"
+            >
+              RSVP Now
+              <span class="btn-icon">✓</span>
+            </button>
+            <a
+              class="btn btn-ghost"
               id="whatsappShare"
               href="#"
               target="_blank"
@@ -1599,7 +1726,7 @@
     <!-- FOOTER -->
     <footer class="site-footer">
       <div class="footer-main">With Best Compliments</div>
-      <div class="footer-line">From the families of Captain Dr. Priya Singh &amp; Dr. Saurabh Singh</div>
+      <div class="footer-line">From the families of Capt Dr. Priya Singh &amp; Dr. Saurabh Singh</div>
       <div class="footer-flowers">
         Awaiting eyes • Blooming hearts • Cute invitations, endless memories
       </div>
@@ -1608,6 +1735,48 @@
       </div>
     </footer>
   </main>
+
+  <!-- RSVP Modal -->
+  <div class="rsvp-modal" id="rsvpModal">
+    <div class="rsvp-modal-content">
+      <button class="rsvp-modal-close" id="rsvpModalClose">×</button>
+      <div class="rsvp-modal-header">
+        <div class="rsvp-modal-title">RSVP</div>
+        <div class="rsvp-modal-subtitle">Please confirm your attendance</div>
+      </div>
+      <form id="rsvpForm">
+        <div class="rsvp-form-group">
+          <label class="rsvp-form-label" for="rsvpName">Your Name *</label>
+          <input
+            type="text"
+            id="rsvpName"
+            class="rsvp-form-input"
+            placeholder="Enter your full name"
+            required
+            autocomplete="name"
+          />
+        </div>
+        <div class="rsvp-form-group">
+          <label class="rsvp-form-label" for="rsvpDate">When will you be arriving? *</label>
+          <input
+            type="date"
+            id="rsvpDate"
+            class="rsvp-form-input"
+            required
+            max="2026-01-24"
+            value="2026-01-21"
+          />
+        </div>
+        <div class="rsvp-modal-actions">
+          <button type="button" class="btn btn-ghost" id="rsvpCancel">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            Send RSVP
+            <span class="btn-icon">➚</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <script>
     // Countdown to Wedding (23 Jan 2026 9:00 PM)
@@ -1695,12 +1864,109 @@
 
       const pageUrl = "https://priyawedssaurabh.in";
       const message = encodeURIComponent(
-        "You are warmly invited to the wedding of Captain Dr. Priya Singh and Dr. Saurabh Singh on 22 and 23 January 2026 at Royal Lotus View Resotel, Bengaluru.\n\n" +
+        "You are warmly invited to the wedding of Capt Dr. Priya Singh and Dr. Saurabh Singh on 22 and 23 January 2026 at Royal Lotus View Resotel, Bengaluru.\n\n" +
         "Please tap the link to view the full invitation:\n" +
         pageUrl
       );
       
       shareBtn.href = `https://wa.me/?text=${message}`;
+    })();
+
+    // RSVP Modal and WhatsApp Integration
+    (function () {
+      const rsvpButton = document.getElementById("rsvpButton");
+      const rsvpModal = document.getElementById("rsvpModal");
+      const rsvpModalClose = document.getElementById("rsvpModalClose");
+      const rsvpCancel = document.getElementById("rsvpCancel");
+      const rsvpForm = document.getElementById("rsvpForm");
+      const rsvpNameInput = document.getElementById("rsvpName");
+      const rsvpDateInput = document.getElementById("rsvpDate");
+
+      if (!rsvpButton || !rsvpModal || !rsvpForm) return;
+
+      // Open modal
+      rsvpButton.addEventListener("click", () => {
+        rsvpModal.classList.add("active");
+        rsvpNameInput.focus();
+      });
+
+      // Close modal
+      function closeModal() {
+        rsvpModal.classList.remove("active");
+        rsvpForm.reset();
+      }
+
+      rsvpModalClose.addEventListener("click", closeModal);
+      rsvpCancel.addEventListener("click", closeModal);
+
+      // Close on background click
+      rsvpModal.addEventListener("click", (e) => {
+        if (e.target === rsvpModal) {
+          closeModal();
+        }
+      });
+
+      // Close on Escape key
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && rsvpModal.classList.contains("active")) {
+          closeModal();
+        }
+      });
+
+      // Handle form submission
+      rsvpForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        
+        const name = rsvpNameInput.value.trim();
+        const date = rsvpDateInput.value;
+        
+        if (!name) {
+          rsvpNameInput.focus();
+          return;
+        }
+
+        if (!date) {
+          rsvpDateInput.focus();
+          return;
+        }
+
+        // Format the date for display
+        const dateObj = new Date(date + 'T00:00:00');
+        const formattedDate = dateObj.toLocaleDateString('en-IN', { 
+          day: 'numeric', 
+          month: 'long', 
+          year: 'numeric' 
+        });
+
+        // Create WhatsApp message
+        // Phone number format: country code + number (without + sign or spaces)
+        // +91 8904621381 becomes 918904621381
+        const phoneNumber = "918904621381";
+        const message = encodeURIComponent(
+          `Hello! I would like to RSVP for the wedding of Capt Dr. Priya Singh and Dr. Saurabh Singh.\n\n` +
+          `Name: ${name}\n` +
+          `Arrival Date: ${formattedDate}\n\n` +
+          `I confirm my attendance for the celebrations on 22 & 23 January 2026 at Royal Lotus View Resotel, Bengaluru.`
+        );
+
+        // Open WhatsApp - try both URL formats for better compatibility
+        // Format 1: api.whatsapp.com (more reliable)
+        const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${message}`;
+        
+        // Try to open WhatsApp
+        const whatsappWindow = window.open(whatsappUrl, "_blank");
+        
+        // Fallback: if window.open fails, try wa.me format
+        if (!whatsappWindow || whatsappWindow.closed || typeof whatsappWindow.closed === "undefined") {
+          const fallbackUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+          window.location.href = fallbackUrl;
+        }
+
+        // Close modal after a short delay
+        setTimeout(() => {
+          closeModal();
+        }, 300);
+      });
     })();
   </script>
 </body>
