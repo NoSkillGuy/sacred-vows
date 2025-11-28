@@ -31,4 +31,6 @@ logs/
 
 # OS generated files
 Icon?
+# But allow PWA icons
+!assets/photos/icons/icon-*.png
 
