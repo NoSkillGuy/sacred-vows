@@ -1,0 +1,72 @@
+{
+  "id": "royal-elegance",
+  "name": "Royal Elegance",
+  "version": "1.0.0",
+  "metadata": {
+    "description": "Elegant wedding invitation template with classic design",
+    "previewImage": "/templates/royal-elegance/preview.jpg",
+    "tags": ["elegant", "classic", "traditional", "indian"],
+    "author": "Wedding Invitation Builder"
+  },
+  "sections": [
+    {
+      "id": "header",
+      "enabled": true,
+      "config": {}
+    },
+    {
+      "id": "hero",
+      "enabled": true,
+      "config": {}
+    },
+    {
+      "id": "couple",
+      "enabled": true,
+      "config": {}
+    },
+    {
+      "id": "fathers-letter",
+      "enabled": true,
+      "config": {}
+    },
+    {
+      "id": "gallery",
+      "enabled": true,
+      "config": {}
+    },
+    {
+      "id": "events",
+      "enabled": true,
+      "config": {}
+    },
+    {
+      "id": "venue",
+      "enabled": true,
+      "config": {}
+    },
+    {
+      "id": "rsvp",
+      "enabled": true,
+      "config": {}
+    },
+    {
+      "id": "footer",
+      "enabled": true,
+      "config": {}
+    }
+  ],
+  "theme": {
+    "colors": {
+      "primary": "#d4af37",
+      "secondary": "#8b6914",
+      "background": "#fff8f0",
+      "text": "#2c2c2c"
+    },
+    "fonts": {
+      "heading": "Playfair Display",
+      "body": "Poppins",
+      "script": "Great Vibes"
+    }
+  }
+}
+

@@ -1,0 +1,12 @@
+{
+  "name": "@wedding-builder/template-engine",
+  "version": "1.0.0",
+  "description": "Template rendering engine for wedding invitation builder",
+  "main": "src/index.js",
+  "type": "module",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  }
+}
+

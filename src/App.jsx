@@ -15,12 +15,16 @@ import ConfettiLayer from './components/ConfettiLayer';
 import CelebrateButton from './components/CelebrateButton';
 import { useLanguage } from './hooks/useLanguage';
 import { registerServiceWorker } from './utils/serviceWorker';
+import { defaultWeddingConfig } from './config/wedding-config';
 
 function App() {
   const { currentLang, translations, updateLanguage } = useLanguage();
   const [showRSVPModal, setShowRSVPModal] = useState(false);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showGuestNameModal, setShowGuestNameModal] = useState(false);
+  
+  // Use default config - in builder, this will come from user data
+  const weddingConfig = defaultWeddingConfig;
 
   useEffect(() => {
     // Register service worker
@@ -71,25 +75,45 @@ function App() {
         onLanguageClick={() => setShowLanguageModal(true)}
         translations={translations}
         currentLang={currentLang}
+        config={weddingConfig}
       />
       <main className="page-shell">
         <Hero 
           onRSVPClick={handleRSVPClick}
           translations={translations}
           currentLang={currentLang}
+          config={weddingConfig}
         />
-        <Couple translations={translations} currentLang={currentLang} />
+        <Couple 
+          translations={translations} 
+          currentLang={currentLang} 
+          config={weddingConfig}
+        />
         <FathersLetter 
           translations={translations}
           currentLang={currentLang}
+          config={weddingConfig}
         />
-        <Gallery translations={translations} currentLang={currentLang} />
-        <Events translations={translations} currentLang={currentLang} />
-        <Venue translations={translations} currentLang={currentLang} />
+        <Gallery 
+          translations={translations} 
+          currentLang={currentLang} 
+          config={weddingConfig}
+        />
+        <Events 
+          translations={translations} 
+          currentLang={currentLang} 
+          config={weddingConfig}
+        />
+        <Venue 
+          translations={translations} 
+          currentLang={currentLang} 
+          config={weddingConfig}
+        />
         <RSVP 
           onRSVPClick={handleRSVPClick}
           translations={translations}
           currentLang={currentLang}
+          config={weddingConfig}
         />
         <Footer translations={translations} currentLang={currentLang} />
       </main>
@@ -113,6 +137,7 @@ function App() {
         onClose={() => setShowRSVPModal(false)}
         translations={translations}
         currentLang={currentLang}
+        config={weddingConfig}
       />
     </>
   );

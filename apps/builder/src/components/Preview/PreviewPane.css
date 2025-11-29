@@ -1,0 +1,166 @@
+.preview-pane {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #f5f5f5;
+}
+
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  flex-shrink: 0;
+}
+
+.preview-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c2c2c;
+}
+
+.preview-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.preview-btn {
+  padding: 6px 12px;
+  border: 1px solid #e0e0e0;
+  background: #ffffff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  color: #666;
+  transition: all 0.2s;
+}
+
+.preview-btn:hover {
+  background: #f5f5f5;
+  border-color: #ccc;
+}
+
+.preview-content {
+  flex: 1;
+  overflow: auto;
+  padding: 0;
+  display: block;
+  background: transparent;
+}
+
+/* Preview wrapper - matches actual website body */
+.preview-wrapper {
+  width: 100%;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(246, 193, 199, 0.35), transparent 60%),
+    radial-gradient(circle at bottom right, rgba(155, 182, 157, 0.35), transparent 60%),
+    #fff8f0;
+  overflow: visible;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+}
+
+/* Ensure invitation button styles take precedence - match exact website styles */
+.preview-wrapper .btn {
+  /* Reset any builder styles and match exact website button styles */
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  border-radius: 999px !important;
+  padding: 9px 18px !important;
+  font-size: 11px !important;
+  letter-spacing: 0.16em !important;
+  text-transform: uppercase !important;
+  border: 1px solid transparent !important;
+  cursor: pointer !important;
+  transition: all 0.18s ease !important;
+  white-space: nowrap !important;
+  font-weight: normal !important;
+}
+
+.preview-wrapper .btn-primary {
+  background: linear-gradient(135deg, var(--button-primary), var(--button-primary-hover)) !important;
+  color: #fff7ef !important;
+  border-color: rgba(124, 40, 49, 0.8) !important;
+  box-shadow:
+    0 16px 30px rgba(124, 40, 49, 0.35),
+    0 0 10px rgba(212, 175, 55, 0.25) !important;
+}
+
+.preview-wrapper .btn-primary:hover {
+  background: linear-gradient(135deg, var(--button-primary-hover), var(--button-primary)) !important;
+  transform: translateY(-1px) !important;
+  box-shadow:
+    0 18px 32px rgba(124, 40, 49, 0.45),
+    0 0 14px rgba(212, 175, 55, 0.35) !important;
+}
+
+.preview-wrapper .btn-ghost {
+  background: rgba(255, 255, 255, 0.8) !important;
+  border-color: rgba(212, 175, 55, 0.7) !important;
+  color: var(--text-main) !important;
+  box-shadow: none !important;
+}
+
+.preview-wrapper .btn-ghost:hover {
+  background: #fff7eb !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06) !important;
+}
+
+.preview-wrapper .btn-icon {
+  font-size: 14px !important;
+}
+
+/* Ensure invitation styles work properly in preview */
+.preview-wrapper * {
+  box-sizing: border-box;
+}
+
+/* Make sure page-shell works correctly */
+.preview-wrapper .page-shell {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 16px 16px 80px;
+  width: 100%;
+}
+
+/* Ensure header is full width and sticky */
+.preview-wrapper .site-header {
+  width: 100%;
+  max-width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* Ensure all sections render correctly */
+.preview-wrapper section {
+  width: 100%;
+  max-width: 100%;
+}
+
+.preview-wrapper .card {
+  width: 100%;
+  max-width: 100%;
+}
+
+.preview-iframe {
+  width: 100%;
+  max-width: 1200px;
+  height: 100%;
+  min-height: 800px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+

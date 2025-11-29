@@ -1,0 +1,97 @@
+// Prisma Schema for Wedding Invitation Builder
+// Run `npx prisma generate` to generate the Prisma Client
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  invitations Invitation[]
+  assets      Asset[]
+
+  @@map("users")
+}
+
+model Invitation {
+  id        String   @id @default(cuid())
+  templateId String  @default("royal-elegance")
+  data      Json     // Stores wedding configuration data
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  rsvpResponses RSVPResponse[]
+  analytics     Analytics[]
+
+  @@map("invitations")
+}
+
+model Template {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  previewImage String?
+  tags        String[] // Array of tags
+  version     String   @default("1.0.0")
+  config      Json?    // Template-specific configuration
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("templates")
+}
+
+model Asset {
+  id          String   @id @default(cuid())
+  url         String
+  filename    String
+  originalName String
+  size        Int      // File size in bytes
+  mimetype    String
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@map("assets")
+}
+
+model RSVPResponse {
+  id           String   @id @default(cuid())
+  invitationId String
+  invitation   Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  name         String
+  date         String   // Arrival date
+  email        String?
+  phone        String?
+  message      String?
+  submittedAt  DateTime @default(now())
+
+  @@map("rsvp_responses")
+}
+
+model Analytics {
+  id           String   @id @default(cuid())
+  invitationId String
+  invitation   Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  type         String   // 'view', 'rsvp', 'share', etc.
+  referrer     String?
+  userAgent    String?
+  ipAddress    String?
+  timestamp    DateTime @default(now())
+
+  @@map("analytics")
+}
+

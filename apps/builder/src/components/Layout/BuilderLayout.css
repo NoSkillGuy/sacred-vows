@@ -1,0 +1,50 @@
+.builder-layout {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  overflow: hidden;
+}
+
+.split-container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.builder-sidebar-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #f8f9fa;
+  border-right: 1px solid #e0e0e0;
+  overflow: hidden;
+}
+
+.builder-preview-container {
+  height: 100vh;
+  overflow: auto;
+  background: #ffffff;
+}
+
+/* react-split gutter styles */
+.split-container .gutter {
+  background-color: #e0e0e0;
+  background-repeat: no-repeat;
+  background-position: 50%;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.split-container .gutter:hover {
+  opacity: 1;
+}
+
+.split-container .gutter.gutter-horizontal {
+  cursor: col-resize;
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftN9AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAOxAAADsQBlSsOGwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAAkSURBVCiRY/z//z8DJQAggFhgIAbA8P//fwYqAiYGBgYGJgYGBgAADgIBEAe8WQAAAABJRU5ErkJggg==');
+}
+
+.split-container .gutter.gutter-horizontal:hover {
+  background-color: #d4af37;
+}
+
