@@ -2273,7 +2273,7 @@
       setInterval(update, 60 * 1000);
     })();
 
-    // Music toggle
+    // Music toggle (language-aware)
     (function () {
       const audio = document.getElementById("bg-music");
       const toggle = document.getElementById("musicToggle");
@@ -2282,22 +2282,46 @@
 
       let isPlaying = false;
 
+      function getMusicLabel(key) {
+        const lang = localStorage.getItem("wedding-lang") || "en";
+        const translations = window.weddingTranslations || {};
+        const langData = translations[lang] || translations.en || {};
+        const fallback =
+          key === "pause"
+            ? "Pause Music"
+            : "Play Music";
+        return langData["music." + key] || fallback;
+      }
+
+      function updateLabel() {
+        const span = toggle.querySelector("span");
+        if (!span) return;
+        span.textContent = getMusicLabel(isPlaying ? "pause" : "play");
+      }
+
       function setState(playing) {
         isPlaying = playing;
         if (playing) {
           dot.classList.add("on");
-          toggle.querySelector("span").textContent = "Pause Music";
           audio.play().catch(() => {});
         } else {
           dot.classList.remove("on");
-          toggle.querySelector("span").textContent = "Play Music";
           audio.pause();
         }
+        updateLabel();
       }
 
       toggle.addEventListener("click", () => {
         setState(!isPlaying);
       });
+
+      // Keep label in sync when language changes
+      window.addEventListener("languageChanged", () => {
+        updateLabel();
+      });
+
+      // Initial label based on current language & state
+      updateLabel();
 
       // Auto-play music on page load
       // Note: Browsers may block autoplay, so we try to play and handle errors gracefully
@@ -2313,6 +2337,8 @@
             // Autoplay was blocked - user interaction required
             // Music will start when user clicks the toggle
             console.log("Autoplay blocked. User interaction required.");
+            // Ensure label is correct even if autoplay fails
+            setState(false);
           });
       }
     })();
@@ -2551,11 +2577,7 @@
           navLinks[5].textContent = langData['nav.rsvp'];
         }
 
-        // Music toggle
-        const musicToggle = document.querySelector('#musicToggle span');
-        if (musicToggle) {
-          musicToggle.textContent = langData['music.play'];
-        }
+        // Music toggle label is handled by the music module (language-aware)
 
         // Hero section
         const heroEyebrow = document.querySelector('.hero-eyebrow');
