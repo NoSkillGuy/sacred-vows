@@ -1782,15 +1782,16 @@
 
   <!-- Language Selection Modal -->
   <div class="language-modal" id="languageModal">
-    <div class="language-modal-content">
-      <div class="language-modal-title" data-i18n="language.title">Choose the Language</div>
-      <div class="language-modal-subtitle" data-i18n="language.subtitle">कृपया भाषा चुनें</div>
-      <div class="language-options">
-        <button class="language-option" data-lang="en">English</button>
-        <button class="language-option" data-lang="hi">हिंदी (Hindi)</button>
+      <div class="language-modal-content">
+        <div class="language-modal-title" data-i18n="language.title">Choose the Language</div>
+        <div class="language-modal-subtitle" data-i18n="language.subtitle">कृपया भाषा चुनें</div>
+        <div class="language-options">
+          <button class="language-option" data-lang="en">English</button>
+          <button class="language-option" data-lang="hi">हिंदी (Hindi)</button>
+          <button class="language-option" data-lang="te">తెలుగు (Telugu)</button>
+        </div>
       </div>
     </div>
-  </div>
 
   <!-- Guest Name Modal -->
   <div class="guest-modal" id="guestNameModal">
@@ -1937,23 +1938,23 @@
 
       <div class="card">
         <div class="card-inner">
-          <p class="muted" style="margin-bottom: 20px; text-align: center;">
+          <p class="muted" id="coupleTogetherText" style="margin-bottom: 20px; text-align: center;">
             Together, Capt Dr. Priya and Dr. Saurabh look forward to beginning this beautiful journey with your blessings and presence.
           </p>
           <div class="couple-grid">
           <div>
-            <h3 class="headline">The Bride</h3>
+            <h3 class="headline" data-role="bride">The Bride</h3>
             <p class="muted">
               <strong>Capt Dr. Priya Singh</strong><br />
-              Daughter of <strong>Mrs. Geeta Singh</strong> &amp; <strong>Mr. Sanjay Kumar Singh</strong>.
+              <span class="relation-label" data-relation="daughter">Daughter of</span> <strong>Mrs. Geeta Singh</strong> &amp; <strong>Mr. Sanjay Kumar Singh</strong>.
             </p>
 
             <div class="person-block">
-              <div class="person-role">Mother</div>
+              <div class="person-role" data-role="mother">Mother</div>
               <div class="person-name">Mrs. Geeta Singh</div>
             </div>
             <div class="person-block">
-              <div class="person-role">Father</div>
+              <div class="person-role" data-role="father">Father</div>
               <div class="person-name">Mr. Sanjay Kumar Singh</div>
             </div>
 
@@ -1965,18 +1966,18 @@
           </div>
 
           <div>
-            <h3 class="headline">The Groom</h3>
+            <h3 class="headline" data-role="groom">The Groom</h3>
             <p class="muted">
               <strong>Dr. Saurabh Singh</strong><br />
-              Son of <strong>Mrs. Vibha Singh</strong> &amp; <strong>Mr. Ashok Kumar Singh</strong>.
+              <span class="relation-label" data-relation="son">Son of</span> <strong>Mrs. Vibha Singh</strong> &amp; <strong>Mr. Ashok Kumar Singh</strong>.
             </p>
 
             <div class="person-block">
-              <div class="person-role">Mother</div>
+              <div class="person-role" data-role="mother">Mother</div>
               <div class="person-name">Mrs. Vibha Singh</div>
             </div>
             <div class="person-block">
-              <div class="person-role">Father</div>
+              <div class="person-role" data-role="father">Father</div>
               <div class="person-name">Mr. Ashok Kumar Singh</div>
             </div>
 
@@ -2169,7 +2170,7 @@
           </div>
         </div>
 
-        <p class="muted" style="margin-top: 14px; font-size: 12px;">
+        <p class="muted" id="eventsCompleteText" style="margin-top: 14px; font-size: 12px;">
           Your presence and blessings at these ceremonies will make our celebration truly complete.
         </p>
       </div>
@@ -2202,7 +2203,7 @@
               <div class="chip">Near Kempegowda International Airport</div>
             </div>
 
-            <p class="muted" style="margin-bottom: 14px;">
+            <p class="muted" id="venueArriveText" style="margin-bottom: 14px;">
               Kindly arrive a little early to comfortably join us for the ceremonies.
               Our families eagerly await to welcome you with warmth and love.
             </p>
@@ -2593,7 +2594,7 @@
 
     // Language Selection and Translation System
     (function () {
-      let translations = { en: {}, hi: {} };
+      let translations = { en: {}, hi: {}, te: {} };
       
       // Helper function to flatten nested object
       function flattenObject(obj, prefix = '') {
@@ -2662,6 +2663,103 @@
           rsvp: { eyebrow: "आरएसवीपी", title: "स्नेह के साथ", subtitle: "कृपया अपनी उपस्थिति की पुष्टि करें और किसी भी सहायता के लिए बेझिझक संपर्क करें।", text: "दोनों परिवारों की ओर से, आप पुष्टि, यात्रा विवरण, या किसी अन्य प्रश्नों के लिए निम्नलिखित से संपर्क कर सकते हैं:", share: { button: "WhatsApp पर निमंत्रण साझा करें", note: "आप इस लिंक को उन दोस्तों और परिवार के साथ साझा कर सकते हैं जिन्हें आप आमंत्रित करना चाहते हैं।" }, modal: { title: "आरएसवीपी", subtitle: "कृपया अपनी उपस्थिति की पुष्टि करें", name: "आपका नाम *", date: "आप कब आ रहे होंगे? *", cancel: "रद्द करें", send: "आरएसवीपी भेजें" }, message: "नमस्ते! मैं कैप्ट डॉ. प्रिया सिंह और डॉ. सौरभ सिंह की शादी के लिए आरएसवीपी करना चाहूंगा।\n\nनाम: {name}\nआगमन तिथि: {date}\n\nमैं 22 और 23 जनवरी 2026 को बेंगलुरु में रॉयल लोटस व्यू रिसोटेल में उत्सव में अपनी उपस्थिति की पुष्टि करता हूं।", whatsapp_share: "आपको 22 और 23 जनवरी 2026 को बेंगलुरु में रॉयल लोटस व्यू रिसोटेल में कैप्ट डॉ. प्रिया सिंह और डॉ. सौरभ सिंह की शादी में आमंत्रित किया गया है।\n\nकृपया पूरा निमंत्रण देखने के लिए लिंक पर टैप करें:\n" },
           footer: { compliments: "शुभकामनाओं के साथ", families: "कैप्ट डॉ. प्रिया सिंह और डॉ. सौरभ सिंह के परिवारों की ओर से", flowers: "प्रतीक्षारत आंखें • खिलते दिल • प्यारे निमंत्रण, अंतहीन यादें", waiting: "हम आपके साथ जश्न मनाने के लिए इंतजार नहीं कर सकते" },
           countdown: { today: "आज हम प्यार का जश्न मनाते हैं।" }
+        },
+        te: {
+          language: { title: "భాషను ఎంచుకోండి", subtitle: "దయచేసి మీకు ఇష్టమైన భాషను ఎంచుకోండి" },
+          nav: { home: "హోమ్", couple: "వరుడు – వధువు", photos: "ఫోటోలు", program: "కార్యక్రమం", venue: "వేదిక", rsvp: "హాజరు సమాచారం" },
+          music: { play: "సంగీతం ఆన్ చేయండి", pause: "సంగీతం ఆపండి" },
+          hero: {
+            eyebrow: "శుభ వివాహం",
+            script: "మా కుటుంబాల ఆశీర్వాదాలతో",
+            names: "క్యాప్ట్ డా. ప్రియా & డా. సౌరభ్",
+            sub: "రెండు హృదయాలు, ఒక ప్రయాణం",
+            date: "22 & 23 జనవరి 2026",
+            location: "రాయల్ లోటస్ వ్యూ రెసోటెల్ · బెంగుళూరు, కర్ణాటక",
+            countdown: "వివాహానికి కౌంట్‌డౌన్",
+            actions: {
+              program: "కార్యక్రమ వివరాలు చూడండి",
+              venue: "వేదిక & దారిమార్గం చూడండి",
+              rsvp: "ఇప్పుడే హాజరు సమాచారం ఇవ్వండి"
+            },
+            caption: "<strong>క్యాప్ట్ డా. ప్రియా & డా. సౌరభ్</strong> తమ కొత్త ప్రయాణాన్ని ఆరంభిస్తున్న వేళ ఒక చిన్న చూపు."
+          },
+          couple: {
+            eyebrow: "వరుడు – వధువు & కుటుంబాలు",
+            title: "గౌరవనీయమైన సంఘము",
+            subtitle: "అపారమైన ఆనందంతో, మా పిల్లల పవిత్ర బంధాన్ని మీరు సాక్షిగా చూడాలని మా కుటుంబాలు మనస్ఫూర్తిగా ఆహ్వానిస్తున్నాయి.",
+            together: "క్యాప్ట్ డా. ప్రియా మరియు డా. సౌరభ్ మీ ఆశీర్వాదాలు, సాన్నిధ్యంతో ఈ అందమైన ప్రయాణాన్ని ప్రారంభించడానికి ఎదురుచూస్తున్నారు.",
+            bride: "వధువు",
+            groom: "వరుడు",
+            daughter: "కుమార్తె",
+            son: "కుమారుడు",
+            mother: "తల్లి",
+            father: "తండ్రి"
+          },
+          father: {
+            eyebrow: "ప్రియ తండ్రి లేఖ",
+            title: "హృదయపు కొన్ని మాటలు",
+            body: "నా ప్రియమైన {name},\n\nకృతజ్ఞతతో నిండిన ప్రశాంత హృదయంతో, మా కుమార్తె క్యాప్ట్ డా. ప్రియా మరియు డా. సౌరభ్ తమ జీవిత ప్రయాణాన్ని భార్యాభర్తలుగా మొదలుపెడుతున్న ఈ శుభ సమయంలో, మీరు మా ఆనందానికి సాక్ష్యంగా ఉండాలని ఆహ్వానిస్తున్నాను.\n\nఒక తండ్రిగా, ఒక చిన్నారి నుండి సమాజ సేవకు అంకితభావంతో ఉన్న కరుణతో కూడిన, ఆత్మవిశ్వాసం కలిగిన వ్యక్తిగా ప్రియను ఎదుగుతూ చూడడం నాకు లభించిన గొప్ప ఆశీర్వాదం. ఈ కొత్త అధ్యాయంలో అడుగుపెడుతుండగా, మా హృదయాలు ఆనందం, భావోద్వేగం, గర్వంతో నిండిపోయాయి.\n\nమీ సాన్నిధ్యం, ఆశీర్వాదాలు, శుభాకాంక్షలు మా కుటుంబాల కోసం ఈ వేడుకను సంపూర్ణంగా మార్చుతాయి. మీరు స్వయంగా విచ్చేస్తే మాకు ఎంతో గౌరవం, ఆనందం. దూరం వల్ల రాలేకపోయినా, మీ హృదయం నిండిన దీవెనలు మనవరకు చేరుతాయని మాకు తెలుసు.\n\nమా మొత్తం కుటుంబం తరఫున, మా ఆనందం, ప్రార్థనలు, వేడుకలలో భాగస్వామ్యం కావాలని ఆప్యాయంగా ఆహ్వానిస్తున్నాను.\n\nఆదరాభిమానాలతో,\nసంజయ్ కుమార్ సింగ్"
+          },
+          guest: {
+            title: "మీ పేరు చెప్పండి",
+            subtitle: "ఈ ఆహ్వానాన్ని వ్యక్తిగతంగా మిమ్మల్ని ఉద్దేశించి చెప్పాలని ఉంది. దయచేసి మీ పేరు తెలియజేయండి.",
+            placeholder: "మీ పేరు నమోదు చేయండి",
+            save: "పేరును సేవ్ చేయండి",
+            skip: "వదిలేయండి"
+          },
+          gallery: {
+            eyebrow: "ఫోటో కథ",
+            title: "మా ప్రయాణం – కొన్ని క్షణాల్లో",
+            subtitle: "ఈ రోజుకి మమ్మల్ని తీసుకొచ్చిన జ్ఞాపకాలు, క్షణాల నుంచి కొన్ని చిత్రాలు."
+          },
+          events: {
+            eyebrow: "కార్యక్రమ వివరాలు",
+            title: "సందర్భాల సమాహారం",
+            subtitle: "ఈ ప్రతి ఆనందకర క్షణంలో మీ సాన్నిధ్యం మాకు గౌరవంగా ఉంటుంది.",
+            day1: "మొదటి రోజు",
+            day2: "రెండో రోజు",
+            tilak: { label: "తిలక్", tag: "శుభారంభం" },
+            haldi: { label: "హల్దీ", tag: "పసుపు & సంప్రదాయాలు" },
+            mehandi: { label: "మెహందీ", tag: "రంగులతో నిండిన ఆనందం" },
+            jaimala: { label: "జయమాల", tag: "హారాల మార్పిడి" },
+            dinner: { label: "విందు", tag: "కుటుంబం, స్నేహితులతో చేతభోజనం" },
+            wedding: { label: "వివాహం", tag: "పవిత్ర ప్రతిజ్ఞలు" },
+            complete: "మీ రాక, మీ ఆశీర్వాదాలు ఈ వేడుకను నిజమైన అర్థంలో పూర్తి చేస్తాయి."
+          },
+          venue: {
+            eyebrow: "వేదిక",
+            title: "మాతో కలిసే ప్రదేశం",
+            subtitle: "జీవితాంతం సహచర్యానికి సాక్షిగా నిలిచే ప్రశాంతమైన, అందమైన వేదిక.",
+            arrive: "విఘ్నం లేకుండా కార్యక్రమాల్లో భాగమవ్వాలని, దయచేసి కొంచెం ముందుగానే విచ్చేయండి. మీకు ఆప్యాయ స్వాగతం పలకడానికి మా కుటుంబం ఎంతో ఆసక్తిగా ఎదురు చూస్తోంది.",
+            maps: "Google Maps లో తెరవండి"
+          },
+          rsvp: {
+            eyebrow: "హాజరు సమాచారం",
+            title: "సాదర ఆహ్వానం",
+            subtitle: "దయచేసి మీ హాజరు గురించి తెలియజేయండి, ఏదైనా సహాయం అవసరమైతే సంకోచం లేకుండా చెప్పండి.",
+            text: "రెండు కుటుంబాల తరఫున, హాజరు నిర్ధారణ, ప్రయాణ వివరాలు లేదా ఇతర ప్రశ్నల కోసం క్రింది సభ్యులను సంప్రదించవచ్చు:",
+            share: {
+              button: "WhatsApp లో ఆహ్వానాన్ని పంపండి",
+              note: "మీరు ఆహ్వానించాలనుకున్న బంధువులు, స్నేహితులతో ఈ లింక్‌ను పంచుకోవచ్చు."
+            },
+            modal: {
+              title: "హాజరు సమాచారం",
+              subtitle: "దయచేసి మీ హాజరును నిర్ధారించండి",
+              name: "మీ పేరు *",
+              date: "మీరు ఎప్పుడు చేరుకుంటున్నారు? *",
+              cancel: "రద్దు చేయండి",
+              send: "హాజరు సమాచారం పంపండి"
+            },
+            message: "నమస్తే! క్యాప్ట్ డా. ప్రియా సింగ్ మరియు డా. సౌరభ్ సింగ్ వివాహానికి హాజరవుతున్నాను.\n\nపేరు: {name}\nచేరుకునే తేదీ: {date}\n\n22 & 23 జనవరి 2026 న బెంగుళూరులోని రాయల్ లోటస్ వ్యూ రెసోటెల్‌లో జరిగే వేడుకలకు నా హాజరును నిర్ధారిస్తున్నాను.",
+            whatsapp_share: "క్యాప్ట్ డా. ప్రియా సింగ్ మరియు డా. సౌరభ్ సింగ్ వివాహానికి మిమ్మల్ని ఆహ్వానిస్తున్నాం – 22 & 23 జనవరి 2026, రాయల్ లోటస్ వ్యూ రెసోటెల్, బెంగుళూరు.\n\nపూర్తి ఆహ్వానాన్ని చూడడానికి దయచేసి ఈ లింక్‌పై క్లిక్ చేయండి:\n"
+          },
+          footer: {
+            compliments: "శుభాకాంక్షలతో",
+            families: "క్యాప్ట్ డా. ప్రియా సింగ్ & డా. సౌరభ్ సింగ్ కుటుంబాల తరఫున",
+            flowers: "ఎదురుచూస్తున్న కళ్ళు • వికసిస్తున్న హృదయాలు • మధుర ఆహ్వానాలు, అనేక జ్ఞాపకాలు",
+            waiting: "మీతో కలిసి ఈ ఆనందాన్ని పంచుకోవడానికి మేము ఆసక్తిగా ఎదురు చూస్తున్నాం"
+          },
+          countdown: { today: "ఈ రోజు మనం ప్రేమను వేడుకగా జరుపుకుంటున్నాం." }
         }
       };
 
@@ -2670,6 +2768,7 @@
         // Use embedded translations directly
         translations.en = flattenObject(embeddedTranslations.en);
         translations.hi = flattenObject(embeddedTranslations.hi);
+        translations.te = flattenObject(embeddedTranslations.te);
         
         // Make translations globally accessible for RSVP form
         window.weddingTranslations = translations;
@@ -2767,6 +2866,12 @@
           }
         }
 
+        // Hero photo caption
+        const heroCaption = document.querySelector('.hero-photo-caption');
+        if (heroCaption && langData['hero.caption']) {
+          heroCaption.innerHTML = langData['hero.caption'];
+        }
+
         // Bottom RSVP button
         const rsvpMainButton = document.getElementById('rsvpButton');
         if (rsvpMainButton && langData['hero.actions.rsvp']) {
@@ -2783,35 +2888,40 @@
         const coupleSubtitle = document.querySelector('#couple .section-subtitle');
         if (coupleSubtitle && langData['couple.subtitle']) coupleSubtitle.textContent = langData['couple.subtitle'];
         
-        const coupleTogether = document.querySelector('#couple .muted');
-        if (coupleTogether && coupleTogether.textContent.includes('Together') && langData['couple.together']) {
+        const coupleTogether = document.getElementById('coupleTogetherText');
+        if (coupleTogether && langData['couple.together']) {
           coupleTogether.textContent = langData['couple.together'];
         }
         
         // Update couple section labels
         const coupleHeadlines = document.querySelectorAll('#couple .headline');
-        if (coupleHeadlines.length >= 2) {
-          if (langData['couple.bride']) coupleHeadlines[0].textContent = langData['couple.bride'];
-          if (langData['couple.groom']) coupleHeadlines[1].textContent = langData['couple.groom'];
-        }
-        
-        const personRoles = document.querySelectorAll('.person-role');
-        personRoles.forEach(role => {
-          if (role.textContent === 'Mother' && langData['couple.mother']) {
-            role.textContent = langData['couple.mother'];
-          } else if (role.textContent === 'Father' && langData['couple.father']) {
-            role.textContent = langData['couple.father'];
+        coupleHeadlines.forEach(headline => {
+          const role = headline.getAttribute('data-role');
+          if (role === 'bride' && langData['couple.bride']) {
+            headline.textContent = langData['couple.bride'];
+          } else if (role === 'groom' && langData['couple.groom']) {
+            headline.textContent = langData['couple.groom'];
           }
         });
         
-        // Update "Daughter of" and "Son of" text
-        const coupleMuted = document.querySelectorAll('#couple .muted');
-        coupleMuted.forEach(muted => {
-          const text = muted.textContent;
-          if (text.includes('Daughter of') && langData['couple.daughter']) {
-            muted.innerHTML = muted.innerHTML.replace('Daughter of', langData['couple.daughter']);
-          } else if (text.includes('Son of') && langData['couple.son']) {
-            muted.innerHTML = muted.innerHTML.replace('Son of', langData['couple.son']);
+        const personRoles = document.querySelectorAll('.person-role');
+        personRoles.forEach(roleEl => {
+          const roleKey = roleEl.getAttribute('data-role');
+          if (roleKey === 'mother' && langData['couple.mother']) {
+            roleEl.textContent = langData['couple.mother'];
+          } else if (roleKey === 'father' && langData['couple.father']) {
+            roleEl.textContent = langData['couple.father'];
+          }
+        });
+        
+        // Update "Daughter of" and "Son of" text via dedicated spans
+        const relationLabels = document.querySelectorAll('.relation-label');
+        relationLabels.forEach(label => {
+          const rel = label.getAttribute('data-relation');
+          if (rel === 'daughter' && langData['couple.daughter']) {
+            label.textContent = langData['couple.daughter'];
+          } else if (rel === 'son' && langData['couple.son']) {
+            label.textContent = langData['couple.son'];
           }
         });
 
@@ -2896,8 +3006,8 @@
           });
         }
         
-        const eventsComplete = document.querySelector('#events .muted');
-        if (eventsComplete && eventsComplete.textContent.includes('presence')) {
+        const eventsComplete = document.getElementById('eventsCompleteText');
+        if (eventsComplete && langData['events.complete']) {
           eventsComplete.textContent = langData['events.complete'];
         }
         
@@ -2918,8 +3028,8 @@
         const venueSubtitle = document.querySelector('#venue .section-subtitle');
         if (venueSubtitle) venueSubtitle.textContent = langData['venue.subtitle'];
         
-        const venueArrive = document.querySelector('#venue .muted');
-        if (venueArrive && venueArrive.textContent.includes('arrive')) {
+        const venueArrive = document.getElementById('venueArriveText');
+        if (venueArrive && langData['venue.arrive']) {
           venueArrive.textContent = langData['venue.arrive'];
         }
         
