@@ -1,0 +1,58 @@
+.editable-image {
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.editable-image:hover,
+.editable-image.hovered {
+  outline: 2px dashed rgba(212, 175, 55, 0.5);
+  outline-offset: 2px;
+}
+
+.editable-image img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  transition: opacity 0.2s ease;
+}
+
+.editable-image img.uploading {
+  opacity: 0.5;
+}
+
+.editable-image-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  color: white;
+  font-size: 14px;
+}
+
+.editable-image.hovered .editable-image-overlay {
+  opacity: 1;
+}
+
+.editable-image-icon {
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+
+.editable-image-text {
+  font-size: 12px;
+  text-align: center;
+  padding: 0 8px;
+}
+

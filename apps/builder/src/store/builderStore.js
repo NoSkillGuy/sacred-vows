@@ -6,27 +6,57 @@ import { updateInvitation, autoSaveInvitation } from '../services/invitationServ
  * Builder Store
  * Manages state for the wedding invitation builder
  */
+const STORAGE_KEY = 'wedding-builder-autosave';
+
+// Load from localStorage on initialization
+function loadFromStorage() {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (error) {
+    console.error('Failed to load from storage:', error);
+  }
+  return {
+    id: null,
+    templateId: 'royal-elegance',
+    data: defaultWeddingConfig,
+    translations: null,
+  };
+}
+
+// Save to localStorage
+function saveToStorage(invitation) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(invitation));
+  } catch (error) {
+    console.error('Failed to save to storage:', error);
+  }
+}
+
 export const useBuilderStore = create((set, get) => {
   let autoSaveTimer = null;
+  
+  // Initialize from localStorage
+  const initialInvitation = loadFromStorage();
 
   return {
     // Current invitation being edited
-    currentInvitation: {
-      id: null,
-      templateId: 'royal-elegance',
-      data: defaultWeddingConfig,
-      translations: null, // Will be loaded from translations file
-    },
+    currentInvitation: initialInvitation,
 
     // Loading and error states
     loading: false,
     error: null,
     saving: false,
+    lastSavedAt: null, // Timestamp of last localStorage save
 
   // Update invitation data
   updateInvitationData: (path, value) => {
     const { currentInvitation } = get();
-    const newData = { ...currentInvitation.data };
+    
+    // Create deep clone to ensure proper immutability
+    const newData = JSON.parse(JSON.stringify(currentInvitation.data));
     
     // Support dot notation paths (e.g., 'couple.bride.name')
     const keys = path.split('.');
@@ -48,7 +78,11 @@ export const useBuilderStore = create((set, get) => {
     
     set({ currentInvitation: updatedInvitation });
     
-    // Auto-save if invitation has an ID
+    // Always save to localStorage (client-side autosave)
+    saveToStorage(updatedInvitation);
+    set({ lastSavedAt: Date.now() });
+    
+    // Also save to server if invitation has an ID (server-side autosave)
     if (updatedInvitation.id) {
       clearTimeout(autoSaveTimer);
       autoSaveTimer = setTimeout(async () => {
@@ -118,7 +152,11 @@ export const useBuilderStore = create((set, get) => {
     
     set({ currentInvitation: updatedInvitation });
     
-    // Auto-save if invitation has an ID
+    // Always save to localStorage (client-side autosave)
+    saveToStorage(updatedInvitation);
+    set({ lastSavedAt: Date.now() });
+    
+    // Also save to server if invitation has an ID (server-side autosave)
     if (updatedInvitation.id) {
       clearTimeout(autoSaveTimer);
       autoSaveTimer = setTimeout(async () => {
@@ -127,8 +165,9 @@ export const useBuilderStore = create((set, get) => {
           await updateInvitation(updatedInvitation.id, { data: newData });
           set({ saving: false });
         } catch (error) {
-          console.error('Auto-save error:', error);
-          set({ saving: false, error: error.message });
+          console.error('Server auto-save error:', error);
+          // Don't set error state for autosave failures, just log
+          set({ saving: false });
         }
       }, 2000);
     }
@@ -137,6 +176,12 @@ export const useBuilderStore = create((set, get) => {
   // Set entire invitation
   setInvitation: (invitation) => {
     set({ currentInvitation: invitation });
+    saveToStorage(invitation); // Also save to localStorage
+  },
+  
+  // Clear autosave data
+  clearAutosave: () => {
+    localStorage.removeItem(STORAGE_KEY);
   },
 
   // Reset to default

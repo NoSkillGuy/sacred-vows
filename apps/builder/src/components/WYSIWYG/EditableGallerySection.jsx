@@ -1,4 +1,10 @@
-function Gallery({ translations, currentLang, config = {} }) {
+import EditableText from './EditableText';
+import EditableImage from './EditableImage';
+
+/**
+ * EditableGallerySection - WYSIWYG editable version of Gallery section
+ */
+function EditableGallerySection({ translations, currentLang, config = {}, onUpdate }) {
   const gallery = config.gallery || {};
   const galleryImages = gallery.images || [
     { src: '/assets/photos/couple/2.jpeg', alt: 'Couple photo 1' },
@@ -31,11 +37,28 @@ function Gallery({ translations, currentLang, config = {} }) {
   return (
     <section id="gallery">
       <div className="section-header">
-        <div className="section-eyebrow">{getTranslation('gallery.eyebrow') || 'Photo Story'}</div>
-        <div className="section-title">{getTranslation('gallery.title') || 'Our Journey in Moments'}</div>
-        <div className="section-subtitle">
-          {getTranslation('gallery.subtitle') || 'A few glimpses from the memories and moments that bring us here today.'}
-        </div>
+        <EditableText
+          value={getTranslation('gallery.eyebrow') || 'Photo Story'}
+          onUpdate={onUpdate}
+          path="customTranslations.gallery.eyebrow"
+          className="section-eyebrow"
+          tag="div"
+        />
+        <EditableText
+          value={getTranslation('gallery.title') || 'Our Journey in Moments'}
+          onUpdate={onUpdate}
+          path="customTranslations.gallery.title"
+          className="section-title"
+          tag="div"
+        />
+        <EditableText
+          value={getTranslation('gallery.subtitle') || 'A few glimpses from the memories and moments that bring us here today.'}
+          onUpdate={onUpdate}
+          path="customTranslations.gallery.subtitle"
+          className="section-subtitle"
+          tag="div"
+          multiline={true}
+        />
       </div>
 
       <div className="card">
@@ -44,7 +67,12 @@ function Gallery({ translations, currentLang, config = {} }) {
             {galleryImages.map((img, index) => (
               <div key={index} className="gallery-item">
                 <div className="gallery-inner tall">
-                  <img src={img.src} alt={img.alt} loading="lazy" />
+                  <EditableImage
+                    src={img.src}
+                    alt={img.alt}
+                    onUpdate={onUpdate}
+                    path={`gallery.images.${index}.src`}
+                  />
                 </div>
               </div>
             ))}
@@ -55,5 +83,5 @@ function Gallery({ translations, currentLang, config = {} }) {
   );
 }
 
-export default Gallery;
+export default EditableGallerySection;
 

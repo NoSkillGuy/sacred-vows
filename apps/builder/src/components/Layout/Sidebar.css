@@ -59,3 +59,36 @@
   flex: 1;
 }
 
+.sidebar-footer {
+  margin-top: auto;
+  padding: 10px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.sidebar-publish-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: none;
+  background: linear-gradient(135deg, #d4af37, #f5d48a);
+  color: #ffffff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
+}
+
+.sidebar-publish-btn:hover {
+  background: linear-gradient(135deg, #b8941f, #d4af37);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
+}
+
+.sidebar-publish-btn:active {
+  transform: translateY(0);
+}
+

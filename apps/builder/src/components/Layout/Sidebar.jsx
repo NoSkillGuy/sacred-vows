@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import ExportModal from '../Export/ExportModal';
 import './Sidebar.css';
 
 const sections = [
@@ -29,7 +31,31 @@ function Sidebar({ activeSection, onSectionChange }) {
           </button>
         ))}
       </nav>
+      <div className="sidebar-footer">
+        <PublishButton />
+      </div>
     </div>
+  );
+}
+
+function PublishButton() {
+  const [showExportModal, setShowExportModal] = useState(false);
+
+  return (
+    <>
+      <button
+        className="sidebar-publish-btn"
+        onClick={() => setShowExportModal(true)}
+        title="Publish your invitation"
+      >
+        <span className="nav-icon">🚀</span>
+        <span className="nav-label">Publish</span>
+      </button>
+      <ExportModal 
+        isOpen={showExportModal} 
+        onClose={() => setShowExportModal(false)} 
+      />
+    </>
   );
 }
 

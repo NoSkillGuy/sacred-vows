@@ -1,38 +1,32 @@
 import { useState } from 'react';
 import { useBuilderStore } from '../../store/builderStore';
+import { useLanguage } from '../../hooks/useLanguage';
+import { exportInvitationAsZip, exportInvitationAsJSON } from '../../services/exportService';
 import './ExportModal.css';
 
 function ExportModal({ isOpen, onClose }) {
   const { currentInvitation } = useBuilderStore();
+  const { translations } = useLanguage();
   const [exporting, setExporting] = useState(false);
   const [exportFormat, setExportFormat] = useState('static');
 
   const handleExport = async () => {
     setExporting(true);
     try {
-      // In production, this would call the API to generate and download the export
-      const response = await fetch(`/api/invitations/${currentInvitation.id}/export`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ format: exportFormat }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Export failed');
+      if (exportFormat === 'json') {
+        // Export as JSON backup
+        exportInvitationAsJSON(currentInvitation.data);
+        onClose();
+        setExporting(false);
+        return;
       }
 
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `wedding-invitation-${currentInvitation.id}.zip`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-
+      // Export as static site ZIP
+      await exportInvitationAsZip(currentInvitation.data, translations);
+      
+      // Show success message
+      alert('✅ Invitation exported successfully!\n\nNext steps:\n1. Extract the ZIP file\n2. Upload to Vercel/Netlify or your hosting\n3. Share the URL with your guests!');
+      
       onClose();
     } catch (error) {
       console.error('Export error:', error);
@@ -60,20 +54,26 @@ function ExportModal({ isOpen, onClose }) {
               value={exportFormat}
               onChange={(e) => setExportFormat(e.target.value)}
             >
-              <option value="static">Static HTML Site</option>
-              <option value="pdf">PDF Document</option>
-              <option value="zip">ZIP Archive</option>
+              <option value="static">Static HTML Site (ZIP)</option>
+              <option value="json">JSON Backup</option>
             </select>
           </div>
 
           <div className="export-info">
-            <p>The exported invitation will include:</p>
+            <p><strong>What you'll get:</strong></p>
             <ul>
-              <li>All invitation content</li>
-              <li>Images and assets</li>
-              <li>Styles and scripts</li>
-              <li>Ready to deploy to any hosting</li>
+              <li>✅ Complete static website (HTML, CSS, JS)</li>
+              <li>✅ All your content and images</li>
+              <li>✅ Ready to deploy instantly</li>
+              <li>✅ Works on any hosting platform</li>
             </ul>
+            <p style={{ marginTop: '16px', fontSize: '13px', color: '#666' }}>
+              <strong>Next steps after download:</strong><br/>
+              1. Extract the ZIP file<br/>
+              2. Go to <a href="https://vercel.com" target="_blank" rel="noopener">vercel.com</a> or <a href="https://netlify.com" target="_blank" rel="noopener">netlify.com</a><br/>
+              3. Drag & drop the folder<br/>
+              4. Share your live URL! 🎉
+            </p>
           </div>
         </div>
 
@@ -84,9 +84,9 @@ function ExportModal({ isOpen, onClose }) {
           <button
             className="btn btn-primary"
             onClick={handleExport}
-            disabled={exporting || !currentInvitation.id}
+            disabled={exporting}
           >
-            {exporting ? 'Exporting...' : 'Export'}
+            {exporting ? 'Exporting...' : 'Download & Publish'}
           </button>
         </div>
       </div>

@@ -1,4 +1,9 @@
-function FathersLetter({ translations, currentLang, config = {} }) {
+import EditableText from './EditableText';
+
+/**
+ * EditableFathersLetterSection - WYSIWYG editable version of Father's Letter section
+ */
+function EditableFathersLetterSection({ translations, currentLang, config = {}, onUpdate }) {
   const storedName = localStorage.getItem('wedding-guest-name');
   const storedTitle = localStorage.getItem('wedding-guest-title') || '';
   const fallbackName = currentLang === 'hi'
@@ -36,20 +41,38 @@ function FathersLetter({ translations, currentLang, config = {} }) {
   return (
     <section id="fathers-letter">
       <div className="section-header">
-        <div className="section-eyebrow">{getTranslation('father.eyebrow') || "From Priya's Father"}</div>
-        <div className="section-title">{getTranslation('father.title') || 'A Few Words From the Heart'}</div>
+        <EditableText
+          value={getTranslation('father.eyebrow') || "From Priya's Father"}
+          onUpdate={onUpdate}
+          path="customTranslations.father.eyebrow"
+          className="section-eyebrow"
+          tag="div"
+        />
+        <EditableText
+          value={getTranslation('father.title') || 'A Few Words From the Heart'}
+          onUpdate={onUpdate}
+          path="customTranslations.father.title"
+          className="section-title"
+          tag="div"
+        />
       </div>
 
       <div className="card">
         <div className="card-inner">
-          <p className="muted" style={{ whiteSpace: 'pre-line' }}>
-            {bodyText}
-          </p>
+          <EditableText
+            value={bodyText || `Dear ${displayName},\n\nIt is with immense joy and gratitude that I extend this invitation to you...`}
+            onUpdate={onUpdate}
+            path="customTranslations.father.body"
+            className="muted"
+            tag="p"
+            multiline={true}
+            style={{ whiteSpace: 'pre-line' }}
+          />
         </div>
       </div>
     </section>
   );
 }
 
-export default FathersLetter;
+export default EditableFathersLetterSection;
 

@@ -1,4 +1,9 @@
-function RSVP({ onRSVPClick, translations, currentLang, config = {} }) {
+import EditableText from './EditableText';
+
+/**
+ * EditableRSVPSection - WYSIWYG editable version of RSVP section
+ */
+function EditableRSVPSection({ onRSVPClick, translations, currentLang, config = {}, onUpdate }) {
   const rsvp = config.rsvp || {};
   const contacts = rsvp.contacts || [
     { badge: 'RSVP', name: 'Anil Kumar Singh' },
@@ -58,24 +63,57 @@ function RSVP({ onRSVPClick, translations, currentLang, config = {} }) {
   return (
     <section id="rsvp">
       <div className="section-header">
-        <div className="section-eyebrow">{getTranslation('rsvp.eyebrow') || 'RSVP'}</div>
-        <div className="section-title">{getTranslation('rsvp.title') || 'With Warm Regards'}</div>
-        <div className="section-subtitle">
-          {getTranslation('rsvp.subtitle') || 'Kindly confirm your presence and feel free to reach out for any assistance.'}
-        </div>
+        <EditableText
+          value={getTranslation('rsvp.eyebrow') || 'RSVP'}
+          onUpdate={onUpdate}
+          path="customTranslations.rsvp.eyebrow"
+          className="section-eyebrow"
+          tag="div"
+        />
+        <EditableText
+          value={getTranslation('rsvp.title') || 'With Warm Regards'}
+          onUpdate={onUpdate}
+          path="customTranslations.rsvp.title"
+          className="section-title"
+          tag="div"
+        />
+        <EditableText
+          value={getTranslation('rsvp.subtitle') || 'Kindly confirm your presence and feel free to reach out for any assistance.'}
+          onUpdate={onUpdate}
+          path="customTranslations.rsvp.subtitle"
+          className="section-subtitle"
+          tag="div"
+          multiline={true}
+        />
       </div>
 
       <div className="card">
         <div className="card-inner">
-          <p className="rsvp-text">
-            {getTranslation('rsvp.text') || 'On behalf of both families, you may contact the following for confirmations, travel details, or any other queries:'}
-          </p>
+          <EditableText
+            value={getTranslation('rsvp.text') || 'On behalf of both families, you may contact the following for confirmations, travel details, or any other queries:'}
+            onUpdate={onUpdate}
+            path="customTranslations.rsvp.text"
+            className="rsvp-text"
+            tag="p"
+            multiline={true}
+          />
 
           <div className="rsvp-grid">
             {contacts.map((contact, index) => (
               <div key={index} className="rsvp-pill">
-                <div className="rsvp-badge">{contact.badge}</div>
-                <span>{contact.name}</span>
+                <EditableText
+                  value={contact.badge}
+                  onUpdate={onUpdate}
+                  path={`rsvp.contacts.${index}.badge`}
+                  className="rsvp-badge"
+                  tag="div"
+                />
+                <EditableText
+                  value={contact.name}
+                  onUpdate={onUpdate}
+                  path={`rsvp.contacts.${index}.name`}
+                  tag="span"
+                />
               </div>
             ))}
           </div>
@@ -94,9 +132,13 @@ function RSVP({ onRSVPClick, translations, currentLang, config = {} }) {
             >
               {getTranslation('rsvp.share.button') || 'Share Invitation on WhatsApp'}
             </a>
-            <p className="small-note">
-              {getTranslation('rsvp.share.note') || 'You may share this link with friends and family whom you wish to invite.'}
-            </p>
+            <EditableText
+              value={getTranslation('rsvp.share.note') || 'You may share this link with friends and family whom you wish to invite.'}
+              onUpdate={onUpdate}
+              path="customTranslations.rsvp.share.note"
+              className="small-note"
+              tag="p"
+            />
           </div>
         </div>
       </div>
@@ -104,5 +146,5 @@ function RSVP({ onRSVPClick, translations, currentLang, config = {} }) {
   );
 }
 
-export default RSVP;
+export default EditableRSVPSection;
 

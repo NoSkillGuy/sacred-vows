@@ -14,16 +14,35 @@ function Couple({ translations, currentLang, config = {} }) {
   const groomMother = groom.parents?.mother || 'Mrs. Vibha Singh';
   const groomFather = groom.parents?.father || 'Mr. Ashok Kumar Singh';
   const groomImage = groom.image || '/assets/photos/groom/1.jpeg';
+
+  // Get custom translations - handle nested paths
+  const getTranslation = (key) => {
+    let customValue = null;
+    if (config?.customTranslations) {
+      const keys = key.split('.');
+      let current = config.customTranslations;
+      for (const k of keys) {
+        if (current && typeof current === 'object' && k in current) {
+          current = current[k];
+        } else {
+          current = null;
+          break;
+        }
+      }
+      customValue = current || null;
+    }
+    return customValue || translations[key] || '';
+  };
   
-  const togetherText = translations['couple.together'] || `Together, ${brideName} and ${groomName} look forward to beginning this beautiful journey with your blessings and presence.`;
+  const togetherText = getTranslation('couple.together') || `Together, ${brideName} and ${groomName} look forward to beginning this beautiful journey with your blessings and presence.`;
 
   return (
     <section id="couple">
       <div className="section-header">
-        <div className="section-eyebrow">{translations['couple.eyebrow'] || 'Couple & Families'}</div>
-        <div className="section-title">{translations['couple.title'] || 'In Honoured Union'}</div>
+        <div className="section-eyebrow">{getTranslation('couple.eyebrow') || 'Couple & Families'}</div>
+        <div className="section-title">{getTranslation('couple.title') || 'In Honoured Union'}</div>
         <div className="section-subtitle">
-          {translations['couple.subtitle'] || 'With immense joy, the families invite you to join them in celebrating the union of their children.'}
+          {getTranslation('couple.subtitle') || 'With immense joy, the families invite you to join them in celebrating the union of their children.'}
         </div>
       </div>
 
@@ -34,18 +53,18 @@ function Couple({ translations, currentLang, config = {} }) {
           </p>
           <div className="couple-grid">
             <div>
-              <h3 className="headline">{translations['couple.bride'] || 'The Bride'}</h3>
+              <h3 className="headline">{getTranslation('couple.bride') || 'The Bride'}</h3>
               <p className="muted">
                 <strong>{brideName}</strong><br />
-                <span className="relation-label">{translations['couple.daughter'] || 'Daughter of'}</span> <strong>{brideMother}</strong> & <strong>{brideFather}</strong>.
+                <span className="relation-label">{getTranslation('couple.daughter') || 'Daughter of'}</span> <strong>{brideMother}</strong> & <strong>{brideFather}</strong>.
               </p>
 
               <div className="person-block">
-                <div className="person-role">{translations['couple.mother'] || 'Mother'}</div>
+                <div className="person-role">{getTranslation('couple.mother') || 'Mother'}</div>
                 <div className="person-name">{brideMother}</div>
               </div>
               <div className="person-block">
-                <div className="person-role">{translations['couple.father'] || 'Father'}</div>
+                <div className="person-role">{getTranslation('couple.father') || 'Father'}</div>
                 <div className="person-name">{brideFather}</div>
               </div>
 
@@ -57,18 +76,18 @@ function Couple({ translations, currentLang, config = {} }) {
             </div>
 
             <div>
-              <h3 className="headline">{translations['couple.groom'] || 'The Groom'}</h3>
+              <h3 className="headline">{getTranslation('couple.groom') || 'The Groom'}</h3>
               <p className="muted">
                 <strong>{groomName}</strong><br />
-                <span className="relation-label">{translations['couple.son'] || 'Son of'}</span> <strong>{groomMother}</strong> & <strong>{groomFather}</strong>.
+                <span className="relation-label">{getTranslation('couple.son') || 'Son of'}</span> <strong>{groomMother}</strong> & <strong>{groomFather}</strong>.
               </p>
 
               <div className="person-block">
-                <div className="person-role">{translations['couple.mother'] || 'Mother'}</div>
+                <div className="person-role">{getTranslation('couple.mother') || 'Mother'}</div>
                 <div className="person-name">{groomMother}</div>
               </div>
               <div className="person-block">
-                <div className="person-role">{translations['couple.father'] || 'Father'}</div>
+                <div className="person-role">{getTranslation('couple.father') || 'Father'}</div>
                 <div className="person-name">{groomFather}</div>
               </div>
 

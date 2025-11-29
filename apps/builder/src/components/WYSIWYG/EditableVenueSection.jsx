@@ -1,4 +1,9 @@
-function Venue({ translations, currentLang, config = {} }) {
+import EditableText from './EditableText';
+
+/**
+ * EditableVenueSection - WYSIWYG editable version of Venue section
+ */
+function EditableVenueSection({ translations, currentLang, config = {}, onUpdate }) {
   const wedding = config.wedding || {};
   const venue = wedding.venue || {};
   
@@ -30,30 +35,72 @@ function Venue({ translations, currentLang, config = {} }) {
   return (
     <section id="venue">
       <div className="section-header">
-        <div className="section-eyebrow">{getTranslation('venue.eyebrow') || 'Venue'}</div>
-        <div className="section-title">{getTranslation('venue.title') || 'Where to Join Us'}</div>
-        <div className="section-subtitle">
-          {getTranslation('venue.subtitle') || 'A serene and elegant venue to witness the beginning of a lifetime of togetherness.'}
-        </div>
+        <EditableText
+          value={getTranslation('venue.eyebrow') || 'Venue'}
+          onUpdate={onUpdate}
+          path="customTranslations.venue.eyebrow"
+          className="section-eyebrow"
+          tag="div"
+        />
+        <EditableText
+          value={getTranslation('venue.title') || 'Where to Join Us'}
+          onUpdate={onUpdate}
+          path="customTranslations.venue.title"
+          className="section-title"
+          tag="div"
+        />
+        <EditableText
+          value={getTranslation('venue.subtitle') || 'A serene and elegant venue to witness the beginning of a lifetime of togetherness.'}
+          onUpdate={onUpdate}
+          path="customTranslations.venue.subtitle"
+          className="section-subtitle"
+          tag="div"
+          multiline={true}
+        />
       </div>
 
       <div className="card">
         <div className="card-inner venue-grid">
           <div>
-            <h3 className="headline">{venueName}</h3>
-            <p className="venue-address" style={{ whiteSpace: 'pre-line' }}>
-              {venueAddress}
-            </p>
+            <EditableText
+              value={venueName}
+              onUpdate={onUpdate}
+              path="wedding.venue.name"
+              className="headline"
+              tag="h3"
+            />
+            <EditableText
+              value={venueAddress}
+              onUpdate={onUpdate}
+              path="wedding.venue.address"
+              className="venue-address"
+              tag="p"
+              multiline={true}
+              style={{ whiteSpace: 'pre-line' }}
+            />
 
             <div className="chip-row">
               {venueTags.map((tag, index) => (
-                <div key={index} className="chip">{tag}</div>
+                <EditableText
+                  key={index}
+                  value={tag}
+                  onUpdate={onUpdate}
+                  path={`wedding.venue.tags.${index}`}
+                  className="chip"
+                  tag="div"
+                />
               ))}
             </div>
 
-            <p className="muted" style={{ marginBottom: '14px' }}>
-              {getTranslation('venue.arrive') || 'Kindly arrive a little early to comfortably join us for the ceremonies. Our families eagerly await to welcome you with warmth and love.'}
-            </p>
+            <EditableText
+              value={getTranslation('venue.arrive') || 'Kindly arrive a little early to comfortably join us for the ceremonies. Our families eagerly await to welcome you with warmth and love.'}
+              onUpdate={onUpdate}
+              path="customTranslations.venue.arrive"
+              className="muted"
+              tag="p"
+              multiline={true}
+              style={{ marginBottom: '14px' }}
+            />
 
             <a
               className="btn btn-primary"
@@ -91,5 +138,5 @@ function Venue({ translations, currentLang, config = {} }) {
   );
 }
 
-export default Venue;
+export default EditableVenueSection;
 
