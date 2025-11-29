@@ -2302,7 +2302,7 @@
             >
               Share Invitation on WhatsApp
             </a>
-            <p class="small-note">
+            <p class="small-note" id="rsvpShareNote">
               You may share this link with friends and family whom you wish to invite.
             </p>
           </div>
@@ -3054,8 +3054,8 @@
         const rsvpShareBtn = document.querySelector('#whatsappShare');
         if (rsvpShareBtn) rsvpShareBtn.textContent = langData['rsvp.share.button'];
         
-        const rsvpShareNote = document.querySelector('.small-note');
-        if (rsvpShareNote && rsvpShareNote.textContent.includes('share')) {
+        const rsvpShareNote = document.getElementById('rsvpShareNote');
+        if (rsvpShareNote && langData['rsvp.share.note']) {
           rsvpShareNote.textContent = langData['rsvp.share.note'];
         }
         
