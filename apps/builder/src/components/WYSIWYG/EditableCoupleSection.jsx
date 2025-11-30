@@ -221,3 +221,4 @@ function EditableCoupleSection({ translations, currentLang, config = {}, onUpdat
 
 export default EditableCoupleSection;
 
+

@@ -59,3 +59,4 @@ function EditableFooter({ translations, currentLang, config = {}, onUpdate }) {
 
 export default EditableFooter;
 
+

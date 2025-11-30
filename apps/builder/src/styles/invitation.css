@@ -1771,6 +1771,12 @@
       z-index: 3000;
     }
 
+    .confetti-burst {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
     .confetti-piece,
     .flower-piece {
       position: absolute;
@@ -1779,6 +1785,7 @@
       border-radius: 2px;
       opacity: 0.9;
       animation: confetti-fall linear forwards;
+      --fall-distance: 110vh;
     }
 
     .flower-piece {
@@ -1790,10 +1797,10 @@
 
     @keyframes confetti-fall {
       0% {
-        transform: translate3d(var(--x, 0), -10%, 0) rotate(0deg);
+        transform: translate3d(var(--x, 0), -12px, 0) rotate(0deg);
       }
       100% {
-        transform: translate3d(var(--xEnd, 0), 110vh, 0) rotate(360deg);
+        transform: translate3d(var(--xEnd, 0), var(--fall-distance, 110vh), 0) rotate(360deg);
       }
     }
 

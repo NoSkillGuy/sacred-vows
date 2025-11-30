@@ -1,84 +1,41 @@
 .preview-pane {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  background: #f5f5f5;
-}
-
-.preview-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 24px;
-  background: #ffffff;
-  border-bottom: 1px solid #e0e0e0;
-  flex-shrink: 0;
-}
-
-.preview-header h3 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: #2c2c2c;
-}
-
-.preview-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.preview-btn {
-  padding: 6px 12px;
-  border: 1px solid #e0e0e0;
-  background: #ffffff;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
-  color: #666;
-  transition: all 0.2s;
-}
-
-.preview-btn:hover {
-  background: #f5f5f5;
-  border-color: #ccc;
-}
-
-.preview-btn.active {
-  background: #d4af37;
-  color: #ffffff;
-  border-color: #d4af37;
-}
-
-.preview-btn.active:hover {
-  background: #b8941f;
-}
-
-/* Edit mode indicator */
-.preview-wrapper[data-edit-mode="true"] {
+  height: 100%;
+  width: 100%;
   position: relative;
-}
-
-.preview-wrapper[data-edit-mode="true"]::before {
-  content: '✏️ Edit Mode - Click any text or image to edit';
-  position: fixed;
-  top: 60px;
-  right: 20px;
-  background: #d4af37;
-  color: white;
-  padding: 8px 16px;
-  border-radius: 4px;
-  font-size: 12px;
-  z-index: 10000;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  pointer-events: none;
+  overflow: hidden;
 }
 
 .preview-content {
   flex: 1;
   overflow: auto;
-  padding: 0;
-  display: block;
-  background: transparent;
+  background: #e8e8e8;
+  position: relative;
+}
+
+/* Device Frame */
+.preview-device-frame {
+  background: #fff;
+  min-height: 100%;
+  transition: max-width 0.3s ease, margin 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.preview-device-frame.device-tablet,
+.preview-device-frame.device-mobile {
+  border-radius: 16px;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+  min-height: auto;
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+
+.preview-device-frame.device-mobile {
+  border-radius: 32px;
+  border: 8px solid #1a1a1a;
 }
 
 /* Preview wrapper - matches actual website body */
@@ -183,49 +140,26 @@
   max-width: 100%;
 }
 
-.preview-iframe {
-  width: 100%;
-  max-width: 1200px;
-  height: 100%;
-  min-height: 800px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+/* Ensure celebrate button floats at bottom-right of visible preview area */
+.preview-device-frame .preview-wrapper {
+  flex: 1;
 }
 
-/* Autosave indicator */
-.autosave-indicator {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 8px;
-  font-size: 11px;
-  color: #666;
-  background: #f5f5f5;
-  border-radius: 4px;
-  margin-right: 8px;
+.preview-device-frame .celebrate-button {
+  position: sticky !important;
+  align-self: flex-end;
+  bottom: 18px;
+  z-index: 3100;
+  margin-top: auto;
+  margin-bottom: 18px;
+  margin-right: 18px;
+  width: fit-content;
+  height: fit-content;
 }
 
-.autosave-indicator.saving {
-  color: #d4af37;
-  background: #fff9e6;
+/* Ensure confetti layer is positioned relative to preview wrapper */
+.preview-wrapper .confetti-layer {
+  position: absolute !important;
+  inset: 0;
+  z-index: 3000;
 }
-
-.autosave-indicator.saved {
-  color: #4caf50;
-  background: #e8f5e9;
-  animation: saveFlash 0.3s ease-out;
-}
-
-@keyframes saveFlash {
-  0% {
-    transform: scale(1.1);
-    background: #c8e6c9;
-  }
-  100% {
-    transform: scale(1);
-    background: #e8f5e9;
-  }
-}
-

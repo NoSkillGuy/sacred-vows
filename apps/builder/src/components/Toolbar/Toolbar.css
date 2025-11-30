@@ -1,0 +1,240 @@
+.builder-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 0 20px;
+  background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
+  border-bottom: 1px solid #e8e8e8;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.toolbar-left,
+.toolbar-center,
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toolbar-left {
+  flex: 0 0 auto;
+}
+
+.toolbar-center {
+  flex: 1;
+  justify-content: center;
+}
+
+.toolbar-right {
+  flex: 0 0 auto;
+}
+
+/* Brand */
+.toolbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-right: 16px;
+}
+
+.brand-icon {
+  font-size: 22px;
+}
+
+.brand-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: #2c2c2c;
+  letter-spacing: -0.01em;
+}
+
+.autosave-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-left: 16px;
+  font-size: 12px;
+  color: #7a7a7a;
+  font-weight: 500;
+}
+
+.autosave-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #bdbdbd;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.autosave-status.autosave-saving .autosave-dot {
+  background: #d4af37;
+  animation: autosavePulse 1s infinite;
+}
+
+.autosave-status.autosave-saved .autosave-dot {
+  background: #4caf50;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+.autosave-status.autosave-idle .autosave-dot {
+  background: #bdbdbd;
+}
+
+.autosave-status .autosave-text {
+  letter-spacing: 0.02em;
+}
+
+@keyframes autosavePulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+  }
+  70% {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.05);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2);
+  }
+}
+
+/* Toolbar Groups */
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.device-group {
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 3px;
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background: #e0e0e0;
+  margin: 0 12px;
+}
+
+/* Toolbar Buttons */
+.toolbar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: #555;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.toolbar-btn:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.toolbar-btn.active {
+  background: #fff;
+  border-color: #d4af37;
+  color: #2c2c2c;
+  box-shadow: 0 1px 3px rgba(212, 175, 55, 0.15);
+}
+
+.toolbar-btn .btn-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.toolbar-btn .btn-label {
+  line-height: 1;
+}
+
+/* Device buttons */
+.toolbar-btn.device-btn {
+  padding: 6px 10px;
+  background: transparent;
+  border-radius: 6px;
+}
+
+.toolbar-btn.device-btn:hover {
+  background: #e8e8e8;
+}
+
+.toolbar-btn.device-btn.active {
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  border-color: transparent;
+}
+
+.toolbar-btn.device-btn .btn-icon {
+  font-size: 18px;
+}
+
+/* Mode toggle */
+.toolbar-btn.mode-toggle {
+  min-width: 100px;
+  justify-content: center;
+}
+
+.toolbar-btn.mode-toggle.active {
+  background: linear-gradient(135deg, #d4af37 0%, #c9a431 100%);
+  color: #fff;
+  border-color: #b8941f;
+}
+
+.toolbar-btn.mode-toggle.active:hover {
+  background: linear-gradient(135deg, #c9a431 0%, #b8941f 100%);
+}
+
+/* Publish button */
+.toolbar-btn.publish-btn {
+  background: linear-gradient(135deg, #7c2831 0%, #6a222a 100%);
+  color: #fff;
+  border-color: rgba(124, 40, 49, 0.3);
+  box-shadow: 0 2px 6px rgba(124, 40, 49, 0.25);
+}
+
+.toolbar-btn.publish-btn:hover {
+  background: linear-gradient(135deg, #8a2d38 0%, #7c2831 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(124, 40, 49, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .builder-toolbar {
+    padding: 0 12px;
+    height: 52px;
+  }
+
+  .toolbar-btn .btn-label {
+    display: none;
+  }
+
+  .toolbar-btn {
+    padding: 8px 10px;
+  }
+
+  .brand-text {
+    display: none;
+  }
+
+  .toolbar-divider {
+    margin: 0 6px;
+  }
+}
+
+

@@ -1,0 +1,43 @@
+{
+  "name": "Priya & Saurabh Wedding Invitation",
+  "short_name": "Priya & Saurabh Wedding Invite",
+  "description": "Royal wedding invitation of Capt Dr. Priya Singh & Dr. Saurabh Singh",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fff8f0",
+  "theme_color": "#d4af37",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "assets/photos/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/photos/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["lifestyle", "events"],
+  "shortcuts": [
+    {
+      "name": "RSVP",
+      "short_name": "RSVP",
+      "description": "Quick RSVP",
+      "url": "/#rsvp",
+      "icons": [{ "src": "assets/photos/icons/icon-192.png", "sizes": "96x96", "type": "image/png" }]
+    },
+    {
+      "name": "Program",
+      "short_name": "Program",
+      "description": "View program details",
+      "url": "/#events",
+      "icons": [{ "src": "assets/photos/icons/icon-192.png", "sizes": "96x96", "type": "image/png" }]
+    }
+  ]
+}
+

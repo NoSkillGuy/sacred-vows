@@ -148,3 +148,4 @@ function EditableRSVPSection({ onRSVPClick, translations, currentLang, config = 
 
 export default EditableRSVPSection;
 
+

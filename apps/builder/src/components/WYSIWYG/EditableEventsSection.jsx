@@ -200,3 +200,4 @@ function EditableEventsSection({ translations, currentLang, config = {}, onUpdat
 
 export default EditableEventsSection;
 
+
