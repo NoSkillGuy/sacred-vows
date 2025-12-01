@@ -1,3 +1,7 @@
+/* ===================================
+   Preview Pane - Premium Design
+   =================================== */
+
 .preview-pane {
   display: flex;
   flex-direction: column;
@@ -10,32 +14,79 @@
 .preview-content {
   flex: 1;
   overflow: auto;
-  background: #e8e8e8;
+  background: 
+    radial-gradient(circle at 20% 20%, rgba(232, 180, 184, 0.1) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(212, 175, 55, 0.08) 0%, transparent 40%),
+    var(--builder-bg);
   position: relative;
+  padding: 0;
+}
+
+/* Scroll styling */
+.preview-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.preview-content::-webkit-scrollbar-track {
+  background: var(--builder-border-light);
+}
+
+.preview-content::-webkit-scrollbar-thumb {
+  background: var(--rose-soft);
+  border-radius: 4px;
+}
+
+.preview-content::-webkit-scrollbar-thumb:hover {
+  background: var(--rose);
 }
 
 /* Device Frame */
 .preview-device-frame {
-  background: #fff;
+  background: var(--white);
   min-height: 100%;
-  transition: max-width 0.3s ease, margin 0.3s ease, box-shadow 0.3s ease;
+  transition: all 0.4s var(--ease-out-expo);
   position: relative;
   display: flex;
   flex-direction: column;
+  box-shadow: var(--shadow-sm);
 }
 
 .preview-device-frame.device-tablet,
 .preview-device-frame.device-mobile {
-  border-radius: 16px;
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
   min-height: auto;
-  margin-top: 24px;
-  margin-bottom: 24px;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.preview-device-frame.device-tablet {
+  max-width: 768px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .preview-device-frame.device-mobile {
-  border-radius: 32px;
-  border: 8px solid #1a1a1a;
+  max-width: 375px;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 2rem;
+  border: 6px solid #1a1a1a;
+  position: relative;
+}
+
+/* Mobile notch */
+.preview-device-frame.device-mobile::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40%;
+  height: 20px;
+  background: #1a1a1a;
+  border-radius: 0 0 12px 12px;
+  z-index: 100;
 }
 
 /* Preview wrapper - matches actual website body */
@@ -56,7 +107,6 @@
 
 /* Ensure invitation button styles take precedence - match exact website styles */
 .preview-wrapper .btn {
-  /* Reset any builder styles and match exact website button styles */
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -162,4 +212,20 @@
   position: absolute !important;
   inset: 0;
   z-index: 3000;
+}
+
+/* Edit mode indicator */
+.preview-pane.edit-mode .preview-device-frame {
+  box-shadow: 
+    var(--shadow-lg),
+    0 0 0 2px var(--gold-light);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .preview-device-frame.device-tablet,
+  .preview-device-frame.device-mobile {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
 }

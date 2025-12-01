@@ -1,8 +1,10 @@
-# Landing Page Design Philosophy
+# Design Philosophy
 ## Sacred Vows - World-Class Romantic Wedding Invitation Platform
 
 **Last Updated:** December 2024  
-**Version:** 1.0
+**Version:** 1.1
+
+> **Note:** This design philosophy is applied consistently across the entire website builder application, including the Landing Page, Auth Pages (Login/Signup), Builder Interface, Toolbar, and all Modals.
 
 ---
 

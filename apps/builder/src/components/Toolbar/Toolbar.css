@@ -1,12 +1,16 @@
+/* ===================================
+   Builder Toolbar - Premium Design
+   =================================== */
+
 .builder-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 56px;
-  padding: 0 20px;
-  background: linear-gradient(180deg, #ffffff 0%, #fafafa 100%);
-  border-bottom: 1px solid #e8e8e8;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  height: 60px;
+  padding: 0 1.25rem;
+  background: linear-gradient(180deg, var(--white) 0%, var(--blush-light) 100%);
+  border-bottom: 1px solid var(--builder-border-light);
+  box-shadow: var(--shadow-xs);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -17,11 +21,34 @@
 .toolbar-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
 }
 
 .toolbar-left {
   flex: 0 0 auto;
+}
+
+/* Back Button */
+.toolbar-back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  color: var(--text-medium);
+  transition: all 0.2s var(--ease-out-quart);
+  margin-right: 0.5rem;
+}
+
+.toolbar-back-btn:hover {
+  background: var(--blush);
+  color: var(--text-dark);
+}
+
+.toolbar-back-btn svg {
+  width: 18px;
+  height: 18px;
 }
 
 .toolbar-center {
@@ -37,56 +64,67 @@
 .toolbar-brand {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding-right: 16px;
+  gap: 0.625rem;
+  padding-right: 1rem;
 }
 
 .brand-icon {
-  font-size: 22px;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #d4af37;
+}
+
+.brand-icon svg {
+  width: 100%;
+  height: 100%;
 }
 
 .brand-text {
-  font-size: 15px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.25rem;
   font-weight: 600;
-  color: #2c2c2c;
-  letter-spacing: -0.01em;
+  color: var(--text-dark);
+  letter-spacing: 0.5px;
 }
 
+/* Autosave Status */
 .autosave-status {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding-left: 16px;
-  font-size: 12px;
-  color: #7a7a7a;
+  gap: 0.4rem;
+  padding-left: 1rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
   font-weight: 500;
 }
 
 .autosave-dot {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
+  min-width: 8px;
+  min-height: 8px;
   border-radius: 50%;
-  background: #bdbdbd;
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.05);
-  transition: background 0.2s ease, box-shadow 0.2s ease;
+  background: var(--builder-border);
+  transition: all 0.3s var(--ease-out-quart);
 }
 
 .autosave-status.autosave-saving .autosave-dot {
-  background: #d4af37;
+  background: var(--gold);
   animation: autosavePulse 1s infinite;
 }
 
 .autosave-status.autosave-saved .autosave-dot {
-  background: #4caf50;
-  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+  background: var(--sage-dark);
+  box-shadow: 0 0 0 3px rgba(143, 168, 143, 0.2);
 }
 
 .autosave-status.autosave-idle .autosave-dot {
-  background: #bdbdbd;
-}
-
-.autosave-status .autosave-text {
-  letter-spacing: 0.02em;
+  background: var(--builder-border);
 }
 
 @keyframes autosavePulse {
@@ -108,54 +146,63 @@
 .toolbar-group {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 0.25rem;
 }
 
 .device-group {
-  background: #f5f5f5;
-  border-radius: 8px;
+  background: var(--blush);
+  border-radius: var(--radius-md);
   padding: 3px;
 }
 
 .toolbar-divider {
   width: 1px;
-  height: 24px;
-  background: #e0e0e0;
-  margin: 0 12px;
+  height: 1.5rem;
+  background: var(--builder-border);
+  margin: 0 0.75rem;
 }
 
 /* Toolbar Buttons */
 .toolbar-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
+  gap: 0.4rem;
+  padding: 0.5rem 0.875rem;
   border: 1px solid transparent;
   background: transparent;
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  font-size: 13px;
+  font-family: 'Quicksand', sans-serif;
+  font-size: 0.8rem;
   font-weight: 500;
-  color: #555;
-  transition: all 0.15s ease;
+  color: var(--text-medium);
+  transition: all 0.2s var(--ease-out-quart);
   white-space: nowrap;
 }
 
 .toolbar-btn:hover {
-  background: #f0f0f0;
-  color: #333;
+  background: var(--blush);
+  color: var(--text-dark);
 }
 
 .toolbar-btn.active {
-  background: #fff;
-  border-color: #d4af37;
-  color: #2c2c2c;
-  box-shadow: 0 1px 3px rgba(212, 175, 55, 0.15);
+  background: var(--white);
+  border-color: var(--rose);
+  color: var(--text-dark);
+  box-shadow: var(--shadow-xs);
 }
 
 .toolbar-btn .btn-icon {
-  font-size: 16px;
-  line-height: 1;
+  width: 1.125rem;
+  height: 1.125rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toolbar-btn .btn-icon svg {
+  width: 100%;
+  height: 100%;
 }
 
 .toolbar-btn .btn-label {
@@ -164,59 +211,62 @@
 
 /* Device buttons */
 .toolbar-btn.device-btn {
-  padding: 6px 10px;
+  padding: 0.4rem 0.6rem;
   background: transparent;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
 }
 
 .toolbar-btn.device-btn:hover {
-  background: #e8e8e8;
+  background: var(--rose-soft);
 }
 
 .toolbar-btn.device-btn.active {
-  background: #fff;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  background: var(--white);
+  box-shadow: var(--shadow-xs);
   border-color: transparent;
 }
 
 .toolbar-btn.device-btn .btn-icon {
-  font-size: 18px;
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
 /* Mode toggle */
 .toolbar-btn.mode-toggle {
-  min-width: 100px;
+  min-width: 90px;
   justify-content: center;
+  padding: 0.5rem 1rem;
 }
 
 .toolbar-btn.mode-toggle.active {
-  background: linear-gradient(135deg, #d4af37 0%, #c9a431 100%);
-  color: #fff;
-  border-color: #b8941f;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+  color: var(--white);
+  border-color: var(--gold-dark);
+  box-shadow: var(--shadow-gold);
 }
 
 .toolbar-btn.mode-toggle.active:hover {
-  background: linear-gradient(135deg, #c9a431 0%, #b8941f 100%);
+  box-shadow: var(--shadow-gold-lg);
 }
 
 /* Publish button */
 .toolbar-btn.publish-btn {
-  background: linear-gradient(135deg, #7c2831 0%, #6a222a 100%);
-  color: #fff;
-  border-color: rgba(124, 40, 49, 0.3);
-  box-shadow: 0 2px 6px rgba(124, 40, 49, 0.25);
+  background: linear-gradient(135deg, var(--burgundy) 0%, var(--burgundy-deep) 100%);
+  color: var(--white);
+  border-color: transparent;
+  box-shadow: var(--shadow-burgundy);
+  padding: 0.5rem 1rem;
 }
 
 .toolbar-btn.publish-btn:hover {
-  background: linear-gradient(135deg, #8a2d38 0%, #7c2831 100%);
   transform: translateY(-1px);
-  box-shadow: 0 3px 8px rgba(124, 40, 49, 0.3);
+  box-shadow: 0 6px 25px rgba(139, 41, 66, 0.35);
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .builder-toolbar {
-    padding: 0 12px;
+    padding: 0 0.75rem;
     height: 52px;
   }
 
@@ -225,7 +275,12 @@
   }
 
   .toolbar-btn {
-    padding: 8px 10px;
+    padding: 0.5rem;
+  }
+
+  .toolbar-btn.mode-toggle {
+    min-width: auto;
+    padding: 0.5rem;
   }
 
   .brand-text {
@@ -233,8 +288,10 @@
   }
 
   .toolbar-divider {
-    margin: 0 6px;
+    margin: 0 0.4rem;
+  }
+
+  .autosave-status .autosave-text {
+    display: none;
   }
 }
-
-

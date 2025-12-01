@@ -1,7 +1,16 @@
 /**
  * Wedding Data Schema
- * Defines the structure for user-provided wedding invitation data
+ * Defines the structure for wedding invitation data
+ * 
+ * This schema separates:
+ * 1. Universal Content Data - Shared across all templates (couple, events, venue, etc.)
+ * 2. Template Configuration - Per-template settings (sections, themes)
  */
+
+// ============================================================================
+// UNIVERSAL CONTENT DATA TYPES
+// These are shared across all templates
+// ============================================================================
 
 /**
  * @typedef {Object} PersonInfo
@@ -67,38 +76,261 @@
  * @typedef {Object} RSVPConfig
  * @property {Contact[]} contacts - List of contacts
  * @property {string} whatsappNumber - WhatsApp number for RSVP
- * @property {string} messageTemplate - RSVP message template with {name} and {date} placeholders
- */
-
-/**
- * @typedef {Object} TranslationSet
- * @property {Object} en - English translations
- * @property {Object} hi - Hindi translations
- * @property {Object} te - Telugu translations
+ * @property {string} maxDate - Maximum RSVP date
  */
 
 /**
  * @typedef {Object} CustomContent
- * @property {string} fathersLetter - Father's letter content with {name} placeholder
+ * @property {Object} fathersLetter - Father's letter configuration
+ * @property {string} fathersLetter.author - Letter author name
  */
 
 /**
- * @typedef {Object} WeddingData
- * @property {CoupleInfo} couple - Couple information
- * @property {WeddingDetails} wedding - Wedding details
- * @property {Event[]} events - Event list
- * @property {GalleryImage[]} gallery - Gallery images
- * @property {RSVPConfig} rsvp - RSVP configuration
- * @property {TranslationSet} translations - Multi-language translations
- * @property {CustomContent} customContent - Custom content sections
- * @property {Object} branding - Branding information
- * @property {string} branding.monogram - Monogram (e.g., "P&S")
- * @property {string} branding.title - Brand title
- * @property {string} branding.subtitle - Brand subtitle
- * @property {string} music - Background music file path
+ * @typedef {Object} MusicConfig
+ * @property {string} file - Music file path
+ * @property {number} volume - Volume level (0-1)
  */
 
-export const WeddingDataSchema = {
-  // Schema validation can be added here
+/**
+ * @typedef {Object} HeroConfig
+ * @property {string} mainImage - Hero section main image
+ */
+
+/**
+ * @typedef {Object} BrandingInfo
+ * @property {string} monogram - Couple monogram (e.g., "P&S")
+ * @property {string} title - Brand title
+ * @property {string} subtitle - Brand subtitle
+ */
+
+// ============================================================================
+// TEMPLATE CONFIGURATION TYPES
+// These are per-template settings
+// ============================================================================
+
+/**
+ * @typedef {Object} SectionConfig
+ * @property {string} id - Section identifier (e.g., 'hero', 'couple', 'events')
+ * @property {boolean} enabled - Whether section is visible
+ * @property {number} order - Display order (0-based)
+ */
+
+/**
+ * @typedef {Object} ThemeColors
+ * @property {string} primary - Primary color (hex)
+ * @property {string} secondary - Secondary color (hex)
+ * @property {string} background - Background color (hex)
+ * @property {string} text - Text color (hex)
+ * @property {string} accent - Accent color (hex, optional)
+ */
+
+/**
+ * @typedef {Object} ThemeFonts
+ * @property {string} heading - Heading font family
+ * @property {string} body - Body font family
+ * @property {string} script - Script/accent font family
+ */
+
+/**
+ * @typedef {Object} ThemeConfig
+ * @property {string} preset - Theme preset ID (e.g., 'royal-gold') or 'custom'
+ * @property {ThemeColors} colors - Theme colors
+ * @property {ThemeFonts} fonts - Theme fonts
+ */
+
+/**
+ * @typedef {Object} TemplateConfig
+ * @property {SectionConfig[]} sections - Section configurations
+ * @property {ThemeConfig} theme - Theme configuration
+ */
+
+// ============================================================================
+// COMPLETE DATA STRUCTURES
+// ============================================================================
+
+/**
+ * Universal Wedding Content Data
+ * This data is preserved when switching templates
+ * 
+ * @typedef {Object} UniversalWeddingData
+ * @property {BrandingInfo} branding - Branding information
+ * @property {CoupleInfo} couple - Couple information
+ * @property {WeddingDetails} wedding - Wedding details
+ * @property {Object} events - Events organized by day
+ * @property {Object} gallery - Gallery configuration
+ * @property {GalleryImage[]} gallery.images - Gallery images
+ * @property {RSVPConfig} rsvp - RSVP configuration
+ * @property {CustomContent} customContent - Custom content sections
+ * @property {MusicConfig} music - Music configuration
+ * @property {HeroConfig} hero - Hero section configuration
+ */
+
+/**
+ * Complete Invitation Data Structure
+ * Stored in the database for each invitation
+ * 
+ * @typedef {Object} InvitationData
+ * @property {string} id - Invitation ID
+ * @property {string} templateId - Current template ID
+ * @property {UniversalWeddingData} data - Universal content data
+ * @property {TemplateConfig} templateConfig - Template-specific configuration
+ * @property {Object} translations - Multi-language translations (optional)
+ */
+
+// ============================================================================
+// SECTION DEFINITIONS
+// Standard sections available across all templates
+// ============================================================================
+
+/**
+ * Standard section types available in the builder
+ */
+export const SECTION_TYPES = {
+  HEADER: 'header',
+  HERO: 'hero',
+  COUPLE: 'couple',
+  FATHERS_LETTER: 'fathers-letter',
+  GALLERY: 'gallery',
+  EVENTS: 'events',
+  VENUE: 'venue',
+  RSVP: 'rsvp',
+  FOOTER: 'footer',
 };
 
+/**
+ * Section metadata for UI display
+ */
+export const SECTION_METADATA = {
+  [SECTION_TYPES.HEADER]: {
+    id: SECTION_TYPES.HEADER,
+    name: 'Header',
+    description: 'Navigation and branding header',
+    icon: '📌',
+    required: true,
+  },
+  [SECTION_TYPES.HERO]: {
+    id: SECTION_TYPES.HERO,
+    name: 'Hero Banner',
+    description: 'Main hero section with couple photo and countdown',
+    icon: '🖼️',
+    required: false,
+  },
+  [SECTION_TYPES.COUPLE]: {
+    id: SECTION_TYPES.COUPLE,
+    name: 'Couple Profile',
+    description: 'Bride and groom information with photos',
+    icon: '💑',
+    required: false,
+  },
+  [SECTION_TYPES.FATHERS_LETTER]: {
+    id: SECTION_TYPES.FATHERS_LETTER,
+    name: "Father's Letter",
+    description: 'Heartfelt letter from the father',
+    icon: '✉️',
+    required: false,
+  },
+  [SECTION_TYPES.GALLERY]: {
+    id: SECTION_TYPES.GALLERY,
+    name: 'Photo Gallery',
+    description: 'Photo gallery with lightbox',
+    icon: '📷',
+    required: false,
+  },
+  [SECTION_TYPES.EVENTS]: {
+    id: SECTION_TYPES.EVENTS,
+    name: 'Events Timeline',
+    description: 'Wedding events schedule',
+    icon: '📅',
+    required: false,
+  },
+  [SECTION_TYPES.VENUE]: {
+    id: SECTION_TYPES.VENUE,
+    name: 'Venue Details',
+    description: 'Venue location with map',
+    icon: '📍',
+    required: false,
+  },
+  [SECTION_TYPES.RSVP]: {
+    id: SECTION_TYPES.RSVP,
+    name: 'RSVP Section',
+    description: 'Guest RSVP form and contacts',
+    icon: '💌',
+    required: false,
+  },
+  [SECTION_TYPES.FOOTER]: {
+    id: SECTION_TYPES.FOOTER,
+    name: 'Footer',
+    description: 'Closing message and credits',
+    icon: '🎀',
+    required: true,
+  },
+};
+
+/**
+ * Default section order for new invitations
+ */
+export const DEFAULT_SECTION_ORDER = [
+  SECTION_TYPES.HEADER,
+  SECTION_TYPES.HERO,
+  SECTION_TYPES.COUPLE,
+  SECTION_TYPES.FATHERS_LETTER,
+  SECTION_TYPES.GALLERY,
+  SECTION_TYPES.EVENTS,
+  SECTION_TYPES.VENUE,
+  SECTION_TYPES.RSVP,
+  SECTION_TYPES.FOOTER,
+];
+
+/**
+ * Create default section configuration
+ * @param {string[]} sectionOrder - Ordered array of section IDs
+ * @returns {SectionConfig[]} Default section configurations
+ */
+export function createDefaultSections(sectionOrder = DEFAULT_SECTION_ORDER) {
+  return sectionOrder.map((id, index) => ({
+    id,
+    enabled: true,
+    order: index,
+  }));
+}
+
+/**
+ * Default theme configuration
+ */
+export const DEFAULT_THEME = {
+  preset: 'custom',
+  colors: {
+    primary: '#d4af37',
+    secondary: '#8b6914',
+    background: '#fff8f0',
+    text: '#2c2c2c',
+    accent: '#c9a227',
+  },
+  fonts: {
+    heading: 'Playfair Display',
+    body: 'Poppins',
+    script: 'Great Vibes',
+  },
+};
+
+/**
+ * Create default template configuration
+ * @param {string} templateId - Template ID
+ * @returns {TemplateConfig} Default template configuration
+ */
+export function createDefaultTemplateConfig(templateId = 'royal-elegance') {
+  return {
+    sections: createDefaultSections(),
+    theme: { ...DEFAULT_THEME },
+  };
+}
+
+// Legacy export for backward compatibility
+export const WeddingDataSchema = {
+  SECTION_TYPES,
+  SECTION_METADATA,
+  DEFAULT_SECTION_ORDER,
+  DEFAULT_THEME,
+  createDefaultSections,
+  createDefaultTemplateConfig,
+};

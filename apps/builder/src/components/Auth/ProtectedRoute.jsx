@@ -55,7 +55,11 @@ function ProtectedRoute({ children }) {
       <div className="auth-loading">
         <div className="auth-loading-spinner">
           <div className="spinner-ring"></div>
-          <span>💒</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '2rem', height: '2rem', color: '#e8b4b8' }}>
+            <circle cx="8" cy="15" r="5"/>
+            <circle cx="16" cy="15" r="5"/>
+            <path d="M8 10a5 5 0 0 1 8 0"/>
+          </svg>
         </div>
         <p>Loading your workspace...</p>
         <style>{`
@@ -78,8 +82,7 @@ function ProtectedRoute({ children }) {
             justify-content: center;
             margin-bottom: 1.5rem;
           }
-          .auth-loading-spinner span {
-            font-size: 2rem;
+          .auth-loading-spinner svg {
             animation: pulse 1.5s ease-in-out infinite;
           }
           .spinner-ring {

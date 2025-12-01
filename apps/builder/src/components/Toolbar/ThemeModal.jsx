@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useBuilderStore } from '../../store/builderStore';
 import './ThemeModal.css';
 
+// All available font options
 const fontOptions = [
   { value: 'Playfair Display', label: 'Playfair Display', style: 'serif' },
   { value: 'Cormorant Garamond', label: 'Cormorant Garamond', style: 'serif' },
@@ -12,26 +13,54 @@ const fontOptions = [
   { value: 'Inter', label: 'Inter', style: 'sans-serif' },
   { value: 'Lato', label: 'Lato', style: 'sans-serif' },
   { value: 'Montserrat', label: 'Montserrat', style: 'sans-serif' },
+  { value: 'Quicksand', label: 'Quicksand', style: 'sans-serif' },
   { value: 'Great Vibes', label: 'Great Vibes', style: 'script' },
   { value: 'Dancing Script', label: 'Dancing Script', style: 'script' },
   { value: 'Tangerine', label: 'Tangerine', style: 'script' },
   { value: 'Alex Brush', label: 'Alex Brush', style: 'script' },
+  { value: 'Parisienne', label: 'Parisienne', style: 'script' },
 ];
 
-const colorPresets = [
-  { name: 'Royal Gold', primary: '#d4af37', secondary: '#8b6914', background: '#fff8f0', text: '#2c2c2c' },
-  { name: 'Rose Garden', primary: '#c77d8a', secondary: '#9b5c6a', background: '#fff5f7', text: '#4a3539' },
-  { name: 'Forest Sage', primary: '#6b8e6b', secondary: '#4a6f4a', background: '#f5f8f5', text: '#2c3c2c' },
-  { name: 'Ocean Blue', primary: '#5b8fa8', secondary: '#3d6b82', background: '#f5fafc', text: '#2c3640' },
-  { name: 'Lavender Dream', primary: '#9b8bb4', secondary: '#7a6a96', background: '#f8f5fc', text: '#3c3544' },
-  { name: 'Sunset Coral', primary: '#e07c5f', secondary: '#c45d42', background: '#fff7f5', text: '#3c3230' },
+// Fallback presets if template manifest is not available
+const fallbackPresets = [
+  { 
+    id: 'royal-gold', 
+    name: 'Royal Gold', 
+    colors: { primary: '#d4af37', secondary: '#8b6914', background: '#fff8f0', text: '#2c2c2c', accent: '#c9a227' },
+    fonts: { heading: 'Playfair Display', body: 'Poppins', script: 'Great Vibes' }
+  },
+  { 
+    id: 'rose-blush', 
+    name: 'Rose Blush', 
+    colors: { primary: '#c77d8a', secondary: '#9b5c6a', background: '#fff5f7', text: '#4a3539', accent: '#e8b4b8' },
+    fonts: { heading: 'Cormorant Garamond', body: 'Lato', script: 'Dancing Script' }
+  },
+  { 
+    id: 'forest-sage', 
+    name: 'Forest Sage', 
+    colors: { primary: '#6b8e6b', secondary: '#4a6f4a', background: '#f5f8f5', text: '#2c3c2c', accent: '#8fbc8f' },
+    fonts: { heading: 'EB Garamond', body: 'Montserrat', script: 'Tangerine' }
+  },
 ];
 
 function ThemeModal({ isOpen, onClose }) {
-  const { currentInvitation, updateNestedData } = useBuilderStore();
-  const theme = currentInvitation.data.theme || {};
+  const { 
+    currentInvitation, 
+    currentTemplateManifest,
+    applyThemePreset,
+    updateThemeColors,
+    updateThemeFonts,
+    getTheme,
+  } = useBuilderStore();
+
+  // Get current theme
+  const theme = getTheme();
   const colors = theme.colors || {};
   const fonts = theme.fonts || {};
+  const currentPreset = theme.preset || 'custom';
+
+  // Get theme presets from template manifest or use fallback
+  const themePresets = currentTemplateManifest?.themes || fallbackPresets;
 
   const [formData, setFormData] = useState({
     primaryColor: colors.primary || '#d4af37',
@@ -45,59 +74,56 @@ function ThemeModal({ isOpen, onClose }) {
 
   // Update local state when store changes
   useEffect(() => {
-    setFormData({
-      primaryColor: colors.primary || '#d4af37',
-      secondaryColor: colors.secondary || '#8b6914',
-      backgroundColor: colors.background || '#fff8f0',
-      textColor: colors.text || '#2c2c2c',
-      headingFont: fonts.heading || 'Playfair Display',
-      bodyFont: fonts.body || 'Poppins',
-      scriptFont: fonts.script || 'Great Vibes',
-    });
-  }, [colors, fonts]);
-
-  const handleChange = (field, value) => {
-    const newData = { ...formData, [field]: value };
-    setFormData(newData);
+    const currentTheme = getTheme();
+    const themeColors = currentTheme.colors || {};
+    const themeFonts = currentTheme.fonts || {};
     
-    // Update store immediately for live preview
-    updateNestedData('theme', {
-      colors: {
-        primary: newData.primaryColor,
-        secondary: newData.secondaryColor,
-        background: newData.backgroundColor,
-        text: newData.textColor,
-      },
-      fonts: {
-        heading: newData.headingFont,
-        body: newData.bodyFont,
-        script: newData.scriptFont,
-      },
+    setFormData({
+      primaryColor: themeColors.primary || '#d4af37',
+      secondaryColor: themeColors.secondary || '#8b6914',
+      backgroundColor: themeColors.background || '#fff8f0',
+      textColor: themeColors.text || '#2c2c2c',
+      headingFont: themeFonts.heading || 'Playfair Display',
+      bodyFont: themeFonts.body || 'Poppins',
+      scriptFont: themeFonts.script || 'Great Vibes',
     });
+  }, [currentInvitation.templateConfig?.theme]);
+
+  const handleColorChange = (field, value) => {
+    const colorMap = {
+      primaryColor: 'primary',
+      secondaryColor: 'secondary',
+      backgroundColor: 'background',
+      textColor: 'text',
+    };
+    
+    setFormData(prev => ({ ...prev, [field]: value }));
+    updateThemeColors({ [colorMap[field]]: value });
   };
 
-  const applyPreset = (preset) => {
-    const newData = {
-      ...formData,
-      primaryColor: preset.primary,
-      secondaryColor: preset.secondary,
-      backgroundColor: preset.background,
-      textColor: preset.text,
+  const handleFontChange = (field, value) => {
+    const fontMap = {
+      headingFont: 'heading',
+      bodyFont: 'body',
+      scriptFont: 'script',
     };
-    setFormData(newData);
     
-    updateNestedData('theme', {
-      colors: {
-        primary: preset.primary,
-        secondary: preset.secondary,
-        background: preset.background,
-        text: preset.text,
-      },
-      fonts: {
-        heading: newData.headingFont,
-        body: newData.bodyFont,
-        script: newData.scriptFont,
-      },
+    setFormData(prev => ({ ...prev, [field]: value }));
+    updateThemeFonts({ [fontMap[field]]: value });
+  };
+
+  const handleApplyPreset = (preset) => {
+    applyThemePreset(preset.id);
+    
+    // Update local form data
+    setFormData({
+      primaryColor: preset.colors.primary,
+      secondaryColor: preset.colors.secondary,
+      backgroundColor: preset.colors.background,
+      textColor: preset.colors.text,
+      headingFont: preset.fonts.heading,
+      bodyFont: preset.fonts.body,
+      scriptFont: preset.fonts.script,
     });
   };
 
@@ -112,23 +138,47 @@ function ThemeModal({ isOpen, onClose }) {
         </div>
 
         <div className="theme-modal-body">
-          {/* Color Presets */}
+          {/* Template Theme Presets */}
           <div className="theme-section">
-            <h4 className="theme-section-title">Color Presets</h4>
-            <div className="color-presets">
-              {colorPresets.map((preset) => (
+            <h4 className="theme-section-title">
+              Theme Presets
+              {currentTemplateManifest && (
+                <span className="theme-section-subtitle">
+                  for {currentTemplateManifest.name}
+                </span>
+              )}
+            </h4>
+            <div className="theme-presets-grid">
+              {themePresets.map((preset) => (
                 <button
-                  key={preset.name}
-                  className="preset-btn"
-                  onClick={() => applyPreset(preset)}
-                  title={preset.name}
+                  key={preset.id}
+                  className={`theme-preset-card ${currentPreset === preset.id ? 'active' : ''}`}
+                  onClick={() => handleApplyPreset(preset)}
                 >
-                  <div className="preset-colors">
-                    <span style={{ background: preset.primary }} />
-                    <span style={{ background: preset.secondary }} />
-                    <span style={{ background: preset.background }} />
+                  <div className="preset-color-preview">
+                    <div 
+                      className="preset-color-bg"
+                      style={{ background: preset.colors.background }}
+                    >
+                      <span 
+                        className="preset-color-primary"
+                        style={{ background: preset.colors.primary }}
+                      />
+                      <span 
+                        className="preset-color-secondary"
+                        style={{ background: preset.colors.secondary }}
+                      />
+                    </div>
                   </div>
-                  <span className="preset-name">{preset.name}</span>
+                  <div className="preset-info">
+                    <span className="preset-name">{preset.name}</span>
+                    {preset.isDefault && (
+                      <span className="preset-default-badge">Default</span>
+                    )}
+                  </div>
+                  {currentPreset === preset.id && (
+                    <div className="preset-active-indicator">✓</div>
+                  )}
                 </button>
               ))}
             </div>
@@ -136,27 +186,34 @@ function ThemeModal({ isOpen, onClose }) {
 
           {/* Custom Colors */}
           <div className="theme-section">
-            <h4 className="theme-section-title">Custom Colors</h4>
+            <h4 className="theme-section-title">
+              Custom Colors
+              {currentPreset !== 'custom' && (
+                <span className="theme-section-hint">
+                  (changes will switch to custom theme)
+                </span>
+              )}
+            </h4>
             <div className="color-grid">
               <ColorPicker
                 label="Primary"
                 value={formData.primaryColor}
-                onChange={(v) => handleChange('primaryColor', v)}
+                onChange={(v) => handleColorChange('primaryColor', v)}
               />
               <ColorPicker
                 label="Secondary"
                 value={formData.secondaryColor}
-                onChange={(v) => handleChange('secondaryColor', v)}
+                onChange={(v) => handleColorChange('secondaryColor', v)}
               />
               <ColorPicker
                 label="Background"
                 value={formData.backgroundColor}
-                onChange={(v) => handleChange('backgroundColor', v)}
+                onChange={(v) => handleColorChange('backgroundColor', v)}
               />
               <ColorPicker
                 label="Text"
                 value={formData.textColor}
-                onChange={(v) => handleChange('textColor', v)}
+                onChange={(v) => handleColorChange('textColor', v)}
               />
             </div>
           </div>
@@ -169,19 +226,19 @@ function ThemeModal({ isOpen, onClose }) {
                 label="Headings"
                 value={formData.headingFont}
                 options={fontOptions.filter(f => f.style === 'serif')}
-                onChange={(v) => handleChange('headingFont', v)}
+                onChange={(v) => handleFontChange('headingFont', v)}
               />
               <FontPicker
                 label="Body Text"
                 value={formData.bodyFont}
                 options={fontOptions.filter(f => f.style === 'sans-serif')}
-                onChange={(v) => handleChange('bodyFont', v)}
+                onChange={(v) => handleFontChange('bodyFont', v)}
               />
               <FontPicker
                 label="Script/Accent"
                 value={formData.scriptFont}
                 options={fontOptions.filter(f => f.style === 'script')}
-                onChange={(v) => handleChange('scriptFont', v)}
+                onChange={(v) => handleFontChange('scriptFont', v)}
               />
             </div>
           </div>
@@ -276,5 +333,3 @@ function FontPicker({ label, value, options, onChange }) {
 }
 
 export default ThemeModal;
-
-

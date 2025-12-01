@@ -862,6 +862,10 @@
   text-align: center;
   margin-bottom: 4rem;
   position: relative;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 2rem;
 }
 
 .section-label {
@@ -910,6 +914,9 @@
   background: var(--white);
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .templates-section::before {
@@ -1128,6 +1135,9 @@
   background: linear-gradient(180deg, var(--blush-light) 0%, var(--cream) 100%);
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .features-section::before {
@@ -1269,6 +1279,9 @@
   background: var(--white);
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .steps-container {
@@ -1398,6 +1411,9 @@
   background: linear-gradient(180deg, var(--cream) 0%, var(--champagne) 100%);
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .testimonials-section::before {

@@ -1,9 +1,23 @@
 /**
  * Wedding Configuration
- * Contains all hardcoded data extracted from components
- * This will be replaced by user data in the builder platform
+ * Contains all default data for the wedding invitation builder
+ * 
+ * This configuration is separated into:
+ * 1. Universal Content Data - Shared across all templates
+ * 2. Template Configuration - Per-template settings (sections, themes)
  */
 
+import { 
+  SECTION_TYPES, 
+  DEFAULT_SECTION_ORDER, 
+  createDefaultSections,
+  DEFAULT_THEME 
+} from '../../../../packages/shared/src/types/wedding-data.js';
+
+/**
+ * Default universal wedding content data
+ * This data is preserved when switching templates
+ */
 export const defaultWeddingConfig = {
   branding: {
     monogram: 'P&S',
@@ -134,7 +148,6 @@ export const defaultWeddingConfig = {
   customContent: {
     fathersLetter: {
       author: 'Sanjay Kumar Singh',
-      // The letter content is in translations, but we can add template-specific content here
     }
   },
   
@@ -145,6 +158,20 @@ export const defaultWeddingConfig = {
   
   hero: {
     mainImage: '/assets/photos/couple/1.jpeg'
-  }
+  },
+
+  // Theme is now part of templateConfig, but keep here for backward compatibility
+  theme: DEFAULT_THEME,
 };
 
+/**
+ * Default template configuration
+ * Per-template settings for sections and theme
+ */
+export const defaultTemplateConfig = {
+  sections: createDefaultSections(),
+  theme: { ...DEFAULT_THEME },
+};
+
+// Re-export for convenience
+export { SECTION_TYPES, DEFAULT_SECTION_ORDER, createDefaultSections, DEFAULT_THEME };
