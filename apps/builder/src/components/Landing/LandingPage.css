@@ -494,6 +494,11 @@
 .hero-content {
   flex: 0 1 620px;
   max-width: 620px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .hero-content > * {
@@ -515,6 +520,7 @@
 .hero-tagline {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.75rem;
   font-size: 0.85rem;
   font-weight: 600;
@@ -540,10 +546,17 @@
   color: var(--text-dark);
   margin-bottom: 1.25rem;
   letter-spacing: -0.5px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .title-accent {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: 'Great Vibes', cursive;
   font-size: 4.5rem;
   font-weight: 400;
@@ -553,6 +566,7 @@
   background-clip: text;
   line-height: 1.3;
   margin-top: 0.25rem;
+  text-align: center;
 }
 
 .hero-subtitle {
@@ -561,11 +575,14 @@
   color: var(--text-light);
   margin-bottom: 2rem;
   max-width: 520px;
+  text-align: center;
 }
 
 /* CTA Buttons */
 .hero-cta {
   display: flex;
+  align-items: center;
+  justify-content: center;
   gap: 1rem;
   margin-bottom: 2.5rem;
 }
@@ -647,12 +664,15 @@
 .hero-stats {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 2rem;
 }
 
 .stat {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 0.2rem;
 }
 
@@ -662,6 +682,10 @@
   font-weight: 700;
   color: var(--text-dark);
   letter-spacing: -0.5px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .stat-label {
@@ -669,6 +693,7 @@
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 1px;
+  text-align: center;
 }
 
 .stat-divider {
@@ -774,6 +799,10 @@
   color: var(--text-dark);
   letter-spacing: 1px;
   margin-bottom: 0.25rem;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .showcase-and {
@@ -781,6 +810,10 @@
   font-size: 2.5rem;
   color: var(--dusty-rose);
   margin: 0.25rem 0;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .showcase-date {
@@ -791,6 +824,10 @@
   letter-spacing: 3px;
   text-transform: uppercase;
   margin-top: 1rem;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .showcase-venue {
@@ -798,6 +835,10 @@
   color: var(--text-light);
   letter-spacing: 1px;
   margin-top: 0.5rem;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .showcase-glow {
@@ -866,6 +907,10 @@
   margin-left: auto;
   margin-right: auto;
   padding: 0 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .section-label {
@@ -877,6 +922,7 @@
   margin-bottom: 0.75rem;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.75rem;
 }
 
@@ -895,6 +941,10 @@
   color: var(--text-dark);
   margin-bottom: 1rem;
   letter-spacing: -0.5px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .section-subtitle {
@@ -903,6 +953,7 @@
   max-width: 580px;
   margin: 0 auto;
   line-height: 1.75;
+  text-align: center;
 }
 
 /* ===================================
@@ -1051,12 +1102,20 @@
   font-weight: 600;
   margin-bottom: 0.5rem;
   letter-spacing: 0.5px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .template-date {
   font-family: 'Great Vibes', cursive;
   font-size: 1.4rem;
   opacity: 0.8;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .template-overlay {
@@ -1111,6 +1170,10 @@
   padding: 1.25rem;
   background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.95) 30%);
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .template-name {
@@ -1119,11 +1182,16 @@
   font-weight: 600;
   color: var(--text-dark);
   margin-bottom: 0.2rem;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .template-desc {
   font-size: 0.8rem;
   color: var(--text-light);
+  text-align: center;
 }
 
 /* ===================================
@@ -1183,6 +1251,10 @@
   transition: all 0.5s var(--ease-out-expo);
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .feature-card::before {
@@ -1262,12 +1334,17 @@
   font-weight: 600;
   color: var(--text-dark);
   margin-bottom: 0.6rem;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .feature-desc {
   font-size: 0.9rem;
   color: var(--text-light);
   line-height: 1.7;
+  text-align: center;
 }
 
 /* ===================================
@@ -1330,6 +1407,10 @@
   position: relative;
   z-index: 1;
   max-width: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .step-number {
@@ -1394,12 +1475,17 @@
   font-weight: 600;
   color: var(--text-dark);
   margin-bottom: 0.6rem;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .step-desc {
   font-size: 0.9rem;
   color: var(--text-light);
   line-height: 1.7;
+  text-align: center;
 }
 
 /* ===================================
@@ -1450,6 +1536,10 @@
   box-shadow: var(--shadow-sm);
   transition: all 0.5s var(--ease-out-expo);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .testimonial-card::before {
@@ -1489,6 +1579,8 @@
   display: flex;
   gap: 0.2rem;
   margin-bottom: 1rem;
+  align-items: center;
+  justify-content: center;
 }
 
 .testimonial-star {
@@ -1503,11 +1595,13 @@
   font-style: italic;
   margin-bottom: 1.5rem;
   position: relative;
+  text-align: center;
 }
 
 .testimonial-author {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 1rem;
   flex-wrap: nowrap;
 }
@@ -1547,11 +1641,16 @@
   font-weight: 600;
   color: var(--text-dark);
   margin-bottom: 0.15rem;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .testimonial-info p {
   font-size: 0.8rem;
   color: var(--text-muted);
+  text-align: center;
 }
 
 .testimonial-verified {
@@ -1642,6 +1741,11 @@
   z-index: 1;
   max-width: 700px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .cta-title {
@@ -1651,6 +1755,11 @@
   color: var(--white);
   margin-bottom: 0.75rem;
   letter-spacing: -0.5px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .cta-title-accent {
@@ -1675,6 +1784,7 @@
   color: rgba(255, 255, 255, 0.7);
   line-height: 1.8;
   margin-bottom: 2.5rem;
+  text-align: center;
 }
 
 .cta-button {
@@ -1731,6 +1841,7 @@
 
 .cta-trust {
   display: flex;
+  align-items: center;
   justify-content: center;
   gap: 4rem;
   margin-top: 3.5rem;
@@ -1740,6 +1851,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 0.25rem;
 }
 
@@ -1751,12 +1863,17 @@
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .trust-label {
   font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.5);
   letter-spacing: 0.5px;
+  text-align: center;
 }
 
 /* ===================================
