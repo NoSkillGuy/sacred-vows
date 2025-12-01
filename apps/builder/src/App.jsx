@@ -1,13 +1,26 @@
-import { useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import BuilderLayout from './components/Layout/BuilderLayout';
-import { useBuilderStore } from './store/builderStore';
+import LandingPage from './components/Landing/LandingPage';
+import LoginPage from './components/Auth/LoginPage';
+import SignupPage from './components/Auth/SignupPage';
+import ProtectedRoute from './components/Auth/ProtectedRoute';
 
 function App() {
-  const { currentInvitation } = useBuilderStore();
-
   return (
     <div className="app">
-      <BuilderLayout />
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route 
+          path="/builder" 
+          element={
+            <ProtectedRoute>
+              <BuilderLayout />
+            </ProtectedRoute>
+          } 
+        />
+      </Routes>
     </div>
   );
 }
