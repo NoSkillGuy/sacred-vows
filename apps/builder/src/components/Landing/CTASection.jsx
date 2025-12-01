@@ -1,16 +1,41 @@
 import { useNavigate } from 'react-router-dom';
 
+// Floating petal SVG
+const FloatingPetal = ({ style }) => (
+  <div className="cta-petal" style={style}>
+    <svg viewBox="0 0 30 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="30" height="40">
+      <path d="M15 0C15 0 30 12 30 25C30 33 23.284 40 15 40C6.716 40 0 33 0 25C0 12 15 0 15 0Z" />
+    </svg>
+  </div>
+);
+
 function CTASection() {
   const navigate = useNavigate();
 
+  // Generate floating petals
+  const petals = [
+    { top: '10%', left: '5%', animationDelay: '0s' },
+    { top: '20%', right: '10%', animationDelay: '2s' },
+    { bottom: '15%', left: '8%', animationDelay: '4s' },
+    { top: '40%', right: '5%', animationDelay: '1s' },
+    { bottom: '30%', right: '15%', animationDelay: '3s' },
+    { top: '60%', left: '3%', animationDelay: '5s' },
+  ];
+
   return (
     <section className="cta-section">
-      <div className="cta-decorations">
-        <div className="cta-flower cta-flower-1">✿</div>
-        <div className="cta-flower cta-flower-2">❀</div>
-        <div className="cta-flower cta-flower-3">✾</div>
-        <div className="cta-flower cta-flower-4">❁</div>
+      {/* Background pattern */}
+      <div className="cta-bg-pattern" />
+      
+      {/* Floating particles */}
+      <div className="cta-particles">
+        {petals.map((style, index) => (
+          <FloatingPetal key={index} style={style} />
+        ))}
       </div>
+      
+      {/* Central glow effect */}
+      <div className="cta-glow" />
 
       <div className="cta-content">
         <h2 className="cta-title">
@@ -22,8 +47,8 @@ function CTASection() {
           invitation with Sacred Vows. Start for free and make your love story shine.
         </p>
         <button className="cta-button" onClick={() => navigate('/signup')}>
-          Create Your Invitation
-          <span>→</span>
+          <span>Create Your Invitation</span>
+          <span className="cta-button-arrow">→</span>
         </button>
 
         <div className="cta-trust">
@@ -46,4 +71,3 @@ function CTASection() {
 }
 
 export default CTASection;
-
