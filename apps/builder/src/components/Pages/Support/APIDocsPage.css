@@ -1,0 +1,322 @@
+/* ===================================
+   API Documentation Page Styles
+   =================================== */
+
+.api-docs-page {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* ===================================
+   API Features
+   =================================== */
+
+.api-features {
+  margin-bottom: 4rem;
+}
+
+.api-features .features-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+.api-features .feature-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  text-align: center;
+  border: 1px solid var(--builder-border-light);
+  transition: all 0.3s var(--ease-out-quart);
+}
+
+.api-features .feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.api-features .feature-icon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--blush) 0%, var(--rose-soft) 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+
+.api-features .feature-icon svg {
+  width: 22px;
+  height: 22px;
+  color: var(--burgundy);
+}
+
+.api-features .feature-card h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 0.35rem;
+}
+
+.api-features .feature-card p {
+  font-size: 0.85rem;
+  color: var(--text-light);
+  line-height: 1.5;
+}
+
+/* ===================================
+   API Sections
+   =================================== */
+
+.api-section {
+  margin-bottom: 3rem;
+}
+
+.api-section h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--builder-border-light);
+}
+
+.api-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  border: 1px solid var(--builder-border-light);
+}
+
+.api-card h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 0.75rem;
+}
+
+.api-card h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.api-card p {
+  font-size: 0.95rem;
+  color: var(--text-medium);
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.api-card p:last-child {
+  margin-bottom: 0;
+}
+
+/* Code Blocks */
+.code-block {
+  background: #1e1e2e;
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  margin: 1rem 0;
+  overflow-x: auto;
+}
+
+.code-block code,
+.code-block pre {
+  font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+  font-size: 0.85rem;
+  color: #cdd6f4;
+  line-height: 1.6;
+}
+
+.code-block pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.code-block.large {
+  padding: 1.25rem 1.5rem;
+}
+
+.code-keyword {
+  color: #89b4fa;
+}
+
+/* Rate Limits */
+.rate-limits {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.rate-limits li {
+  padding: 0.5rem 0;
+  font-size: 0.95rem;
+  color: var(--text-medium);
+  border-bottom: 1px solid var(--builder-border-light);
+}
+
+.rate-limits li:last-child {
+  border-bottom: none;
+}
+
+/* ===================================
+   Endpoints Table
+   =================================== */
+
+.endpoints-table {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--builder-border-light);
+  overflow: hidden;
+}
+
+.endpoints-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.endpoints-table th,
+.endpoints-table td {
+  padding: 1rem 1.25rem;
+  text-align: left;
+  border-bottom: 1px solid var(--builder-border-light);
+}
+
+.endpoints-table th {
+  background: var(--blush-light);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.endpoints-table td {
+  font-size: 0.9rem;
+  color: var(--text-medium);
+}
+
+.endpoints-table td code {
+  font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+  font-size: 0.85rem;
+  background: var(--blush-light);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  color: var(--text-dark);
+}
+
+.endpoints-table tbody tr:hover {
+  background: var(--blush-light);
+}
+
+.endpoints-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.method-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-family: 'Fira Code', monospace;
+  text-transform: uppercase;
+}
+
+.method-badge.get {
+  background: #d4edda;
+  color: #155724;
+}
+
+.method-badge.post {
+  background: #cce5ff;
+  color: #004085;
+}
+
+.method-badge.put {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.method-badge.delete {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* ===================================
+   Help Section
+   =================================== */
+
+.api-help {
+  background: linear-gradient(135deg, var(--blush-light) 0%, var(--champagne) 100%);
+  border-radius: var(--radius-xl);
+  padding: 3.5rem;
+  text-align: center;
+  margin-top: 4rem;
+}
+
+.api-help h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 500;
+  color: var(--text-dark);
+  margin-bottom: 0.75rem;
+  border: none;
+  padding: 0;
+}
+
+.api-help p {
+  font-size: 1.05rem;
+  color: var(--text-light);
+  margin-bottom: 2rem;
+}
+
+.help-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+/* ===================================
+   Responsive
+   =================================== */
+
+@media (max-width: 1024px) {
+  .api-features .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .api-features .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .endpoints-table {
+    overflow-x: auto;
+  }
+
+  .endpoints-table table {
+    min-width: 600px;
+  }
+
+  .api-help {
+    padding: 2.5rem 1.5rem;
+  }
+
+  .help-buttons {
+    flex-direction: column;
+  }
+
+  .api-card {
+    padding: 1.5rem;
+  }
+}
+

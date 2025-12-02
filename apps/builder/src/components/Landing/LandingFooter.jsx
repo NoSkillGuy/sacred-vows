@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 // SVG Icons
 const RingIcon = () => (
   <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -52,16 +54,16 @@ function LandingFooter() {
             of your love story. Share your joy with the world.
           </p>
           <div className="footer-social">
-            <a href="#" className="social-link" aria-label="Instagram">
+            <a href="https://instagram.com" className="social-link" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
               <InstagramIcon />
             </a>
-            <a href="#" className="social-link" aria-label="Pinterest">
+            <a href="https://pinterest.com" className="social-link" aria-label="Pinterest" target="_blank" rel="noopener noreferrer">
               <PinterestIcon />
             </a>
-            <a href="#" className="social-link" aria-label="Facebook">
+            <a href="https://facebook.com" className="social-link" aria-label="Facebook" target="_blank" rel="noopener noreferrer">
               <FacebookIcon />
             </a>
-            <a href="#" className="social-link" aria-label="Twitter">
+            <a href="https://twitter.com" className="social-link" aria-label="Twitter" target="_blank" rel="noopener noreferrer">
               <TwitterIcon />
             </a>
           </div>
@@ -70,33 +72,33 @@ function LandingFooter() {
         <div className="footer-column">
           <h4>Templates</h4>
           <ul>
-            <li><a href="#templates">All Templates</a></li>
-            <li><a href="#templates">Traditional</a></li>
-            <li><a href="#templates">Modern</a></li>
-            <li><a href="#templates">Minimal</a></li>
-            <li><a href="#templates">Floral</a></li>
+            <li><Link to="/templates-gallery">All Templates</Link></li>
+            <li><Link to="/templates/traditional">Traditional</Link></li>
+            <li><Link to="/templates/modern">Modern</Link></li>
+            <li><Link to="/templates/minimal">Minimal</Link></li>
+            <li><Link to="/templates/floral">Floral</Link></li>
           </ul>
         </div>
 
         <div className="footer-column">
           <h4>Company</h4>
           <ul>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Blog</a></li>
-            <li><a href="#">Careers</a></li>
-            <li><a href="#">Press</a></li>
-            <li><a href="#">Contact</a></li>
+            <li><Link to="/about">About Us</Link></li>
+            <li><Link to="/blog">Blog</Link></li>
+            <li><Link to="/careers">Careers</Link></li>
+            <li><Link to="/press">Press</Link></li>
+            <li><Link to="/contact">Contact</Link></li>
           </ul>
         </div>
 
         <div className="footer-column">
           <h4>Support</h4>
           <ul>
-            <li><a href="#">Help Center</a></li>
-            <li><a href="#">FAQs</a></li>
-            <li><a href="#">Pricing</a></li>
-            <li><a href="#">Tutorials</a></li>
-            <li><a href="#">API</a></li>
+            <li><Link to="/help">Help Center</Link></li>
+            <li><Link to="/faqs">FAQs</Link></li>
+            <li><Link to="/pricing">Pricing</Link></li>
+            <li><Link to="/tutorials">Tutorials</Link></li>
+            <li><Link to="/api-docs">API</Link></li>
           </ul>
         </div>
       </div>
@@ -106,9 +108,9 @@ function LandingFooter() {
           © {currentYear} Sacred Vows. Made with <span>♥</span> for couples everywhere.
         </p>
         <div className="footer-links">
-          <a href="#">Privacy Policy</a>
-          <a href="#">Terms of Service</a>
-          <a href="#">Cookie Policy</a>
+          <Link to="/privacy">Privacy Policy</Link>
+          <Link to="/terms">Terms of Service</Link>
+          <Link to="/cookies">Cookie Policy</Link>
         </div>
       </div>
     </footer>

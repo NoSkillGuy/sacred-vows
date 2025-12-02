@@ -1,0 +1,349 @@
+/* ===================================
+   Press Page Styles
+   =================================== */
+
+.press-page {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* ===================================
+   Stats
+   =================================== */
+
+.press-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  background: linear-gradient(135deg, #2d2d2d 0%, #1a1a2e 100%);
+  border-radius: var(--radius-xl);
+  padding: 3rem 2rem;
+  margin-bottom: 4rem;
+}
+
+.press-stats .stat-item {
+  text-align: center;
+}
+
+.press-stats .stat-number {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.press-stats .stat-label {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ===================================
+   About Section
+   =================================== */
+
+.press-about {
+  margin-bottom: 4rem;
+}
+
+.about-content {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  padding: 2.5rem;
+  border: 1px solid var(--builder-border-light);
+}
+
+.about-content h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 1.25rem;
+}
+
+.about-content p {
+  font-size: 1rem;
+  color: var(--text-medium);
+  line-height: 1.85;
+  margin-bottom: 1rem;
+}
+
+.about-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* ===================================
+   Press Kit
+   =================================== */
+
+.press-kit {
+  margin-bottom: 4rem;
+}
+
+.press-kit .section-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.press-kit-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.press-kit-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem 1.75rem;
+  border: 1px solid var(--builder-border-light);
+  transition: all 0.3s var(--ease-out-quart);
+}
+
+.press-kit-item:hover {
+  border-color: var(--rose);
+  box-shadow: var(--shadow-sm);
+}
+
+.kit-info h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 0.2rem;
+}
+
+.kit-info p {
+  font-size: 0.85rem;
+  color: var(--text-light);
+}
+
+.download-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--blush-light);
+  border: 1px solid var(--builder-border);
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius-md);
+  font-family: 'Quicksand', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.download-btn:hover {
+  background: var(--rose-soft);
+  border-color: var(--rose);
+}
+
+.download-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ===================================
+   Press Releases
+   =================================== */
+
+.press-releases {
+  margin-bottom: 4rem;
+}
+
+.press-releases .section-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.releases-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.release-card {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  padding: 2rem;
+  border: 1px solid var(--builder-border-light);
+  transition: all 0.3s var(--ease-out-quart);
+  cursor: pointer;
+}
+
+.release-card:hover {
+  border-color: var(--rose);
+  box-shadow: var(--shadow-md);
+}
+
+.release-date {
+  font-size: 0.8rem;
+  color: var(--gold-dark);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.release-card h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin: 0.5rem 0 0.75rem;
+}
+
+.release-card p {
+  font-size: 0.95rem;
+  color: var(--text-light);
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.release-card .read-more {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--gold-dark);
+}
+
+/* ===================================
+   Media Coverage
+   =================================== */
+
+.media-coverage {
+  margin-bottom: 4rem;
+}
+
+.media-coverage .section-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.coverage-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+.coverage-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  border: 1px solid var(--builder-border-light);
+  transition: all 0.3s var(--ease-out-quart);
+}
+
+.coverage-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.coverage-card .outlet {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--burgundy);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: var(--rose-soft);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+}
+
+.coverage-card h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin: 0.75rem 0 0.5rem;
+  line-height: 1.3;
+}
+
+.coverage-date {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ===================================
+   Press Contact
+   =================================== */
+
+.press-contact {
+  background: linear-gradient(135deg, var(--blush-light) 0%, var(--champagne) 100%);
+  border-radius: var(--radius-xl);
+  padding: 3.5rem;
+  text-align: center;
+}
+
+.press-contact h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 500;
+  color: var(--text-dark);
+  margin-bottom: 0.75rem;
+}
+
+.press-contact > p {
+  font-size: 1.05rem;
+  color: var(--text-light);
+  margin-bottom: 1.5rem;
+}
+
+.press-contact .contact-info {
+  margin-bottom: 2rem;
+}
+
+.press-contact .contact-info p {
+  font-size: 0.95rem;
+  color: var(--text-medium);
+  margin-bottom: 0.25rem;
+}
+
+/* ===================================
+   Responsive
+   =================================== */
+
+@media (max-width: 1024px) {
+  .press-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .press-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    padding: 2rem 1.5rem;
+  }
+
+  .press-stats .stat-number {
+    font-size: 2rem;
+  }
+
+  .press-kit-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .download-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .coverage-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .press-contact {
+    padding: 2.5rem 1.5rem;
+  }
+}
+
