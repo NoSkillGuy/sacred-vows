@@ -688,9 +688,9 @@
   justify-content: center;
 }
 
-.stat-label {
+.hero-stats .stat-label {
   font-size: 0.75rem;
-  color: var(--text-muted);
+  color: var(--text-light) !important;
   text-transform: uppercase;
   letter-spacing: 1px;
   text-align: center;
@@ -1870,8 +1870,9 @@
 }
 
 .trust-label {
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 600;
   letter-spacing: 0.5px;
   text-align: center;
 }
