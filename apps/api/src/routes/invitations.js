@@ -22,8 +22,31 @@ router.get('/', (req, res) => {
 });
 
 /**
+ * Get preview data
+ * GET /api/invitations/:id/preview
+ * NOTE: This route must be defined BEFORE /:id to avoid being shadowed
+ */
+router.get('/:id/preview', (req, res) => {
+  const { id } = req.params;
+  const invitation = invitations.find(inv => inv.id === id);
+
+  if (!invitation) {
+    return res.status(404).json({ error: 'Invitation not found' });
+  }
+
+  res.json({ 
+    invitation: {
+      id: invitation.id,
+      templateId: invitation.templateId,
+      data: invitation.data,
+    }
+  });
+});
+
+/**
  * Get single invitation
  * GET /api/invitations/:id
+ * NOTE: This route must be defined AFTER more specific routes like /:id/preview
  */
 router.get('/:id', (req, res) => {
   const { id } = req.params;
@@ -104,27 +127,6 @@ router.delete('/:id', (req, res) => {
 
   invitations.splice(invitationIndex, 1);
   res.json({ message: 'Invitation deleted' });
-});
-
-/**
- * Get preview data
- * GET /api/invitations/:id/preview
- */
-router.get('/:id/preview', (req, res) => {
-  const { id } = req.params;
-  const invitation = invitations.find(inv => inv.id === id);
-
-  if (!invitation) {
-    return res.status(404).json({ error: 'Invitation not found' });
-  }
-
-  res.json({ 
-    invitation: {
-      id: invitation.id,
-      templateId: invitation.templateId,
-      data: invitation.data,
-    }
-  });
 });
 
 export default router;

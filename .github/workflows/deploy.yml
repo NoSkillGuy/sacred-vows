@@ -49,6 +49,10 @@ jobs:
         working-directory: ./apps/api
         run: npm ci
       
+      - name: Generate Prisma Client
+        working-directory: ./apps/api
+        run: npx prisma generate
+      
       - name: Run Prisma migrations
         working-directory: ./apps/api
         run: npx prisma migrate deploy
@@ -56,5 +60,7 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
       
       - name: Deploy to Railway
-        # Add Railway deployment steps here
-        run: echo "Deploy to Railway"
+        uses: bervProject/railway-deploy@main
+        with:
+          railway_token: ${{ secrets.RAILWAY_TOKEN }}
+          service: api

@@ -267,23 +267,9 @@ router.get('/manifests', (req, res) => {
 });
 
 /**
- * Get single template
- * GET /api/templates/:id
- */
-router.get('/:id', (req, res) => {
-  const { id } = req.params;
-  const template = templates.find(t => t.id === id);
-
-  if (!template) {
-    return res.status(404).json({ error: 'Template not found' });
-  }
-
-  res.json({ template });
-});
-
-/**
  * Get template manifest
  * GET /api/templates/:id/manifest
+ * NOTE: This route must be defined BEFORE /:id to avoid being shadowed
  */
 router.get('/:id/manifest', (req, res) => {
   const { id } = req.params;
@@ -323,6 +309,22 @@ router.get('/:id/manifest', (req, res) => {
   };
 
   res.json({ manifest });
+});
+
+/**
+ * Get single template
+ * GET /api/templates/:id
+ * NOTE: This route must be defined AFTER more specific routes like /:id/manifest
+ */
+router.get('/:id', (req, res) => {
+  const { id } = req.params;
+  const template = templates.find(t => t.id === id);
+
+  if (!template) {
+    return res.status(404).json({ error: 'Template not found' });
+  }
+
+  res.json({ template });
 });
 
 export default router;
