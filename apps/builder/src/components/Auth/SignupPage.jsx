@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import zxcvbn from 'zxcvbn';
 import { register } from '../../services/authService';
 import { usePetals } from './usePetals';
 import './AuthPage.css';
@@ -51,6 +52,8 @@ function SignupPage() {
     password: '',
     confirmPassword: '',
   });
+  const [strength, setStrength] = useState('weak');
+  const [showTooltip, setShowTooltip] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -58,12 +61,28 @@ function SignupPage() {
   const petals = usePetals(10);
 
   const handleChange = (e) => {
+    const { name, value } = e.target;
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
     setError('');
+
+    if (name === 'password') {
+      const score = zxcvbn(value).score;
+      const level = score >= 3 ? 'strong' : score === 2 ? 'medium' : 'weak';
+      setStrength(level);
+    }
   };
+
+  const strengthMessages = {
+    weak: 'Keep going—add length and symbols',
+    medium: 'Almost there—mix upper/lower & numbers',
+    strong: 'Strong password—looks great!',
+  };
+
+  const tooltipVisible = showTooltip;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -184,11 +203,20 @@ function SignupPage() {
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
+                onFocus={() => setShowTooltip(true)}
+                onBlur={() => setShowTooltip(false)}
                 placeholder="Create a password"
                 className="auth-input"
                 required
                 minLength={6}
               />
+              <div 
+                className={`auth-tooltip strength-${strength} ${tooltipVisible ? 'visible' : ''}`}
+                role="status"
+                aria-live="polite"
+              >
+                {strengthMessages[strength]}
+              </div>
             </div>
 
             <div className="auth-field">
