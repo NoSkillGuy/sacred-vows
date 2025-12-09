@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { login } from '../../services/authService';
+import { usePetals } from './usePetals';
 import './AuthPage.css';
 
 // SVG Icons
@@ -42,8 +43,6 @@ const PetalSVG = ({ color = '#e8b4b8' }) => (
   </svg>
 );
 
-const petalColors = ['#f5d0d3', '#e8b4b8', '#fce4e2', '#d4969c', '#c9a1a6'];
-
 function LoginPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -53,15 +52,8 @@ function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Generate petals
-  const petals = [...Array(10)].map((_, i) => ({
-    id: i,
-    left: `${Math.random() * 100}%`,
-    delay: `${Math.random() * 8}s`,
-    duration: `${15 + Math.random() * 10}s`,
-    size: 14 + Math.random() * 10,
-    color: petalColors[Math.floor(Math.random() * petalColors.length)]
-  }));
+  // Generate petals once per mount to avoid animation resets
+  const petals = usePetals(10);
 
   const handleChange = (e) => {
     setFormData({
