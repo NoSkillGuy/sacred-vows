@@ -1,12 +1,75 @@
 import React from 'react';
-import { mergeTemplateData } from './loadTemplate';
+import { loadTemplate, mergeTemplateData } from './loadTemplate';
+
+const DEFAULT_TEMPLATE_ID = 'royal-elegance';
+
+function mergeSections(baseSections = [], overrides = []) {
+  const sectionMap = new Map(
+    baseSections.map((section) => [section.id, { enabled: true, ...section }]),
+  );
+
+  overrides.forEach((override) => {
+    if (!override?.id) return;
+    const existing = sectionMap.get(override.id) || { id: override.id, enabled: true };
+    sectionMap.set(override.id, { ...existing, ...override });
+  });
+
+  return Array.from(sectionMap.values());
+}
+
+function orderSections(sections = [], defaultOrder = []) {
+  const orderIndex = (id) => {
+    const idx = defaultOrder.indexOf(id);
+    return idx === -1 ? Number.MAX_SAFE_INTEGER : idx;
+  };
+
+  return sections
+    .filter((section) => section.enabled !== false)
+    .sort((a, b) => {
+      const aOrder = a.order ?? orderIndex(a.id);
+      const bOrder = b.order ?? orderIndex(b.id);
+      return aOrder - bOrder;
+    });
+}
+
+function resolveTheme(templateTheme = {}, manifest = {}, userTheme = {}) {
+  const manifestDefault = manifest.themes?.find((theme) => theme.isDefault) || {};
+  const baseTheme = templateTheme || {};
+  const preset = userTheme.preset || baseTheme.preset || manifestDefault.id || 'custom';
+
+  return {
+    preset,
+    colors: {
+      ...(manifestDefault.colors || {}),
+      ...(baseTheme.colors || {}),
+      ...(userTheme.colors || {}),
+    },
+    fonts: {
+      ...(manifestDefault.fonts || {}),
+      ...(baseTheme.fonts || {}),
+      ...(userTheme.fonts || {}),
+    },
+  };
+}
+
+function getSectionProps(sectionId, commonProps) {
+  switch (sectionId) {
+    case 'header':
+      return { ...commonProps, onLanguageClick: commonProps.onLanguageClick };
+    case 'hero':
+      return { ...commonProps, onRSVPClick: commonProps.onRSVPClick };
+    case 'rsvp':
+      return { ...commonProps, onRSVPClick: commonProps.onRSVPClick };
+    default:
+      return commonProps;
+  }
+}
 
 /**
  * Template Renderer Component
  * Renders a template with provided data
  */
 export function TemplateRenderer({ templateId, userData, translations, currentLang, onRSVPClick, onLanguageClick }) {
-  const [templateConfig, setTemplateConfig] = React.useState(null);
   const [mergedConfig, setMergedConfig] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
@@ -15,13 +78,42 @@ export function TemplateRenderer({ templateId, userData, translations, currentLa
     async function load() {
       try {
         setLoading(true);
-        // In a real implementation, this would load the template dynamically
-        // For now, we'll use the default config from the main app
+        const templateToLoad = templateId || DEFAULT_TEMPLATE_ID;
+        const definition = await loadTemplate(templateToLoad);
+
+        // Universal content base (sample data for now)
         const { defaultWeddingConfig } = await import('../../../src/config/wedding-config');
-        const config = defaultWeddingConfig;
-        
-        setTemplateConfig(config);
-        const merged = mergeTemplateData(config, userData || {});
+        const contentConfig = mergeTemplateData(defaultWeddingConfig, userData || {});
+
+        // Section ordering and theme resolution
+        const userTemplateConfig = userData?.templateConfig || {};
+        const combinedSections = mergeSections(
+          definition.config?.sections || [],
+          userTemplateConfig.sections || [],
+        );
+        const orderedSections = orderSections(
+          combinedSections,
+          definition.manifest?.defaultSectionOrder || [],
+        );
+        const theme = resolveTheme(
+          definition.config?.theme || {},
+          definition.manifest || {},
+          userTemplateConfig.theme || {},
+        );
+
+        const merged = {
+          ...contentConfig,
+          sections: orderedSections,
+          theme,
+          templateMeta: {
+            id: definition.config?.id || definition.manifest?.id || templateToLoad,
+            name: definition.config?.name || definition.manifest?.name,
+            version: definition.config?.version || definition.manifest?.version,
+            metadata: definition.config?.metadata,
+            manifest: definition.manifest,
+          },
+        };
+
         setMergedConfig(merged);
         setError(null);
       } catch (err) {
@@ -32,9 +124,7 @@ export function TemplateRenderer({ templateId, userData, translations, currentLa
       }
     }
 
-    if (templateId) {
-      load();
-    }
+    load();
   }, [templateId, userData]);
 
   if (loading) {
@@ -50,62 +140,52 @@ export function TemplateRenderer({ templateId, userData, translations, currentLa
   }
 
   // Dynamically import template components
-  // In a real implementation, this would load template-specific components
-  // For now, we'll use the existing components from the main app
   const TemplateComponents = React.lazy(() => 
     import('../../../src/components').then(components => ({
       default: () => (
-        <>
-          {React.createElement(components.Header || require('../../../src/components/Header').default, {
-            onLanguageClick,
-            translations,
-            currentLang,
-            config: mergedConfig,
-          })}
-          <main className="page-shell">
-            {React.createElement(components.Hero || require('../../../src/components/Hero').default, {
+        <main className="page-shell">
+          {(() => {
+            const registry = {
+              header: components.Header || require('../../../src/components/Header').default,
+              hero: components.Hero || require('../../../src/components/Hero').default,
+              couple: components.Couple || require('../../../src/components/Couple').default,
+              'fathers-letter': components.FathersLetter || require('../../../src/components/FathersLetter').default,
+              gallery: components.Gallery || require('../../../src/components/Gallery').default,
+              events: components.Events || require('../../../src/components/Events').default,
+              venue: components.Venue || require('../../../src/components/Venue').default,
+              rsvp: components.RSVP || require('../../../src/components/RSVP').default,
+              footer: components.Footer || require('../../../src/components/Footer').default,
+            };
+
+            const commonProps = {
+              translations,
+              currentLang,
+              config: mergedConfig,
               onRSVPClick,
-              translations,
-              currentLang,
-              config: mergedConfig,
-            })}
-            {React.createElement(components.Couple || require('../../../src/components/Couple').default, {
-              translations,
-              currentLang,
-              config: mergedConfig,
-            })}
-            {React.createElement(components.FathersLetter || require('../../../src/components/FathersLetter').default, {
-              translations,
-              currentLang,
-              config: mergedConfig,
-            })}
-            {React.createElement(components.Gallery || require('../../../src/components/Gallery').default, {
-              translations,
-              currentLang,
-              config: mergedConfig,
-            })}
-            {React.createElement(components.Events || require('../../../src/components/Events').default, {
-              translations,
-              currentLang,
-              config: mergedConfig,
-            })}
-            {React.createElement(components.Venue || require('../../../src/components/Venue').default, {
-              translations,
-              currentLang,
-              config: mergedConfig,
-            })}
-            {React.createElement(components.RSVP || require('../../../src/components/RSVP').default, {
-              onRSVPClick,
-              translations,
-              currentLang,
-              config: mergedConfig,
-            })}
-            {React.createElement(components.Footer || require('../../../src/components/Footer').default, {
-              translations,
-              currentLang,
-            })}
-          </main>
-        </>
+              onLanguageClick,
+            };
+
+            const sectionsToRender = mergedConfig.sections || [];
+
+            return sectionsToRender.map((section) => {
+              const SectionComponent = registry[section.id];
+
+              if (!SectionComponent) {
+                console.warn(`Section component not found for id: ${section.id}`);
+                return null;
+              }
+
+              const sectionProps = getSectionProps(section.id, commonProps);
+
+              return (
+                <SectionComponent
+                  key={section.id}
+                  {...sectionProps}
+                />
+              );
+            });
+          })()}
+        </main>
       ),
     }))
   );

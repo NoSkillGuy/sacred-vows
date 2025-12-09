@@ -4,16 +4,18 @@
  */
 
 /**
- * Loads a template by ID
+ * Loads a template definition (config + manifest) by ID
  * @param {string} templateId - Template identifier
- * @returns {Promise<Object>} Template configuration and components
+ * @returns {Promise<{config: Object, manifest: Object}>} Template files
  */
 export async function loadTemplate(templateId) {
   try {
     // In production, this would fetch from API or load from file system
-    // For now, we'll use a simple mapping
     const templateMap = {
-      'royal-elegance': () => import('../../../templates/royal-elegance/config.json'),
+      'royal-elegance': {
+        config: () => import('../../../templates/royal-elegance/config.json'),
+        manifest: () => import('../../../templates/royal-elegance/manifest.json'),
+      },
     };
 
     const templateLoader = templateMap[templateId];
@@ -21,8 +23,15 @@ export async function loadTemplate(templateId) {
       throw new Error(`Template ${templateId} not found`);
     }
 
-    const templateConfig = await templateLoader();
-    return templateConfig.default || templateConfig;
+    const [config, manifest] = await Promise.all([
+      templateLoader.config(),
+      templateLoader.manifest(),
+    ]);
+
+    return {
+      config: config.default || config,
+      manifest: manifest.default || manifest,
+    };
   } catch (error) {
     console.error(`Error loading template ${templateId}:`, error);
     throw error;
