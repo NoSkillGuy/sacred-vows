@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { getInvitations, deleteInvitation } from '../../services/invitationService';
 import { getCurrentUser, logout } from '../../services/authService';
+import { useToast } from '../Toast/ToastProvider';
 import './Dashboard.css';
 
 // SVG Icons
@@ -92,6 +93,9 @@ const HeartIcon = () => (
   </svg>
 );
 
+const WELCOME_TOAST_KEY_PREFIX = 'sv_welcome_toast_shown';
+const WELCOME_TOAST_DELAY_MS = 280;
+
 function Dashboard() {
   const navigate = useNavigate();
   const [invitations, setInvitations] = useState([]);
@@ -99,6 +103,7 @@ function Dashboard() {
   const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const { addToast } = useToast();
 
   useEffect(() => {
     loadInvitations();
@@ -144,7 +149,15 @@ function Dashboard() {
     }
   }
 
+  function getWelcomeToastKey(currentUser) {
+    const identifier = currentUser?.id || currentUser?.email || currentUser?.name || 'guest';
+    return `${WELCOME_TOAST_KEY_PREFIX}_${identifier}`;
+  }
+
   function handleLogout() {
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.removeItem(getWelcomeToastKey(user));
+    }
     logout();
     navigate('/login');
   }
@@ -152,6 +165,23 @@ function Dashboard() {
   function getInitials(name) {
     if (!name) return '?';
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  }
+
+  function getFirstName(name) {
+    if (!name) return 'there';
+    return name.trim().split(' ')[0] || 'there';
+  }
+
+  function truncateLabel(text, maxLength = 28) {
+    if (!text) return '';
+    return text.length <= maxLength ? text : `${text.slice(0, maxLength - 3)}...`;
+  }
+
+  function getToastDurationMs() {
+    if (typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches) {
+      return 5000;
+    }
+    return 6000;
   }
 
   function formatDate(dateString) {
@@ -168,6 +198,35 @@ function Dashboard() {
   const totalInvitations = invitations.length;
   const publishedCount = invitations.filter(inv => inv.status === 'published').length;
   const draftCount = invitations.filter(inv => inv.status === 'draft').length;
+
+  useEffect(() => {
+    if (loading) return;
+    if (!user) return;
+    if (typeof sessionStorage === 'undefined') return;
+
+    const toastKey = getWelcomeToastKey(user);
+    if (sessionStorage.getItem(toastKey)) return;
+
+    const firstName = getFirstName(user.name);
+    const displayName = truncateLabel(firstName);
+    const fullLine = `${firstName} — Everything you need to wow your guests.`;
+    const displayLine = `${displayName} — Everything you need to wow your guests.`;
+
+    const timer = setTimeout(() => {
+      addToast({
+        title: 'Welcome back',
+        description: displayLine,
+        tooltip: fullLine,
+        duration: getToastDurationMs(),
+        icon: 'heart',
+        tone: 'info',
+        ariaLive: 'polite',
+      });
+      sessionStorage.setItem(toastKey, 'true');
+    }, WELCOME_TOAST_DELAY_MS);
+
+    return () => clearTimeout(timer);
+  }, [addToast, loading, user]);
 
   if (loading) {
     return (
@@ -197,12 +256,7 @@ function Dashboard() {
               <span className="header-logo-text">Sacred Vows</span>
             </Link>
           </div>
-          
-          <div className="header-welcome">
-            <h1>Welcome back, {user?.name?.split(' ')[0] || 'there'}!</h1>
-            <p>Manage your beautiful wedding invitations</p>
-          </div>
-          
+
           <div className="header-actions">
             <Link to="/templates" className="btn btn-primary">
               <PlusIcon />
