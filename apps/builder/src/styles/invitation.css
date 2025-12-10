@@ -809,9 +809,9 @@
     }
 
     /* GENERAL SECTIONS */
-    section {
+    /* section {
       margin-top: var(--section-spacing);
-    }
+    } */
 
     .section-header {
       margin-bottom: 22px;
