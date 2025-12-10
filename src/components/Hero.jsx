@@ -1,25 +1,34 @@
 import { useState, useEffect } from 'react';
 
 function Hero({ onRSVPClick, translations, currentLang, config = {} }) {
-  const [countdown, setCountdown] = useState('Loading...');
+  const [countdown, setCountdown] = useState('');
   
-  // Get config values with fallbacks
+  // Get config values without template-specific defaults
   const wedding = config.wedding || {};
-  const countdownTarget = wedding.countdownTarget || '2026-01-23T21:00:00';
-  const heroImage = config.hero?.mainImage || '/assets/photos/couple/1.jpeg';
+  const countdownTarget = wedding.countdownTarget;
+  const heroImage = config.hero?.mainImage;
   const couple = config.couple || {};
-  const brideName = couple.bride?.name || 'Capt Dr. Priya Singh';
-  const groomName = couple.groom?.name || 'Dr. Saurabh Singh';
+  const brideName = couple.bride?.name || '';
+  const groomName = couple.groom?.name || '';
 
   useEffect(() => {
+    if (!countdownTarget) {
+      setCountdown('');
+      return;
+    }
+
     const target = new Date(countdownTarget);
+    if (Number.isNaN(target.getTime())) {
+      setCountdown('');
+      return;
+    }
 
     const update = () => {
       const now = new Date();
       const diff = target - now;
 
       if (diff <= 0) {
-        setCountdown(translations['countdown.today'] || 'Today we humbly celebrate this blessed union.');
+        setCountdown(translations['countdown.today'] || '');
         return;
       }
 
@@ -37,32 +46,33 @@ function Hero({ onRSVPClick, translations, currentLang, config = {} }) {
     return () => clearInterval(interval);
   }, [translations, countdownTarget]);
 
-  const heroNames = (translations['hero.names'] || `${brideName} & ${groomName}`).replace('&', '<span class="hero-amp">&amp;</span>');
+  const namesText = translations['hero.names'] || (brideName || groomName ? `${brideName} & ${groomName}` : '');
+  const heroNames = namesText ? namesText.replace('&', '<span class="hero-amp">&amp;</span>') : '';
 
   return (
     <section className="hero" id="top">
       <div className="hero-inner">
         <div>
-          <div className="hero-eyebrow">{translations['hero.eyebrow'] || 'THE WEDDING OF'}</div>
-          <div className="hero-script">{translations['hero.script'] || 'With the blessings of our families'}</div>
+          <div className="hero-eyebrow">{translations['hero.eyebrow'] || ''}</div>
+          <div className="hero-script">{translations['hero.script'] || ''}</div>
 
           <div className="hero-names" dangerouslySetInnerHTML={{ __html: heroNames }} />
 
           <div className="hero-sub">
-            {translations['hero.sub'] || 'TWO HEARTS, ONE DESTINY'}
+            {translations['hero.sub'] || ''}
           </div>
 
           <div className="hero-date">
-            {translations['hero.date'] || '22 & 23 JANUARY 2026'}
+            {translations['hero.date'] || wedding.dates?.join(' & ')}
           </div>
           <div className="hero-location">
-            {translations['hero.location'] || 'ROYAL LOTUS VIEW RESOTEL · BENGALURU, KARNATAKA'}
+            {translations['hero.location'] || wedding.venue?.fullAddress}
           </div>
 
           <div className="hero-divider"></div>
 
           <div className="hero-countdown">
-            <div className="hero-count-label">{translations['hero.countdown'] || 'COUNTDOWN TO WEDDING'}</div>
+            <div className="hero-count-label">{translations['hero.countdown'] || ''}</div>
             <div className="hero-countdown-values">
               {countdown}
             </div>
@@ -86,10 +96,12 @@ function Hero({ onRSVPClick, translations, currentLang, config = {} }) {
         <aside className="hero-photo-card">
           <div className="hero-photo-frame">
             <div className="hero-photo-inner">
-              <img src={heroImage} alt={`${brideName} & ${groomName}`} loading="lazy" />
+              {heroImage ? (
+                <img src={heroImage} alt={`${brideName} & ${groomName}`} loading="lazy" />
+              ) : null}
             </div>
           </div>
-          <div className="hero-photo-caption" dangerouslySetInnerHTML={{ __html: translations['hero.caption'] || `A glimpse of <strong>${brideName} & ${groomName}</strong> as they begin their forever.` }} />
+          <div className="hero-photo-caption" dangerouslySetInnerHTML={{ __html: translations['hero.caption'] || '' }} />
         </aside>
       </div>
     </section>

@@ -4,12 +4,6 @@ import PageLayout from '../PageLayout';
 import { getAllTemplateManifests } from '../../../services/templateService';
 import './TemplatesGalleryPage.css';
 
-const fallbackColors = {
-  primary: '#d4af37',
-  background: '#fff8f0',
-  accent: '#c9a227',
-};
-
 function TemplatesGalleryPage() {
   const [templates, setTemplates] = useState([]);
   const [activeCategory, setActiveCategory] = useState('all');
@@ -54,11 +48,18 @@ function TemplatesGalleryPage() {
 
   const resolveColors = (template) => {
     const defaultTheme = template.themes?.find((theme) => theme.isDefault) || template.themes?.[0];
-    const colors = defaultTheme?.colors || {};
+    const colors = defaultTheme?.colors;
+    if (!colors) {
+      return {
+        primary: '#111827',
+        background: '#f3f4f6',
+        accent: '#d1d5db',
+      };
+    }
     return {
-      primary: colors.primary || fallbackColors.primary,
-      background: colors.background || fallbackColors.background,
-      accent: colors.accent || colors.secondary || fallbackColors.accent,
+      primary: colors.primary || '#111827',
+      background: colors.background || '#f3f4f6',
+      accent: colors.accent || colors.secondary || '#d1d5db',
     };
   };
 

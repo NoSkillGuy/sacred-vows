@@ -21,28 +21,6 @@ const fontOptions = [
   { value: 'Parisienne', label: 'Parisienne', style: 'script' },
 ];
 
-// Fallback presets if template manifest is not available
-const fallbackPresets = [
-  { 
-    id: 'royal-gold', 
-    name: 'Royal Gold', 
-    colors: { primary: '#d4af37', secondary: '#8b6914', background: '#fff8f0', text: '#2c2c2c', accent: '#c9a227' },
-    fonts: { heading: 'Playfair Display', body: 'Poppins', script: 'Great Vibes' }
-  },
-  { 
-    id: 'rose-blush', 
-    name: 'Rose Blush', 
-    colors: { primary: '#c77d8a', secondary: '#9b5c6a', background: '#fff5f7', text: '#4a3539', accent: '#e8b4b8' },
-    fonts: { heading: 'Cormorant Garamond', body: 'Lato', script: 'Dancing Script' }
-  },
-  { 
-    id: 'forest-sage', 
-    name: 'Forest Sage', 
-    colors: { primary: '#6b8e6b', secondary: '#4a6f4a', background: '#f5f8f5', text: '#2c3c2c', accent: '#8fbc8f' },
-    fonts: { heading: 'EB Garamond', body: 'Montserrat', script: 'Tangerine' }
-  },
-];
-
 function ThemeModal({ isOpen, onClose }) {
   const { 
     currentInvitation, 
@@ -59,17 +37,17 @@ function ThemeModal({ isOpen, onClose }) {
   const fonts = theme.fonts || {};
   const currentPreset = theme.preset || 'custom';
 
-  // Get theme presets from template manifest or use fallback
-  const themePresets = currentTemplateManifest?.themes || fallbackPresets;
+  // Get theme presets from template manifest
+  const themePresets = currentTemplateManifest?.themes || [];
 
   const [formData, setFormData] = useState({
-    primaryColor: colors.primary || '#d4af37',
-    secondaryColor: colors.secondary || '#8b6914',
-    backgroundColor: colors.background || '#fff8f0',
-    textColor: colors.text || '#2c2c2c',
-    headingFont: fonts.heading || 'Playfair Display',
-    bodyFont: fonts.body || 'Poppins',
-    scriptFont: fonts.script || 'Great Vibes',
+    primaryColor: colors.primary || '#000000',
+    secondaryColor: colors.secondary || '#000000',
+    backgroundColor: colors.background || '#ffffff',
+    textColor: colors.text || '#000000',
+    headingFont: fonts.heading || '',
+    bodyFont: fonts.body || '',
+    scriptFont: fonts.script || '',
   });
 
   // Update local state when store changes
@@ -79,13 +57,13 @@ function ThemeModal({ isOpen, onClose }) {
     const themeFonts = currentTheme.fonts || {};
     
     setFormData({
-      primaryColor: themeColors.primary || '#d4af37',
-      secondaryColor: themeColors.secondary || '#8b6914',
-      backgroundColor: themeColors.background || '#fff8f0',
-      textColor: themeColors.text || '#2c2c2c',
-      headingFont: themeFonts.heading || 'Playfair Display',
-      bodyFont: themeFonts.body || 'Poppins',
-      scriptFont: themeFonts.script || 'Great Vibes',
+      primaryColor: themeColors.primary || '#000000',
+      secondaryColor: themeColors.secondary || '#000000',
+      backgroundColor: themeColors.background || '#ffffff',
+      textColor: themeColors.text || '#000000',
+      headingFont: themeFonts.heading || '',
+      bodyFont: themeFonts.body || '',
+      scriptFont: themeFonts.script || '',
     });
   }, [currentInvitation.templateConfig?.theme]);
 
@@ -148,40 +126,44 @@ function ThemeModal({ isOpen, onClose }) {
                 </span>
               )}
             </h4>
-            <div className="theme-presets-grid">
-              {themePresets.map((preset) => (
-                <button
-                  key={preset.id}
-                  className={`theme-preset-card ${currentPreset === preset.id ? 'active' : ''}`}
-                  onClick={() => handleApplyPreset(preset)}
-                >
-                  <div className="preset-color-preview">
-                    <div 
-                      className="preset-color-bg"
-                      style={{ background: preset.colors.background }}
-                    >
-                      <span 
-                        className="preset-color-primary"
-                        style={{ background: preset.colors.primary }}
-                      />
-                      <span 
-                        className="preset-color-secondary"
-                        style={{ background: preset.colors.secondary }}
-                      />
+            {themePresets.length === 0 ? (
+              <p className="muted">No theme presets defined for this template.</p>
+            ) : (
+              <div className="theme-presets-grid">
+                {themePresets.map((preset) => (
+                  <button
+                    key={preset.id}
+                    className={`theme-preset-card ${currentPreset === preset.id ? 'active' : ''}`}
+                    onClick={() => handleApplyPreset(preset)}
+                  >
+                    <div className="preset-color-preview">
+                      <div 
+                        className="preset-color-bg"
+                        style={{ background: preset.colors.background }}
+                      >
+                        <span 
+                          className="preset-color-primary"
+                          style={{ background: preset.colors.primary }}
+                        />
+                        <span 
+                          className="preset-color-secondary"
+                          style={{ background: preset.colors.secondary }}
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <div className="preset-info">
-                    <span className="preset-name">{preset.name}</span>
-                    {preset.isDefault && (
-                      <span className="preset-default-badge">Default</span>
+                    <div className="preset-info">
+                      <span className="preset-name">{preset.name}</span>
+                      {preset.isDefault && (
+                        <span className="preset-default-badge">Default</span>
+                      )}
+                    </div>
+                    {currentPreset === preset.id && (
+                      <div className="preset-active-indicator">✓</div>
                     )}
-                  </div>
-                  {currentPreset === preset.id && (
-                    <div className="preset-active-indicator">✓</div>
-                  )}
-                </button>
-              ))}
-            </div>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Custom Colors */}

@@ -7,15 +7,15 @@ function Header({ onLanguageClick, translations, currentLang, config = {} }) {
   // Get config values with fallbacks
   const branding = config.branding || {};
   const music = config.music || {};
-  const monogram = branding.monogram || 'P&S';
-  const title = branding.title || 'CAPT DR. PRIYA & DR. SAURABH';
-  const subtitle = branding.subtitle || '22 & 23 JANUARY 2026 · BENGALURU';
-  const musicFile = music.file || '/assets/music/1.mp3';
-  const musicVolume = music.volume || 0.5;
+  const monogram = branding.monogram || '';
+  const title = branding.title || '';
+  const subtitle = branding.subtitle || '';
+  const musicFile = music.file;
+  const musicVolume = typeof music.volume === 'number' ? music.volume : 0.5;
 
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio) return;
+    if (!audio || !musicFile) return;
 
     const handlePlay = () => setIsPlaying(true);
     const handlePause = () => setIsPlaying(false);
@@ -40,7 +40,7 @@ function Header({ onLanguageClick, translations, currentLang, config = {} }) {
 
   const toggleMusic = () => {
     const audio = audioRef.current;
-    if (!audio) return;
+    if (!audio || !musicFile) return;
 
     if (isPlaying) {
       audio.pause();
@@ -84,9 +84,11 @@ function Header({ onLanguageClick, translations, currentLang, config = {} }) {
           </div>
         </div>
       </div>
-      <audio ref={audioRef} id="bg-music" loop>
-        <source src={musicFile} type="audio/mpeg" />
-      </audio>
+      {musicFile ? (
+        <audio ref={audioRef} id="bg-music" loop>
+          <source src={musicFile} type="audio/mpeg" />
+        </audio>
+      ) : null}
     </header>
   );
 }
