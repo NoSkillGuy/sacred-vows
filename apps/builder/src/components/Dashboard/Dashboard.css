@@ -806,16 +806,16 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 4rem 2rem;
+  padding: 3rem 1.5rem;
   background: var(--white);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-sm);
 }
 
 .dashboard-empty-icon {
-  width: 6rem;
-  height: 6rem;
-  margin-bottom: 1.5rem;
+  width: 4.5rem;
+  height: 4.5rem;
+  margin-bottom: 1.25rem;
   color: var(--rose);
   opacity: 0.4;
 }
@@ -831,7 +831,7 @@
 .dashboard-empty p {
   color: var(--text-muted);
   font-size: 1rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   max-width: 400px;
 }
 
