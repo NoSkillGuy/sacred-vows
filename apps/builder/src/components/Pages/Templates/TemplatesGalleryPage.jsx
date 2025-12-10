@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import PageLayout from '../PageLayout';
 import { getAllTemplateManifests } from '../../../services/templateService';
+import TemplateCardUnified from '../../Templates/TemplateCardUnified';
 import './TemplatesGalleryPage.css';
 
 function TemplatesGalleryPage() {
@@ -46,23 +47,6 @@ function TemplatesGalleryPage() {
     ? templates
     : templates.filter(t => t.category === activeCategory);
 
-  const resolveColors = (template) => {
-    const defaultTheme = template.themes?.find((theme) => theme.isDefault) || template.themes?.[0];
-    const colors = defaultTheme?.colors;
-    if (!colors) {
-      return {
-        primary: '#111827',
-        background: '#f3f4f6',
-        accent: '#d1d5db',
-      };
-    }
-    return {
-      primary: colors.primary || '#111827',
-      background: colors.background || '#f3f4f6',
-      accent: colors.accent || colors.secondary || '#d1d5db',
-    };
-  };
-
   return (
     <PageLayout
       title="Wedding Invitation Templates"
@@ -102,57 +86,18 @@ function TemplatesGalleryPage() {
             </div>
           ) : (
             filteredTemplates.map(template => {
-              const { primary, background, accent } = resolveColors(template);
               const isReady = template.status === 'ready' || template.isAvailable;
               const badge = !isReady ? 'Coming Soon' : (template.isFeatured ? 'Featured' : null);
 
               return (
-                <div key={template.id} className="template-card">
-                  {badge && (
-                    <div className={`popular-badge ${!isReady ? 'coming-soon' : ''}`}>{badge}</div>
-                  )}
-                  
-                  <div className="template-preview">
-                    <div 
-                      className="template-inner"
-                      style={{
-                        background: `linear-gradient(180deg, ${background} 0%, ${accent} 100%)`,
-                        borderColor: primary
-                      }}
-                    >
-                      <div className="template-ornament" style={{ color: primary }}>✦</div>
-                      <div className="template-names">Sarah & Michael</div>
-                      <div className="template-date" style={{ color: primary }}>
-                        December 15, 2025
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="template-overlay">
-                    <button 
-                      className="preview-btn"
-                      onClick={() => isReady && navigate('/signup')}
-                      disabled={!isReady}
-                    >
-                      {isReady ? 'Use This Template' : 'Coming Soon'}
-                    </button>
-                  </div>
-
-                  <div className="template-info">
-                    <div className="template-colors">
-                      {[primary, background, accent].map((color, i) => (
-                        <span 
-                          key={i} 
-                          className="color-dot"
-                          style={{ backgroundColor: color }}
-                        />
-                      ))}
-                    </div>
-                    <h3>{template.name}</h3>
-                    <p>{template.description}</p>
-                    <span className="template-category">{template.category}</span>
-                  </div>
-                </div>
+                <TemplateCardUnified
+                  key={template.id}
+                  template={template}
+                  badgeOverride={badge}
+                  onPrimaryAction={() => isReady && navigate('/signup')}
+                  primaryLabel={isReady ? 'Use This Template' : 'Coming Soon'}
+                  primaryDisabled={!isReady}
+                />
               );
             })
           )}

@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import { trackCTA, trackExperiment, trackTemplateDemo, trackTemplateView } from '../../services/analyticsService';
 import { getAllTemplateManifests } from '../../services/templateService';
+import TemplateCardUnified from '../Templates/TemplateCardUnified';
 
 // SVG Ornaments for each template style
 const OrnamentClassic = () => (
@@ -66,9 +67,6 @@ const defaultColors = {
   background: '#fff8f0',
 };
 
-const defaultNames = 'Priya & Rahul';
-const defaultDate = 'Dec 15, 2025';
-
 function TemplateShowcase({ onSectionView }) {
   const navigate = useNavigate();
   const [templates, setTemplates] = useState([]);
@@ -124,8 +122,8 @@ function TemplateShowcase({ onSectionView }) {
         ...template,
         Ornament,
         ornamentColor: accent,
-        names: template.names || defaultNames,
-        date: template.date || defaultDate,
+        names: template.names || template.name,
+        date: template.date || null,
         className: template.className || `template-${template.id}`,
         tags,
         isReady: template.status === 'ready' || template.isAvailable,
@@ -199,61 +197,19 @@ function TemplateShowcase({ onSectionView }) {
               <p>Loading templates...</p>
             </div>
           ) : (
-            filteredTemplates.map((template) => {
-              const OrnamentComponent = template.Ornament;
-              const isComingSoon = template.status === 'coming-soon';
-
-              return (
-                <div
-                  key={template.id}
-                  className={`template-card ${template.className}`}
-                  onMouseEnter={() => trackTemplateView(template.id)}
-                >
-                  <div className="template-preview">
-                    <div className="template-inner">
-                      <div className="template-ornament" style={{ color: template.ornamentColor }}>
-                        <OrnamentComponent />
-                      </div>
-                      <div className="template-names">{template.names}</div>
-                      <div className="template-date">{template.date}</div>
-                      <div className="template-ornament" style={{ color: template.ornamentColor, transform: 'rotate(180deg)' }}>
-                        <OrnamentComponent />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="template-overlay">
-                    <div className="template-actions">
-                      <button 
-                        className="template-overlay-btn"
-                        onClick={() => handleCustomize(template)}
-                        disabled={!template.isReady}
-                      >
-                        {template.isReady ? 'Customize This Design' : 'Coming Soon'}
-                      </button>
-                      <button 
-                        className="template-overlay-secondary"
-                        onClick={() => handleDemo(template)}
-                      >
-                        View Demo
-                      </button>
-                    </div>
-                  </div>
-                  <div className="template-info">
-                    <h3 className="template-name">{template.name}</h3>
-                    <p className="template-desc">{template.description}</p>
-                    <div className="template-meta">
-                      <span className="template-tag">{template.category}</span>
-                      {template.tags?.map((tag) => (
-                        <span key={tag} className={`template-tag badge ${tag === 'coming-soon' ? 'coming-soon' : ''}`}>{tag}</span>
-                      ))}
-                      {!template.isReady && (
-                        <span className="template-tag badge coming-soon">Coming Soon</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })
+            filteredTemplates.map((template) => (
+              <TemplateCardUnified
+                key={template.id}
+                template={template}
+                onPrimaryAction={handleCustomize}
+                primaryLabel={template.isReady ? 'Customize This Design' : 'Coming Soon'}
+                primaryDisabled={!template.isReady}
+                onSecondaryAction={handleDemo}
+                secondaryLabel="View Demo"
+                showSecondary
+                onCardClick={() => trackTemplateView(template.id)}
+              />
+            ))
           )}
         </div>
       </div>

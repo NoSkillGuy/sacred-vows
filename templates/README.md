@@ -10,7 +10,7 @@
 - Purpose: what the API serves to the landing page and builder listings.
 - Key fields:
   - `id`, `name`, `version`
-  - `description`, `previewImage`, optional `previewImages: []`
+  - `description`, `names` (display label), `date` (display date), `previewImage`, optional `previewImages: []`
   - `tags`: up to 3 strings (API will trim to 3)
   - `category`, `author`
   - Pricing/availability: `price`, `currency`, `status` (`ready`/`coming-soon`/`hidden`), `isAvailable`, `isComingSoon`, `isFeatured`
@@ -36,6 +36,8 @@
   "id": "art-deco-glam",
   "name": "Art Deco Glam",
   "description": "Black and gold art-deco inspired layout for luxurious celebrations.",
+  "names": "Aarav & Nisha",
+  "date": "Feb 22, 2026",
   "previewImage": "/templates/art-deco-glam/preview.jpg",
   "tags": ["luxury", "art-deco", "gold"],
   "category": "luxury",
@@ -80,6 +82,7 @@
 - Create `templates/<template-id>/` using a URL-safe, lowercase slug.
 - Add `manifest.json`, `config.json`, and `preview.jpg` (plus any `preview-*.jpg` referenced in `previewImages`).
 - Cap `tags` to 3; ensure `previewImage` paths point to `/templates/<id>/...`.
+- Add catalog display text: `names` (shown on landing cards; falls back to `name` if omitted) and `date` (optional; hides if omitted).
 - Provide at least one theme; mark exactly one `isDefault: true`.
 - Keep `sections` IDs consistent across manifest/config; include `defaultSectionOrder` covering all sections.
 - Set availability flags: `status`, `isAvailable`, `isComingSoon`, `isFeatured` as needed.

@@ -1239,8 +1239,8 @@
 .templates-grid {
   display: grid;
   width: 100%;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
+  grid-template-columns: repeat(3, minmax(300px, 1fr));
+  gap: 1.5rem;
 }
 
 .template-card {

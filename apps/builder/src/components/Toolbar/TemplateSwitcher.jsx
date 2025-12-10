@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useBuilderStore } from '../../store/builderStore';
-import { getTemplates, getTemplateManifest, formatPrice } from '../../services/templateService';
+import { getTemplates, getTemplateManifest } from '../../services/templateService';
+import TemplateCardUnified from '../Templates/TemplateCardUnified';
 import './TemplateSwitcher.css';
 
 // SVG Icons
@@ -11,31 +12,11 @@ const CloseIcon = () => (
   </svg>
 );
 
-const CheckIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
-    <polyline points="20 6 9 17 4 12"/>
-  </svg>
-);
-
-const StarIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12">
-    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-  </svg>
-);
-
 const WarningIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="20" height="20">
     <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
     <line x1="12" y1="9" x2="12" y2="13"/>
     <line x1="12" y1="17" x2="12.01" y2="17"/>
-  </svg>
-);
-
-const TemplateIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="48" height="48">
-    <rect x="3" y="3" width="18" height="18" rx="2"/>
-    <path d="M3 9h18"/>
-    <path d="M9 21V9"/>
   </svg>
 );
 
@@ -130,14 +111,22 @@ function TemplateSwitcher({ isOpen, onClose }) {
             </div>
           ) : (
             <div className="template-switcher-grid">
-              {templates.map((template) => (
-                <TemplateCard
-                  key={template.id}
-                  template={template}
-                  isActive={template.id === currentInvitation.templateId}
-                  onSelect={handleTemplateClick}
-                />
-              ))}
+              {templates.map((template) => {
+                const isActive = template.id === currentInvitation.templateId;
+                const isReady = template.status === 'ready' || template.isAvailable;
+                return (
+                  <TemplateCardUnified
+                    key={template.id}
+                    template={template}
+                    active={isActive}
+                    showActiveBadge
+                    onCardClick={() => handleTemplateClick(template)}
+                    onPrimaryAction={handleTemplateClick}
+                    primaryLabel={isActive ? 'Current Template' : isReady ? 'Switch Template' : 'Coming Soon'}
+                    primaryDisabled={!isReady}
+                  />
+                );
+              })}
             </div>
           )}
         </div>
@@ -180,69 +169,6 @@ function TemplateSwitcher({ isOpen, onClose }) {
             </div>
           </div>
         )}
-      </div>
-    </div>
-  );
-}
-
-function TemplateCard({ template, isActive, onSelect }) {
-  const {
-    id,
-    name,
-    description,
-    price,
-    currency,
-    previewImage,
-    isAvailable,
-    isComingSoon,
-    isFeatured,
-  } = template;
-
-  return (
-    <div 
-      className={`template-switch-card ${isActive ? 'active' : ''} ${!isAvailable ? 'disabled' : ''}`}
-      onClick={() => onSelect(template)}
-    >
-      {isFeatured && (
-        <div className="template-featured-badge">
-          <StarIcon />
-          Featured
-        </div>
-      )}
-      
-      {isActive && (
-        <div className="template-active-badge">
-          <CheckIcon />
-          Current
-        </div>
-      )}
-
-      <div className="template-preview">
-        {previewImage ? (
-          <img 
-            src={previewImage} 
-            alt={name}
-            onError={(e) => {
-              e.target.style.display = 'none';
-              e.target.nextSibling.style.display = 'flex';
-            }}
-          />
-        ) : null}
-        <div className="template-preview-placeholder" style={{ display: previewImage ? 'none' : 'flex' }}>
-          <TemplateIcon />
-        </div>
-        
-        {isComingSoon && (
-          <div className="template-coming-soon">
-            <span>Coming Soon</span>
-          </div>
-        )}
-      </div>
-
-      <div className="template-info">
-        <h4>{name}</h4>
-        <p>{description}</p>
-        <div className="template-price">{formatPrice(price, currency)}</div>
       </div>
     </div>
   );

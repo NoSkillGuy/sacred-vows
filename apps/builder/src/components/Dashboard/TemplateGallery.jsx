@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { getTemplates, formatPrice } from '../../services/templateService';
+import { getTemplates } from '../../services/templateService';
 import { createInvitation } from '../../services/invitationService';
 import { getCurrentUser, logout } from '../../services/authService';
+import TemplateCardUnified from '../Templates/TemplateCardUnified';
 import './Dashboard.css';
 
 // SVG Icons
@@ -200,106 +201,23 @@ function TemplateGallery() {
 
         {/* Template Grid */}
         <div className="template-grid">
-          {templates.map((template) => (
-            <TemplateCard
-              key={template.id}
-              template={template}
-              onSelect={handleSelectTemplate}
-              isCreating={creating === template.id}
-            />
-          ))}
+          {templates.map((template) => {
+            const isCreating = creating === template.id;
+            const isReady = template.status === 'ready' || template.isAvailable;
+            return (
+              <TemplateCardUnified
+                key={template.id}
+                template={template}
+                onPrimaryAction={handleSelectTemplate}
+                primaryLabel={isCreating ? 'Creating...' : isReady ? 'Select Template' : 'Coming Soon'}
+                primaryDisabled={!isReady || isCreating}
+                primaryLoading={isCreating}
+              />
+            );
+          })}
         </div>
       </div>
     </div>
-  );
-}
-
-function TemplateCard({ template, onSelect, isCreating }) {
-  const {
-    id,
-    name,
-    description,
-    price,
-    currency,
-    previewImage,
-    tags,
-    isAvailable,
-    isComingSoon,
-    isFeatured,
-  } = template;
-
-  return (
-    <article className={`template-card ${isFeatured ? 'featured' : ''}`}>
-      {isFeatured && (
-        <div className="template-featured-badge">
-          <StarIcon />
-          Featured
-        </div>
-      )}
-      
-      <div className="template-preview">
-        {previewImage ? (
-          <img 
-            src={previewImage} 
-            alt={name}
-            className="template-preview-image"
-            onError={(e) => {
-              e.target.style.display = 'none';
-              e.target.nextSibling.style.display = 'flex';
-            }}
-          />
-        ) : null}
-        <div className="template-preview-placeholder" style={{ display: previewImage ? 'none' : 'flex' }}>
-          <TemplateIcon />
-          <span>Preview coming soon</span>
-        </div>
-        
-        {isComingSoon && (
-          <div className="template-coming-soon">
-            <span className="template-coming-soon-badge">Coming Soon</span>
-            <span>We're working on this design</span>
-          </div>
-        )}
-      </div>
-      
-      <div className="template-info">
-        <div className="template-header">
-          <h3 className="template-name">{name}</h3>
-          <div className="template-price">
-            {formatPrice(price, currency)}
-          </div>
-        </div>
-        
-        <p className="template-description">{description}</p>
-        
-        {tags && tags.length > 0 && (
-          <div className="template-tags">
-            {tags.slice(0, 4).map((tag) => (
-              <span key={tag} className="template-tag">{tag}</span>
-            ))}
-          </div>
-        )}
-        
-        <div className="template-actions">
-          <button 
-            className="btn btn-primary"
-            onClick={() => onSelect(template)}
-            disabled={!isAvailable || isCreating}
-          >
-            {isCreating ? (
-              <>
-                <span className="loading-spinner" style={{ width: '1rem', height: '1rem' }}></span>
-                Creating...
-              </>
-            ) : isAvailable ? (
-              'Select Template'
-            ) : (
-              'Coming Soon'
-            )}
-          </button>
-        </div>
-      </div>
-    </article>
   );
 }
 

@@ -93,10 +93,10 @@
 
 .templates-gallery-page .templates-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 340px));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 360px));
   justify-content: center;
   justify-items: center;
-  gap: 1.75rem;
+  gap: 1.4rem;
   margin-bottom: 5rem;
 }
 

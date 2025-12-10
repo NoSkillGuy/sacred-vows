@@ -9,8 +9,10 @@ const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Path to templates directory
-const TEMPLATES_DIR = path.resolve(__dirname, '../../../../../templates');
+// Path to templates directory (can be overridden in env for container)
+const TEMPLATES_DIR = process.env.TEMPLATES_DIR
+  ? path.resolve(process.env.TEMPLATES_DIR)
+  : path.resolve(__dirname, '../../../../templates');
 
 function getTemplateIds() {
   try {
@@ -87,6 +89,8 @@ function manifestToSummary(manifest) {
     id: manifest.id,
     name: manifest.name,
     description: manifest.description,
+    names: manifest.names,
+    date: manifest.date,
     price: manifest.price,
     currency: manifest.currency,
     previewImage: manifest.previewImage,

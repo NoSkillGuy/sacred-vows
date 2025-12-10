@@ -27,6 +27,7 @@ services:
       DATABASE_URL: postgresql://wedding_builder:wedding_builder_password@postgres:5432/wedding_builder?schema=public
       JWT_SECRET: your-secret-key-change-in-production
       PORT: 3000
+      TEMPLATES_DIR: /app/templates
     depends_on:
       postgres:
         condition: service_healthy
@@ -34,6 +35,7 @@ services:
       - ./apps/api:/app
       - /app/node_modules
       - ./uploads:/app/uploads
+      - ./templates:/app/templates
 
 volumes:
   postgres_data:
