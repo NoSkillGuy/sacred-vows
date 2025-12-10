@@ -154,7 +154,6 @@ function HeroSection({ onSectionView }) {
         {/* Desktop Navigation */}
         <div className="nav-links">
           <a href="#templates">Templates</a>
-          <a href="#features">Features</a>
           <a href="#how-it-works">How It Works</a>
           <button className="nav-cta" onClick={() => { trackCTA('nav_start_free'); navigate('/signup'); }}>
             <span>Start Free</span>
@@ -179,7 +178,6 @@ function HeroSection({ onSectionView }) {
       {/* Mobile Navigation Overlay */}
       <div className={`mobile-nav ${mobileMenuOpen ? 'open' : ''}`}>
         <a href="#templates" onClick={() => { closeMobileMenu(); trackCTA('mobile_nav_templates'); }}>Templates</a>
-        <a href="#features" onClick={() => { closeMobileMenu(); trackCTA('mobile_nav_features'); }}>Features</a>
         <a href="#how-it-works" onClick={() => { closeMobileMenu(); trackCTA('mobile_nav_how'); }}>How It Works</a>
         <button className="nav-cta" onClick={() => { closeMobileMenu(); trackCTA('mobile_nav_start_free'); navigate('/signup'); }}>
           <span>Start Free</span>

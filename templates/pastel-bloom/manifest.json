@@ -5,7 +5,7 @@
   "description": "Soft watercolor florals with romantic pastels and elegant typography.",
   "previewImage": "/templates/pastel-bloom/preview.jpg",
   "previewImages": [],
-  "tags": ["floral", "romantic", "pastel", "watercolor"],
+  "tags": ["floral", "romantic", "pastel"],
   "category": "romantic",
   "author": "Sacred Vows",
   "price": 649,
@@ -74,12 +74,5 @@
         "script": "Dancing Script"
       }
     }
-  ],
-
-  "features": [
-    "Watercolor floral hero",
-    "Romantic typography",
-    "Photo gallery with lightbox",
-    "RSVP with contact cards"
   ]
 }

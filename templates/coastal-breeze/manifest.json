@@ -5,7 +5,7 @@
   "description": "Airy minimal design inspired by coastal blues and creamy sands.",
   "previewImage": "/templates/coastal-breeze/preview.jpg",
   "previewImages": [],
-  "tags": ["minimal", "modern", "coastal", "blue"],
+  "tags": ["minimal", "coastal", "modern"],
   "category": "minimal",
   "author": "Sacred Vows",
   "price": 699,
@@ -74,12 +74,5 @@
         "script": "Dancing Script"
       }
     }
-  ],
-
-  "features": [
-    "Minimal coastal layout",
-    "Clean typography with airy spacing",
-    "Photo gallery with lightbox",
-    "RSVP and contact cards"
   ]
 }

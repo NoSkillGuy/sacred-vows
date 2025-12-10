@@ -5,7 +5,7 @@
   "description": "Warm, earthy tones with hand-drawn elements. Perfect for intimate, countryside celebrations.",
   "previewImage": "/templates/rustic-charm/preview.jpg",
   "previewImages": [],
-  "tags": ["rustic", "bohemian", "earthy", "hand-drawn"],
+  "tags": ["rustic", "bohemian", "earthy"],
   "category": "bohemian",
   "author": "Sacred Vows",
   "price": 549,
@@ -48,11 +48,5 @@
       "colors": { "primary": "#6b8e6b", "secondary": "#4a6f4a", "background": "#f5f8f5", "text": "#2c3c2c", "accent": "#8fbc8f" },
       "fonts": { "heading": "EB Garamond", "body": "Montserrat", "script": "Tangerine" }
     }
-  ],
-  "features": [
-    "Hand-drawn illustrations",
-    "Kraft paper textures",
-    "Casual, warm typography",
-    "Photo collage sections"
   ]
 }

@@ -5,7 +5,7 @@
   "description": "Warm amber gradients with modern typography inspired by sunset hues.",
   "previewImage": "/templates/desert-sunset/preview.jpg",
   "previewImages": [],
-  "tags": ["modern", "sunset", "warm", "gradient"],
+  "tags": ["modern", "sunset", "warm"],
   "category": "modern",
   "author": "Sacred Vows",
   "price": 799,
@@ -74,12 +74,5 @@
         "script": "Dancing Script"
       }
     }
-  ],
-
-  "features": [
-    "Gradient hero with modern typography",
-    "Photo gallery with lightbox",
-    "Events timeline with icons",
-    "RSVP with contact details"
   ]
 }

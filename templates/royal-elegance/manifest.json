@@ -8,7 +8,7 @@
     "/templates/royal-elegance/preview-1.jpg",
     "/templates/royal-elegance/preview-2.jpg"
   ],
-  "tags": ["elegant", "classic", "traditional", "indian"],
+  "tags": ["elegant", "classic", "traditional"],
   "category": "traditional",
   "author": "Sacred Vows",
   "price": 499,
@@ -207,17 +207,6 @@
         "script": "Dancing Script"
       }
     }
-  ],
-
-  "features": [
-    "Bilingual support (English & Hindi)",
-    "RSVP tracking with guest management",
-    "Photo gallery with lightbox",
-    "Event timeline with locations",
-    "WhatsApp sharing",
-    "Custom color themes",
-    "Section reordering",
-    "Mobile responsive"
   ]
 }
 

@@ -118,7 +118,7 @@ function TemplateShowcase({ onSectionView }) {
         ...(template.tags || []),
         template.isFeatured ? 'popular' : null,
         template.status === 'coming-soon' ? 'coming-soon' : null,
-      ].filter(Boolean);
+      ].filter(Boolean).slice(0, 3);
 
       return {
         ...template,
@@ -128,7 +128,6 @@ function TemplateShowcase({ onSectionView }) {
         date: template.date || defaultDate,
         className: template.className || `template-${template.id}`,
         tags,
-        features: template.features || [],
         isReady: template.status === 'ready' || template.isAvailable,
       };
     });
@@ -223,11 +222,6 @@ function TemplateShowcase({ onSectionView }) {
                     </div>
                   </div>
                   <div className="template-overlay">
-                    <div className="template-highlights">
-                      {template.features.map((feature) => (
-                        <span key={feature} className="template-pill">{feature}</span>
-                      ))}
-                    </div>
                     <div className="template-actions">
                       <button 
                         className="template-overlay-btn"

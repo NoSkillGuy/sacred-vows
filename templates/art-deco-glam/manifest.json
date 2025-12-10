@@ -5,7 +5,7 @@
   "description": "Black and gold art-deco inspired layout for luxurious celebrations.",
   "previewImage": "/templates/art-deco-glam/preview.jpg",
   "previewImages": [],
-  "tags": ["luxury", "art-deco", "black", "gold"],
+  "tags": ["luxury", "art-deco", "gold"],
   "category": "luxury",
   "author": "Sacred Vows",
   "price": 1099,
@@ -74,12 +74,5 @@
         "script": "Dancing Script"
       }
     }
-  ],
-
-  "features": [
-    "Art-deco frames and dividers",
-    "Luxury black and gold palette",
-    "Photo gallery with lightbox",
-    "Event timeline with icons"
   ]
 }

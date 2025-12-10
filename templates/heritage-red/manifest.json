@@ -5,7 +5,7 @@
   "description": "Deep red and gold traditional motif with festive accents.",
   "previewImage": "/templates/heritage-red/preview.jpg",
   "previewImages": [],
-  "tags": ["traditional", "red", "gold", "festive"],
+  "tags": ["traditional", "red", "gold"],
   "category": "traditional",
   "author": "Sacred Vows",
   "price": 899,
@@ -74,12 +74,5 @@
         "script": "Dancing Script"
       }
     }
-  ],
-
-  "features": [
-    "Traditional red and gold palette",
-    "Cultural motif borders",
-    "Photo gallery with lightbox",
-    "Events timeline and RSVP"
   ]
 }

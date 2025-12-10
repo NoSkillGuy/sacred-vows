@@ -25,14 +25,21 @@ function getTemplateIds() {
 }
 
 function normalizeManifest(input, templateId) {
+  const { features, tags, ...manifestWithoutFeatures } = input || {};
+  const trimmedTags = Array.isArray(tags) ? tags.slice(0, 3) : tags;
   const status =
-    input.status ||
-    (input.isAvailable ? 'ready' : input.isComingSoon ? 'coming-soon' : 'hidden');
+    manifestWithoutFeatures.status ||
+    (manifestWithoutFeatures.isAvailable
+      ? 'ready'
+      : manifestWithoutFeatures.isComingSoon
+        ? 'coming-soon'
+        : 'hidden');
 
   return {
-    ...input,
-    id: input.id || templateId,
-    name: input.name || templateId,
+    ...manifestWithoutFeatures,
+    ...(trimmedTags ? { tags: trimmedTags } : {}),
+    id: manifestWithoutFeatures.id || templateId,
+    name: manifestWithoutFeatures.name || templateId,
     status,
     isAvailable: status === 'ready',
     isComingSoon: status === 'coming-soon',
@@ -91,7 +98,6 @@ function manifestToSummary(manifest) {
     isComingSoon: manifest.isComingSoon,
     isFeatured: manifest.isFeatured,
     version: manifest.version,
-    features: manifest.features,
   };
 }
 
