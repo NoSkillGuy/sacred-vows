@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { getInvitations, deleteInvitation } from '../../services/invitationService';
+import { getInvitations, deleteInvitation, updateInvitation } from '../../services/invitationService';
 import { getCurrentUser, logout } from '../../services/authService';
 import { useToast } from '../Toast/ToastProvider';
+import EditableText from '../WYSIWYG/EditableText';
 import './Dashboard.css';
 
 // SVG Icons
@@ -194,6 +195,25 @@ function Dashboard() {
     return 6000;
   }
 
+  async function handleInvitationTitleUpdate(id, newTitle) {
+    const trimmedTitle = newTitle?.trim() || 'Untitled Invitation';
+    const previousInvitations = invitations;
+
+    // Optimistically update UI
+    setInvitations(prev => prev.map(inv => (
+      inv.id === id ? { ...inv, title: trimmedTitle } : inv
+    )));
+
+    try {
+      await updateInvitation(id, { title: trimmedTitle });
+    } catch (error) {
+      console.error('Failed to update invitation title:', error);
+      alert('Could not update the invitation name. Please try again.');
+      // Revert on failure
+      setInvitations(previousInvitations);
+    }
+  }
+
   function formatDate(dateString) {
     if (!dateString) return 'Date not set';
     const date = new Date(dateString);
@@ -383,6 +403,7 @@ function Dashboard() {
                   invitation={invitation}
                   onEdit={() => navigate(`/builder/${invitation.id}`)}
                   onDelete={() => handleDelete(invitation.id)}
+                  onTitleUpdate={handleInvitationTitleUpdate}
                   formatDate={formatDate}
                 />
               ))}
@@ -394,14 +415,15 @@ function Dashboard() {
   );
 }
 
-function InvitationCard({ invitation, onEdit, onDelete, formatDate }) {
+function InvitationCard({ invitation, onEdit, onDelete, onTitleUpdate, formatDate }) {
   const { id, title, data, status, templateId, createdAt } = invitation;
   
-  // Extract couple names from data if available
+  // Extract couple names from data if available (used as fallback)
   const coupleData = data?.couple || {};
-  const coupleName = coupleData.bride && coupleData.groom 
+  const fallbackCoupleName = coupleData.bride && coupleData.groom 
     ? `${coupleData.bride} & ${coupleData.groom}`
-    : title || 'Untitled Invitation';
+    : 'Untitled Invitation';
+  const displayTitle = title?.trim() || fallbackCoupleName;
   
   const weddingDate = data?.weddingDate || createdAt;
 
@@ -418,7 +440,14 @@ function InvitationCard({ invitation, onEdit, onDelete, formatDate }) {
       </div>
       
       <div className="invitation-info">
-        <h3 className="invitation-couple">{coupleName}</h3>
+        <EditableText
+          value={displayTitle}
+          onUpdate={(path, value) => onTitleUpdate?.(id, value)}
+          path={`invitations.${id}.title`}
+          className="invitation-couple"
+          tag="h3"
+          placeholder="Click to name your invitation"
+        />
         <div className="invitation-date">
           <CalendarIcon />
           {formatDate(weddingDate)}

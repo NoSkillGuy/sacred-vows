@@ -65,12 +65,13 @@ router.get('/:id', (req, res) => {
  */
 router.post('/', (req, res) => {
   try {
-    const { templateId, data } = req.body;
+    const { templateId, data, title } = req.body;
 
     const invitation = {
       id: Date.now().toString(),
       templateId: templateId || 'royal-elegance',
       data: data || {},
+      title: title || 'Untitled Invitation',
       userId: req.user?.userId || 'anonymous', // In production, from auth middleware
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -92,7 +93,7 @@ router.post('/', (req, res) => {
 router.put('/:id', (req, res) => {
   try {
     const { id } = req.params;
-    const { data, templateId } = req.body;
+    const { data, templateId, title, status } = req.body;
 
     const invitationIndex = invitations.findIndex(inv => inv.id === id);
     if (invitationIndex === -1) {
@@ -101,8 +102,10 @@ router.put('/:id', (req, res) => {
 
     invitations[invitationIndex] = {
       ...invitations[invitationIndex],
-      data: data || invitations[invitationIndex].data,
+      data: data ?? invitations[invitationIndex].data,
       templateId: templateId || invitations[invitationIndex].templateId,
+      title: title !== undefined ? title : invitations[invitationIndex].title,
+      status: status || invitations[invitationIndex].status,
       updatedAt: new Date(),
     };
 
