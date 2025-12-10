@@ -1,0 +1,35 @@
+{
+  "id": "coastal-breeze",
+  "name": "Coastal Breeze",
+  "version": "1.0.0",
+  "metadata": {
+    "description": "Airy minimal design inspired by coastal blues and creamy sands.",
+    "previewImage": "/templates/coastal-breeze/preview.jpg",
+    "tags": ["minimal", "modern", "coastal", "blue"],
+    "author": "Sacred Vows"
+  },
+  "sections": [
+    { "id": "header", "enabled": true, "config": {} },
+    { "id": "hero", "enabled": true, "config": {} },
+    { "id": "couple", "enabled": true, "config": {} },
+    { "id": "fathers-letter", "enabled": true, "config": {} },
+    { "id": "gallery", "enabled": true, "config": {} },
+    { "id": "events", "enabled": true, "config": {} },
+    { "id": "venue", "enabled": true, "config": {} },
+    { "id": "rsvp", "enabled": true, "config": {} },
+    { "id": "footer", "enabled": true, "config": {} }
+  ],
+  "theme": {
+    "colors": {
+      "primary": "#4c9fbf",
+      "secondary": "#2d6a86",
+      "background": "#f4fbff",
+      "text": "#123041"
+    },
+    "fonts": {
+      "heading": "Playfair Display",
+      "body": "Poppins",
+      "script": "Great Vibes"
+    }
+  }
+}

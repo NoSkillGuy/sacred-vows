@@ -1,0 +1,58 @@
+{
+  "id": "minimal-modern",
+  "name": "Minimal Modern",
+  "version": "1.0.0",
+  "description": "Clean, contemporary design with minimalist aesthetics. Ideal for couples who prefer understated elegance.",
+  "previewImage": "/templates/minimal-modern/preview.jpg",
+  "previewImages": [],
+  "tags": ["minimal", "modern", "clean", "contemporary"],
+  "category": "modern",
+  "author": "Sacred Vows",
+  "price": 699,
+  "currency": "INR",
+  "status": "coming-soon",
+  "isAvailable": false,
+  "isComingSoon": true,
+  "isFeatured": false,
+  "sections": [
+    { "id": "header", "name": "Header", "description": "Navigation and branding header", "icon": "📌", "required": true, "defaultEnabled": true },
+    { "id": "hero", "name": "Hero Banner", "description": "Main hero section with couple photo", "icon": "🖼️", "required": false, "defaultEnabled": true },
+    { "id": "couple", "name": "Couple Profile", "description": "Bride and groom information", "icon": "💑", "required": false, "defaultEnabled": true },
+    { "id": "fathers-letter", "name": "Father's Letter", "description": "Heartfelt letter from the father", "icon": "✉️", "required": false, "defaultEnabled": true },
+    { "id": "gallery", "name": "Photo Gallery", "description": "Photo gallery with lightbox", "icon": "📷", "required": false, "defaultEnabled": true },
+    { "id": "events", "name": "Events Timeline", "description": "Wedding events schedule", "icon": "📅", "required": false, "defaultEnabled": true },
+    { "id": "venue", "name": "Venue Details", "description": "Venue location with map", "icon": "📍", "required": false, "defaultEnabled": true },
+    { "id": "rsvp", "name": "RSVP Section", "description": "Guest RSVP form", "icon": "💌", "required": false, "defaultEnabled": true },
+    { "id": "footer", "name": "Footer", "description": "Closing message", "icon": "🎀", "required": true, "defaultEnabled": true }
+  ],
+  "defaultSectionOrder": ["header", "hero", "couple", "fathers-letter", "gallery", "events", "venue", "rsvp", "footer"],
+  "themes": [
+    {
+      "id": "royal-gold",
+      "name": "Royal Gold",
+      "isDefault": true,
+      "colors": { "primary": "#d4af37", "secondary": "#8b6914", "background": "#fff8f0", "text": "#2c2c2c", "accent": "#c9a227" },
+      "fonts": { "heading": "Playfair Display", "body": "Poppins", "script": "Great Vibes" }
+    },
+    {
+      "id": "rose-blush",
+      "name": "Rose Blush",
+      "isDefault": false,
+      "colors": { "primary": "#c77d8a", "secondary": "#9b5c6a", "background": "#fff5f7", "text": "#4a3539", "accent": "#e8b4b8" },
+      "fonts": { "heading": "Cormorant Garamond", "body": "Lato", "script": "Dancing Script" }
+    },
+    {
+      "id": "forest-sage",
+      "name": "Forest Sage",
+      "isDefault": false,
+      "colors": { "primary": "#6b8e6b", "secondary": "#4a6f4a", "background": "#f5f8f5", "text": "#2c3c2c", "accent": "#8fbc8f" },
+      "fonts": { "heading": "EB Garamond", "body": "Montserrat", "script": "Tangerine" }
+    }
+  ],
+  "features": [
+    "Sleek animations",
+    "Modern typography",
+    "Photo-centric layout",
+    "RSVP with dietary preferences"
+  ]
+}

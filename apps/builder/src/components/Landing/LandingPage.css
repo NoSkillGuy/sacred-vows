@@ -1232,11 +1232,13 @@
 .templates-carousel-wrapper {
   position: relative;
   max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
 }
 
 .templates-grid {
   display: grid;
+  width: 100%;
   grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
 }

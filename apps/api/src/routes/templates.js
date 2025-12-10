@@ -12,27 +12,8 @@ const __dirname = path.dirname(__filename);
 // Path to templates directory
 const TEMPLATES_DIR = path.resolve(__dirname, '../../../../../templates');
 
-/**
- * Load template manifest from file system
- * @param {string} templateId - Template ID
- * @returns {Object|null} Template manifest or null if not found
- */
-function loadManifest(templateId) {
-  try {
-    const manifestPath = path.join(TEMPLATES_DIR, templateId, 'manifest.json');
-    if (fs.existsSync(manifestPath)) {
-      const content = fs.readFileSync(manifestPath, 'utf8');
-      return JSON.parse(content);
-    }
-  } catch (error) {
-    console.error(`Failed to load manifest for ${templateId}:`, error);
-  }
-  return null;
-}
-
-// Template list with base information
-// Full manifests are loaded from file system on demand
-const templates = [
+// Template list with base information (used as fallback when a manifest file is missing)
+const templateFallbacks = [
   {
     id: 'royal-elegance',
     name: 'Royal Elegance',
@@ -160,6 +141,106 @@ const templates = [
     isAvailable: false,
     isComingSoon: true,
   },
+  {
+    id: 'desert-sunset',
+    name: 'Desert Sunset',
+    description: 'Warm amber gradients with modern typography inspired by sunset hues.',
+    price: 799,
+    currency: 'INR',
+    previewImage: '/templates/desert-sunset/preview.jpg',
+    previewImages: [],
+    tags: ['modern', 'sunset', 'warm', 'gradient'],
+    category: 'modern',
+    features: [
+      'Gradient hero with modern typography',
+      'Photo gallery with lightbox',
+      'Events timeline with icons',
+      'RSVP with contact details',
+    ],
+    version: '1.0.0',
+    isAvailable: false,
+    isComingSoon: true,
+  },
+  {
+    id: 'pastel-bloom',
+    name: 'Pastel Bloom',
+    description: 'Soft watercolor florals with romantic pastels and elegant typography.',
+    price: 649,
+    currency: 'INR',
+    previewImage: '/templates/pastel-bloom/preview.jpg',
+    previewImages: [],
+    tags: ['floral', 'romantic', 'pastel', 'watercolor'],
+    category: 'romantic',
+    features: [
+      'Watercolor floral hero',
+      'Romantic typography',
+      'Photo gallery with lightbox',
+      'RSVP with contact cards',
+    ],
+    version: '1.0.0',
+    isAvailable: false,
+    isComingSoon: true,
+  },
+  {
+    id: 'art-deco-glam',
+    name: 'Art Deco Glam',
+    description: 'Black and gold art-deco inspired layout for luxurious celebrations.',
+    price: 1099,
+    currency: 'INR',
+    previewImage: '/templates/art-deco-glam/preview.jpg',
+    previewImages: [],
+    tags: ['luxury', 'art-deco', 'black', 'gold'],
+    category: 'luxury',
+    features: [
+      'Art-deco frames and dividers',
+      'Luxury black and gold palette',
+      'Photo gallery with lightbox',
+      'Event timeline with icons',
+    ],
+    version: '1.0.0',
+    isAvailable: false,
+    isComingSoon: true,
+  },
+  {
+    id: 'coastal-breeze',
+    name: 'Coastal Breeze',
+    description: 'Airy minimal design inspired by coastal blues and creamy sands.',
+    price: 699,
+    currency: 'INR',
+    previewImage: '/templates/coastal-breeze/preview.jpg',
+    previewImages: [],
+    tags: ['minimal', 'modern', 'coastal', 'blue'],
+    category: 'minimal',
+    features: [
+      'Minimal coastal layout',
+      'Clean typography with airy spacing',
+      'Photo gallery with lightbox',
+      'RSVP and contact cards',
+    ],
+    version: '1.0.0',
+    isAvailable: false,
+    isComingSoon: true,
+  },
+  {
+    id: 'heritage-red',
+    name: 'Heritage Red',
+    description: 'Deep red and gold traditional motif with festive accents.',
+    price: 899,
+    currency: 'INR',
+    previewImage: '/templates/heritage-red/preview.jpg',
+    previewImages: [],
+    tags: ['traditional', 'red', 'gold', 'festive'],
+    category: 'traditional',
+    features: [
+      'Traditional red and gold palette',
+      'Cultural motif borders',
+      'Photo gallery with lightbox',
+      'Events timeline and RSVP',
+    ],
+    version: '1.0.0',
+    isAvailable: false,
+    isComingSoon: true,
+  },
 ];
 
 // Default sections configuration for templates without manifest
@@ -203,8 +284,112 @@ const defaultThemes = [
 // Default section order
 const defaultSectionOrder = ['header', 'hero', 'couple', 'fathers-letter', 'gallery', 'events', 'venue', 'rsvp', 'footer'];
 
-// Get unique categories from templates
-const categories = [...new Set(templates.map(t => t.category))];
+function getTemplateIds() {
+  try {
+    return fs.readdirSync(TEMPLATES_DIR).filter((entry) => {
+      const fullPath = path.join(TEMPLATES_DIR, entry);
+      return fs.existsSync(fullPath) && fs.statSync(fullPath).isDirectory();
+    });
+  } catch (error) {
+    console.error('Failed to read templates directory', error);
+    return [];
+  }
+}
+
+function normalizeManifest(input, templateId) {
+  const status =
+    input.status ||
+    (input.isAvailable ? 'ready' : input.isComingSoon ? 'coming-soon' : 'hidden');
+
+  return {
+    ...input,
+    id: input.id || templateId,
+    name: input.name || templateId,
+    version: input.version || '1.0.0',
+    description: input.description || '',
+    previewImage: input.previewImage,
+    previewImages: input.previewImages || [],
+    tags: input.tags || [],
+    category: input.category || 'general',
+    price: input.price ?? 0,
+    currency: input.currency || 'INR',
+    author: input.author || 'Sacred Vows',
+    sections: input.sections || defaultSections,
+    themes: input.themes || defaultThemes,
+    defaultSectionOrder: input.defaultSectionOrder || defaultSectionOrder,
+    status,
+    isAvailable: status === 'ready',
+    isComingSoon: status === 'coming-soon',
+    isFeatured: input.isFeatured || false,
+    features: input.features || [],
+  };
+}
+
+/**
+ * Load template manifest from file system or fallback data
+ * @param {string} templateId - Template ID
+ * @returns {Object|null} Template manifest or null if not found
+ */
+function loadManifest(templateId) {
+  try {
+    const manifestPath = path.join(TEMPLATES_DIR, templateId, 'manifest.json');
+    if (fs.existsSync(manifestPath)) {
+      const content = fs.readFileSync(manifestPath, 'utf8');
+      const parsed = JSON.parse(content);
+      return normalizeManifest(parsed, templateId);
+    }
+  } catch (error) {
+    console.error(`Failed to load manifest for ${templateId}:`, error);
+  }
+
+  const fallback = templateFallbacks.find((template) => template.id === templateId);
+  if (fallback) {
+    return normalizeManifest(fallback, templateId);
+  }
+
+  return null;
+}
+
+function getTemplateCatalog() {
+  const catalog = [];
+  const templateIds = getTemplateIds();
+
+  templateIds.forEach((templateId) => {
+    const manifest = loadManifest(templateId);
+    if (manifest) {
+      catalog.push(manifest);
+    }
+  });
+
+  // Include fallback templates that might not yet have a manifest directory
+  templateFallbacks.forEach((fallback) => {
+    if (!catalog.find((item) => item.id === fallback.id)) {
+      catalog.push(normalizeManifest(fallback, fallback.id));
+    }
+  });
+
+  return catalog;
+}
+
+function manifestToSummary(manifest) {
+  return {
+    id: manifest.id,
+    name: manifest.name,
+    description: manifest.description,
+    price: manifest.price,
+    currency: manifest.currency,
+    previewImage: manifest.previewImage,
+    previewImages: manifest.previewImages,
+    tags: manifest.tags,
+    category: manifest.category,
+    status: manifest.status,
+    isAvailable: manifest.isAvailable,
+    isComingSoon: manifest.isComingSoon,
+    isFeatured: manifest.isFeatured,
+    version: manifest.version,
+    features: manifest.features,
+  };
+}
 
 /**
  * Get all templates
@@ -214,19 +399,23 @@ const categories = [...new Set(templates.map(t => t.category))];
 router.get('/', (req, res) => {
   const { category, featured } = req.query;
   
-  let filteredTemplates = templates;
-  
+  const catalog = getTemplateCatalog();
+
+  let filteredTemplates = catalog;
+
   if (category && category !== 'all') {
-    filteredTemplates = filteredTemplates.filter(t => t.category === category);
+    filteredTemplates = filteredTemplates.filter((t) => t.category === category);
   }
-  
+
   if (featured === 'true') {
-    filteredTemplates = filteredTemplates.filter(t => t.isFeatured);
+    filteredTemplates = filteredTemplates.filter((t) => t.isFeatured);
   }
-  
-  res.json({ 
-    templates: filteredTemplates,
-    categories: ['all', ...categories],
+
+  const categories = ['all', ...new Set(catalog.map((t) => t.category).filter(Boolean))];
+
+  res.json({
+    templates: filteredTemplates.map(manifestToSummary),
+    categories,
   });
 });
 
@@ -235,34 +424,7 @@ router.get('/', (req, res) => {
  * GET /api/templates/manifests
  */
 router.get('/manifests', (req, res) => {
-  const manifests = templates.map(template => {
-    // Try to load manifest from file system
-    const fileManifest = loadManifest(template.id);
-    
-    if (fileManifest) {
-      return fileManifest;
-    }
-    
-    // Return default manifest structure
-    return {
-      id: template.id,
-      name: template.name,
-      version: template.version,
-      description: template.description,
-      previewImage: template.previewImage,
-      tags: template.tags,
-      category: template.category,
-      price: template.price,
-      currency: template.currency,
-      isAvailable: template.isAvailable,
-      isFeatured: template.isFeatured,
-      sections: defaultSections,
-      themes: defaultThemes,
-      defaultSectionOrder,
-      features: template.features,
-    };
-  });
-  
+  const manifests = getTemplateCatalog();
   res.json({ manifests });
 });
 
@@ -273,40 +435,12 @@ router.get('/manifests', (req, res) => {
  */
 router.get('/:id/manifest', (req, res) => {
   const { id } = req.params;
-  const template = templates.find(t => t.id === id);
 
-  if (!template) {
+  const manifest = loadManifest(id);
+
+  if (!manifest) {
     return res.status(404).json({ error: 'Template not found' });
   }
-
-  // Try to load manifest from file system
-  const fileManifest = loadManifest(id);
-  
-  if (fileManifest) {
-    return res.json({ manifest: fileManifest });
-  }
-  
-  // Return default manifest structure
-  const manifest = {
-    id: template.id,
-    name: template.name,
-    version: template.version,
-    description: template.description,
-    previewImage: template.previewImage,
-    previewImages: template.previewImages,
-    tags: template.tags,
-    category: template.category,
-    price: template.price,
-    currency: template.currency,
-    isAvailable: template.isAvailable,
-    isFeatured: template.isFeatured,
-    isComingSoon: template.isComingSoon,
-    sections: defaultSections,
-    themes: defaultThemes,
-    defaultSectionOrder,
-    features: template.features,
-    author: 'Sacred Vows',
-  };
 
   res.json({ manifest });
 });
@@ -318,13 +452,14 @@ router.get('/:id/manifest', (req, res) => {
  */
 router.get('/:id', (req, res) => {
   const { id } = req.params;
-  const template = templates.find(t => t.id === id);
 
-  if (!template) {
+  const manifest = loadManifest(id);
+
+  if (!manifest) {
     return res.status(404).json({ error: 'Template not found' });
   }
 
-  res.json({ template });
+  res.json({ template: manifestToSummary(manifest) });
 });
 
 export default router;

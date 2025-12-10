@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import { trackCTA, trackExperiment, trackTemplateDemo, trackTemplateView } from '../../services/analyticsService';
+import { getAllTemplateManifests } from '../../services/templateService';
 
 // SVG Ornaments for each template style
 const OrnamentClassic = () => (
@@ -49,110 +50,92 @@ const OrnamentSun = () => (
   </svg>
 );
 
-const templates = [
-  {
-    id: 'royal-elegance',
-    name: 'Royal Elegance',
-    description: 'Classic gold and cream design',
-    className: 'template-royal-elegance',
-    Ornament: OrnamentClassic,
-    names: 'Priya & Rahul',
-    date: 'Dec 15, 2025',
-    ornamentColor: '#d4af37',
-    category: 'traditional',
-    tags: ['popular'],
-    features: ['RSVP', 'Photo gallery', 'Music'],
-  },
-  {
-    id: 'eternal-bloom',
-    name: 'Eternal Bloom',
-    description: 'Soft floral watercolor theme',
-    className: 'template-eternal-bloom',
-    Ornament: OrnamentFloral,
-    names: 'Emma & James',
-    date: 'June 8, 2025',
-    ornamentColor: '#e8b4b8',
-    category: 'floral',
-    tags: ['new'],
-    features: ['Floral art', 'Photo gallery', 'Multi-language'],
-  },
-  {
-    id: 'midnight-romance',
-    name: 'Midnight Romance',
-    description: 'Dark elegant sophistication',
-    className: 'template-midnight-romance',
-    Ornament: OrnamentStar,
-    names: 'Sophia & William',
-    date: 'Nov 22, 2025',
-    ornamentColor: '#d4af37',
-    category: 'modern',
-    tags: ['popular'],
-    features: ['Dark mode', 'Animated hero', 'Music'],
-  },
-  {
-    id: 'garden-dreams',
-    name: 'Garden Dreams',
-    description: 'Botanical illustrations',
-    className: 'template-garden-dreams',
-    Ornament: OrnamentLeaf,
-    names: 'Olivia & Liam',
-    date: 'April 18, 2025',
-    ornamentColor: '#8fa88f',
-    category: 'floral',
-    tags: [],
-    features: ['Botanical art', 'RSVP', 'Map'],
-  },
-  {
-    id: 'classic-monogram',
-    name: 'Classic Monogram',
-    description: 'Timeless minimal design',
-    className: 'template-classic-monogram',
-    Ornament: OrnamentDiamond,
-    names: 'Isabella & Noah',
-    date: 'Sept 5, 2025',
-    ornamentColor: '#2c2c2c',
-    category: 'minimal',
-    tags: ['minimal'],
-    features: ['Monogram', 'Clean layout', 'RSVP'],
-  },
-  {
-    id: 'sunset-serenade',
-    name: 'Sunset Serenade',
-    description: 'Warm gradient aesthetics',
-    className: 'template-sunset-serenade',
-    Ornament: OrnamentSun,
-    names: 'Ava & Ethan',
-    date: 'Aug 12, 2025',
-    ornamentColor: '#e6a87c',
-    category: 'modern',
-    tags: ['new'],
-    features: ['Gradient', 'Timeline', 'Music'],
-  },
-];
+const ornamentByCategory = {
+  traditional: OrnamentClassic,
+  floral: OrnamentFloral,
+  romantic: OrnamentFloral,
+  modern: OrnamentStar,
+  minimal: OrnamentDiamond,
+  bohemian: OrnamentLeaf,
+  luxury: OrnamentSun,
+};
 
-const filters = [
-  { id: 'all', label: 'All' },
-  { id: 'traditional', label: 'Traditional' },
-  { id: 'modern', label: 'Modern' },
-  { id: 'floral', label: 'Floral' },
-  { id: 'minimal', label: 'Minimal' },
-  { id: 'popular', label: 'Popular' },
-  { id: 'new', label: 'New' },
-];
+const defaultColors = {
+  primary: '#d4af37',
+  accent: '#c9a227',
+  background: '#fff8f0',
+};
+
+const defaultNames = 'Priya & Rahul';
+const defaultDate = 'Dec 15, 2025';
 
 function TemplateShowcase({ onSectionView }) {
   const navigate = useNavigate();
+  const [templates, setTemplates] = useState([]);
   const [activeFilter, setActiveFilter] = useState('all');
   const [query, setQuery] = useState('');
   const [demoTemplate, setDemoTemplate] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (onSectionView) onSectionView('templates');
     trackExperiment('templates_filters', 'chips_search_v1');
+    loadTemplates();
   }, [onSectionView]);
 
+  async function loadTemplates() {
+    try {
+      setLoading(true);
+      const manifests = await getAllTemplateManifests();
+      setTemplates(manifests || []);
+    } catch (error) {
+      console.error('Failed to load templates', error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const filters = useMemo(() => {
+    const categories = Array.from(
+      new Set(templates.map((template) => template.category).filter(Boolean))
+    );
+
+    return [
+      { id: 'all', label: 'All' },
+      { id: 'popular', label: 'Popular' },
+      { id: 'coming-soon', label: 'Coming Soon' },
+      ...categories.map((category) => ({ id: category, label: category.charAt(0).toUpperCase() + category.slice(1) })),
+    ];
+  }, [templates]);
+
+  const enrichedTemplates = useMemo(() => {
+    return templates.map((template) => {
+      const Ornament = ornamentByCategory[template.category] || OrnamentSun;
+      const defaultTheme = template.themes?.find((theme) => theme.isDefault) || template.themes?.[0];
+      const colors = defaultTheme?.colors || {};
+      const accent = colors.accent || colors.primary || defaultColors.accent;
+      const tags = [
+        ...(template.tags || []),
+        template.isFeatured ? 'popular' : null,
+        template.status === 'coming-soon' ? 'coming-soon' : null,
+      ].filter(Boolean);
+
+      return {
+        ...template,
+        Ornament,
+        ornamentColor: accent,
+        names: template.names || defaultNames,
+        date: template.date || defaultDate,
+        className: template.className || `template-${template.id}`,
+        tags,
+        features: template.features || [],
+        isReady: template.status === 'ready' || template.isAvailable,
+      };
+    });
+  }, [templates]);
+
   const filteredTemplates = useMemo(() => {
-    return templates.filter((template) => {
+    return enrichedTemplates.filter((template) => {
       const matchesFilter =
         activeFilter === 'all' ||
         template.category === activeFilter ||
@@ -160,9 +143,10 @@ function TemplateShowcase({ onSectionView }) {
       const matchesQuery = template.name.toLowerCase().includes(query.toLowerCase());
       return matchesFilter && matchesQuery;
     });
-  }, [activeFilter, query]);
+  }, [activeFilter, query, enrichedTemplates]);
 
   const handleCustomize = (template) => {
+    if (!template.isReady) return;
     trackCTA('templates_customize', { templateId: template.id });
     navigate('/signup', { state: { templateId: template.id } });
   };
@@ -210,60 +194,73 @@ function TemplateShowcase({ onSectionView }) {
 
       <div className="templates-carousel-wrapper">
         <div className="templates-grid">
-          {filteredTemplates.map((template) => {
-            const OrnamentComponent = template.Ornament;
-            return (
-              <div
-                key={template.id}
-                className={`template-card ${template.className}`}
-                onMouseEnter={() => trackTemplateView(template.id)}
-              >
-                <div className="template-preview">
-                  <div className="template-inner">
-                    <div className="template-ornament" style={{ color: template.ornamentColor }}>
-                      <OrnamentComponent />
+          {loading ? (
+            <div className="templates-loading">
+              <div className="loading-spinner" />
+              <p>Loading templates...</p>
+            </div>
+          ) : (
+            filteredTemplates.map((template) => {
+              const OrnamentComponent = template.Ornament;
+              const isComingSoon = template.status === 'coming-soon';
+
+              return (
+                <div
+                  key={template.id}
+                  className={`template-card ${template.className}`}
+                  onMouseEnter={() => trackTemplateView(template.id)}
+                >
+                  <div className="template-preview">
+                    <div className="template-inner">
+                      <div className="template-ornament" style={{ color: template.ornamentColor }}>
+                        <OrnamentComponent />
+                      </div>
+                      <div className="template-names">{template.names}</div>
+                      <div className="template-date">{template.date}</div>
+                      <div className="template-ornament" style={{ color: template.ornamentColor, transform: 'rotate(180deg)' }}>
+                        <OrnamentComponent />
+                      </div>
                     </div>
-                    <div className="template-names">{template.names}</div>
-                    <div className="template-date">{template.date}</div>
-                    <div className="template-ornament" style={{ color: template.ornamentColor, transform: 'rotate(180deg)' }}>
-                      <OrnamentComponent />
+                  </div>
+                  <div className="template-overlay">
+                    <div className="template-highlights">
+                      {template.features.map((feature) => (
+                        <span key={feature} className="template-pill">{feature}</span>
+                      ))}
+                    </div>
+                    <div className="template-actions">
+                      <button 
+                        className="template-overlay-btn"
+                        onClick={() => handleCustomize(template)}
+                        disabled={!template.isReady}
+                      >
+                        {template.isReady ? 'Customize This Design' : 'Coming Soon'}
+                      </button>
+                      <button 
+                        className="template-overlay-secondary"
+                        onClick={() => handleDemo(template)}
+                      >
+                        View Demo
+                      </button>
+                    </div>
+                  </div>
+                  <div className="template-info">
+                    <h3 className="template-name">{template.name}</h3>
+                    <p className="template-desc">{template.description}</p>
+                    <div className="template-meta">
+                      <span className="template-tag">{template.category}</span>
+                      {template.tags?.map((tag) => (
+                        <span key={tag} className={`template-tag badge ${tag === 'coming-soon' ? 'coming-soon' : ''}`}>{tag}</span>
+                      ))}
+                      {!template.isReady && (
+                        <span className="template-tag badge coming-soon">Coming Soon</span>
+                      )}
                     </div>
                   </div>
                 </div>
-                <div className="template-overlay">
-                  <div className="template-highlights">
-                    {template.features.map((feature) => (
-                      <span key={feature} className="template-pill">{feature}</span>
-                    ))}
-                  </div>
-                  <div className="template-actions">
-                    <button 
-                      className="template-overlay-btn"
-                      onClick={() => handleCustomize(template)}
-                    >
-                      Customize This Design
-                    </button>
-                    <button 
-                      className="template-overlay-secondary"
-                      onClick={() => handleDemo(template)}
-                    >
-                      View Demo
-                    </button>
-                  </div>
-                </div>
-                <div className="template-info">
-                  <h3 className="template-name">{template.name}</h3>
-                  <p className="template-desc">{template.description}</p>
-                  <div className="template-meta">
-                    <span className="template-tag">{template.category}</span>
-                    {template.tags?.map((tag) => (
-                      <span key={tag} className="template-tag badge">{tag}</span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
       </div>
 

@@ -13,6 +13,7 @@
   "author": "Sacred Vows",
   "price": 499,
   "currency": "INR",
+  "status": "ready",
   "isAvailable": true,
   "isFeatured": true,
 

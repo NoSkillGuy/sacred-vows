@@ -1,0 +1,35 @@
+{
+  "id": "desert-sunset",
+  "name": "Desert Sunset",
+  "version": "1.0.0",
+  "metadata": {
+    "description": "Warm amber gradients with modern typography inspired by sunset hues.",
+    "previewImage": "/templates/desert-sunset/preview.jpg",
+    "tags": ["modern", "sunset", "warm", "gradient"],
+    "author": "Sacred Vows"
+  },
+  "sections": [
+    { "id": "header", "enabled": true, "config": {} },
+    { "id": "hero", "enabled": true, "config": {} },
+    { "id": "couple", "enabled": true, "config": {} },
+    { "id": "fathers-letter", "enabled": true, "config": {} },
+    { "id": "gallery", "enabled": true, "config": {} },
+    { "id": "events", "enabled": true, "config": {} },
+    { "id": "venue", "enabled": true, "config": {} },
+    { "id": "rsvp", "enabled": true, "config": {} },
+    { "id": "footer", "enabled": true, "config": {} }
+  ],
+  "theme": {
+    "colors": {
+      "primary": "#d18f3f",
+      "secondary": "#a86523",
+      "background": "#fff3e0",
+      "text": "#2f2415"
+    },
+    "fonts": {
+      "heading": "Playfair Display",
+      "body": "Poppins",
+      "script": "Great Vibes"
+    }
+  }
+}
