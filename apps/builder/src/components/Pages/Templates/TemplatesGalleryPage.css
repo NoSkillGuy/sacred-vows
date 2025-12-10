@@ -5,13 +5,14 @@
 .templates-gallery-page {
   max-width: 1400px;
   margin: 0 auto;
+  padding: 0 1rem;
 }
 
 /* ===================================
    Filters
    =================================== */
 
-.template-filters {
+.templates-gallery-page .template-filters {
   display: flex;
   justify-content: center;
   gap: 0.75rem;
@@ -19,7 +20,7 @@
   flex-wrap: wrap;
 }
 
-.filter-btn {
+.templates-gallery-page .filter-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -35,18 +36,18 @@
   transition: all 0.3s var(--ease-out-quart);
 }
 
-.filter-btn:hover {
+.templates-gallery-page .filter-btn:hover {
   border-color: var(--rose);
   color: var(--text-dark);
 }
 
-.filter-btn.active {
+.templates-gallery-page .filter-btn.active {
   background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
   border-color: var(--gold);
   color: var(--white);
 }
 
-.filter-count {
+.templates-gallery-page .filter-count {
   font-size: 0.75rem;
   font-weight: 600;
   padding: 0.15rem 0.5rem;
@@ -54,12 +55,12 @@
   border-radius: 100px;
 }
 
-.filter-btn.active .filter-count {
+.templates-gallery-page .filter-btn.active .filter-count {
   background: rgba(255, 255, 255, 0.25);
 }
 
 /* Category Links */
-.category-links {
+.templates-gallery-page .category-links {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -70,19 +71,19 @@
   border-radius: var(--radius-lg);
 }
 
-.category-links p {
+.templates-gallery-page .category-links p {
   font-size: 0.9rem;
   color: var(--text-muted);
 }
 
-.category-links a {
+.templates-gallery-page .category-links a {
   font-size: 0.9rem;
   color: var(--text-medium);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
-.category-links a:hover {
+.templates-gallery-page .category-links a:hover {
   color: var(--gold-dark);
 }
 
@@ -90,15 +91,20 @@
    Templates Grid
    =================================== */
 
-.templates-grid {
+.templates-gallery-page .templates-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 340px));
+  justify-content: center;
+  justify-items: center;
   gap: 1.75rem;
   margin-bottom: 5rem;
 }
 
-.template-card {
+.templates-gallery-page .template-card {
   position: relative;
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto;
   background: var(--white);
   border-radius: var(--radius-xl);
   overflow: hidden;
@@ -107,12 +113,12 @@
   border: 1px solid var(--builder-border-light);
 }
 
-.template-card:hover {
+.templates-gallery-page .template-card:hover {
   transform: translateY(-10px);
   box-shadow: var(--shadow-xl);
 }
 
-.popular-badge {
+.templates-gallery-page .popular-badge {
   position: absolute;
   top: 1rem;
   right: 1rem;
@@ -127,7 +133,7 @@
   z-index: 10;
 }
 
-.template-preview {
+.templates-gallery-page .template-preview {
   aspect-ratio: 3/4;
   padding: 1.5rem;
   display: flex;
@@ -136,7 +142,7 @@
   background: var(--cream);
 }
 
-.template-inner {
+.templates-gallery-page .template-inner {
   width: 100%;
   height: 100%;
   border-radius: var(--radius-lg);
@@ -150,17 +156,17 @@
   transition: transform 0.4s var(--ease-out-expo);
 }
 
-.template-card:hover .template-inner {
+.templates-gallery-page .template-card:hover .template-inner {
   transform: scale(1.03);
 }
 
-.template-ornament {
+.templates-gallery-page .template-ornament {
   font-size: 1.5rem;
   margin-bottom: 1rem;
   opacity: 0.8;
 }
 
-.template-names {
+.templates-gallery-page .template-names {
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.35rem;
   font-weight: 600;
@@ -168,12 +174,12 @@
   margin-bottom: 0.5rem;
 }
 
-.template-date {
+.templates-gallery-page .template-date {
   font-family: 'Great Vibes', cursive;
   font-size: 1.1rem;
 }
 
-.template-overlay {
+.templates-gallery-page .template-overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.6) 100%);
@@ -185,11 +191,11 @@
   border-radius: var(--radius-xl);
 }
 
-.template-card:hover .template-overlay {
+.templates-gallery-page .template-card:hover .template-overlay {
   opacity: 1;
 }
 
-.preview-btn {
+.templates-gallery-page .preview-btn {
   background: var(--white);
   color: var(--text-dark);
   border: none;
@@ -204,38 +210,38 @@
   transition: all 0.4s var(--ease-out-expo);
 }
 
-.template-card:hover .preview-btn {
+.templates-gallery-page .template-card:hover .preview-btn {
   transform: translateY(0);
   opacity: 1;
   transition-delay: 0.1s;
 }
 
-.preview-btn:hover {
+.templates-gallery-page .preview-btn:hover {
   background: var(--gold);
   color: var(--white);
   transform: scale(1.05);
 }
 
-.template-info {
+.templates-gallery-page .template-info {
   padding: 1.25rem 1.5rem 1.5rem;
   text-align: center;
 }
 
-.template-colors {
+.templates-gallery-page .template-colors {
   display: flex;
   justify-content: center;
   gap: 0.4rem;
   margin-bottom: 0.75rem;
 }
 
-.color-dot {
+.templates-gallery-page .color-dot {
   width: 16px;
   height: 16px;
   border-radius: 50%;
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.template-info h3 {
+.templates-gallery-page .template-info h3 {
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.2rem;
   font-weight: 600;
@@ -243,13 +249,13 @@
   margin-bottom: 0.35rem;
 }
 
-.template-info p {
+.templates-gallery-page .template-info p {
   font-size: 0.85rem;
   color: var(--text-light);
   margin-bottom: 0.75rem;
 }
 
-.template-category {
+.templates-gallery-page .template-category {
   font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -264,7 +270,7 @@
    CTA Section
    =================================== */
 
-.templates-cta {
+.templates-gallery-page .templates-cta {
   background: linear-gradient(135deg, #2d2d2d 0%, #1a1a2e 100%);
   border-radius: var(--radius-xl);
   padding: 4rem;
@@ -273,7 +279,7 @@
   overflow: hidden;
 }
 
-.templates-cta::before {
+.templates-gallery-page .templates-cta::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -281,7 +287,7 @@
   pointer-events: none;
 }
 
-.templates-cta h2 {
+.templates-gallery-page .templates-cta h2 {
   font-family: 'Cormorant Garamond', serif;
   font-size: 2.25rem;
   font-weight: 500;
@@ -290,14 +296,14 @@
   position: relative;
 }
 
-.templates-cta p {
+.templates-gallery-page .templates-cta p {
   font-size: 1.05rem;
   color: rgba(255, 255, 255, 0.7);
   margin-bottom: 2rem;
   position: relative;
 }
 
-.cta-buttons {
+.templates-gallery-page .cta-buttons {
   display: flex;
   gap: 1rem;
   justify-content: center;
@@ -309,47 +315,47 @@
    =================================== */
 
 @media (max-width: 768px) {
-  .template-filters {
+  .templates-gallery-page .template-filters {
     gap: 0.5rem;
   }
 
-  .filter-btn {
+  .templates-gallery-page .filter-btn {
     padding: 0.6rem 1rem;
     font-size: 0.85rem;
   }
 
-  .category-links {
+  .templates-gallery-page .category-links {
     flex-wrap: wrap;
     gap: 1rem;
   }
 
-  .templates-grid {
+  .templates-gallery-page .templates-grid {
     grid-template-columns: 1fr;
     max-width: 400px;
     margin-left: auto;
     margin-right: auto;
   }
 
-  .templates-cta {
+  .templates-gallery-page .templates-cta {
     padding: 3rem 1.5rem;
   }
 
-  .templates-cta h2 {
+  .templates-gallery-page .templates-cta h2 {
     font-size: 1.75rem;
   }
 
-  .cta-buttons {
+  .templates-gallery-page .cta-buttons {
     flex-direction: column;
   }
 }
 
 @media (max-width: 480px) {
-  .filter-btn {
+  .templates-gallery-page .filter-btn {
     padding: 0.5rem 0.75rem;
     font-size: 0.8rem;
   }
 
-  .filter-count {
+  .templates-gallery-page .filter-count {
     display: none;
   }
 }
