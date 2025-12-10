@@ -295,6 +295,27 @@ function Dashboard() {
           </div>
         </header>
 
+        <div className="dashboard-quickstart">
+          <div className="quickstart-copy">
+            <p className="section-label">Quick start</p>
+            <h2>Launch your invitation in 3 steps</h2>
+            <p className="section-subtitle">Pick a template, add details, share your link.</p>
+          </div>
+          <div className="quickstart-actions">
+            <button className="btn btn-primary" onClick={() => navigate('/templates')}>
+              <PlusIcon />
+              Choose template
+            </button>
+            <button className="btn btn-secondary" onClick={() => navigate('/dashboard')}>
+              <EyeIcon />
+              Preview later
+            </button>
+            <button className="btn btn-ghost" onClick={() => navigate('/templates')}>
+              See examples
+            </button>
+          </div>
+        </div>
+
         {/* Stats */}
         {totalInvitations > 0 && (
           <div className="dashboard-stats">

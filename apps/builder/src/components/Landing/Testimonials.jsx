@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 // Star icon component
 const StarIcon = () => (
   <svg viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
@@ -29,6 +31,7 @@ const testimonials = [
     location: 'Mumbai, India',
     date: 'Married Dec 2024',
     stars: 5,
+    platform: 'Google Reviews',
   },
   {
     content: "We were amazed at how professional our invitation looked. The multi-language support was perfect for our multicultural wedding. Highly recommend to all couples!",
@@ -36,6 +39,7 @@ const testimonials = [
     location: 'London, UK',
     date: 'Married Nov 2024',
     stars: 5,
+    platform: 'Trustpilot',
   },
   {
     content: "The RSVP tracking feature saved us so much time. Everything was seamless from start to finish. Our invitation felt so personal and our guests loved the interactive elements.",
@@ -43,10 +47,15 @@ const testimonials = [
     location: 'Delhi, India',
     date: 'Married Oct 2024',
     stars: 5,
+    platform: 'WeddingWire',
   },
 ];
 
-function Testimonials() {
+function Testimonials({ onSectionView }) {
+  useEffect(() => {
+    if (onSectionView) onSectionView('testimonials');
+  }, [onSectionView]);
+
   return (
     <section className="testimonials-section">
       <div className="section-header">
@@ -57,12 +66,25 @@ function Testimonials() {
         </p>
       </div>
 
+      <div className="social-proof-bar">
+        <div className="rating-score">
+          <span className="rating-number">4.9/5</span>
+          <span className="rating-label">Avg rating from verified couples</span>
+        </div>
+        <div className="proof-logos">
+          <span className="proof-pill"><StarIcon /> Google</span>
+          <span className="proof-pill"><StarIcon /> Pinterest</span>
+          <span className="proof-pill"><StarIcon /> WeddingWire</span>
+        </div>
+      </div>
+
       <div className="testimonials-carousel">
         <div className="testimonials-grid">
           {testimonials.map((testimonial, index) => (
             <div key={index} className="testimonial-card">
-              <div className="testimonial-quote-icon">"</div>
-              
+              <div className="testimonial-badge">
+                <span>{testimonial.platform}</span>
+              </div>
               <div className="testimonial-stars">
                 {[...Array(testimonial.stars)].map((_, i) => (
                   <span key={i} className="testimonial-star">

@@ -32,22 +32,25 @@ const steps = [
     Icon: PaletteIcon,
     title: 'Choose Your Template',
     description: 'Browse our beautiful collection and select the design that speaks to your heart.',
+    target: '#templates',
   },
   {
     number: 2,
     Icon: EditIcon,
     title: 'Customize Every Detail',
     description: 'Add your photos, edit text, choose colors, and make it uniquely yours.',
+    target: '/signup',
   },
   {
     number: 3,
     Icon: SendIcon,
     title: 'Share With Guests',
     description: 'Send your stunning invitation to loved ones with just a click.',
+    target: '#cta',
   },
 ];
 
-function HowItWorks() {
+function HowItWorks({ onSectionView }) {
   const containerRef = useRef(null);
   const [inView, setInView] = useState(false);
 
@@ -56,6 +59,7 @@ function HowItWorks() {
       ([entry]) => {
         if (entry.isIntersecting) {
           setInView(true);
+          if (onSectionView) onSectionView('how_it_works');
         }
       },
       { threshold: 0.3 }
@@ -67,6 +71,14 @@ function HowItWorks() {
 
     return () => observer.disconnect();
   }, []);
+
+  const handleStepClick = (target) => {
+    if (target?.startsWith('#')) {
+      document.querySelector(target)?.scrollIntoView({ behavior: 'smooth' });
+    } else if (target) {
+      window.location.href = target;
+    }
+  };
 
   return (
     <section id="how-it-works" className="how-it-works-section">
@@ -86,14 +98,19 @@ function HowItWorks() {
         {steps.map((step) => {
           const IconComponent = step.Icon;
           return (
-            <div key={step.number} className="step">
+            <button
+              key={step.number}
+              className="step"
+              type="button"
+              onClick={() => handleStepClick(step.target)}
+            >
               <div className="step-number">{step.number}</div>
               <div className="step-icon">
                 <IconComponent />
               </div>
               <h3 className="step-title">{step.title}</h3>
               <p className="step-desc">{step.description}</p>
-            </div>
+            </button>
           );
         })}
       </div>

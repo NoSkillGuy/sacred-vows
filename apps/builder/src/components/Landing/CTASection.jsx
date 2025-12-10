@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { trackCTA } from '../../services/analyticsService';
 
 // Floating petal SVG
 const FloatingPetal = ({ style }) => (
@@ -9,7 +11,7 @@ const FloatingPetal = ({ style }) => (
   </div>
 );
 
-function CTASection() {
+function CTASection({ onSectionView }) {
   const navigate = useNavigate();
 
   // Generate floating petals
@@ -22,8 +24,12 @@ function CTASection() {
     { top: '60%', left: '3%', animationDelay: '5s' },
   ];
 
+  useEffect(() => {
+    if (onSectionView) onSectionView('cta');
+  }, [onSectionView]);
+
   return (
-    <section className="cta-section">
+    <section id="cta" className="cta-section">
       {/* Background pattern */}
       <div className="cta-bg-pattern" />
       
@@ -46,9 +52,13 @@ function CTASection() {
           Join thousands of couples who have created their perfect wedding 
           invitation with Sacred Vows. Start for free and make your love story shine.
         </p>
-        <button className="cta-button" onClick={() => navigate('/signup')}>
+        <button className="cta-button" onClick={() => { trackCTA('cta_bottom'); navigate('/signup'); }}>
           <span>Create Your Invitation</span>
           <span className="cta-button-arrow">→</span>
+        </button>
+        <p className="cta-privacy">No spam. Private links, easy exports, delete anytime.</p>
+        <button className="back-to-top" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          Back to top ↑
         </button>
 
         <div className="cta-trust">

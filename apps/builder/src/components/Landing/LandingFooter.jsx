@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { trackCTA } from '../../services/analyticsService';
 
 // SVG Icons
 const RingIcon = () => (
@@ -36,11 +38,33 @@ const TwitterIcon = () => (
   </svg>
 );
 
-function LandingFooter() {
+function LandingFooter({ onSectionView }) {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (onSectionView) onSectionView('footer');
+  }, [onSectionView]);
+
   const currentYear = new Date().getFullYear();
 
   return (
     <footer className="landing-footer">
+      <div className="footer-cta">
+        <div>
+          <p className="section-label">Start in minutes</p>
+          <h3>Ready to create your invitation?</h3>
+          <p className="section-subtitle">Private links, instant previews, no credit card.</p>
+        </div>
+        <div className="footer-cta-actions">
+          <button className="cta-button" onClick={() => { trackCTA('footer_start'); navigate('/signup'); }}>
+            Start free →
+          </button>
+          <button className="cta-secondary" onClick={() => { trackCTA('footer_templates'); navigate('/templates-gallery'); }}>
+            Browse templates
+          </button>
+        </div>
+      </div>
+
       <div className="footer-content">
         <div className="footer-brand">
           <div className="footer-logo">
@@ -80,7 +104,7 @@ function LandingFooter() {
           </ul>
         </div>
 
-        <div className="footer-column">
+        <div className="footer-column secondary">
           <h4>Company</h4>
           <ul>
             <li><Link to="/about">About Us</Link></li>
@@ -91,7 +115,7 @@ function LandingFooter() {
           </ul>
         </div>
 
-        <div className="footer-column">
+        <div className="footer-column secondary">
           <h4>Support</h4>
           <ul>
             <li><Link to="/help">Help Center</Link></li>

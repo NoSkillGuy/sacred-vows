@@ -50,7 +50,6 @@ function SignupPage() {
     name: '',
     email: '',
     password: '',
-    confirmPassword: '',
   });
   const [strength, setStrength] = useState('weak');
   const [showTooltip, setShowTooltip] = useState(false);
@@ -88,12 +87,6 @@ function SignupPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
-
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      setLoading(false);
-      return;
-    }
 
     if (formData.password.length < 6) {
       setError('Password must be at least 6 characters');
@@ -162,6 +155,7 @@ function SignupPage() {
           <div className="auth-header">
             <h1 className="auth-title">Create Your Account</h1>
             <p className="auth-subtitle">Start creating your dream wedding invitation</p>
+            <p className="auth-helper">No credit card. Under 1 minute to get started.</p>
           </div>
 
           {error && <div className="auth-error">{error}</div>}
@@ -217,20 +211,6 @@ function SignupPage() {
               >
                 {strengthMessages[strength]}
               </div>
-            </div>
-
-            <div className="auth-field">
-              <label htmlFor="confirmPassword" className="auth-label">Confirm Password</label>
-              <input
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                placeholder="Confirm your password"
-                className="auth-input"
-                required
-              />
             </div>
 
             <button 

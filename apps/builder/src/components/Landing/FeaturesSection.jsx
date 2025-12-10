@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 // SVG Icons with elegant design
 const PreviewIcon = () => (
   <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -91,7 +93,11 @@ const features = [
   },
 ];
 
-function FeaturesSection() {
+function FeaturesSection({ onSectionView }) {
+  useEffect(() => {
+    if (onSectionView) onSectionView('features');
+  }, [onSectionView]);
+
   return (
     <section id="features" className="features-section">
       <div className="section-header">

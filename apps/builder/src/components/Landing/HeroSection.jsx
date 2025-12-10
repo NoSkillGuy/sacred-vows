@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+import { trackCTA } from '../../services/analyticsService';
 
 // SVG Components for premium look
 const RingIcon = () => (
@@ -59,13 +60,17 @@ const OrnamentSVG = () => (
 // Petal colors for variety
 const petalColors = ['#f5d0d3', '#e8b4b8', '#fce4e2', '#d4969c', '#c9a1a6'];
 
-function HeroSection() {
+function HeroSection({ onSectionView }) {
   const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const sectionRef = useRef(null);
 
   useEffect(() => {
     setMounted(true);
+    if (onSectionView && sectionRef.current) {
+      onSectionView('hero');
+    }
   }, []);
 
   // Generate petals with random properties
@@ -80,6 +85,7 @@ function HeroSection() {
 
   const scrollToTemplates = () => {
     document.getElementById('templates')?.scrollIntoView({ behavior: 'smooth' });
+    trackCTA('scroll_to_templates', { source: 'hero' });
   };
 
   const toggleMobileMenu = () => {
@@ -91,7 +97,7 @@ function HeroSection() {
   };
 
   return (
-    <section className="hero-section">
+    <section ref={sectionRef} className="hero-section">
       {/* Animated gradient background */}
       <div className="hero-bg" />
       
@@ -150,7 +156,10 @@ function HeroSection() {
           <a href="#templates">Templates</a>
           <a href="#features">Features</a>
           <a href="#how-it-works">How It Works</a>
-          <button className="nav-login" onClick={() => navigate('/login')}>
+          <button className="nav-cta" onClick={() => { trackCTA('nav_start_free'); navigate('/signup'); }}>
+            <span>Start Free</span>
+          </button>
+          <button className="nav-login" onClick={() => { trackCTA('nav_sign_in'); navigate('/login'); }}>
             <span>Sign In</span>
           </button>
         </div>
@@ -169,10 +178,13 @@ function HeroSection() {
 
       {/* Mobile Navigation Overlay */}
       <div className={`mobile-nav ${mobileMenuOpen ? 'open' : ''}`}>
-        <a href="#templates" onClick={closeMobileMenu}>Templates</a>
-        <a href="#features" onClick={closeMobileMenu}>Features</a>
-        <a href="#how-it-works" onClick={closeMobileMenu}>How It Works</a>
-        <button className="nav-login" onClick={() => { closeMobileMenu(); navigate('/login'); }}>
+        <a href="#templates" onClick={() => { closeMobileMenu(); trackCTA('mobile_nav_templates'); }}>Templates</a>
+        <a href="#features" onClick={() => { closeMobileMenu(); trackCTA('mobile_nav_features'); }}>Features</a>
+        <a href="#how-it-works" onClick={() => { closeMobileMenu(); trackCTA('mobile_nav_how'); }}>How It Works</a>
+        <button className="nav-cta" onClick={() => { closeMobileMenu(); trackCTA('mobile_nav_start_free'); navigate('/signup'); }}>
+          <span>Start Free</span>
+        </button>
+        <button className="nav-login" onClick={() => { closeMobileMenu(); trackCTA('mobile_nav_sign_in'); navigate('/login'); }}>
           <span>Sign In</span>
         </button>
       </div>
@@ -191,7 +203,7 @@ function HeroSection() {
             interactive designs they'll treasure forever.
           </p>
           <div className="hero-cta">
-            <button className="cta-primary" onClick={() => navigate('/signup')}>
+            <button className="cta-primary" onClick={() => { trackCTA('hero_start_free'); navigate('/signup'); }}>
               <span>Start Creating Free</span>
               <span className="cta-arrow">→</span>
             </button>
@@ -199,6 +211,7 @@ function HeroSection() {
               View Templates
             </button>
           </div>
+          <p className="hero-trust">Private links, no spam. Live preview before sharing.</p>
           <div className="hero-stats">
             <div className="stat">
               <span className="stat-number">10,000+</span>
@@ -219,6 +232,10 @@ function HeroSection() {
 
         {/* Hero Showcase - 3D Invitation Card */}
         <div className={`hero-showcase ${mounted ? 'mounted' : ''}`}>
+          <div className="hero-showcase-meta">
+            <span className="live-pill">Live preview</span>
+            <span className="hero-meta-copy">See changes instantly</span>
+          </div>
           <div className="showcase-wrapper">
             <div className="showcase-card">
               <div className="showcase-inner">
@@ -236,6 +253,39 @@ function HeroSection() {
               </div>
             </div>
             <div className="showcase-glow" />
+          </div>
+          <div className="hero-preview-pane">
+            <div className="preview-bar">
+              <span className="preview-dot" />
+              <span className="preview-dot" />
+              <span className="preview-dot" />
+              <span className="preview-title">Invitation builder preview</span>
+            </div>
+            <div className="preview-body">
+              <div className="preview-left">
+                <div className="preview-card">
+                  <div className="preview-heading" />
+                  <div className="preview-line wide" />
+                  <div className="preview-line" />
+                  <div className="preview-line short" />
+                </div>
+                <div className="preview-card secondary">
+                  <div className="preview-line wide" />
+                  <div className="preview-line" />
+                </div>
+              </div>
+              <div className="preview-right">
+                <div className="preview-phone">
+                  <div className="preview-phone-top" />
+                  <div className="preview-phone-body">
+                    <div className="preview-phone-line wide" />
+                    <div className="preview-phone-line" />
+                    <div className="preview-phone-line" />
+                    <div className="preview-phone-line short" />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

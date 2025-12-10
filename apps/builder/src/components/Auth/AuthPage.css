@@ -186,6 +186,12 @@
   line-height: 1.6;
 }
 
+.auth-helper {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-top: 0.35rem;
+}
+
 /* Error */
 .auth-error {
   background: #fff5f5;

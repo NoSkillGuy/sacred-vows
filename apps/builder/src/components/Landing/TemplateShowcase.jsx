@@ -1,4 +1,6 @@
 import { useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { trackCTA, trackExperiment, trackTemplateDemo, trackTemplateView } from '../../services/analyticsService';
 
 // SVG Ornaments for each template style
 const OrnamentClassic = () => (
@@ -57,6 +59,9 @@ const templates = [
     names: 'Priya & Rahul',
     date: 'Dec 15, 2025',
     ornamentColor: '#d4af37',
+    category: 'traditional',
+    tags: ['popular'],
+    features: ['RSVP', 'Photo gallery', 'Music'],
   },
   {
     id: 'eternal-bloom',
@@ -67,6 +72,9 @@ const templates = [
     names: 'Emma & James',
     date: 'June 8, 2025',
     ornamentColor: '#e8b4b8',
+    category: 'floral',
+    tags: ['new'],
+    features: ['Floral art', 'Photo gallery', 'Multi-language'],
   },
   {
     id: 'midnight-romance',
@@ -77,6 +85,9 @@ const templates = [
     names: 'Sophia & William',
     date: 'Nov 22, 2025',
     ornamentColor: '#d4af37',
+    category: 'modern',
+    tags: ['popular'],
+    features: ['Dark mode', 'Animated hero', 'Music'],
   },
   {
     id: 'garden-dreams',
@@ -87,6 +98,9 @@ const templates = [
     names: 'Olivia & Liam',
     date: 'April 18, 2025',
     ornamentColor: '#8fa88f',
+    category: 'floral',
+    tags: [],
+    features: ['Botanical art', 'RSVP', 'Map'],
   },
   {
     id: 'classic-monogram',
@@ -97,6 +111,9 @@ const templates = [
     names: 'Isabella & Noah',
     date: 'Sept 5, 2025',
     ornamentColor: '#2c2c2c',
+    category: 'minimal',
+    tags: ['minimal'],
+    features: ['Monogram', 'Clean layout', 'RSVP'],
   },
   {
     id: 'sunset-serenade',
@@ -107,11 +124,53 @@ const templates = [
     names: 'Ava & Ethan',
     date: 'Aug 12, 2025',
     ornamentColor: '#e6a87c',
+    category: 'modern',
+    tags: ['new'],
+    features: ['Gradient', 'Timeline', 'Music'],
   },
 ];
 
-function TemplateShowcase() {
+const filters = [
+  { id: 'all', label: 'All' },
+  { id: 'traditional', label: 'Traditional' },
+  { id: 'modern', label: 'Modern' },
+  { id: 'floral', label: 'Floral' },
+  { id: 'minimal', label: 'Minimal' },
+  { id: 'popular', label: 'Popular' },
+  { id: 'new', label: 'New' },
+];
+
+function TemplateShowcase({ onSectionView }) {
   const navigate = useNavigate();
+  const [activeFilter, setActiveFilter] = useState('all');
+  const [query, setQuery] = useState('');
+  const [demoTemplate, setDemoTemplate] = useState(null);
+
+  useEffect(() => {
+    if (onSectionView) onSectionView('templates');
+    trackExperiment('templates_filters', 'chips_search_v1');
+  }, [onSectionView]);
+
+  const filteredTemplates = useMemo(() => {
+    return templates.filter((template) => {
+      const matchesFilter =
+        activeFilter === 'all' ||
+        template.category === activeFilter ||
+        template.tags?.includes(activeFilter);
+      const matchesQuery = template.name.toLowerCase().includes(query.toLowerCase());
+      return matchesFilter && matchesQuery;
+    });
+  }, [activeFilter, query]);
+
+  const handleCustomize = (template) => {
+    trackCTA('templates_customize', { templateId: template.id });
+    navigate('/signup', { state: { templateId: template.id } });
+  };
+
+  const handleDemo = (template) => {
+    setDemoTemplate(template);
+    trackTemplateDemo(template.id);
+  };
 
   return (
     <section id="templates" className="templates-section">
@@ -124,12 +183,41 @@ function TemplateShowcase() {
         </p>
       </div>
 
+      <div className="templates-actions">
+        <div className="filter-chips" role="tablist" aria-label="Template categories">
+          {filters.map((filter) => (
+            <button
+              key={filter.id}
+              role="tab"
+              aria-selected={activeFilter === filter.id}
+              className={`filter-chip ${activeFilter === filter.id ? 'active' : ''}`}
+              onClick={() => setActiveFilter(filter.id)}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
+        <div className="template-search">
+          <input
+            type="search"
+            placeholder="Search templates"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            aria-label="Search templates"
+          />
+        </div>
+      </div>
+
       <div className="templates-carousel-wrapper">
         <div className="templates-grid">
-          {templates.map((template) => {
+          {filteredTemplates.map((template) => {
             const OrnamentComponent = template.Ornament;
             return (
-              <div key={template.id} className={`template-card ${template.className}`}>
+              <div
+                key={template.id}
+                className={`template-card ${template.className}`}
+                onMouseEnter={() => trackTemplateView(template.id)}
+              >
                 <div className="template-preview">
                   <div className="template-inner">
                     <div className="template-ornament" style={{ color: template.ornamentColor }}>
@@ -143,22 +231,87 @@ function TemplateShowcase() {
                   </div>
                 </div>
                 <div className="template-overlay">
-                  <button 
-                    className="template-overlay-btn"
-                    onClick={() => navigate('/signup')}
-                  >
-                    Customize This Design
-                  </button>
+                  <div className="template-highlights">
+                    {template.features.map((feature) => (
+                      <span key={feature} className="template-pill">{feature}</span>
+                    ))}
+                  </div>
+                  <div className="template-actions">
+                    <button 
+                      className="template-overlay-btn"
+                      onClick={() => handleCustomize(template)}
+                    >
+                      Customize This Design
+                    </button>
+                    <button 
+                      className="template-overlay-secondary"
+                      onClick={() => handleDemo(template)}
+                    >
+                      View Demo
+                    </button>
+                  </div>
                 </div>
                 <div className="template-info">
                   <h3 className="template-name">{template.name}</h3>
                   <p className="template-desc">{template.description}</p>
+                  <div className="template-meta">
+                    <span className="template-tag">{template.category}</span>
+                    {template.tags?.map((tag) => (
+                      <span key={tag} className="template-tag badge">{tag}</span>
+                    ))}
+                  </div>
                 </div>
               </div>
             );
           })}
         </div>
       </div>
+
+      {demoTemplate && (
+        <div
+          className="template-demo-modal"
+          role="dialog"
+          aria-modal="true"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setDemoTemplate(null);
+          }}
+        >
+          <div className="template-demo-content">
+            <div className="template-demo-header">
+              <div>
+                <p className="section-label">Live preview</p>
+                <h3>{demoTemplate.name}</h3>
+                <p className="template-desc">{demoTemplate.description}</p>
+              </div>
+              <button className="close-btn" aria-label="Close preview" onClick={() => setDemoTemplate(null)}>×</button>
+            </div>
+            <div className="template-demo-body">
+              <div className={`template-card ${demoTemplate.className} demo-mode`}>
+                <div className="template-preview">
+                  <div className="template-inner">
+                    <div className="template-ornament" style={{ color: demoTemplate.ornamentColor }}>
+                      <demoTemplate.Ornament />
+                    </div>
+                    <div className="template-names">{demoTemplate.names}</div>
+                    <div className="template-date">{demoTemplate.date}</div>
+                    <div className="template-ornament" style={{ color: demoTemplate.ornamentColor, transform: 'rotate(180deg)' }}>
+                      <demoTemplate.Ornament />
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="template-demo-actions">
+                <button className="cta-primary" onClick={() => handleCustomize(demoTemplate)}>
+                  Start with this template
+                </button>
+                <button className="cta-secondary" onClick={() => setDemoTemplate(null)}>
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
