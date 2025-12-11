@@ -357,14 +357,16 @@
       left: 0;
       right: 0;
       z-index: 1000;
-      background: linear-gradient(to bottom, rgba(255, 248, 240, 0.98), rgba(255, 248, 240, 0.95));
+      background:
+        linear-gradient(to bottom, rgba(255, 248, 240, 0.98), rgba(255, 246, 240, 0.94)),
+        linear-gradient(to top, rgba(252, 228, 217, 0.35), transparent 48%);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(212, 175, 55, 0.18);
+      border-bottom: 1px solid rgba(212, 175, 55, 0.2);
       margin: 0;
-      padding: 10px 16px 6px;
+      padding: 14px 28px 12px;
       width: 100%;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
     }
 
     .nav-inner {
@@ -373,22 +375,22 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
+      gap: 20px;
+      flex-wrap: nowrap;
     }
 
     .nav-inner > div:last-child {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 14px;
       flex-shrink: 0;
     }
 
       .brand {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        flex: 1;
+        gap: 12px;
+        flex: 0 0 auto;
         min-width: 0;
       }
 
@@ -406,20 +408,20 @@
       }
 
     .brand-monogram {
-      width: 38px;
-      height: 38px;
+      width: 54px;
+      height: 54px;
       border-radius: 50%;
-      border: 1px solid rgba(212, 175, 55, 0.9);
+      border: 1.5px solid rgba(212, 175, 55, 0.9);
       display: flex;
       align-items: center;
       justify-content: center;
       background:
-        radial-gradient(circle at 30% 0, #fdf3d5, #f0cd76);
+        radial-gradient(circle at 40% 35%, #fff7eb, #f0cf87 72%);
       color: #553616;
       font-family: "Playfair Display", serif;
       font-weight: 600;
-      font-size: 18px;
-      box-shadow: 0 0 20px rgba(212, 175, 55, 0.7);
+      font-size: 22px;
+      box-shadow: 0 6px 22px rgba(212, 175, 55, 0.6);
     }
 
     .brand-text {
@@ -429,25 +431,28 @@
     }
 
     .brand-title {
-      font-size: 13px;
-      letter-spacing: 0.16em;
+      font-size: 16px;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
+      font-weight: 600;
+      color: #3a343f;
     }
 
     .brand-sub {
-      font-size: 10px;
-      letter-spacing: 0.18em;
+      font-size: 12px;
+      letter-spacing: 0.22em;
       text-transform: uppercase;
-      color: var(--text-muted);
+      color: #6f6460;
     }
 
     .nav-links {
       display: none;
-      gap: 18px;
-      font-size: 11px;
-      letter-spacing: 0.16em;
+      gap: 26px;
+      font-size: 13px;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: var(--text-muted);
+      color: #3f3a3a;
+      font-weight: 500;
     }
 
     .nav-links a {
@@ -474,16 +479,17 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 32px;
-      height: 32px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
-      border: 1px solid rgba(212, 175, 55, 0.55);
-      background: linear-gradient(135deg, #fff9f0, #fdf2f7);
-      font-size: 16px;
+      border: 1.4px solid rgba(212, 175, 55, 0.9);
+      background: linear-gradient(145deg, #fffaf3, #f6ead7);
+      font-size: 18px;
+      color: #2f3d51;
       cursor: pointer;
       user-select: none;
       transition: all 0.2s ease;
-      box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
+      box-shadow: 0 6px 16px rgba(212, 175, 55, 0.22);
     }
 
     .language-switcher:hover {
@@ -495,20 +501,22 @@
     .music-toggle {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      border-radius: 999px;
-      padding: 4px 10px;
-      border: 1px solid rgba(212, 175, 55, 0.55);
-      background: linear-gradient(to right, #fff9f0, #fce7e7);
-      font-size: 11px;
+      gap: 8px;
+      border-radius: 20px;
+      padding: 6px 14px;
+      min-height: 36px;
+      border: 1.4px solid rgba(212, 175, 55, 0.9);
+      background: linear-gradient(135deg, #fff7f2, #f9eee6);
+      font-size: 12px;
+      color: #5a4c46;
       cursor: pointer;
       user-select: none;
-      box-shadow: 0 10px 18px rgba(212, 175, 55, 0.18);
+      box-shadow: 0 8px 18px rgba(212, 175, 55, 0.22);
     }
 
     .music-dot {
-      width: 9px;
-      height: 9px;
+      width: 10px;
+      height: 10px;
       border-radius: 999px;
       background: #b91c1c;
       box-shadow: 0 0 10px rgba(185, 28, 28, 0.6);

@@ -2,7 +2,7 @@ function Gallery({ translations, currentLang, config = {} }) {
   const gallery = config.gallery || {};
   const galleryImages = gallery.images || [
     { src: '/assets/photos/couple/2.jpeg', alt: 'Couple photo 1' },
-    { src: '/assets/photos/family/3.jpeg', alt: 'Couple photo 2' },
+    { src: '/assets/photos/family/3.jpeg', alt: 'Couple photo 2 (portrait)', orientation: 'portrait' },
     { src: '/assets/photos/couple/7.jpeg', alt: 'Friends and candid moment' },
     { src: '/assets/photos/couple/3.jpeg', alt: 'Traditional attire' },
     { src: '/assets/photos/couple/1.jpeg', alt: 'Favourite memory together' },
@@ -22,13 +22,16 @@ function Gallery({ translations, currentLang, config = {} }) {
       <div className="card">
         <div className="card-inner">
           <div className="gallery-grid">
-            {galleryImages.map((img, index) => (
-              <div key={index} className="gallery-item">
-                <div className="gallery-inner tall">
-                  <img src={img.src} alt={img.alt} loading="lazy" />
+            {galleryImages.map((img, index) => {
+              const isPortrait = img.orientation === 'portrait' || /portrait/i.test(img.alt || '');
+              return (
+                <div key={index} className="gallery-item">
+                  <div className={`gallery-inner${isPortrait ? ' tall' : ''}`}>
+                    <img src={img.src} alt={img.alt} loading="lazy" />
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>

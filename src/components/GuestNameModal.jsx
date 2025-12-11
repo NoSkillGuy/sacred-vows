@@ -1,10 +1,18 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 function GuestNameModal({ isOpen, onClose, translations, currentLang }) {
   const [name, setName] = useState('');
   const [title, setTitle] = useState('');
 
   if (!isOpen) return null;
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const storedName = localStorage.getItem('wedding-guest-name') || '';
+    const storedTitle = localStorage.getItem('wedding-guest-title') || '';
+    setName(storedName);
+    setTitle(storedTitle);
+  }, [isOpen]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -40,9 +48,7 @@ function GuestNameModal({ isOpen, onClose, translations, currentLang }) {
             <option value="">Title (optional)</option>
             <option value="Mr.">Mr.</option>
             <option value="Mrs.">Mrs.</option>
-            <option value="Ms.">Ms.</option>
-            <option value="Dr.">Dr.</option>
-            <option value="Prof.">Prof.</option>
+            <option value="Miss">Miss</option>
           </select>
           <input
             type="text"

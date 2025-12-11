@@ -8,8 +8,8 @@ function LanguageModal({ isOpen, onClose, onSelect, currentLang, translations })
   ];
 
   return (
-    <div className="language-modal active" onClick={onClose}>
-      <div className="language-modal-content" onClick={(e) => e.stopPropagation()}>
+    <div className="language-modal active">
+      <div className="language-modal-content">
         <div className="language-modal-title">
           {translations['language.title'] || 'Choose the Language'}
         </div>

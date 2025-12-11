@@ -22,8 +22,7 @@ function RSVPModal({ isOpen, onClose, translations, currentLang, config = {} }) 
     return dates.map(d => new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'long' })).join(' & ') + ' ' + new Date(dates[0]).getFullYear();
   };
   
-  const defaultDate = dates[0] ? new Date(new Date(dates[0]).getTime() - 24 * 60 * 60 * 1000).toISOString().split('T')[0] : '2026-01-21';
-  const [date, setDate] = useState(defaultDate);
+  const [date, setDate] = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -31,6 +30,7 @@ function RSVPModal({ isOpen, onClose, translations, currentLang, config = {} }) 
       if (storedName) {
         setName(storedName);
       }
+      setDate('');
     }
   }, [isOpen]);
 

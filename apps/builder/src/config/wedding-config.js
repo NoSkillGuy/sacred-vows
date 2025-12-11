@@ -124,7 +124,7 @@ export const defaultWeddingConfig = {
   gallery: {
     images: [
       { src: '/assets/photos/couple/2.jpeg', alt: 'Couple photo 1', category: 'couple' },
-      { src: '/assets/photos/family/3.jpeg', alt: 'Couple photo 2', category: 'family' },
+      { src: '/assets/photos/family/3.jpeg', alt: 'Couple photo 2 (portrait)', category: 'family', orientation: 'portrait' },
       { src: '/assets/photos/couple/7.jpeg', alt: 'Friends and candid moment', category: 'couple' },
       { src: '/assets/photos/couple/3.jpeg', alt: 'Traditional attire', category: 'couple' },
       { src: '/assets/photos/couple/1.jpeg', alt: 'Favourite memory together', category: 'couple' },
