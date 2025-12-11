@@ -11,8 +11,8 @@ function RSVP({ onRSVPClick, translations, currentLang, config = {} }) {
   
   const couple = config.couple || {};
   const wedding = config.wedding || {};
-  const brideName = couple.bride?.name || 'Capt Dr. Priya Singh';
-  const groomName = couple.groom?.name || 'Dr. Saurabh Singh';
+  const brideName = couple.bride?.name || 'Capt (Dr) Priya Singh';
+  const groomName = couple.groom?.name || 'Dr Saurabh Singh';
   const dates = wedding.dates || ['2026-01-22', '2026-01-23'];
   const venue = wedding.venue || {};
   const venueName = venue.name || 'Royal Lotus View Resotel';

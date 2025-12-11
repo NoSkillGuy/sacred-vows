@@ -33,7 +33,7 @@ function EditableFooter({ translations, currentLang, config = {}, onUpdate }) {
         tag="div"
       />
       <EditableText
-        value={getTranslation('footer.families') || 'From the families of Capt Dr. Priya Singh & Dr. Saurabh Singh'}
+        value={getTranslation('footer.families') || 'From the families of Capt (Dr) Priya Singh & Dr Saurabh Singh'}
         onUpdate={onUpdate}
         path="customTranslations.footer.families"
         className="footer-line"

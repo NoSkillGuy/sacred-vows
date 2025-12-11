@@ -4,21 +4,21 @@ export const translations = {
     nav: { home: "Home", couple: "Couple", photos: "Photos", program: "Program", venue: "Venue", rsvp: "RSVP" },
     music: { play: "Play Music", pause: "Pause Music" },
     hero: { 
-      eyebrow: "THE WEDDING OF", 
+      eyebrow: "The Wedding Of", 
       script: "With the blessings of our families", 
-      names: "CAPT DR. PRIYA & DR. SAURABH", 
-      sub: "TWO HEARTS, ONE DESTINY", 
-      date: "22 & 23 JANUARY 2026", 
-      location: "ROYAL LOTUS VIEW RESOTEL · BENGALURU, KARNATAKA", 
-      countdown: "COUNTDOWN TO WEDDING", 
+      names: "CAPT (Dr) PRIYA & Dr SAURABH", 
+      sub: "Two hearts, one destiny", 
+      date: "22 & 23 January 2026", 
+      location: "Royal Lotus View Resotel · Bengaluru, Karnataka", 
+      countdown: "Countdown to Wedding", 
       actions: { program: "View Program Details", venue: "View Venue & Directions", rsvp: "RSVP Now" }, 
-      caption: "A glimpse of <strong>Capt Dr. Priya & Dr. Saurabh</strong> as they begin their forever." 
+      caption: "A glimpse of <strong>Capt (Dr) Priya & Dr Saurabh</strong> as they begin their forever." 
     },
     couple: { 
       eyebrow: "Couple & Families", 
       title: "In Honoured Union", 
       subtitle: "With immense joy, the families invite you to join them in celebrating the union of their children.", 
-      together: "Together, Capt Dr. Priya and Dr. Saurabh look forward to beginning this beautiful journey with your blessings and presence.", 
+      together: "Together, Capt (Dr) Priya and Dr Saurabh look forward to beginning this beautiful journey with your blessings and presence.", 
       bride: "The Bride", 
       groom: "The Groom", 
       daughter: "Daughter of", 
@@ -29,7 +29,7 @@ export const translations = {
     father: {
       eyebrow: "From Priya's Father",
       title: "A Few Words From the Heart",
-      body: "My dear and respected {name},\n\nWith folded hands and a heart filled with gratitude and quiet joy, I most humbly invite you to join us as our daughter, Capt Dr. Priya, and our son, Dr. Saurabh, embark upon this sacred journey of marriage.\n\nAs a father, it has been one of the greatest blessings of my life to watch Priya grow from a curious child into a compassionate, dignified and responsible individual, devoted to the service of others. Today, as she steps into this new chapter, our hearts are filled with emotion, humility and pride.\n\nYour gracious presence, heartfelt blessings and good wishes will be a profound honour for our families and will make this auspicious occasion truly complete. If you are able to be with us in person, we shall consider it our privilege. If distance or circumstances keep you away, your blessings from afar will reach us all the same and will be received with equal warmth and respect.\n\nOn behalf of our entire family, I extend a warm and respectful welcome to you, and invite you to share in our happiness, our prayers and our celebrations.\n\nWith deepest regards and respectful pranam,\nSanjay Kumar Singh"
+      body: "My dear and respected {name},\n\nWith folded hands and a heart filled with gratitude and quiet joy, I most humbly invite you to join us as our daughter, Capt (Dr) Priya, and our son, Dr Saurabh, embark upon this sacred journey of marriage.\n\nAs a father, it has been one of the greatest blessings of my life to watch Priya grow from a curious child into a compassionate, dignified and responsible individual, devoted to the service of others. Today, as she steps into this new chapter, our hearts are filled with emotion, humility and pride.\n\nYour gracious presence, heartfelt blessings and good wishes will be a profound honour for our families and will make this auspicious occasion truly complete. If you are able to be with us in person, we shall consider it our privilege. If distance or circumstances keep you away, your blessings from afar will reach us all the same and will be received with equal warmth and respect.\n\nOn behalf of our entire family, I extend a warm and respectful welcome to you, and invite you to share in our happiness, our prayers and our celebrations.\n\nWith deepest regards and respectful pranam,\nSanjay Kumar Singh"
     },
     guest: {
       title: "Add Your Name",
@@ -67,12 +67,12 @@ export const translations = {
       text: "On behalf of both families, you may contact the following for confirmations, travel details, or any other queries:", 
       share: { button: "Share Invitation on WhatsApp", note: "You may share this link with friends and family whom you wish to invite." }, 
       modal: { title: "RSVP", subtitle: "Please confirm your attendance", name: "Your Name *", date: "When will you be arriving? *", cancel: "Cancel", send: "Send RSVP" }, 
-      message: "Hello! I would like to RSVP for the wedding of Capt Dr. Priya Singh and Dr. Saurabh Singh.\n\nName: {name}\nArrival Date: {date}\n\nI confirm my attendance for the celebrations on 22 & 23 January 2026 at Royal Lotus View Resotel, Bengaluru.", 
-      whatsapp_share: "You are warmly invited to the wedding of Capt Dr. Priya Singh and Dr. Saurabh Singh on 22 and 23 January 2026 at Royal Lotus View Resotel, Bengaluru.\n\nPlease tap the link to view the full invitation:\n" 
+      message: "Hello! I would like to RSVP for the wedding of Capt (Dr) Priya Singh and Dr Saurabh Singh.\n\nName: {name}\nArrival Date: {date}\n\nI confirm my attendance for the celebrations on 22 & 23 January 2026 at Royal Lotus View Resotel, Bengaluru.", 
+      whatsapp_share: "You are warmly invited to the wedding of Capt (Dr) Priya Singh and Dr Saurabh Singh on 22 and 23 January 2026 at Royal Lotus View Resotel, Bengaluru.\n\nPlease tap the link to view the full invitation:\n" 
     },
     footer: { 
       compliments: "With Best Compliments", 
-      families: "From the families of Capt Dr. Priya Singh & Dr. Saurabh Singh", 
+      families: "From the families of Capt (Dr) Priya Singh & Dr Saurabh Singh", 
       flowers: "Awaiting eyes • Blooming hearts • Cherished invitations, timeless blessings", 
       waiting: "We look forward to celebrating with you" 
     },

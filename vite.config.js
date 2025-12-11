@@ -11,7 +11,7 @@ export default defineConfig({
       manifest: {
         name: 'Priya & Saurabh Wedding Invitation',
         short_name: 'Priya & Saurabh Wedding Invite',
-        description: 'Royal wedding invitation of Capt Dr. Priya Singh & Dr. Saurabh Singh',
+        description: 'Royal wedding invitation of Capt (Dr) Priya Singh & Dr Saurabh Singh',
         theme_color: '#d4af37',
         background_color: '#fff8f0',
         display: 'standalone',

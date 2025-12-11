@@ -21,7 +21,7 @@ function Footer({ translations, currentLang, config = {} }) {
   return (
     <footer className="site-footer">
       <div className="footer-main">{getTranslation('footer.compliments') || 'With Best Compliments'}</div>
-      <div className="footer-line">{getTranslation('footer.families') || 'From the families of Capt Dr. Priya Singh & Dr. Saurabh Singh'}</div>
+      <div className="footer-line">{getTranslation('footer.families') || 'From the families of Capt (Dr) Priya Singh & Dr Saurabh Singh'}</div>
       <div className="footer-flowers">
         {getTranslation('footer.flowers') || 'Awaiting eyes • Blooming hearts • Cherished invitations, timeless blessings'}
       </div>

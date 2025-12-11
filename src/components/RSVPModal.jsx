@@ -10,8 +10,8 @@ function RSVPModal({ isOpen, onClose, translations, currentLang, config = {} }) 
   const whatsappNumber = rsvp.whatsappNumber || '918527476555';
   const dates = wedding.dates || ['2026-01-22', '2026-01-23'];
   const venue = wedding.venue || {};
-  const brideName = couple.bride?.name || 'Capt Dr. Priya Singh';
-  const groomName = couple.groom?.name || 'Dr. Saurabh Singh';
+  const brideName = couple.bride?.name || 'Capt (Dr) Priya Singh';
+  const groomName = couple.groom?.name || 'Dr Saurabh Singh';
   const venueName = venue.name || 'Royal Lotus View Resotel';
   const venueCity = venue.city || 'Bengaluru';
   

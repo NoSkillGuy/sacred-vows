@@ -21,14 +21,14 @@ import {
 export const defaultWeddingConfig = {
   branding: {
     monogram: 'P&S',
-    title: 'CAPT DR. PRIYA & DR. SAURABH',
-    subtitle: '22 & 23 JANUARY 2026 · BENGALURU'
+    title: 'CAPT (Dr) PRIYA & Dr SAURABH',
+    subtitle: '22 & 23 January 2026 · Bengaluru'
   },
   
   couple: {
     bride: {
-      name: 'Capt Dr. Priya Singh',
-      title: 'Capt Dr.',
+      name: 'Capt (Dr) Priya Singh',
+      title: 'Capt (Dr)',
       parents: {
         mother: 'Mrs. Geeta Singh',
         father: 'Mr. Sanjay Kumar Singh'
@@ -36,8 +36,8 @@ export const defaultWeddingConfig = {
       image: '/assets/photos/bride/1.jpeg'
     },
     groom: {
-      name: 'Dr. Saurabh Singh',
-      title: 'Dr.',
+      name: 'Dr Saurabh Singh',
+      title: 'Dr',
       parents: {
         mother: 'Mrs. Vibha Singh',
         father: 'Mr. Ashok Kumar Singh'

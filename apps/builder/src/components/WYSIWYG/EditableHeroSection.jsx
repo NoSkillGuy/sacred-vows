@@ -13,8 +13,8 @@ function EditableHeroSection({ onRSVPClick, translations, currentLang, config = 
   const countdownTarget = wedding.countdownTarget || '2026-01-23T21:00:00';
   const heroImage = config.hero?.mainImage || '/assets/photos/couple/1.jpeg';
   const couple = config.couple || {};
-  const brideName = couple.bride?.name || 'Capt Dr. Priya Singh';
-  const groomName = couple.groom?.name || 'Dr. Saurabh Singh';
+  const brideName = couple.bride?.name || 'Capt (Dr) Priya Singh';
+  const groomName = couple.groom?.name || 'Dr Saurabh Singh';
   
   // Get custom translations from config - handle nested paths like 'hero.eyebrow'
   // This traverses the nested object structure: customTranslations.hero.eyebrow
@@ -65,7 +65,7 @@ function EditableHeroSection({ onRSVPClick, translations, currentLang, config = 
       <div className="hero-inner">
         <div>
           <EditableText
-            value={getTranslation('hero.eyebrow') || 'THE WEDDING OF'}
+            value={getTranslation('hero.eyebrow') || 'The Wedding Of'}
             onUpdate={onUpdate}
             path="customTranslations.hero.eyebrow"
             className="hero-eyebrow"
@@ -101,7 +101,7 @@ function EditableHeroSection({ onRSVPClick, translations, currentLang, config = 
           </div>
 
           <EditableText
-            value={getTranslation('hero.sub') || 'TWO HEARTS, ONE DESTINY'}
+            value={getTranslation('hero.sub') || 'Two hearts, one destiny'}
             onUpdate={onUpdate}
             path="customTranslations.hero.sub"
             className="hero-sub"
@@ -109,7 +109,7 @@ function EditableHeroSection({ onRSVPClick, translations, currentLang, config = 
           />
 
           <EditableText
-            value={getTranslation('hero.date') || wedding.dates?.join(' & ') || '22 & 23 JANUARY 2026'}
+            value={getTranslation('hero.date') || wedding.dates?.join(' & ') || '22 & 23 January 2026'}
             onUpdate={onUpdate}
             path="customTranslations.hero.date"
             className="hero-date"
@@ -117,7 +117,7 @@ function EditableHeroSection({ onRSVPClick, translations, currentLang, config = 
           />
           
           <EditableText
-            value={getTranslation('hero.location') || wedding.venue?.fullAddress || 'ROYAL LOTUS VIEW RESOTEL · BENGALURU, KARNATAKA'}
+            value={getTranslation('hero.location') || wedding.venue?.fullAddress || 'Royal Lotus View Resotel · Bengaluru, Karnataka'}
             onUpdate={onUpdate}
             path="customTranslations.hero.location"
             className="hero-location"
@@ -127,7 +127,7 @@ function EditableHeroSection({ onRSVPClick, translations, currentLang, config = 
           <div className="hero-divider"></div>
 
           <div className="hero-countdown">
-            <div className="hero-count-label">{translations['hero.countdown'] || 'COUNTDOWN TO WEDDING'}</div>
+            <div className="hero-count-label">{translations['hero.countdown'] || 'Countdown to Wedding'}</div>
             <div className="hero-countdown-values">{countdown}</div>
           </div>
 
