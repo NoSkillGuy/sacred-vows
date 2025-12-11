@@ -6,7 +6,7 @@ export const translations = {
     hero: { 
       eyebrow: "The Wedding Of", 
       script: "With the blessings of our families", 
-      names: "CAPT (Dr) PRIYA & Dr SAURABH", 
+      names: "Capt (Dr) Priya & Dr Saurabh", 
       sub: "Two hearts, one destiny", 
       date: "22 & 23 January 2026", 
       location: "Royal Lotus View Resotel · Bengaluru, Karnataka", 

@@ -1,12 +1,12 @@
 function Gallery({ translations, currentLang, config = {} }) {
   const gallery = config.gallery || {};
   const galleryImages = gallery.images || [
-    { src: '/assets/photos/couple/2.jpeg', alt: 'Couple photo 1' },
-    { src: '/assets/photos/family/3.jpeg', alt: 'Couple photo 2 (portrait)', orientation: 'portrait' },
-    { src: '/assets/photos/couple/7.jpeg', alt: 'Friends and candid moment' },
-    { src: '/assets/photos/couple/3.jpeg', alt: 'Traditional attire' },
-    { src: '/assets/photos/couple/1.jpeg', alt: 'Favourite memory together' },
-    { src: '/assets/photos/couple/8.jpeg', alt: 'Special capture' }
+    { src: '/assets/photos/couple/21.jpeg', alt: 'Couple photo 1', orientation: 'portrait' },
+    { src: '/assets/photos/family/22.jpeg', alt: 'Couple photo 2 (portrait)', orientation: 'portrait' },
+    { src: '/assets/photos/couple/23.jpeg', alt: 'Friends and candid moment', orientation: 'portrait' },
+    { src: '/assets/photos/couple/24.jpeg', alt: 'Traditional attire', orientation: 'portrait' },
+    { src: '/assets/photos/couple/25.jpeg', alt: 'Favourite memory together', orientation: 'portrait' },
+    { src: '/assets/photos/couple/26.jpeg', alt: 'Special capture', orientation: 'portrait' }
   ];
 
   return (

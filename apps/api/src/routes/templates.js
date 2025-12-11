@@ -158,7 +158,40 @@ router.get('/', (req, res) => {
  * GET /api/templates/manifests
  */
 router.get('/manifests', (req, res) => {
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/e85de9ab-c4a4-469a-8552-f24bbe0246a8', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      sessionId: 'debug-session',
+      runId: 'initial',
+      hypothesisId: 'C',
+      location: 'templates.js:GET /manifests:start',
+      message: 'Received request for manifests',
+      data: { templatesDir: TEMPLATES_DIR },
+      timestamp: Date.now(),
+    }),
+  }).catch(() => {});
+  // #endregion
+
   const manifests = getTemplateCatalog();
+
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/e85de9ab-c4a4-469a-8552-f24bbe0246a8', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      sessionId: 'debug-session',
+      runId: 'initial',
+      hypothesisId: 'C',
+      location: 'templates.js:GET /manifests:response',
+      message: 'Returning manifests',
+      data: { count: manifests.length, ids: manifests.map((m) => m.id) },
+      timestamp: Date.now(),
+    }),
+  }).catch(() => {});
+  // #endregion
+
   res.json({ manifests });
 });
 

@@ -7,6 +7,7 @@ function RSVPModal({ isOpen, onClose, translations, currentLang, config = {} }) 
   const couple = config.couple || {};
   
   const maxDate = rsvp.maxDate || '2026-01-24';
+  const defaultArrivalDate = rsvp.defaultArrivalDate || wedding.dates?.[0] || '2026-01-21';
   const whatsappNumber = rsvp.whatsappNumber || '918527476555';
   const dates = wedding.dates || ['2026-01-22', '2026-01-23'];
   const venue = wedding.venue || {};
@@ -30,9 +31,9 @@ function RSVPModal({ isOpen, onClose, translations, currentLang, config = {} }) 
       if (storedName) {
         setName(storedName);
       }
-      setDate('');
+      setDate(defaultArrivalDate);
     }
-  }, [isOpen]);
+  }, [isOpen, defaultArrivalDate]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

@@ -1,4 +1,27 @@
-:root {
+<html lang="en"><head>
+  
+
+  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Royal wedding invitation of Capt (Dr) Priya Singh &amp; Dr Saurabh Singh">
+  
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#d4af37">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Priya &amp; Saurabh Wedding Invite">
+  <meta name="mobile-web-app-capable" content="yes">
+  
+  <!-- Apple Touch Icons -->
+  <link rel="apple-touch-icon" href="/assets/photos/couple/1.jpeg">
+  <link rel="icon" type="image/jpeg" href="/assets/photos/couple/1.jpeg">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&amp;family=Poppins:wght@300;400;500;600&amp;family=Great+Vibes&amp;display=swap" rel="stylesheet">
+
+  <title>Priya &amp; Saurabh - Wedding Invitation</title>
+<style type="text/css">    :root {
       --bg-page: #fff8f0;
       --bg-card: #fff7ee;
       --bg-card-deep: #fbead9;
@@ -54,7 +77,7 @@
     .page-shell {
       max-width: var(--page-width);
       margin: 0 auto;
-      padding: 0px 16px 16px 16px;
+      padding: 16px 16px 80px;
     }
 
     /* Mobile-first responsive adjustments */
@@ -76,6 +99,7 @@
       .brand-monogram {
         width: 32px;
         height: 32px;
+        font-size: 14px;
       }
 
       .brand-title {
@@ -356,14 +380,16 @@
       left: 0;
       right: 0;
       z-index: 1000;
-      background: linear-gradient(to bottom, rgba(255, 248, 240, 0.98), rgba(255, 248, 240, 0.95));
+      background:
+        linear-gradient(to bottom, rgba(255, 248, 240, 0.98), rgba(255, 246, 240, 0.94)),
+        linear-gradient(to top, rgba(252, 228, 217, 0.35), transparent 48%);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(212, 175, 55, 0.18);
+      border-bottom: 1px solid rgba(212, 175, 55, 0.2);
       margin: 0;
-      padding: 10px 16px 6px;
+      padding: 14px 28px 12px;
       width: 100%;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
     }
 
     .nav-inner {
@@ -372,22 +398,22 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
+      gap: 20px;
+      flex-wrap: nowrap;
     }
 
     .nav-inner > div:last-child {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 14px;
       flex-shrink: 0;
     }
 
       .brand {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        flex: 1;
+        gap: 12px;
+        flex: 0 0 auto;
         min-width: 0;
       }
 
@@ -405,12 +431,20 @@
       }
 
     .brand-monogram {
-      width: 38px;
-      height: 38px;
+      width: 54px;
+      height: 54px;
       border-radius: 50%;
-      border: 1px solid rgba(212, 175, 55, 0.9);
-      object-fit: cover;
-      box-shadow: 0 0 20px rgba(212, 175, 55, 0.7);
+      border: 1.5px solid rgba(212, 175, 55, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at 40% 35%, #fff7eb, #f0cf87 72%);
+      color: #553616;
+      font-family: "Playfair Display", serif;
+      font-weight: 600;
+      font-size: 22px;
+      box-shadow: 0 6px 22px rgba(212, 175, 55, 0.6);
     }
 
     .brand-text {
@@ -420,25 +454,28 @@
     }
 
     .brand-title {
-      font-size: 13px;
-      letter-spacing: 0.16em;
+      font-size: 16px;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
+      font-weight: 600;
+      color: #3a343f;
     }
 
     .brand-sub {
-      font-size: 10px;
-      letter-spacing: 0.18em;
+      font-size: 12px;
+      letter-spacing: 0.22em;
       text-transform: uppercase;
-      color: var(--text-muted);
+      color: #6f6460;
     }
 
     .nav-links {
       display: none;
-      gap: 18px;
-      font-size: 11px;
-      letter-spacing: 0.16em;
+      gap: 26px;
+      font-size: 13px;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: var(--text-muted);
+      color: #3f3a3a;
+      font-weight: 500;
     }
 
     .nav-links a {
@@ -465,16 +502,17 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 32px;
-      height: 32px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
-      border: 1px solid rgba(212, 175, 55, 0.55);
-      background: linear-gradient(135deg, #fff9f0, #fdf2f7);
-      font-size: 16px;
+      border: 1.4px solid rgba(212, 175, 55, 0.9);
+      background: linear-gradient(145deg, #fffaf3, #f6ead7);
+      font-size: 18px;
+      color: #2f3d51;
       cursor: pointer;
       user-select: none;
       transition: all 0.2s ease;
-      box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
+      box-shadow: 0 6px 16px rgba(212, 175, 55, 0.22);
     }
 
     .language-switcher:hover {
@@ -486,20 +524,22 @@
     .music-toggle {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      border-radius: 999px;
-      padding: 4px 10px;
-      border: 1px solid rgba(212, 175, 55, 0.55);
-      background: linear-gradient(to right, #fff9f0, #fce7e7);
-      font-size: 11px;
+      gap: 8px;
+      border-radius: 20px;
+      padding: 6px 14px;
+      min-height: 36px;
+      border: 1.4px solid rgba(212, 175, 55, 0.9);
+      background: linear-gradient(135deg, #fff7f2, #f9eee6);
+      font-size: 12px;
+      color: #5a4c46;
       cursor: pointer;
       user-select: none;
-      box-shadow: 0 10px 18px rgba(212, 175, 55, 0.18);
+      box-shadow: 0 8px 18px rgba(212, 175, 55, 0.22);
     }
 
     .music-dot {
-      width: 9px;
-      height: 9px;
+      width: 10px;
+      height: 10px;
       border-radius: 999px;
       background: #b91c1c;
       box-shadow: 0 0 10px rgba(185, 28, 28, 0.6);
@@ -578,115 +618,6 @@
       }
       .hero-inner {
         grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.95fr);
-      }
-    }
-
-    .blessing-icon {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 0;
-    }
-
-    .blessing-icon.ganesh {
-      padding-top: 20px;
-      padding-bottom: 4px;
-    }
-
-    .blessing-icon.kalash {
-      padding-top: 4px;
-      padding-bottom: 0;
-    }
-
-    .ganesh-img,
-    .kalash-img {
-      width: 50px;
-      height: 50px;
-      object-fit: contain;
-      filter: drop-shadow(0 2px 6px rgba(124, 40, 49, 0.25));
-    }
-
-    .kalash-img {
-      width: 70px;
-      height: 70px;
-    }
-
-    .ganesh-img {
-      border-radius: 50%;
-    }
-
-    .ganesh-slok {
-      text-align: center;
-      padding: 4px 16px;
-      background: transparent;
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .ganesh-symbol {
-      font-size: clamp(18px, 3.5vw, 24px);
-      color: rgba(124, 40, 49, 0.7);
-      line-height: 1;
-      display: inline-flex;
-      align-items: center;
-      opacity: 0.8;
-      filter: drop-shadow(0 1px 2px rgba(124, 40, 49, 0.2));
-      flex-shrink: 0;
-    }
-
-    .ganesh-text {
-      font-family: "Playfair Display", serif;
-      font-size: clamp(16px, 3vw, 20px);
-      color: rgba(124, 40, 49, 0.8);
-      line-height: 1.8;
-      font-weight: 600;
-      text-align: center;
-      flex: 0 1 auto;
-    }
-
-    .ganesh-slok-translation {
-      font-size: 11px;
-      color: var(--text-muted);
-      line-height: 1.5;
-    }
-
-    @media (max-width: 480px) {
-      .blessing-icon.ganesh {
-        padding-top: 16px;
-        padding-bottom: 2px;
-      }
-
-      .blessing-icon.kalash {
-        padding-top: 2px;
-        padding-bottom: 0;
-      }
-
-      .ganesh-img,
-      .kalash-img {
-        width: 40px;
-        height: 40px;
-      }
-
-      .ganesh-slok {
-        padding: 2px 12px;
-        gap: 8px;
-      }
-
-      .ganesh-symbol {
-        font-size: 16px;
-      }
-
-      .ganesh-text {
-        font-size: 14px;
-        line-height: 1.6;
-      }
-
-      .ganesh-slok-translation {
-        font-size: 9px;
       }
     }
 
@@ -909,9 +840,9 @@
     }
 
     /* GENERAL SECTIONS */
-    section {
+    /* section {
       margin-top: var(--section-spacing);
-    }
+    } */
 
     .section-header {
       margin-bottom: 22px;
@@ -1626,6 +1557,21 @@
       transform: translateY(0);
     }
 
+    .language-option.active {
+      background: linear-gradient(135deg, var(--accent-gold-soft), var(--accent-blush));
+      border-color: var(--border-gold);
+      box-shadow: 0 8px 16px rgba(212, 175, 55, 0.3);
+    }
+
+    .language-flag {
+      margin-right: 8px;
+      font-size: 18px;
+    }
+
+    .language-name {
+      font-weight: 500;
+    }
+
     /* Guest Name Modal (for personalization) */
     .guest-modal {
       display: none;
@@ -1856,6 +1802,12 @@
       z-index: 3000;
     }
 
+    .confetti-burst {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
     .confetti-piece,
     .flower-piece {
       position: absolute;
@@ -1864,6 +1816,7 @@
       border-radius: 2px;
       opacity: 0.9;
       animation: confetti-fall linear forwards;
+      --fall-distance: 110vh;
     }
 
     .flower-piece {
@@ -1875,10 +1828,10 @@
 
     @keyframes confetti-fall {
       0% {
-        transform: translate3d(var(--x, 0), -10%, 0) rotate(0deg);
+        transform: translate3d(var(--x, 0), -12px, 0) rotate(0deg);
       }
       100% {
-        transform: translate3d(var(--xEnd, 0), 110vh, 0) rotate(360deg);
+        transform: translate3d(var(--xEnd, 0), var(--fall-distance, 110vh), 0) rotate(360deg);
       }
     }
 
@@ -1909,3 +1862,25 @@
       transform: translateY(-1px);
       box-shadow: 0 14px 26px rgba(0, 0, 0, 0.16);
     }
+</style></head>
+<body>
+  <div id="root"><header class="site-header"><div class="nav-inner"><div class="brand"><div class="brand-monogram">P&amp;S</div><div class="brand-text"><div class="brand-title">CAPT (Dr) PRIYA &amp; Dr SAURABH</div><div class="brand-sub">22 &amp; 23 January 2026 · Bengaluru</div></div></div><nav class="nav-links"><a href="#top">Home</a><a href="#couple">Couple</a><a href="#gallery">Photos</a><a href="#events">Program</a><a href="#venue">Venue</a><a href="#rsvp">RSVP</a></nav><div style="display: flex; align-items: center; gap: 10px;"><button class="language-switcher" title="Change Language" aria-label="Change Language">🌐</button><div class="music-toggle"><div class="music-dot "></div><span>Play Music</span></div></div></div><audio id="bg-music" loop=""><source src="/assets/music/1.mp3" type="audio/mpeg"></audio></header><main class="page-shell"><section class="hero" id="top"><div class="hero-inner"><div><div class="hero-eyebrow">The Wedding Of</div><div class="hero-script">With the blessings of our families</div><div class="hero-names">CAPT (Dr) PRIYA <span class="hero-amp">&amp;</span> Dr SAURABH</div><div class="hero-sub">Two hearts, one destiny</div><div class="hero-date">22 &amp; 23 January 2026</div><div class="hero-location">Royal Lotus View Resotel · Bengaluru, Karnataka</div><div class="hero-divider"></div><div class="hero-countdown"><div class="hero-count-label">Countdown to Wedding</div><div class="hero-countdown-values">43d • 12h • 19m</div></div><div class="hero-actions"><a href="#events" class="btn btn-primary">View Program Details<span class="btn-icon">↧</span></a><a href="#venue" class="btn btn-ghost">View Venue &amp; Directions</a><button class="btn btn-primary">RSVP Now<span class="btn-icon">✓</span></button></div></div><aside class="hero-photo-card"><div class="hero-photo-frame"><div class="hero-photo-inner"><img src="/assets/photos/couple/1.jpeg" alt="Capt (Dr) Priya Singh &amp; Dr Saurabh Singh" loading="lazy"></div></div><div class="hero-photo-caption">A glimpse of <strong>Capt (Dr) Priya &amp; Dr Saurabh</strong> as they begin their forever.</div></aside></div></section><section id="couple"><div class="section-header"><div class="section-eyebrow">Couple &amp; Families</div><div class="section-title">In Honoured Union</div><div class="section-subtitle">With immense joy, the families invite you to join them in celebrating the union of their children.</div></div><div class="card"><div class="card-inner"><p class="muted" style="margin-bottom: 20px; text-align: center;">Together, Capt (Dr) Priya and Dr Saurabh look forward to beginning this beautiful journey with your blessings and presence.</p><div class="couple-grid"><div><h3 class="headline">The Bride</h3><p class="muted"><strong>Capt (Dr) Priya Singh</strong><br><span class="relation-label">Daughter of</span> <strong>Mrs. Geeta Singh</strong> &amp; <strong>Mr. Sanjay Kumar Singh</strong>.</p><div class="person-block"><div class="person-role">Mother</div><div class="person-name">Mrs. Geeta Singh</div></div><div class="person-block"><div class="person-role">Father</div><div class="person-name">Mr. Sanjay Kumar Singh</div></div><div class="portrait-frame"><div class="portrait-inner"><img src="/assets/photos/bride/1.jpeg" alt="Bride - Capt (Dr) Priya Singh"></div></div></div><div><h3 class="headline">The Groom</h3><p class="muted"><strong>Dr Saurabh Singh</strong><br><span class="relation-label">Son of</span> <strong>Mrs. Vibha Singh</strong> &amp; <strong>Mr. Ashok Kumar Singh</strong>.</p><div class="person-block"><div class="person-role">Mother</div><div class="person-name">Mrs. Vibha Singh</div></div><div class="person-block"><div class="person-role">Father</div><div class="person-name">Mr. Ashok Kumar Singh</div></div><div class="portrait-frame"><div class="portrait-inner"><img src="/assets/photos/groom/1.jpeg" alt="Groom - Dr Saurabh Singh"></div></div></div></div></div></div></section><section id="fathers-letter"><div class="section-header"><div class="section-eyebrow">From Priya's Father</div><div class="section-title">A Few Words From the Heart</div></div><div class="card"><div class="card-inner"><p class="muted" style="white-space: pre-line;">My dear and respected family member and respected guest,
+
+With folded hands and a heart filled with gratitude and quiet joy, I most humbly invite you to join us as our daughter, Capt (Dr) Priya, and our son, Dr Saurabh, embark upon this sacred journey of marriage.
+
+As a father, it has been one of the greatest blessings of my life to watch Priya grow from a curious child into a compassionate, dignified and responsible individual, devoted to the service of others. Today, as she steps into this new chapter, our hearts are filled with emotion, humility and pride.
+
+Your gracious presence, heartfelt blessings and good wishes will be a profound honour for our families and will make this auspicious occasion truly complete. If you are able to be with us in person, we shall consider it our privilege. If distance or circumstances keep you away, your blessings from afar will reach us all the same and will be received with equal warmth and respect.
+
+On behalf of our entire family, I extend a warm and respectful welcome to you, and invite you to share in our happiness, our prayers and our celebrations.
+
+With deepest regards and respectful pranam,
+Sanjay Kumar Singh</p></div></div></section><section id="gallery"><div class="section-header"><div class="section-eyebrow">Photo Story</div><div class="section-title">Our Journey in Moments</div><div class="section-subtitle">A few glimpses from the memories and moments that bring us here today.</div></div><div class="card"><div class="card-inner"><div class="gallery-grid"><div class="gallery-item"><div class="gallery-inner"><img src="/assets/photos/couple/2.jpeg" alt="Couple photo 1" loading="lazy"></div></div><div class="gallery-item"><div class="gallery-inner tall"><img src="/assets/photos/family/3.jpeg" alt="Couple photo 2 (portrait)" loading="lazy"></div></div><div class="gallery-item"><div class="gallery-inner"><img src="/assets/photos/couple/7.jpeg" alt="Friends and candid moment" loading="lazy"></div></div><div class="gallery-item"><div class="gallery-inner"><img src="/assets/photos/couple/3.jpeg" alt="Traditional attire" loading="lazy"></div></div><div class="gallery-item"><div class="gallery-inner"><img src="/assets/photos/couple/1.jpeg" alt="Favourite memory together" loading="lazy"></div></div><div class="gallery-item"><div class="gallery-inner"><img src="/assets/photos/couple/8.jpeg" alt="Special capture" loading="lazy"></div></div></div></div></div></section><section id="events"><div class="section-header"><div class="section-eyebrow">Program Details</div><div class="section-title">The Celebrations</div><div class="section-subtitle">We would be honoured by your presence at each of these moments of joy.</div></div><div class="card"><div class="card-inner event-grid"><div class="event-day"><div class="event-date-label">Day One</div><div class="event-date-main">Thursday · 22 January 2026</div><div class="event-item"><div class="event-icon-wrapper"><div class="event-icon-emoji">🪔</div></div><div class="event-content"><div class="event-left"><div class="event-label">Tilak</div><div class="event-tag">Auspicious beginning</div></div><div class="event-time">3:00 PM</div></div></div><div class="event-item"><div class="event-icon-wrapper"><div class="event-icon-emoji">🌼</div></div><div class="event-content"><div class="event-left"><div class="event-label">Haldi</div><div class="event-tag">Turmeric &amp; traditions</div></div><div class="event-time">6:00 PM</div></div></div><div class="event-item"><div class="event-icon-wrapper"><div class="event-icon-emoji">🌺</div></div><div class="event-content"><div class="event-left"><div class="event-label">Mehandi</div><div class="event-tag">Henna &amp; happiness</div></div><div class="event-time">9:00 PM</div></div></div></div><div class="event-day"><div class="event-date-label">Day Two</div><div class="event-date-main">Friday · 23 January 2026</div><div class="event-item"><div class="event-icon-wrapper"><div class="event-icon-emoji">💐</div></div><div class="event-content"><div class="event-left"><div class="event-label">Jaimala</div><div class="event-tag">Exchange of garlands</div></div><div class="event-time">5:00 PM</div></div></div><div class="event-item"><div class="event-icon-wrapper"><div class="event-icon-emoji">🍽️</div></div><div class="event-content"><div class="event-left"><div class="event-label">Dinner</div><div class="event-tag">Feast with family &amp; friends</div></div><div class="event-time">8:00 PM</div></div></div><div class="event-item"><div class="event-icon-wrapper"><img src="/assets/photos/icons/3.jpg" alt="Wedding" class="event-icon-image"></div><div class="event-content"><div class="event-left"><div class="event-label">Wedding</div><div class="event-tag">Sacred vows</div></div><div class="event-time">9:00 PM</div></div></div></div></div><p class="muted" style="margin-top: 14px; font-size: 12px;">Your presence and blessings at these ceremonies will make our celebration truly complete.</p></div></section><section id="venue"><div class="section-header"><div class="section-eyebrow">Venue</div><div class="section-title">Where to Join Us</div><div class="section-subtitle">A serene and elegant venue to witness the beginning of a lifetime of togetherness.</div></div><div class="card"><div class="card-inner venue-grid"><div><h3 class="headline">Royal Lotus View Resotel</h3><p class="venue-address" style="white-space: pre-line;">Royal Lotus View Resotel,
+Kempegowda, International Airport Road,
+PO, behind ITC Factory,
+Chikkajala, Tharabanahalli,
+Bengaluru, Karnataka 562157</p><div class="chip-row"><div class="chip">Bengaluru, Karnataka</div><div class="chip">Near Kempegowda International Airport</div></div><p class="muted" style="margin-bottom: 14px;">Kindly arrive a little early to comfortably join us for the ceremonies. Our families eagerly await to welcome you with warmth and love.</p><a class="btn btn-primary" href="https://maps.app.goo.gl/pmjNuaGXQwdzSe6X6" target="_blank" rel="noopener noreferrer">Open in Google Maps<span class="btn-icon">➚</span></a></div><div class="map-card" aria-label="Venue map preview"><iframe class="map-embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15552.234567890!2d77.6336814!3d13.1880748!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae1f47ee285e73%3A0x2fb4085d618d38a8!2sRoyal+Lotus+View+Resotel!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin" title="Venue Location"></iframe><div class="map-footer"><span>Tap below to open the venue in your Maps.</span><a href="https://maps.app.goo.gl/pmjNuaGXQwdzSe6X6" target="_blank" rel="noopener noreferrer">View full map ↗</a></div></div></div></div></section><section id="rsvp"><div class="section-header"><div class="section-eyebrow">RSVP</div><div class="section-title">With Warm Regards</div><div class="section-subtitle">Kindly confirm your presence and feel free to reach out for any assistance.</div></div><div class="card"><div class="card-inner"><p class="rsvp-text">On behalf of both families, you may contact the following for confirmations, travel details, or any other queries:</p><div class="rsvp-grid"><div class="rsvp-pill"><div class="rsvp-badge">RSVP</div><span>Anil Kumar Singh</span></div><div class="rsvp-pill"><div class="rsvp-badge">RSVP</div><span>Arun Kumar Singh</span></div><div class="rsvp-pill"><div class="rsvp-badge">RSVP</div><span>Ashok Kumar Singh</span></div><div class="rsvp-pill"><div class="rsvp-badge">RSVP</div><span>Arvind Kumar Singh</span></div><div class="rsvp-pill"><div class="rsvp-badge">Host</div><span>Siva Praveen Rayapudi</span></div><div class="rsvp-pill"><div class="rsvp-badge">Host</div><span>Pooja Singh</span></div></div><div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 8px;"><button class="btn btn-primary">RSVP Now<span class="btn-icon">✓</span></button><a class="btn btn-ghost" href="#" target="_blank" rel="noopener noreferrer">Share Invitation on WhatsApp</a><p class="small-note">You may share this link with friends and family whom you wish to invite.</p></div></div></div></section><footer class="site-footer"><div class="footer-main">With Best Compliments</div><div class="footer-line">From the families of Capt (Dr) Priya Singh &amp; Dr Saurabh Singh</div><div class="footer-flowers">Awaiting eyes • Blooming hearts • Cherished invitations, timeless blessings</div><div class="footer-mini">We look forward to celebrating with you</div></footer></main><div id="confettiLayer" class="confetti-layer" aria-hidden="true"></div><button type="button" class="celebrate-button" title="Celebrate" aria-label="Celebrate">🎉</button><div class="language-modal active"><div class="language-modal-content"><div class="language-modal-title">Choose the Language</div><div class="language-modal-subtitle">Please select your preferred language</div><div class="language-options"><button class="language-option active" data-lang="en">English</button><button class="language-option " data-lang="hi">हिंदी (Hindi)</button><button class="language-option " data-lang="te">తెలుగు (Telugu)</button></div></div></div></div>
+  
+
+
+</body></html>

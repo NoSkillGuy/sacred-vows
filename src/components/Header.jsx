@@ -8,6 +8,7 @@ function Header({ onLanguageClick, translations, currentLang, config = {} }) {
   const branding = config.branding || {};
   const music = config.music || {};
   const monogram = branding.monogram || '';
+  const logo = branding.logo;
   const title = branding.title || '';
   const subtitle = branding.subtitle || '';
   const musicFile = music.file;
@@ -53,7 +54,13 @@ function Header({ onLanguageClick, translations, currentLang, config = {} }) {
     <header className="site-header">
       <div className="nav-inner">
         <div className="brand">
-          <div className="brand-monogram">{monogram}</div>
+          <div className="brand-monogram">
+            {logo ? (
+              <img src={logo} alt={monogram || 'Monogram'} />
+            ) : (
+              monogram
+            )}
+          </div>
           <div className="brand-text">
             <div className="brand-title">{title}</div>
             <div className="brand-sub">{subtitle}</div>
@@ -72,14 +79,15 @@ function Header({ onLanguageClick, translations, currentLang, config = {} }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <button
             className="language-switcher"
+            id="languageSwitcher"
             onClick={onLanguageClick}
             title="Change Language"
             aria-label="Change Language"
           >
             🌐
           </button>
-          <div className="music-toggle" onClick={toggleMusic}>
-            <div className={`music-dot ${isPlaying ? 'on' : ''}`}></div>
+          <div className="music-toggle" id="musicToggle" onClick={toggleMusic}>
+            <div className={`music-dot ${isPlaying ? 'on' : ''}`} id="musicDot"></div>
             <span>{isPlaying ? (translations['music.pause'] || 'Pause Music') : (translations['music.play'] || 'Play Music')}</span>
           </div>
         </div>

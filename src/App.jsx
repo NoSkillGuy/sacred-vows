@@ -13,6 +13,7 @@ import GuestNameModal from './components/GuestNameModal';
 import RSVPModal from './components/RSVPModal';
 import ConfettiLayer from './components/ConfettiLayer';
 import CelebrateButton from './components/CelebrateButton';
+import Blessings from './components/Blessings';
 import { useLanguage } from './hooks/useLanguage';
 import { registerServiceWorker } from './utils/serviceWorker';
 import { defaultWeddingConfig } from './config/wedding-config';
@@ -77,6 +78,7 @@ function App() {
         currentLang={currentLang}
         config={weddingConfig}
       />
+      <Blessings />
       <main className="page-shell">
         <Hero 
           onRSVPClick={handleRSVPClick}

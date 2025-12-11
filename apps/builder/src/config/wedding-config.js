@@ -21,7 +21,8 @@ import {
 export const defaultWeddingConfig = {
   branding: {
     monogram: 'P&S',
-    title: 'CAPT (Dr) PRIYA & Dr SAURABH',
+    logo: '/assets/photos/icons/logo.jpeg',
+    title: 'Capt (Dr) Priya & Dr Saurabh',
     subtitle: '22 & 23 January 2026 · Bengaluru'
   },
   
@@ -123,12 +124,12 @@ export const defaultWeddingConfig = {
   
   gallery: {
     images: [
-      { src: '/assets/photos/couple/2.jpeg', alt: 'Couple photo 1', category: 'couple' },
-      { src: '/assets/photos/family/3.jpeg', alt: 'Couple photo 2 (portrait)', category: 'family', orientation: 'portrait' },
-      { src: '/assets/photos/couple/7.jpeg', alt: 'Friends and candid moment', category: 'couple' },
-      { src: '/assets/photos/couple/3.jpeg', alt: 'Traditional attire', category: 'couple' },
-      { src: '/assets/photos/couple/1.jpeg', alt: 'Favourite memory together', category: 'couple' },
-      { src: '/assets/photos/couple/8.jpeg', alt: 'Special capture', category: 'couple' }
+      { src: '/assets/photos/couple/21.jpeg', alt: 'Couple photo 1', category: 'couple', orientation: 'portrait' },
+      { src: '/assets/photos/family/22.jpeg', alt: 'Couple photo 2 (portrait)', category: 'family', orientation: 'portrait' },
+      { src: '/assets/photos/couple/23.jpeg', alt: 'Friends and candid moment', category: 'couple', orientation: 'portrait' },
+      { src: '/assets/photos/couple/24.jpeg', alt: 'Traditional attire', category: 'couple', orientation: 'portrait' },
+      { src: '/assets/photos/couple/25.jpeg', alt: 'Favourite memory together', category: 'couple', orientation: 'portrait' },
+      { src: '/assets/photos/couple/26.jpeg', alt: 'Special capture', category: 'couple', orientation: 'portrait' }
     ]
   },
   
@@ -142,6 +143,7 @@ export const defaultWeddingConfig = {
       { badge: 'Host', name: 'Pooja Singh' }
     ],
     whatsappNumber: '918527476555',
+    defaultArrivalDate: '2026-01-21',
     maxDate: '2026-01-24'
   },
   
@@ -157,7 +159,7 @@ export const defaultWeddingConfig = {
   },
   
   hero: {
-    mainImage: '/assets/photos/couple/1.jpeg'
+    mainImage: '/assets/photos/couple/11.jpeg'
   },
 
   // Theme is now part of templateConfig, but keep here for backward compatibility

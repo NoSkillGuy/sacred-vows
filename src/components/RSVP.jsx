@@ -62,7 +62,7 @@ function RSVP({ onRSVPClick, translations, currentLang, config = {} }) {
           </div>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center', marginBottom: '8px' }}>
-            <button className="btn btn-primary" onClick={onRSVPClick}>
+            <button className="btn btn-primary" id="rsvpButton" onClick={onRSVPClick}>
               {translations['hero.actions.rsvp'] || 'RSVP Now'}
               <span className="btn-icon">✓</span>
             </button>

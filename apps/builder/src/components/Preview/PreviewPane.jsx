@@ -15,6 +15,7 @@ import CelebrateButton from '../Invitation/CelebrateButton';
 import RSVPModal from '../Invitation/RSVPModal';
 import LanguageModal from '../Invitation/LanguageModal';
 import GuestNameModal from '../Invitation/GuestNameModal';
+import Blessings from '../Invitation/Blessings';
 // WYSIWYG Editable Components
 import { useEditable } from '../WYSIWYG/useEditable';
 import EditableHeroSection from '../WYSIWYG/EditableHeroSection';
@@ -218,7 +219,7 @@ function PreviewPane({ editMode = true, deviceMode = 'desktop' }) {
               currentLang={currentLang}
               config={currentInvitation.data}
             />
-            
+            <Blessings />
             <main className="page-shell" key={editMode ? 'edit' : `view-${modeKey}`}>
               {/* Dynamically render enabled sections in order */}
               {mainSections.map((section, index) => renderSection(section, index))}

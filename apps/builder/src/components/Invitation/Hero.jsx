@@ -97,7 +97,7 @@ function Hero({ onRSVPClick, translations, currentLang, config = {} }) {
 
           <div className="hero-countdown">
             <div className="hero-count-label">{getTranslation('hero.countdown')}</div>
-            <div className="hero-countdown-values">
+            <div className="hero-countdown-values" id="countdown">
               {countdown}
             </div>
           </div>
@@ -110,7 +110,7 @@ function Hero({ onRSVPClick, translations, currentLang, config = {} }) {
             <a href="#venue" className="btn btn-ghost">
               {getTranslation('hero.actions.venue') || 'View Venue & Directions'}
             </a>
-            <button className="btn btn-primary" onClick={onRSVPClick}>
+            <button className="btn btn-primary" id="rsvpButtonHeader" onClick={onRSVPClick}>
               {getTranslation('hero.actions.rsvp') || 'RSVP Now'}
               <span className="btn-icon">✓</span>
             </button>

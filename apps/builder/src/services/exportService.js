@@ -28,6 +28,20 @@ export function generateInvitationHTML(invitationData, translations) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Wedding invitation for ${brideName} & ${groomName}" />
   
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#d4af37" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="${brideName} & ${groomName} Wedding Invite" />
+  <meta name="mobile-web-app-capable" content="yes" />
+
+  <!-- Manifest -->
+  <link rel="manifest" href="./manifest.json" />
+  
+  <!-- Apple Touch Icons -->
+  <link rel="apple-touch-icon" href="./assets/photos/icons/logo.jpeg" />
+  <link rel="icon" type="image/jpeg" href="./assets/photos/icons/logo.jpeg" />
+
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:wght@300;400;500;600&family=Great+Vibes&display=swap" rel="stylesheet" />
   
@@ -59,10 +73,36 @@ export function generateInvitationHTML(invitationData, translations) {
  */
 export async function exportInvitationAsZip(invitationData, translations) {
   const zip = new JSZip();
+  const manifest = `{
+  "name": "Priya & Saurabh Wedding Invitation",
+  "short_name": "Priya & Saurabh Wedding Invite",
+  "description": "Royal wedding invitation of Capt (Dr) Priya Singh & Dr Saurabh Singh",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fff8f0",
+  "theme_color": "#d4af37",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "assets/photos/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "assets/photos/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "RSVP", "short_name": "RSVP", "description": "Quick RSVP", "url": "/#rsvp", "icons": [{ "src": "assets/photos/icons/icon-192.png", "sizes": "96x96", "type": "image/png" }] },
+    { "name": "Program", "short_name": "Program", "description": "View program details", "url": "/#events", "icons": [{ "src": "assets/photos/icons/icon-192.png", "sizes": "96x96", "type": "image/png" }] }
+  ]
+}`;
+
+  const png1x1 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==';
+  const jpeg1x1 = '/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxISEhISEhIVFRUVFRUVFRUVFRUVFRUWFxUVFRUYHSggGBolGxUVITEhJSkrLi4uFx8zODMsNygtLisBCgoKDg0OGhAQGi0lICUtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLf/AABEIAKgBLAMBIgACEQEDEQH/xAAbAAEAAgMBAQAAAAAAAAAAAAAABQYBAwQCB//EADwQAAEDAgQDBgQEBQQCAwAAAAEAAhEDIQQSMUEFUWFxBhMicYGRoQcjQrHB0fAHFSNSYuEzgpKiFf/EABoBAQADAQEBAAAAAAAAAAAAAAABAgMEBQb/xAAuEQACAgECBAMIAwEBAAAAAAAAAQIRAxIhMUETIlFhBRQycaGxwTNScpHB0f/aAAwDAQACEQMRAD8A9xREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQf/2Q==';
   
   // Generate HTML
   const html = generateInvitationHTML(invitationData, translations);
   zip.file('index.html', html);
+  zip.file('manifest.json', manifest);
+  zip.file('assets/photos/icons/icon-192.png', png1x1, { base64: true });
+  zip.file('assets/photos/icons/icon-512.png', png1x1, { base64: true });
+  zip.file('assets/photos/icons/logo.jpeg', jpeg1x1, { base64: true });
   
   // Add placeholder files (in production, these would be actual bundled files)
   zip.file('styles.css', '/* Styles will be included in production */');

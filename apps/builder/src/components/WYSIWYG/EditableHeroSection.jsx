@@ -11,7 +11,7 @@ function EditableHeroSection({ onRSVPClick, translations, currentLang, config = 
   
   const wedding = config.wedding || {};
   const countdownTarget = wedding.countdownTarget || '2026-01-23T21:00:00';
-  const heroImage = config.hero?.mainImage || '/assets/photos/couple/1.jpeg';
+  const heroImage = config.hero?.mainImage || '/assets/photos/couple/11.jpeg';
   const couple = config.couple || {};
   const brideName = couple.bride?.name || 'Capt (Dr) Priya Singh';
   const groomName = couple.groom?.name || 'Dr Saurabh Singh';
@@ -128,7 +128,7 @@ function EditableHeroSection({ onRSVPClick, translations, currentLang, config = 
 
           <div className="hero-countdown">
             <div className="hero-count-label">{translations['hero.countdown'] || 'Countdown to Wedding'}</div>
-            <div className="hero-countdown-values">{countdown}</div>
+            <div className="hero-countdown-values" id="countdown">{countdown}</div>
           </div>
 
           <div className="hero-actions">
@@ -139,7 +139,7 @@ function EditableHeroSection({ onRSVPClick, translations, currentLang, config = 
             <a href="#venue" className="btn btn-ghost">
               {translations['hero.actions.venue'] || 'View Venue & Directions'}
             </a>
-            <button className="btn btn-primary" onClick={onRSVPClick}>
+            <button className="btn btn-primary" id="rsvpButtonHeader" onClick={onRSVPClick}>
               {translations['hero.actions.rsvp'] || 'RSVP Now'}
               <span className="btn-icon">✓</span>
             </button>
