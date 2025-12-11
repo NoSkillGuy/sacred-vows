@@ -170,6 +170,7 @@ export const defaultWeddingConfig = {
  */
 export const defaultTemplateConfig = {
   sections: createDefaultSections(),
+  themes: [],
   theme: { ...DEFAULT_THEME },
 };
 

@@ -90,6 +90,38 @@ function PreviewPane({ editMode = true, deviceMode = 'desktop' }) {
     return getEnabledSections();
   }, [currentInvitation.templateConfig?.sections]);
 
+  // Apply theme to CSS variables
+  useEffect(() => {
+    const theme = currentInvitation?.templateConfig?.theme || currentInvitation?.data?.theme || {};
+    const colors = theme.colors || {};
+    const fonts = theme.fonts || {};
+    const root = document.documentElement;
+
+    const setColor = (name, value) => {
+      if (value) root.style.setProperty(name, value);
+    };
+
+    setColor('--bg-page', colors.background);
+    setColor('--bg-card', colors.background);
+    setColor('--bg-card-deep', colors.background);
+    setColor('--border-gold', colors.primary);
+    setColor('--border-soft', colors.secondary || colors.primary);
+    setColor('--accent-gold', colors.primary);
+    setColor('--accent-gold-soft', colors.accent || colors.primary);
+    setColor('--accent-rose', colors.accent || colors.primary);
+    setColor('--accent-blush', colors.secondary || colors.accent || colors.primary);
+    setColor('--accent-sage', colors.secondary || colors.accent || colors.primary);
+    setColor('--text-main', colors.text);
+    setColor('--text-muted', colors.text);
+    setColor('--button-primary', colors.primary);
+    setColor('--button-primary-hover', colors.secondary || colors.primary);
+
+    if (fonts.heading) root.style.setProperty('--font-heading', fonts.heading);
+    if (fonts.body) root.style.setProperty('--font-body', fonts.body);
+    if (fonts.script) root.style.setProperty('--font-script', fonts.script);
+    if (fonts.body) document.body.style.setProperty('font-family', fonts.body);
+  }, [currentInvitation?.templateConfig?.theme]);
+
   const handleRSVPClick = () => {
     setShowRSVPModal(true);
   };

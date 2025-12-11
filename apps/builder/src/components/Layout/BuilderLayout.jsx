@@ -3,11 +3,13 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Toolbar from '../Toolbar/Toolbar';
 import PreviewPane from '../Preview/PreviewPane';
 import { getInvitation } from '../../services/invitationService';
+import { useBuilderStore } from '../../store/builderStore';
 import './BuilderLayout.css';
 
 function BuilderLayout() {
   const { invitationId } = useParams();
   const navigate = useNavigate();
+  const { setCurrentInvitation, loadTemplateManifest } = useBuilderStore();
   const [editMode, setEditMode] = useState(true);
   const [deviceMode, setDeviceMode] = useState('desktop');
   const [invitation, setInvitation] = useState(null);
@@ -29,6 +31,8 @@ function BuilderLayout() {
       setError(null);
       const data = await getInvitation(invitationId);
       setInvitation(data);
+      setCurrentInvitation(data);
+      await loadTemplateManifest();
     } catch (err) {
       console.error('Failed to load invitation:', err);
       setError('Failed to load invitation');

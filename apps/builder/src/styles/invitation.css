@@ -18,6 +18,9 @@
       --radius-medium: 18px;
       --page-width: 1080px;
       --section-spacing: 70px;
+      --font-heading: "Playfair Display";
+      --font-body: "Poppins";
+      --font-script: "Great Vibes";
     }
 
     * {
@@ -27,10 +30,10 @@
     }
 
     body {
-      font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: var(--font-body, "Poppins"), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(246, 193, 199, 0.35), transparent 60%),
-        radial-gradient(circle at bottom right, rgba(155, 182, 157, 0.35), transparent 60%),
+        radial-gradient(circle at top left, color-mix(in srgb, var(--accent-blush, var(--bg-page)) 35%, transparent), transparent 60%),
+        radial-gradient(circle at bottom right, color-mix(in srgb, var(--accent-sage, var(--bg-page)) 35%, transparent), transparent 60%),
         var(--bg-page);
       color: var(--text-main);
       -webkit-font-smoothing: antialiased;
@@ -351,13 +354,15 @@
     }
 
     /* HEADER / NAV */
-    header.site-header {
+header.site-header {
       position: sticky;
       top: 0;
       left: 0;
       right: 0;
       z-index: 1000;
-      background: linear-gradient(to bottom, rgba(255, 248, 240, 0.98), rgba(255, 248, 240, 0.95));
+  background: linear-gradient(to bottom,
+    color-mix(in srgb, var(--bg-page) 95%, transparent),
+    color-mix(in srgb, var(--bg-page) 90%, transparent));
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid rgba(212, 175, 55, 0.18);
@@ -540,9 +545,9 @@
       border-radius: 32px;
       padding: 26px 18px 30px;
       background:
-        radial-gradient(circle at top left, rgba(246, 193, 199, 0.35), transparent 55%),
-        radial-gradient(circle at bottom right, rgba(155, 182, 157, 0.4), transparent 55%),
-        #fffaf4;
+    radial-gradient(circle at top left, color-mix(in srgb, var(--accent-blush, var(--bg-card)) 35%, transparent), transparent 55%),
+    radial-gradient(circle at bottom right, color-mix(in srgb, var(--accent-sage, var(--bg-card)) 40%, transparent), transparent 55%),
+    var(--bg-card);
       border: 1px solid rgba(212, 175, 55, 0.45);
       box-shadow: var(--shadow-soft);
       position: relative;
@@ -554,7 +559,7 @@
       content: "";
       position: absolute;
       border-radius: 999px;
-      background: radial-gradient(circle, rgba(250, 250, 250, 0.9), transparent 70%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--bg-card) 90%, transparent), transparent 70%);
       opacity: 0.9;
       pointer-events: none;
     }
@@ -752,8 +757,8 @@
       border-radius: 26px;
       border: 1px solid rgba(212, 175, 55, 0.6);
       background:
-        radial-gradient(circle at top, rgba(246, 193, 199, 0.35), transparent 65%),
-        #fff9f2;
+    radial-gradient(circle at top, color-mix(in srgb, var(--accent-blush, var(--bg-card)) 35%, transparent), transparent 65%),
+    var(--bg-card);
       padding: 14px 14px 16px;
       box-shadow: var(--shadow-soft);
       position: relative;
@@ -764,14 +769,14 @@
       border-radius: 22px;
       border: 1px solid rgba(212, 175, 55, 0.9);
       padding: 5px;
-      background: linear-gradient(145deg, #fdfaf4, #f8e6d1);
+  background: linear-gradient(145deg, color-mix(in srgb, var(--bg-card) 90%, var(--border-gold) 10%), color-mix(in srgb, var(--bg-card) 80%, var(--border-gold) 20%));
       margin-bottom: 10px;
     }
 
     .hero-photo-inner {
       border-radius: 18px;
       overflow: hidden;
-      background: #f3d6d6;
+  background: color-mix(in srgb, var(--accent-blush, var(--bg-card)) 20%, var(--bg-card) 80%);
       aspect-ratio: 4 / 5;
       display: flex;              /* use flex so child img can stretch to fill */
       align-items: stretch;

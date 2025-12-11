@@ -94,9 +94,9 @@
   width: 100%;
   min-height: 100vh;
   background:
-    radial-gradient(circle at top left, rgba(246, 193, 199, 0.35), transparent 60%),
-    radial-gradient(circle at bottom right, rgba(155, 182, 157, 0.35), transparent 60%),
-    #fff8f0;
+    radial-gradient(circle at top left, color-mix(in srgb, var(--accent-blush, var(--bg-page)) 35%, transparent), transparent 60%),
+    radial-gradient(circle at bottom right, color-mix(in srgb, var(--accent-sage, var(--bg-page)) 35%, transparent), transparent 60%),
+    var(--bg-page);
   overflow: visible;
   position: relative;
   margin: 0;

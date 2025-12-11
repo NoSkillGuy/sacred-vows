@@ -99,12 +99,55 @@ export const useBuilderStore = create((set, get) => {
       const { currentInvitation } = get();
       try {
         const manifest = await getTemplateManifest(currentInvitation.templateId);
+        // If manifest has theme presets, sync them into templateConfig for use in UI
+        if (manifest?.themes?.length) {
+          const defaultTheme = manifest.themes.find(t => t.isDefault) || manifest.themes[0];
+          const existingTheme = currentInvitation.templateConfig?.theme || {};
+          const hasPreset = Boolean(existingTheme.preset);
+
+          const themeWithPreset = hasPreset || !defaultTheme ? existingTheme : {
+            preset: defaultTheme.id,
+            colors: existingTheme.colors || { ...defaultTheme.colors },
+            fonts: existingTheme.fonts || { ...defaultTheme.fonts },
+          };
+
+          const updatedInvitation = {
+            ...currentInvitation,
+            templateConfig: {
+              ...currentInvitation.templateConfig,
+              themes: manifest.themes,
+              theme: themeWithPreset,
+            },
+            data: {
+              ...currentInvitation.data,
+              theme: themeWithPreset,
+            },
+          };
+          set({ currentInvitation: updatedInvitation });
+        }
+
         set({ currentTemplateManifest: manifest });
         return manifest;
       } catch (error) {
         console.error('Failed to load template manifest:', error);
         return null;
       }
+    },
+
+    /**
+     * Set current invitation (e.g., after fetching from API)
+     * @param {Object} invitation - Invitation object from backend
+     */
+    setCurrentInvitation: (invitation) => {
+      const invitationWithConfig = {
+        ...invitation,
+        templateConfig: {
+          ...defaultTemplateConfig,
+          ...invitation.templateConfig,
+        },
+      };
+      set({ currentInvitation: invitationWithConfig });
+      saveToStorage(invitationWithConfig);
     },
 
     /**
@@ -291,7 +334,8 @@ export const useBuilderStore = create((set, get) => {
     applyThemePreset: (presetId) => {
       const { currentInvitation, currentTemplateManifest } = get();
       
-      const preset = currentTemplateManifest?.themes?.find(t => t.id === presetId);
+      const preset = currentTemplateManifest?.themes?.find(t => t.id === presetId)
+        || currentInvitation?.templateConfig?.themes?.find(t => t.id === presetId);
       if (!preset) {
         console.warn(`Theme preset not found: ${presetId}`);
         return;
@@ -453,6 +497,7 @@ export const useBuilderStore = create((set, get) => {
         // Reset template config to new template defaults
         templateConfig: {
           sections: defaultSections,
+          themes: newManifest?.themes || currentInvitation.templateConfig?.themes,
           theme: defaultTheme ? {
             preset: defaultTheme.id,
             colors: { ...defaultTheme.colors },

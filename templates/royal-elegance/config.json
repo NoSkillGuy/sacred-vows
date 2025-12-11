@@ -55,12 +55,118 @@
       "config": {}
     }
   ],
+  "themes": [
+    {
+      "id": "royal-gold",
+      "name": "Royal Gold",
+      "isDefault": true,
+      "colors": {
+        "primary": "#d4af37",
+        "secondary": "#8b6914",
+        "background": "#fff8f0",
+        "text": "#2c2c2c",
+        "accent": "#c9a227"
+      },
+      "fonts": {
+        "heading": "Playfair Display",
+        "body": "Poppins",
+        "script": "Great Vibes"
+      }
+    },
+    {
+      "id": "rose-blush",
+      "name": "Rose Blush",
+      "isDefault": false,
+      "colors": {
+        "primary": "#c77d8a",
+        "secondary": "#9b5c6a",
+        "background": "#fff5f7",
+        "text": "#4a3539",
+        "accent": "#e8b4b8"
+      },
+      "fonts": {
+        "heading": "Cormorant Garamond",
+        "body": "Lato",
+        "script": "Dancing Script"
+      }
+    },
+    {
+      "id": "ivory-cream",
+      "name": "Ivory Cream",
+      "isDefault": false,
+      "colors": {
+        "primary": "#a67c52",
+        "secondary": "#8b6914",
+        "background": "#fffef5",
+        "text": "#3d3d3d",
+        "accent": "#d4b896"
+      },
+      "fonts": {
+        "heading": "Libre Baskerville",
+        "body": "Inter",
+        "script": "Alex Brush"
+      }
+    },
+    {
+      "id": "forest-sage",
+      "name": "Forest Sage",
+      "isDefault": false,
+      "colors": {
+        "primary": "#6b8e6b",
+        "secondary": "#4a6f4a",
+        "background": "#f5f8f5",
+        "text": "#2c3c2c",
+        "accent": "#8fbc8f"
+      },
+      "fonts": {
+        "heading": "EB Garamond",
+        "body": "Montserrat",
+        "script": "Tangerine"
+      }
+    },
+    {
+      "id": "midnight-navy",
+      "name": "Midnight Navy",
+      "isDefault": false,
+      "colors": {
+        "primary": "#1e3a5f",
+        "secondary": "#2c5282",
+        "background": "#f7fafc",
+        "text": "#1a202c",
+        "accent": "#4299e1"
+      },
+      "fonts": {
+        "heading": "Crimson Text",
+        "body": "Poppins",
+        "script": "Great Vibes"
+      }
+    },
+    {
+      "id": "lavender-dream",
+      "name": "Lavender Dream",
+      "isDefault": false,
+      "colors": {
+        "primary": "#9b8bb4",
+        "secondary": "#7a6a96",
+        "background": "#f8f5fc",
+        "text": "#3c3544",
+        "accent": "#c4b5dc"
+      },
+      "fonts": {
+        "heading": "Playfair Display",
+        "body": "Lato",
+        "script": "Dancing Script"
+      }
+    }
+  ],
   "theme": {
+    "preset": "royal-gold",
     "colors": {
       "primary": "#d4af37",
       "secondary": "#8b6914",
       "background": "#fff8f0",
-      "text": "#2c2c2c"
+      "text": "#2c2c2c",
+      "accent": "#c9a227"
     },
     "fonts": {
       "heading": "Playfair Display",

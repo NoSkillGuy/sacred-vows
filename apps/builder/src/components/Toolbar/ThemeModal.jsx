@@ -37,8 +37,8 @@ function ThemeModal({ isOpen, onClose }) {
   const fonts = theme.fonts || {};
   const currentPreset = theme.preset || 'custom';
 
-  // Get theme presets from template manifest
-  const themePresets = currentTemplateManifest?.themes || [];
+  // Get theme presets from manifest; if manifest has none, fall back to template config
+  const themePresets = (currentTemplateManifest?.themes?.length ? currentTemplateManifest.themes : currentInvitation?.templateConfig?.themes) || [];
 
   const [formData, setFormData] = useState({
     primaryColor: colors.primary || '#000000',
