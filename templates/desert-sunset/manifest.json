@@ -43,15 +43,15 @@
 
   "themes": [
     {
-      "id": "sunset-amber",
-      "name": "Sunset Amber",
+      "id": "amber-dusk",
+      "name": "Amber Dusk",
       "isDefault": true,
       "colors": {
-        "primary": "#d18f3f",
-        "secondary": "#a86523",
-        "background": "#fff3e0",
-        "text": "#2f2415",
-        "accent": "#f7c27d"
+        "primary": "#d58a3a",
+        "secondary": "#9c5a1f",
+        "background": "#fff4e3",
+        "text": "#2d1f12",
+        "accent": "#f4c27a"
       },
       "fonts": {
         "heading": "Playfair Display",
@@ -60,15 +60,15 @@
       }
     },
     {
-      "id": "dusk-rose",
-      "name": "Dusk Rose",
+      "id": "rose-dune",
+      "name": "Rose Dune",
       "isDefault": false,
       "colors": {
-        "primary": "#c26a5c",
-        "secondary": "#8c4a47",
-        "background": "#fff5f2",
-        "text": "#2f2424",
-        "accent": "#f2b8b5"
+        "primary": "#c97162",
+        "secondary": "#8a4c3f",
+        "background": "#fff3ee",
+        "text": "#2f1f1c",
+        "accent": "#f0b7a1"
       },
       "fonts": {
         "heading": "Cormorant Garamond",

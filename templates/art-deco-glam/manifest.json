@@ -43,15 +43,15 @@
 
   "themes": [
     {
-      "id": "noir-gold",
-      "name": "Noir Gold",
+      "id": "deco-noir-brass",
+      "name": "Deco Noir Brass",
       "isDefault": true,
       "colors": {
-        "primary": "#d4af37",
-        "secondary": "#0f0f10",
-        "background": "#0a0a0c",
-        "text": "#f5e9c9",
-        "accent": "#b88a2d"
+        "primary": "#d8b45a",
+        "secondary": "#120e0b",
+        "background": "#0a0a0f",
+        "text": "#f4e8d5",
+        "accent": "#9c7a2f"
       },
       "fonts": {
         "heading": "Playfair Display",
@@ -60,15 +60,15 @@
       }
     },
     {
-      "id": "emerald-gold",
-      "name": "Emerald Gold",
+      "id": "deco-emerald-onyx",
+      "name": "Deco Emerald Onyx",
       "isDefault": false,
       "colors": {
-        "primary": "#c9a227",
-        "secondary": "#0f2a24",
-        "background": "#0c1916",
-        "text": "#e8e2d0",
-        "accent": "#1b6f52"
+        "primary": "#c3a75f",
+        "secondary": "#0f2d2a",
+        "background": "#0b1816",
+        "text": "#e9e3d4",
+        "accent": "#1f8b65"
       },
       "fonts": {
         "heading": "Cormorant Garamond",

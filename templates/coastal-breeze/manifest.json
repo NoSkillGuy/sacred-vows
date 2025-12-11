@@ -43,15 +43,15 @@
 
   "themes": [
     {
-      "id": "seafoam",
-      "name": "Seafoam",
+      "id": "seafoam-breeze",
+      "name": "Seafoam Breeze",
       "isDefault": true,
       "colors": {
-        "primary": "#4c9fbf",
-        "secondary": "#2d6a86",
-        "background": "#f4fbff",
-        "text": "#123041",
-        "accent": "#8fd3f4"
+        "primary": "#2b9fcf",
+        "secondary": "#1b6d9b",
+        "background": "#eef8ff",
+        "text": "#0f3045",
+        "accent": "#9ad7f2"
       },
       "fonts": {
         "heading": "Playfair Display",
@@ -60,15 +60,15 @@
       }
     },
     {
-      "id": "sandstone",
-      "name": "Sandstone",
+      "id": "sandstone-cove",
+      "name": "Sandstone Cove",
       "isDefault": false,
       "colors": {
-        "primary": "#c2a477",
-        "secondary": "#8d6e4f",
-        "background": "#fdf7ef",
-        "text": "#2c2114",
-        "accent": "#e8d8bd"
+        "primary": "#c49a6c",
+        "secondary": "#8b6b4b",
+        "background": "#f9f1e3",
+        "text": "#2f2316",
+        "accent": "#e6c9a8"
       },
       "fonts": {
         "heading": "Cormorant Garamond",

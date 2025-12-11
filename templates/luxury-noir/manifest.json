@@ -30,24 +30,24 @@
   "defaultSectionOrder": ["header", "hero", "couple", "fathers-letter", "gallery", "events", "venue", "rsvp", "footer"],
   "themes": [
     {
-      "id": "royal-gold",
-      "name": "Royal Gold",
+      "id": "noir-opulence",
+      "name": "Noir Opulence",
       "isDefault": true,
-      "colors": { "primary": "#d4af37", "secondary": "#8b6914", "background": "#fff8f0", "text": "#2c2c2c", "accent": "#c9a227" },
+      "colors": { "primary": "#d9b24c", "secondary": "#1a1410", "background": "#0c0a0d", "text": "#f3e7d5", "accent": "#a6782f" },
       "fonts": { "heading": "Playfair Display", "body": "Poppins", "script": "Great Vibes" }
     },
     {
-      "id": "rose-blush",
-      "name": "Rose Blush",
+      "id": "velvet-rose",
+      "name": "Velvet Rose",
       "isDefault": false,
-      "colors": { "primary": "#c77d8a", "secondary": "#9b5c6a", "background": "#fff5f7", "text": "#4a3539", "accent": "#e8b4b8" },
+      "colors": { "primary": "#c07a8c", "secondary": "#8b5063", "background": "#f9f2f6", "text": "#3b2731", "accent": "#e6b7c7" },
       "fonts": { "heading": "Cormorant Garamond", "body": "Lato", "script": "Dancing Script" }
     },
     {
-      "id": "forest-sage",
-      "name": "Forest Sage",
+      "id": "evergreen-opal",
+      "name": "Evergreen Opal",
       "isDefault": false,
-      "colors": { "primary": "#6b8e6b", "secondary": "#4a6f4a", "background": "#f5f8f5", "text": "#2c3c2c", "accent": "#8fbc8f" },
+      "colors": { "primary": "#6e9c89", "secondary": "#3f6b5a", "background": "#f3f8f5", "text": "#24332d", "accent": "#9ad1bc" },
       "fonts": { "heading": "EB Garamond", "body": "Montserrat", "script": "Tangerine" }
     }
   ]

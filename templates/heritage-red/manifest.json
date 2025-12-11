@@ -43,15 +43,15 @@
 
   "themes": [
     {
-      "id": "royal-red",
-      "name": "Royal Red",
+      "id": "heritage-scarlet",
+      "name": "Heritage Scarlet",
       "isDefault": true,
       "colors": {
-        "primary": "#b21f2d",
-        "secondary": "#8c0f1f",
-        "background": "#fff7f2",
-        "text": "#2b0b0f",
-        "accent": "#d4af37"
+        "primary": "#b92231",
+        "secondary": "#821420",
+        "background": "#fff3f0",
+        "text": "#2c0d12",
+        "accent": "#d8a33b"
       },
       "fonts": {
         "heading": "Playfair Display",
@@ -60,15 +60,15 @@
       }
     },
     {
-      "id": "marigold",
-      "name": "Marigold",
+      "id": "marigold-festival",
+      "name": "Marigold Festival",
       "isDefault": false,
       "colors": {
-        "primary": "#d68a00",
-        "secondary": "#b56b00",
-        "background": "#fff8e5",
-        "text": "#2d1a08",
-        "accent": "#f2c94c"
+        "primary": "#d58b00",
+        "secondary": "#9c6400",
+        "background": "#fff6e0",
+        "text": "#2f210b",
+        "accent": "#f5c74a"
       },
       "fonts": {
         "heading": "Cormorant Garamond",

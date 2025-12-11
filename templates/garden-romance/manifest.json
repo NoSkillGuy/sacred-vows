@@ -30,25 +30,140 @@
   "defaultSectionOrder": ["header", "hero", "couple", "fathers-letter", "gallery", "events", "venue", "rsvp", "footer"],
   "themes": [
     {
-      "id": "royal-gold",
-      "name": "Royal Gold",
+      "id": "sage-romance",
+      "name": "Sage Romance",
       "isDefault": true,
-      "colors": { "primary": "#d4af37", "secondary": "#8b6914", "background": "#fff8f0", "text": "#2c2c2c", "accent": "#c9a227" },
-      "fonts": { "heading": "Playfair Display", "body": "Poppins", "script": "Great Vibes" }
+      "colors": {
+        "primary": "#7BAF9E",
+        "secondary": "#5F8F80",
+        "background": "#F8FBF9",
+        "text": "#2D3B34",
+        "accent": "#DDEDE6"
+      },
+      "fonts": {
+        "heading": "Playfair Display",
+        "body": "Lato",
+        "script": "Great Vibes"
+      }
     },
     {
-      "id": "rose-blush",
-      "name": "Rose Blush",
+      "id": "eucalyptus-dream",
+      "name": "Eucalyptus Dream",
       "isDefault": false,
-      "colors": { "primary": "#c77d8a", "secondary": "#9b5c6a", "background": "#fff5f7", "text": "#4a3539", "accent": "#e8b4b8" },
-      "fonts": { "heading": "Cormorant Garamond", "body": "Lato", "script": "Dancing Script" }
+      "colors": {
+        "primary": "#A3C7B5",
+        "secondary": "#7FA694",
+        "background": "#F4FAF7",
+        "text": "#26322D",
+        "accent": "#E6F3EE"
+      },
+      "fonts": {
+        "heading": "Cormorant Garamond",
+        "body": "Inter",
+        "script": "Parisienne"
+      }
     },
     {
-      "id": "forest-sage",
-      "name": "Forest Sage",
+      "id": "garden-vine",
+      "name": "Garden Vine",
       "isDefault": false,
-      "colors": { "primary": "#6b8e6b", "secondary": "#4a6f4a", "background": "#f5f8f5", "text": "#2c3c2c", "accent": "#8fbc8f" },
-      "fonts": { "heading": "EB Garamond", "body": "Montserrat", "script": "Tangerine" }
+      "colors": {
+        "primary": "#6E8F62",
+        "secondary": "#4F6B46",
+        "background": "#F6FBF3",
+        "text": "#1F2A1D",
+        "accent": "#D8E8CF"
+      },
+      "fonts": {
+        "heading": "Cardo",
+        "body": "Montserrat",
+        "script": "Allura"
+      }
+    },
+    {
+      "id": "meadow-soft",
+      "name": "Meadow Soft",
+      "isDefault": false,
+      "colors": {
+        "primary": "#B9D6B1",
+        "secondary": "#8CAF87",
+        "background": "#FAFFFA",
+        "text": "#2B3A2C",
+        "accent": "#EAF6E7"
+      },
+      "fonts": {
+        "heading": "Garamond",
+        "body": "Source Sans Pro",
+        "script": "Dancing Script"
+      }
+    },
+    {
+      "id": "olive-embrace",
+      "name": "Olive Embrace",
+      "isDefault": false,
+      "colors": {
+        "primary": "#8C9F59",
+        "secondary": "#6F8043",
+        "background": "#FBFFF7",
+        "text": "#2B2F1E",
+        "accent": "#EDF4DD"
+      },
+      "fonts": {
+        "heading": "Merriweather",
+        "body": "Roboto",
+        "script": "Great Vibes"
+      }
+    },
+    {
+      "id": "forest-serenade",
+      "name": "Forest Serenade",
+      "isDefault": false,
+      "colors": {
+        "primary": "#4C704A",
+        "secondary": "#3A5538",
+        "background": "#F2F8F2",
+        "text": "#192219",
+        "accent": "#CDE4CC"
+      },
+      "fonts": {
+        "heading": "Playfair Display",
+        "body": "Nunito",
+        "script": "Sacramento"
+      }
+    },
+    {
+      "id": "ivy-lantern",
+      "name": "Ivy Lantern",
+      "isDefault": false,
+      "colors": {
+        "primary": "#90A98F",
+        "secondary": "#6C8C6A",
+        "background": "#F5FBF4",
+        "text": "#253225",
+        "accent": "#E4F0E3"
+      },
+      "fonts": {
+        "heading": "Lora",
+        "body": "Open Sans",
+        "script": "Marck Script"
+      }
+    },
+    {
+      "id": "whispering-garden",
+      "name": "Whispering Garden",
+      "isDefault": false,
+      "colors": {
+        "primary": "#A7C49B",
+        "secondary": "#88A17D",
+        "background": "#F7FFF5",
+        "text": "#2A3729",
+        "accent": "#EAF6DF"
+      },
+      "fonts": {
+        "heading": "Baskerville",
+        "body": "Poppins",
+        "script": "Butterfly Kids"
+      }
     }
-  ]
+  ]  
 }

@@ -1,20 +1,10 @@
 import React, { useMemo } from 'react';
 import './TemplateCardUnified.css';
 
-const defaultColors = {
-  primary: '#d4af37',
-  background: '#fff8f0',
-  accent: '#c9a227',
-};
-
-function resolveColors(template) {
-  const defaultTheme = template.themes?.find((theme) => theme.isDefault) || template.themes?.[0];
-  const colors = defaultTheme?.colors || {};
-  return {
-    primary: colors.primary || defaultColors.primary,
-    background: colors.background || defaultColors.background,
-    accent: colors.accent || colors.secondary || defaultColors.accent,
-  };
+function resolveTheme(template) {
+  if (template.defaultTheme) return template.defaultTheme;
+  const themes = template.themes || [];
+  return themes.find((theme) => theme?.isDefault) || themes[0] || null;
 }
 
 function TemplateCardUnified({
@@ -31,13 +21,41 @@ function TemplateCardUnified({
   showActiveBadge = false,
   badgeOverride,
 }) {
-  const { primary, background, accent } = useMemo(() => resolveColors(template), [template]);
+  const resolvedTheme = useMemo(() => resolveTheme(template), [template]);
+  const colors = resolvedTheme?.colors;
+  const requiredColorKeys = ['primary', 'background', 'accent', 'text'];
+  const hasAllColors = requiredColorKeys.every((key) => colors?.[key]);
+
+  if (!resolvedTheme || !hasAllColors) {
+    console.warn('Template missing required theme colors', template?.id || template?.name);
+    return null;
+  }
+
+  const { primary, background, accent, text } = colors;
   const displayNames = template.names || template.name;
   const displayDate = template.date || null;
-  const tags = [
+
+  const baseTags = [
     ...(template.tags || []),
     template.isFeatured ? 'featured' : null,
-  ].filter(Boolean).slice(0, 4);
+  ].filter(Boolean);
+
+  const seenTags = new Set();
+  const tags = [];
+
+  baseTags.forEach((tag) => {
+    const key = String(tag).trim().toLowerCase();
+    if (!key || seenTags.has(key)) return;
+    seenTags.add(key);
+    tags.push(tag);
+  });
+
+  const categoryTag =
+    template.category && !seenTags.has(String(template.category).trim().toLowerCase())
+      ? template.category
+      : null;
+
+  const displayTags = tags.slice(0, 4);
   const isReady = template.status === 'ready' || template.isAvailable;
   const badge =
     badgeOverride ||
@@ -81,7 +99,7 @@ function TemplateCardUnified({
           }}
         >
           <div className="unified-ornament" style={{ color: primary }}>✦</div>
-          <div className="unified-names">{displayNames}</div>
+          <div className="unified-names" style={{ color: text }}>{displayNames}</div>
           {displayDate ? (
             <div className="unified-date" style={{ color: primary }}>
               {displayDate}
@@ -134,8 +152,8 @@ function TemplateCardUnified({
         <h3>{template.name}</h3>
         <p>{template.description}</p>
         <div className="unified-meta">
-          {template.category && <span className="unified-tag">{template.category}</span>}
-          {tags.map((tag) => (
+          {categoryTag && <span className="unified-tag">{categoryTag}</span>}
+          {displayTags.map((tag) => (
             <span key={tag} className="unified-tag badge">
               {tag}
             </span>

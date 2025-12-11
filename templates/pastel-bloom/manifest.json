@@ -43,15 +43,15 @@
 
   "themes": [
     {
-      "id": "blush-rose",
-      "name": "Blush Rose",
+      "id": "blush-petal",
+      "name": "Blush Petal",
       "isDefault": true,
       "colors": {
-        "primary": "#e9b7c3",
-        "secondary": "#d28fa5",
-        "background": "#fff6f8",
-        "text": "#3f2a32",
-        "accent": "#f5d9e3"
+        "primary": "#e4b7c8",
+        "secondary": "#c58ba3",
+        "background": "#fff7fb",
+        "text": "#3f2b34",
+        "accent": "#f6d9e6"
       },
       "fonts": {
         "heading": "Playfair Display",
@@ -60,15 +60,15 @@
       }
     },
     {
-      "id": "sage-lilac",
-      "name": "Sage Lilac",
+      "id": "lilac-mist",
+      "name": "Lilac Mist",
       "isDefault": false,
       "colors": {
-        "primary": "#9aa6a0",
-        "secondary": "#78827b",
-        "background": "#f7f6ff",
-        "text": "#2f2b38",
-        "accent": "#c9c2e3"
+        "primary": "#a9a3d6",
+        "secondary": "#7d75b1",
+        "background": "#f6f5ff",
+        "text": "#2f2b3a",
+        "accent": "#cfc8f0"
       },
       "fonts": {
         "heading": "Cormorant Garamond",

@@ -29,6 +29,20 @@ function getTemplateIds() {
 function normalizeManifest(input, templateId) {
   const { features, tags, ...manifestWithoutFeatures } = input || {};
   const trimmedTags = Array.isArray(tags) ? tags.slice(0, 3) : tags;
+
+  const themes = Array.isArray(manifestWithoutFeatures.themes)
+    ? manifestWithoutFeatures.themes
+    : [];
+
+  const hasExplicitDefault = themes.some((theme) => theme?.isDefault);
+  const normalizedThemes = themes.map((theme, index) => {
+    if (hasExplicitDefault) return theme;
+    return index === 0 ? { ...theme, isDefault: true } : theme;
+  });
+
+  const defaultTheme =
+    normalizedThemes.find((theme) => theme?.isDefault) || normalizedThemes[0] || null;
+  const defaultThemeColors = defaultTheme?.colors || null;
   const status =
     manifestWithoutFeatures.status ||
     (manifestWithoutFeatures.isAvailable
@@ -39,6 +53,9 @@ function normalizeManifest(input, templateId) {
 
   return {
     ...manifestWithoutFeatures,
+    themes: normalizedThemes,
+    defaultTheme,
+    defaultThemeColors,
     ...(trimmedTags ? { tags: trimmedTags } : {}),
     id: manifestWithoutFeatures.id || templateId,
     name: manifestWithoutFeatures.name || templateId,
@@ -102,6 +119,9 @@ function manifestToSummary(manifest) {
     isComingSoon: manifest.isComingSoon,
     isFeatured: manifest.isFeatured,
     version: manifest.version,
+    themes: manifest.themes,
+    defaultTheme: manifest.defaultTheme,
+    defaultThemeColors: manifest.defaultThemeColors,
   };
 }
 

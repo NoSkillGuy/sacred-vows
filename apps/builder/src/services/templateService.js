@@ -28,32 +28,33 @@ function getHeaders() {
  */
 export async function getTemplates(options = {}) {
   try {
-    const params = new URLSearchParams();
-    
-    if (options.category) {
-      params.append('category', options.category);
-    }
-    
-    if (options.featured) {
-      params.append('featured', 'true');
-    }
-    
-    const queryString = params.toString();
-    const url = `${API_BASE_URL}/templates${queryString ? `?${queryString}` : ''}`;
-    
-    const response = await fetch(url, {
+    const response = await fetch(`${API_BASE_URL}/templates/manifests`, {
       method: 'GET',
       headers: getHeaders(),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch templates');
+      throw new Error('Failed to fetch template manifests');
     }
 
     const data = await response.json();
+    const manifests = data.manifests || [];
+
+    const categories = ['all', ...new Set(manifests.map((t) => t.category).filter(Boolean))];
+
+    let filtered = manifests;
+
+    if (options.category && options.category !== 'all') {
+      filtered = filtered.filter((t) => t.category === options.category);
+    }
+
+    if (options.featured) {
+      filtered = filtered.filter((t) => t.isFeatured);
+    }
+
     return {
-      templates: data.templates || [],
-      categories: data.categories || [],
+      templates: filtered,
+      categories,
     };
   } catch (error) {
     console.error('Get templates error:', error);

@@ -30,24 +30,24 @@
   "defaultSectionOrder": ["header", "hero", "couple", "fathers-letter", "gallery", "events", "venue", "rsvp", "footer"],
   "themes": [
     {
-      "id": "royal-gold",
-      "name": "Royal Gold",
+      "id": "harvest-wheat",
+      "name": "Harvest Wheat",
       "isDefault": true,
-      "colors": { "primary": "#d4af37", "secondary": "#8b6914", "background": "#fff8f0", "text": "#2c2c2c", "accent": "#c9a227" },
+      "colors": { "primary": "#cfa45c", "secondary": "#8f6a38", "background": "#fff9ee", "text": "#2f2616", "accent": "#e3c892" },
       "fonts": { "heading": "Playfair Display", "body": "Poppins", "script": "Great Vibes" }
     },
     {
-      "id": "rose-blush",
-      "name": "Rose Blush",
+      "id": "rosewood-dust",
+      "name": "Rosewood Dust",
       "isDefault": false,
-      "colors": { "primary": "#c77d8a", "secondary": "#9b5c6a", "background": "#fff5f7", "text": "#4a3539", "accent": "#e8b4b8" },
+      "colors": { "primary": "#c0806e", "secondary": "#8b594f", "background": "#f9f1ee", "text": "#342421", "accent": "#e1b6a7" },
       "fonts": { "heading": "Cormorant Garamond", "body": "Lato", "script": "Dancing Script" }
     },
     {
-      "id": "forest-sage",
-      "name": "Forest Sage",
+      "id": "fern-wood",
+      "name": "Fern Wood",
       "isDefault": false,
-      "colors": { "primary": "#6b8e6b", "secondary": "#4a6f4a", "background": "#f5f8f5", "text": "#2c3c2c", "accent": "#8fbc8f" },
+      "colors": { "primary": "#6d8f5f", "secondary": "#4e6a43", "background": "#f4f7f1", "text": "#2c3528", "accent": "#98bb8a" },
       "fonts": { "heading": "EB Garamond", "body": "Montserrat", "script": "Tangerine" }
     }
   ]
