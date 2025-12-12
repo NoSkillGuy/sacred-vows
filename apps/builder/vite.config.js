@@ -11,7 +11,7 @@ export default defineConfig({
       '@template-engine': path.resolve(__dirname, '../../packages/template-engine/src'),
     },
   },
-  publicDir: path.resolve(__dirname, '../../public'),
+  publicDir: 'public',
   server: {
     port: 3001,
     proxy: {

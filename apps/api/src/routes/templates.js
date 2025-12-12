@@ -12,7 +12,7 @@ const __dirname = path.dirname(__filename);
 // Path to templates directory (can be overridden in env for container)
 const TEMPLATES_DIR = process.env.TEMPLATES_DIR
   ? path.resolve(process.env.TEMPLATES_DIR)
-  : path.resolve(__dirname, '../../../../templates');
+  : path.resolve(__dirname, '../../../builder/templates');
 
 function getTemplateIds() {
   try {
