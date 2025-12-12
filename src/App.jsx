@@ -17,6 +17,7 @@ import Blessings from './components/Blessings';
 import { useLanguage } from './hooks/useLanguage';
 import { registerServiceWorker } from './utils/serviceWorker';
 import { defaultWeddingConfig } from './config/wedding-config';
+import { applyThemeToDocument } from '../packages/shared/src/theme/applyTheme';
 
 function App() {
   const { currentLang, translations, updateLanguage } = useLanguage();
@@ -56,6 +57,10 @@ function App() {
       window.removeEventListener('guestNameUpdated', handleLanguageChange);
     };
   }, [updateLanguage]);
+
+  useEffect(() => {
+    applyThemeToDocument(weddingConfig?.theme);
+  }, [weddingConfig?.theme]);
 
   const handleRSVPClick = () => {
     setShowRSVPModal(true);

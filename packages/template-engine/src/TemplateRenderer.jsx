@@ -1,5 +1,6 @@
 import React from 'react';
 import { loadTemplate, mergeTemplateData } from './loadTemplate';
+import { applyThemeToDocument, mergeBrandThemes } from '../../shared/src/theme/applyTheme';
 
 const DEFAULT_TEMPLATE_ID = 'royal-elegance';
 
@@ -34,21 +35,10 @@ function orderSections(sections = [], defaultOrder = []) {
 
 function resolveTheme(templateTheme = {}, manifest = {}, userTheme = {}) {
   const manifestDefault = manifest.themes?.find((theme) => theme.isDefault) || {};
-  const baseTheme = templateTheme || {};
-  const preset = userTheme.preset || baseTheme.preset || manifestDefault.id || 'custom';
-
+  const merged = mergeBrandThemes(manifestDefault, templateTheme, userTheme);
   return {
-    preset,
-    colors: {
-      ...(manifestDefault.colors || {}),
-      ...(baseTheme.colors || {}),
-      ...(userTheme.colors || {}),
-    },
-    fonts: {
-      ...(manifestDefault.fonts || {}),
-      ...(baseTheme.fonts || {}),
-      ...(userTheme.fonts || {}),
-    },
+    ...merged,
+    preset: userTheme?.preset || templateTheme?.preset || manifestDefault.id || merged.preset || 'custom',
   };
 }
 
@@ -126,6 +116,12 @@ export function TemplateRenderer({ templateId, userData, translations, currentLa
 
     load();
   }, [templateId, userData]);
+
+  React.useEffect(() => {
+    if (mergedConfig?.theme) {
+      applyThemeToDocument(mergedConfig.theme);
+    }
+  }, [mergedConfig?.theme]);
 
   if (loading) {
     return <div>Loading template...</div>;

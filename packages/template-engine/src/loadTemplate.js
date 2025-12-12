@@ -16,6 +16,10 @@ export async function loadTemplate(templateId) {
         config: () => import('../../../templates/royal-elegance/config.json'),
         manifest: () => import('../../../templates/royal-elegance/manifest.json'),
       },
+      'heritage-red': {
+        config: () => import('../../../templates/heritage-red/config.json'),
+        manifest: () => import('../../../templates/heritage-red/manifest.json'),
+      },
     };
 
     const templateLoader = templateMap[templateId];

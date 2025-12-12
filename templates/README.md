@@ -57,7 +57,7 @@
 }
 ```
 
-`config.json` excerpt:
+`config.json` excerpt (brand-kit aware):
 ```json
 {
   "id": "art-deco-glam",
@@ -72,11 +72,42 @@
     { "id": "hero", "enabled": true, "config": {} }
   ],
   "theme": {
-    "colors": { "primary": "#d4af37", "secondary": "#0f0f10", "background": "#0a0a0c", "text": "#f5e9c9" },
-    "fonts": { "heading": "Playfair Display", "body": "Poppins", "script": "Great Vibes" }
+    "preset": "art-deco-gold",
+    "colors": {
+      "primary": "#d4af37",
+      "secondary": "#0f0f10",
+      "accent": "#f7d87c",
+      "background": { "page": "#0a0a0c", "card": "#111116" },
+      "text": { "primary": "#f5e9c9", "muted": "#bfb49b" }
+    },
+    "states": { "hover": { "primary": "#b78c24" }, "focus": { "ring": "0 0 0 3px rgba(212,175,55,0.4)" } },
+    "gradients": { "hero": { "start": "rgba(212,175,55,0.18)", "end": "rgba(15,15,16,0.72)", "angle": "135deg" } },
+    "radii": { "md": "12px", "xl": "28px" },
+    "spacing": { "scale": { "sm": "12px", "md": "16px", "lg": "24px" }, "section": { "y": { "desktop": "72px" } } },
+    "typography": {
+      "family": { "heading": "Playfair Display", "body": "Poppins", "script": "Great Vibes" },
+      "sizes": { "h1": "42px", "body": "16px", "small": "13px" },
+      "letterSpacing": { "caps": "0.08em" }
+    },
+    "buttons": { "primary": { "background": "#d4af37", "text": "#0f0f10", "hoverBackground": "#b78c24" } },
+    "cards": { "surface": "#111116", "shadow": "0 18px 44px rgba(0,0,0,0.35)", "radius": "24px" },
+    "dividers": { "color": "rgba(212,175,55,0.35)", "thickness": "1px" },
+    "layout": { "container": { "maxWidth": "1100px" }, "grid": { "gutters": { "desktop": "20px" } } },
+    "accessibility": { "focusRing": "0 0 0 3px rgba(212, 175, 55, 0.6)", "minTapSize": "44px" }
   }
 }
 ```
+
+### Theme/brand kit contract
+- Core palette: `colors.primary|secondary|accent|muted`, `colors.background.page|card|raised|overlay`, `colors.text.primary|muted|onPrimary`.
+- States: `states.hover|active|focus|disabled`.
+- Gradients/overlays: `gradients.hero|cta`, `overlays.imageVeil|card|modal`.
+- Foundations: `radii`, `borders`, `spacing.scale`, `spacing.section`, `layout.container`, `layout.breakpoints`, `layout.grid`.
+- Typography: `typography.family`, `weights`, `sizes`, `lineHeights`, `letterSpacing`, `decorations`.
+- Components: `links`, `buttons` (primary/ghost/outline/subtle), `forms`, `chips`, `cards`, `dividers`, `lists`, `icons`.
+- Imagery and motion: `imagery`, `illustrations`, `motion`.
+- Section layouts: `sections.hero|story|events|gallery|rsvp`, `cta.layouts`.
+- Shell/accessibility: `shell.header|footer|social`, `accessibility.focusRing|contrastTarget|minTapSize`.
 
 ## Checklist for adding a template
 - Create `templates/<template-id>/` using a URL-safe, lowercase slug.
