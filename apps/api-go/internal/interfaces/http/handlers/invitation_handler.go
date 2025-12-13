@@ -113,9 +113,15 @@ func (h *InvitationHandler) Create(c *gin.Context) {
 		userID = "anonymous"
 	}
 
+	var titlePtr *string
+	if req.Title != "" {
+		titlePtr = &req.Title
+	}
+
 	output, err := h.createUC.Execute(c.Request.Context(), invitation.CreateInvitationInput{
 		TemplateID: req.TemplateID,
 		Data:       req.Data,
+		Title:      titlePtr,
 		UserID:     userID.(string),
 	})
 
@@ -144,6 +150,8 @@ func (h *InvitationHandler) Update(c *gin.Context) {
 		ID:         id,
 		TemplateID: req.TemplateID,
 		Data:       req.Data,
+		Title:      req.Title,
+		Status:     req.Status,
 	})
 
 	if err != nil {

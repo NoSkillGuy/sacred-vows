@@ -22,6 +22,8 @@ type UpdateInvitationInput struct {
 	ID         string
 	TemplateID *string
 	Data       *json.RawMessage
+	Title      *string
+	Status     *string
 }
 
 type UpdateInvitationOutput struct {
@@ -38,8 +40,19 @@ func (uc *UpdateInvitationUseCase) Execute(ctx context.Context, input UpdateInvi
 		invitation.TemplateID = *input.TemplateID
 	}
 
-	if input.Data != nil {
-		invitation.Data = *input.Data
+	// Handle data update - merge with title/status if provided
+	if input.Data != nil || input.Title != nil || input.Status != nil {
+		dataToUpdate := invitation.Data
+		if input.Data != nil {
+			dataToUpdate = *input.Data
+		}
+
+		// Merge title and status into data
+		mergedData, err := mergeMetadataIntoData(dataToUpdate, input.Title, input.Status)
+		if err != nil {
+			return nil, errors.Wrap(errors.ErrBadRequest.Code, "Invalid invitation data", err)
+		}
+		invitation.Data = mergedData
 	}
 
 	if err := uc.invitationRepo.Update(ctx, invitation); err != nil {

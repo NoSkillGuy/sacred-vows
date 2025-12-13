@@ -23,6 +23,7 @@ func NewCreateInvitationUseCase(invitationRepo repository.InvitationRepository) 
 type CreateInvitationInput struct {
 	TemplateID string
 	Data       json.RawMessage
+	Title      *string
 	UserID     string
 }
 
@@ -35,12 +36,18 @@ func (uc *CreateInvitationUseCase) Execute(ctx context.Context, input CreateInvi
 		input.Data = json.RawMessage("{}")
 	}
 
+	// Merge title into data if provided
+	dataWithMeta, err := mergeMetadataIntoData(input.Data, input.Title, nil)
+	if err != nil {
+		return nil, errors.Wrap(errors.ErrBadRequest.Code, "Invalid invitation data", err)
+	}
+
 	templateID := input.TemplateID
 	if templateID == "" {
 		templateID = "royal-elegance"
 	}
 
-	invitation, err := domain.NewInvitation(templateID, input.UserID, input.Data)
+	invitation, err := domain.NewInvitation(templateID, input.UserID, dataWithMeta)
 	if err != nil {
 		return nil, errors.Wrap(errors.ErrBadRequest.Code, "Invalid invitation data", err)
 	}

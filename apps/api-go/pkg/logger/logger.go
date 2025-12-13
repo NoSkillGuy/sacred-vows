@@ -2,6 +2,7 @@ package logger
 
 import (
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -43,9 +44,11 @@ func GinLogger() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		path := c.Request.URL.Path
 		query := c.Request.URL.RawQuery
+		start := time.Now()
 
 		c.Next()
 
+		latency := time.Since(start)
 		GetLogger().Info("HTTP Request",
 			zap.Int("status", c.Writer.Status()),
 			zap.String("method", c.Request.Method),
@@ -53,7 +56,7 @@ func GinLogger() gin.HandlerFunc {
 			zap.String("query", query),
 			zap.String("ip", c.ClientIP()),
 			zap.String("user-agent", c.Request.UserAgent()),
-			zap.Duration("latency", c.Elapsed),
+			zap.Duration("latency", latency),
 		)
 	}
 }

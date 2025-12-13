@@ -82,7 +82,7 @@ func main() {
 	registerUC := authUC.NewRegisterUseCase(userRepo)
 	loginUC := authUC.NewLoginUseCase(userRepo)
 	getCurrentUserUC := authUC.NewGetCurrentUserUseCase(userRepo)
-	googleOAuthUC := authUC.NewGoogleOAuthUseCase(userRepo, googleOAuthService.GetOAuthConfig())
+	googleOAuthUC := authUC.NewGoogleOAuthUseCaseWithService(userRepo, googleOAuthService.GetOAuthConfig(), googleOAuthService)
 
 	createInvitationUC := invitation.NewCreateInvitationUseCase(invitationRepo)
 	getInvitationByIDUC := invitation.NewGetInvitationByIDUseCase(invitationRepo)

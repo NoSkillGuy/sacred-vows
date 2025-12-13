@@ -4,27 +4,27 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sacred-vows/api-go/internal/infrastructure/auth"
-	"github.com/sacred-vows/api-go/internal/usecase/auth"
+	authinfra "github.com/sacred-vows/api-go/internal/infrastructure/auth"
+	authuc "github.com/sacred-vows/api-go/internal/usecase/auth"
 	"github.com/sacred-vows/api-go/pkg/errors"
 )
 
 type AuthHandler struct {
-	registerUC       *auth.RegisterUseCase
-	loginUC          *auth.LoginUseCase
-	getCurrentUserUC *auth.GetCurrentUserUseCase
-	googleOAuthUC    *auth.GoogleOAuthUseCase
-	jwtService       *auth.JWTService
-	googleOAuth      *auth.GoogleOAuthService
+	registerUC       *authuc.RegisterUseCase
+	loginUC          *authuc.LoginUseCase
+	getCurrentUserUC *authuc.GetCurrentUserUseCase
+	googleOAuthUC    *authuc.GoogleOAuthUseCase
+	jwtService       *authinfra.JWTService
+	googleOAuth      *authinfra.GoogleOAuthService
 }
 
 func NewAuthHandler(
-	registerUC *auth.RegisterUseCase,
-	loginUC *auth.LoginUseCase,
-	getCurrentUserUC *auth.GetCurrentUserUseCase,
-	googleOAuthUC *auth.GoogleOAuthUseCase,
-	jwtService *auth.JWTService,
-	googleOAuth *auth.GoogleOAuthService,
+	registerUC *authuc.RegisterUseCase,
+	loginUC *authuc.LoginUseCase,
+	getCurrentUserUC *authuc.GetCurrentUserUseCase,
+	googleOAuthUC *authuc.GoogleOAuthUseCase,
+	jwtService *authinfra.JWTService,
+	googleOAuth *authinfra.GoogleOAuthService,
 ) *AuthHandler {
 	return &AuthHandler{
 		registerUC:       registerUC,
@@ -58,7 +58,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 		return
 	}
 
-	output, err := h.registerUC.Execute(c.Request.Context(), auth.RegisterInput{
+	output, err := h.registerUC.Execute(c.Request.Context(), authuc.RegisterInput{
 		Email:    req.Email,
 		Password: req.Password,
 		Name:     req.Name,
@@ -94,7 +94,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	output, err := h.loginUC.Execute(c.Request.Context(), auth.LoginInput{
+	output, err := h.loginUC.Execute(c.Request.Context(), authuc.LoginInput{
 		Email:    req.Email,
 		Password: req.Password,
 	})
@@ -158,7 +158,7 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 		return
 	}
 
-	output, err := h.googleOAuthUC.Execute(c.Request.Context(), auth.GoogleOAuthInput{Code: code})
+	output, err := h.googleOAuthUC.Execute(c.Request.Context(), authuc.GoogleOAuthInput{Code: code})
 	if err != nil {
 		c.Redirect(http.StatusTemporaryRedirect, frontendURL+"/login?error=oauth_failed")
 		return
@@ -181,13 +181,28 @@ func (h *AuthHandler) GoogleVerify(c *gin.Context) {
 		return
 	}
 
-	userInfo, err := h.googleOAuth.VerifyIDToken(c.Request.Context(), req.Credential)
+	output, err := h.googleOAuthUC.Verify(c.Request.Context(), authuc.GoogleVerifyInput{
+		Credential: req.Credential,
+	})
 	if err != nil {
+		appErr, ok := err.(*errors.AppError)
+		if ok {
+			c.JSON(appErr.Code, appErr.ToResponse())
+			return
+		}
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid Google credential"})
 		return
 	}
 
-	// Find or create user (this should be done in use case)
-	// For now, return error - this needs to be implemented properly
-	c.JSON(http.StatusInternalServerError, gin.H{"error": "Not yet implemented"})
+	// Generate token
+	token, err := h.jwtService.GenerateToken(output.User.ID, output.User.Email)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate token"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"token": token,
+		"user":  output.User,
+	})
 }
