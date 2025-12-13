@@ -25,8 +25,8 @@ services:
       DATABASE_URL: postgresql://wedding_builder:wedding_builder_password@postgres:5432/wedding_builder
       JWT_SECRET: ${JWT_SECRET:-dev-secret-key-min-32-chars-long-for-security}
       PORT: 3000
-      TEMPLATES_DIR: /root/templates
-      UPLOAD_PATH: /root/uploads
+      TEMPLATES_DIR: /app/templates
+      UPLOAD_PATH: /app/uploads
       FRONTEND_URL: http://localhost:5173
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
@@ -35,8 +35,8 @@ services:
       postgres:
         condition: service_healthy
     volumes:
-      - ./apps/builder/templates:/root/templates
-      - api_go_uploads:/root/uploads
+      - ./apps/builder/templates:/app/templates
+      - api_go_uploads:/app/uploads
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/health"]
       interval: 30s

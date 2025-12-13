@@ -116,22 +116,6 @@ export async function getTemplateManifest(id) {
  */
 export async function getAllTemplateManifests() {
   try {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/e85de9ab-c4a4-469a-8552-f24bbe0246a8', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sessionId: 'debug-session',
-        runId: 'initial',
-        hypothesisId: 'A',
-        location: 'templateService.js:getAllTemplateManifests:start',
-        message: 'Fetching template manifests',
-        data: { apiBase: API_BASE_URL },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-    // #endregion
-
     const response = await fetch(`${API_BASE_URL}/templates/manifests`, {
       method: 'GET',
       headers: getHeaders(),
@@ -142,41 +126,10 @@ export async function getAllTemplateManifests() {
     }
 
     const data = await response.json();
-    
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/e85de9ab-c4a4-469a-8552-f24bbe0246a8', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sessionId: 'debug-session',
-        runId: 'initial',
-        hypothesisId: 'A',
-        location: 'templateService.js:getAllTemplateManifests:response',
-        message: 'Received template manifests response',
-        data: { status: response.status, count: (data?.manifests || []).length },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-    // #endregion
+    const manifests = data.manifests || [];
 
-    return data.manifests || [];
+    return manifests;
   } catch (error) {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/e85de9ab-c4a4-469a-8552-f24bbe0246a8', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sessionId: 'debug-session',
-        runId: 'initial',
-        hypothesisId: 'A',
-        location: 'templateService.js:getAllTemplateManifests:error',
-        message: 'Failed fetching template manifests',
-        data: { error: error?.message },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-    // #endregion
-
     console.error('Get template manifests error:', error);
     throw error;
   }

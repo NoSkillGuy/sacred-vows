@@ -38,6 +38,17 @@ func (uc *GetAllTemplatesUseCase) Execute(ctx context.Context, input GetAllTempl
 	categories["all"] = true
 
 	for _, manifest := range catalog {
+		// Filter out coming-soon templates - only show ready templates
+		isReady := false
+		if manifest.Status != nil && *manifest.Status == "ready" {
+			isReady = true
+		} else if manifest.IsAvailable != nil && *manifest.IsAvailable {
+			isReady = true
+		}
+		if !isReady {
+			continue
+		}
+
 		// Filter by category
 		if input.Category != nil && *input.Category != "all" {
 			if manifest.Category == nil || *manifest.Category != *input.Category {

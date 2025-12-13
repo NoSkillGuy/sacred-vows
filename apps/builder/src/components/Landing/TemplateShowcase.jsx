@@ -84,56 +84,11 @@ function TemplateShowcase({ onSectionView }) {
   async function loadTemplates() {
     try {
       setLoading(true);
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/e85de9ab-c4a4-469a-8552-f24bbe0246a8', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sessionId: 'debug-session',
-          runId: 'initial',
-          hypothesisId: 'B',
-          location: 'TemplateShowcase.jsx:loadTemplates:start',
-          message: 'Loading templates for landing',
-          data: {},
-          timestamp: Date.now(),
-        }),
-      }).catch(() => {});
-      // #endregion
-
       const manifests = await getAllTemplateManifests();
-      setTemplates(manifests || []);
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/e85de9ab-c4a4-469a-8552-f24bbe0246a8', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sessionId: 'debug-session',
-          runId: 'initial',
-          hypothesisId: 'B',
-          location: 'TemplateShowcase.jsx:loadTemplates:success',
-          message: 'Templates loaded',
-          data: { count: (manifests || []).length },
-          timestamp: Date.now(),
-        }),
-      }).catch(() => {});
-      // #endregion
+      const templatesList = manifests || [];
+      setTemplates(templatesList);
     } catch (error) {
       console.error('Failed to load templates', error);
-      // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/e85de9ab-c4a4-469a-8552-f24bbe0246a8', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sessionId: 'debug-session',
-          runId: 'initial',
-          hypothesisId: 'B',
-          location: 'TemplateShowcase.jsx:loadTemplates:error',
-          message: 'Failed to load templates',
-          data: { error: error?.message },
-          timestamp: Date.now(),
-        }),
-      }).catch(() => {});
-      // #endregion
     } finally {
       setLoading(false);
     }
@@ -147,7 +102,6 @@ function TemplateShowcase({ onSectionView }) {
     return [
       { id: 'all', label: 'All' },
       { id: 'popular', label: 'Popular' },
-      { id: 'coming-soon', label: 'Coming Soon' },
       ...categories.map((category) => ({ id: category, label: category.charAt(0).toUpperCase() + category.slice(1) })),
     ];
   }, [templates]);
@@ -161,7 +115,6 @@ function TemplateShowcase({ onSectionView }) {
       const tags = [
         ...(template.tags || []),
         template.isFeatured ? 'popular' : null,
-        template.status === 'coming-soon' ? 'coming-soon' : null,
       ].filter(Boolean).slice(0, 3);
 
       return {
@@ -178,7 +131,7 @@ function TemplateShowcase({ onSectionView }) {
   }, [templates]);
 
   const filteredTemplates = useMemo(() => {
-    return enrichedTemplates.filter((template) => {
+    const filtered = enrichedTemplates.filter((template) => {
       const matchesFilter =
         activeFilter === 'all' ||
         template.category === activeFilter ||
@@ -186,6 +139,7 @@ function TemplateShowcase({ onSectionView }) {
       const matchesQuery = template.name.toLowerCase().includes(query.toLowerCase());
       return matchesFilter && matchesQuery;
     });
+    return filtered;
   }, [activeFilter, query, enrichedTemplates]);
 
   const handleCustomize = (template) => {

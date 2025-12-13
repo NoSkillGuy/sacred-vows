@@ -34,6 +34,18 @@ func (uc *GetManifestsUseCase) Execute(ctx context.Context) (*GetManifestsOutput
 			continue
 		}
 
+		// Filter out coming-soon templates - only show ready templates
+		isReady := false
+		if manifest.Status != nil && *manifest.Status == "ready" {
+			isReady = true
+		} else if manifest.IsAvailable != nil && *manifest.IsAvailable {
+			isReady = true
+		}
+
+		if !isReady {
+			continue
+		}
+
 		// Convert to map
 		manifestMap := make(map[string]interface{})
 		manifestMap["id"] = manifest.ID
