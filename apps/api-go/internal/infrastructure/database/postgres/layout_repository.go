@@ -30,7 +30,7 @@ func (r *layoutRepository) Create(ctx context.Context, layout *domain.Layout) er
 }
 
 func (r *layoutRepository) FindByID(ctx context.Context, id string) (*domain.Layout, error) {
-	var model TemplateModel
+	var model LayoutModel
 	if err := r.db.WithContext(ctx).Where("id = ?", id).First(&model).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
@@ -41,7 +41,7 @@ func (r *layoutRepository) FindByID(ctx context.Context, id string) (*domain.Lay
 }
 
 func (r *layoutRepository) FindAll(ctx context.Context) ([]*domain.Layout, error) {
-	var models []TemplateModel
+	var models []LayoutModel
 	// Database column is "isActive" (camelCase with quotes) - use quoted name in query
 	if err := r.db.WithContext(ctx).Where("\"isActive\" = ?", true).Find(&models).Error; err != nil {
 		return nil, err
@@ -64,15 +64,15 @@ func (r *layoutRepository) Update(ctx context.Context, layout *domain.Layout) er
 		return err
 	}
 	model.UpdatedAt = time.Now()
-	return r.db.WithContext(ctx).Model(&TemplateModel{}).Where("id = ?", layout.ID).Updates(model).Error
+	return r.db.WithContext(ctx).Model(&LayoutModel{}).Where("id = ?", layout.ID).Updates(model).Error
 }
 
 func (r *layoutRepository) Delete(ctx context.Context, id string) error {
-	return r.db.WithContext(ctx).Delete(&TemplateModel{}, "id = ?", id).Error
+	return r.db.WithContext(ctx).Delete(&LayoutModel{}, "id = ?", id).Error
 }
 
-func toLayoutModel(layout *domain.Layout) (*TemplateModel, error) {
-	model := &TemplateModel{
+func toLayoutModel(layout *domain.Layout) (*LayoutModel, error) {
+	model := &LayoutModel{
 		ID:           layout.ID,
 		Name:         layout.Name,
 		Description:  layout.Description,
@@ -105,7 +105,7 @@ func toLayoutModel(layout *domain.Layout) (*TemplateModel, error) {
 	return model, nil
 }
 
-func toLayoutDomain(model *TemplateModel) (*domain.Layout, error) {
+func toLayoutDomain(model *LayoutModel) (*domain.Layout, error) {
 	layout := &domain.Layout{
 		ID:           model.ID,
 		Name:         model.Name,
@@ -148,5 +148,3 @@ func toLayoutDomain(model *TemplateModel) (*domain.Layout, error) {
 
 	return layout, nil
 }
-
-

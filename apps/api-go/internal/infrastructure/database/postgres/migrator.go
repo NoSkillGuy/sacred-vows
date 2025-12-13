@@ -3,7 +3,6 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -11,11 +10,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/sacred-vows/api-go/internal/domain"
-	"github.com/sacred-vows/api-go/internal/interfaces/repository"
 	"github.com/sacred-vows/api-go/pkg/logger"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
 )
 
 // Migration represents a migration file
@@ -291,146 +287,4 @@ func min(a, b int) int {
 		return a
 	}
 	return b
-}
-
-// MigrateLayoutsFromFiles migrates layouts from file system to database
-func MigrateLayoutsFromFiles(ctx context.Context, db *gorm.DB, layoutsDir string, layoutRepo repository.LayoutRepository) error {
-	log := logger.GetLogger()
-
-	// Check if templates table is empty
-	var count int64
-	if err := db.WithContext(ctx).Model(&TemplateModel{}).Count(&count).Error; err != nil {
-		return fmt.Errorf("failed to check layouts count: %w", err)
-	}
-
-	if count > 0 {
-		log.Info("Layouts already exist in database, skipping migration")
-		return nil
-	}
-
-	log.Info("Starting layout migration from files", zap.String("layoutsDir", layoutsDir))
-
-	entries, err := os.ReadDir(layoutsDir)
-	if err != nil {
-		return fmt.Errorf("failed to read layouts directory: %w", err)
-	}
-
-	successCount := 0
-	errorCount := 0
-
-	for _, entry := range entries {
-		if !entry.IsDir() {
-			continue
-		}
-
-		layoutID := entry.Name()
-		layoutPath := filepath.Join(layoutsDir, layoutID)
-
-		// Check if manifest.json exists
-		manifestPath := filepath.Join(layoutPath, "manifest.json")
-		configPath := filepath.Join(layoutPath, "config.json")
-
-		manifestData, err := os.ReadFile(manifestPath)
-		if err != nil {
-			log.Warn("Skipping layout (manifest.json not found)", zap.String("layoutId", layoutID))
-			errorCount++
-			continue
-		}
-
-		// Read config.json (optional)
-		var configData []byte
-		if _, err := os.Stat(configPath); err == nil {
-			configData, err = os.ReadFile(configPath)
-			if err != nil {
-				log.Warn("Config.json exists but could not be read", zap.String("layoutId", layoutID), zap.Error(err))
-			}
-		}
-
-		// Parse manifest to extract basic fields
-		var manifest map[string]interface{}
-		if err := json.Unmarshal(manifestData, &manifest); err != nil {
-			log.Warn("Failed to parse manifest.json", zap.String("layoutId", layoutID), zap.Error(err))
-			errorCount++
-			continue
-		}
-
-		// Extract layout fields
-		name := layoutID
-		if nameStr, ok := manifest["name"].(string); ok {
-			name = nameStr
-		}
-
-		var description *string
-		if desc, ok := manifest["description"].(string); ok {
-			description = &desc
-		}
-
-		var previewImage *string
-		if preview, ok := manifest["previewImage"].(string); ok {
-			previewImage = &preview
-		}
-
-		var tags []string
-		if tagsArr, ok := manifest["tags"].([]interface{}); ok {
-			for _, tag := range tagsArr {
-				if tagStr, ok := tag.(string); ok {
-					tags = append(tags, tagStr)
-				}
-			}
-		}
-
-		version := "1.0.0"
-		if versionStr, ok := manifest["version"].(string); ok {
-			version = versionStr
-		}
-
-		// Create domain layout
-		manifestRaw := json.RawMessage(manifestData)
-		var configRaw *json.RawMessage
-		if len(configData) > 0 {
-			configRawVal := json.RawMessage(configData)
-			configRaw = &configRawVal
-		}
-
-		layout := &domain.Layout{
-			ID:           layoutID,
-			Name:         name,
-			Description:  description,
-			PreviewImage: previewImage,
-			Tags:         tags,
-			Version:      version,
-			Config:       configRaw,
-			Manifest:     &manifestRaw,
-			IsActive:     true,
-		}
-
-		// Check if layout already exists
-		existing, err := layoutRepo.FindByID(ctx, layoutID)
-		if err != nil {
-			log.Warn("Error checking for existing layout", zap.String("layoutId", layoutID), zap.Error(err))
-			errorCount++
-			continue
-		}
-
-		if existing != nil {
-			log.Info("Layout already exists, skipping", zap.String("layoutId", layoutID))
-			continue
-		}
-
-		// Insert layout
-		if err := layoutRepo.Create(ctx, layout); err != nil {
-			log.Warn("Failed to create layout", zap.String("layoutId", layoutID), zap.Error(err))
-			errorCount++
-			continue
-		}
-
-		successCount++
-		log.Info("Migrated layout", zap.String("layoutId", layoutID))
-	}
-
-	log.Info("Layout migration completed",
-		zap.Int("success", successCount),
-		zap.Int("errors", errorCount))
-
-	return nil
 }

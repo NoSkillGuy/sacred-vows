@@ -88,7 +88,7 @@ func main() {
 	if err := db.AutoMigrate(
 		&postgres.UserModel{},
 		&postgres.InvitationModel{},
-		&postgres.TemplateModel{},
+		&postgres.LayoutModel{},
 		&postgres.AssetModel{},
 		&postgres.RSVPResponseModel{},
 		&postgres.AnalyticsModel{},

@@ -30,7 +30,7 @@ Provides PostgreSQL database implementation using GORM. Implements all repositor
 Database models that map to PostgreSQL tables:
 - `UserModel` - Users table
 - `InvitationModel` - Invitations table
-- `TemplateModel` - Layouts table (table name kept as templates for backward compatibility)
+- `LayoutModel` - Layouts table (table name kept as templates for backward compatibility)
 - `AssetModel` - Assets table
 - `RSVPResponseModel` - RSVP responses table
 - `AnalyticsModel` - Analytics table

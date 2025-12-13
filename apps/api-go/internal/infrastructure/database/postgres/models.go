@@ -34,9 +34,9 @@ func (InvitationModel) TableName() string {
 	return "invitations"
 }
 
-// TemplateModel represents the templates table (stores layout data)
+// LayoutModel represents the templates table (stores layout data)
 // Note: Table name is kept as "templates" for backward compatibility
-type TemplateModel struct {
+type LayoutModel struct {
 	ID           string          `gorm:"primaryKey;type:text"`
 	Name         string          `gorm:"type:text;not null"`
 	Description  *string         `gorm:"type:text"`
@@ -50,7 +50,7 @@ type TemplateModel struct {
 	UpdatedAt    time.Time       `gorm:"autoUpdateTime"`
 }
 
-func (TemplateModel) TableName() string {
+func (LayoutModel) TableName() string {
 	return "templates"
 }
 
