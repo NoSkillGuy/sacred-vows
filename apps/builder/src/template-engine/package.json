@@ -1,7 +1,7 @@
 {
-  "name": "@wedding-builder/template-engine",
+  "name": "@wedding-builder/layout-engine",
   "version": "1.0.0",
-  "description": "Template rendering engine for wedding invitation builder",
+  "description": "Layout rendering engine for wedding invitation builder",
   "main": "src/index.js",
   "type": "module",
   "dependencies": {

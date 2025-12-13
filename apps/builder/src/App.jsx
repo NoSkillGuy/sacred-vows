@@ -60,7 +60,7 @@ function App() {
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/cookies" element={<CookiesPage />} />
         
-        {/* Smart redirect after login - goes to dashboard or templates based on user state */}
+        {/* Smart redirect after login - goes to dashboard or layouts based on user state */}
         <Route 
           path="/app" 
           element={

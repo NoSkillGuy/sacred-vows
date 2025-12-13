@@ -1,5 +1,5 @@
 /* ===================================
-   Dashboard & Template Gallery Styles
+   Dashboard & Layout Gallery Styles
    Premium Romantic Wedding Theme
    =================================== */
 
@@ -8,7 +8,7 @@
    =================================== */
 
 .dashboard-page,
-.template-gallery-page {
+.layout-gallery-page {
   min-height: 100vh;
   background: linear-gradient(135deg, var(--blush-light) 0%, var(--cream) 50%, var(--champagne) 100%);
   position: relative;
@@ -17,7 +17,7 @@
 
 /* Animated background decorations */
 .dashboard-page::before,
-.template-gallery-page::before {
+.layout-gallery-page::before {
   content: '';
   position: fixed;
   top: -50%;
@@ -269,7 +269,7 @@
 }
 
 /* ===================================
-   Template Gallery Specific
+   Layout Gallery Specific
    =================================== */
 
 .gallery-intro {
@@ -332,15 +332,15 @@
   outline-offset: 2px;
 }
 
-/* Template Grid */
-.template-grid {
+/* Layout Grid */
+.layout-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 2rem;
 }
 
-/* Template Card */
-.template-card {
+/* Layout Card */
+.layout-card {
   position: relative;
   background: var(--white);
   border-radius: var(--radius-xl);
@@ -350,22 +350,22 @@
   border: 1px solid var(--builder-border-light);
 }
 
-.template-card:hover {
+.layout-card:hover {
   transform: translateY(-8px);
   box-shadow: var(--shadow-xl);
 }
 
-.template-card.featured {
+.layout-card.featured {
   border-color: var(--gold-light);
   box-shadow: var(--shadow-gold);
 }
 
-.template-card.featured:hover {
+.layout-card.featured:hover {
   box-shadow: var(--shadow-gold-lg);
 }
 
 /* Featured Badge */
-.template-featured-badge {
+.layout-featured-badge {
   position: absolute;
   top: 1rem;
   left: 1rem;
@@ -384,32 +384,32 @@
   box-shadow: var(--shadow-gold);
 }
 
-.template-featured-badge svg {
+.layout-featured-badge svg {
   width: 0.875rem;
   height: 0.875rem;
 }
 
-/* Template Preview */
-.template-preview {
+/* Layout Preview */
+.layout-preview {
   position: relative;
   aspect-ratio: 4 / 3;
   background: linear-gradient(135deg, var(--blush) 0%, var(--champagne) 100%);
   overflow: hidden;
 }
 
-.template-preview-image {
+.layout-preview-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.5s var(--ease-out-expo);
 }
 
-.template-card:hover .template-preview-image {
+.layout-card:hover .layout-preview-image {
   transform: scale(1.05);
 }
 
-/* Placeholder for templates without images */
-.template-preview-placeholder {
+/* Placeholder for layouts without images */
+.layout-preview-placeholder {
   width: 100%;
   height: 100%;
   display: flex;
@@ -420,20 +420,20 @@
   background: linear-gradient(135deg, var(--blush) 0%, var(--champagne) 100%);
 }
 
-.template-preview-placeholder svg {
+.layout-preview-placeholder svg {
   width: 3.5rem;
   height: 3.5rem;
   color: #d4af37;
   opacity: 0.6;
 }
 
-.template-preview-placeholder span {
+.layout-preview-placeholder span {
   font-size: 0.85rem;
   color: var(--text-muted);
 }
 
 /* Coming Soon Overlay */
-.template-coming-soon {
+.layout-coming-soon {
   position: absolute;
   inset: 0;
   background: rgba(255, 255, 255, 0.85);
@@ -445,7 +445,7 @@
   gap: 0.5rem;
 }
 
-.template-coming-soon-badge {
+.layout-coming-soon-badge {
   padding: 0.5rem 1rem;
   background: linear-gradient(135deg, var(--burgundy) 0%, var(--burgundy-deep) 100%);
   border-radius: var(--radius-full);
@@ -456,17 +456,17 @@
   letter-spacing: 0.05em;
 }
 
-.template-coming-soon span:last-child {
+.layout-coming-soon span:last-child {
   font-size: 0.8rem;
   color: var(--text-muted);
 }
 
-/* Template Info */
-.template-info {
+/* Layout Info */
+.layout-info {
   padding: 1.5rem;
 }
 
-.template-header {
+.layout-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -475,7 +475,7 @@
   margin-bottom: 0.75rem;
 }
 
-.template-name {
+.layout-name {
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.35rem;
   font-weight: 600;
@@ -483,7 +483,7 @@
   margin: 0;
 }
 
-.template-price {
+.layout-price {
   display: flex;
   align-items: center;
   gap: 0.35rem;
@@ -496,7 +496,7 @@
   color: var(--gold-dark);
 }
 
-.template-description {
+.layout-description {
   color: var(--text-muted);
   font-size: 0.9rem;
   line-height: 1.5;
@@ -507,14 +507,14 @@
   overflow: hidden;
 }
 
-.template-tags {
+.layout-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: 1.25rem;
 }
 
-.template-tag {
+.layout-tag {
   padding: 0.25rem 0.625rem;
   background: var(--blush);
   border-radius: var(--radius-full);
@@ -523,22 +523,22 @@
   text-transform: capitalize;
 }
 
-.template-actions {
+.layout-actions {
   display: flex;
   gap: 0.75rem;
 }
 
-.template-actions .btn {
+.layout-actions .btn {
   flex: 1;
 }
 
-.template-actions .btn-preview {
+.layout-actions .btn-preview {
   background: var(--builder-surface);
   color: var(--text-dark);
   border: 2px solid var(--builder-border);
 }
 
-.template-actions .btn-preview:hover {
+.layout-actions .btn-preview:hover {
   border-color: var(--rose);
   background: var(--blush-light);
 }
@@ -721,7 +721,7 @@
   opacity: 0.6;
 }
 
-.invitation-template {
+.invitation-layout {
   font-size: 0.8rem;
   color: var(--text-light);
   margin-bottom: 1rem;
@@ -1002,7 +1002,7 @@
     padding: 1.5rem;
   }
   
-  .template-grid {
+  .layout-grid {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.5rem;
   }
@@ -1053,7 +1053,7 @@
     font-size: 0.8rem;
   }
   
-  .template-grid {
+  .layout-grid {
     grid-template-columns: 1fr;
   }
   
@@ -1080,7 +1080,7 @@
 }
 
 @media (max-width: 480px) {
-  .template-actions {
+  .layout-actions {
     flex-direction: column;
   }
   

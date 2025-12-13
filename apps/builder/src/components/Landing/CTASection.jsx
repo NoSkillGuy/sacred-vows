@@ -68,7 +68,7 @@ function CTASection({ onSectionView }) {
           </div>
           <div className="trust-item">
             <span className="trust-number">50+</span>
-            <span className="trust-label">Templates Available</span>
+            <span className="trust-label">Layouts Available</span>
           </div>
           <div className="trust-item">
             <span className="trust-number">4.9/5</span>

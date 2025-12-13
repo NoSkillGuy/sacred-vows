@@ -26,7 +26,7 @@ function TermsPage() {
               wedding invitations. Our services include:
             </p>
             <ul>
-              <li>Wedding invitation templates and customization tools</li>
+              <li>Wedding invitation layouts and customization tools</li>
               <li>Guest management and RSVP tracking</li>
               <li>Invitation sharing and analytics</li>
               <li>Premium features for paid subscribers</li>
@@ -95,7 +95,7 @@ function TermsPage() {
             <p>
               The Service and its original content, features, and functionality are owned by 
               Sacred Vows and are protected by international copyright, trademark, and other 
-              intellectual property laws. Our templates, designs, and branding remain our 
+              intellectual property laws. Our layouts, designs, and branding remain our 
               exclusive property.
             </p>
           </section>
@@ -108,7 +108,7 @@ function TermsPage() {
               <li>Attempt to gain unauthorized access to any part of the Service</li>
               <li>Interfere with or disrupt the Service or servers</li>
               <li>Use automated systems to access the Service without permission</li>
-              <li>Resell or redistribute our templates or services</li>
+              <li>Resell or redistribute our layouts or services</li>
               <li>Remove any copyright or proprietary notices</li>
             </ul>
           </section>

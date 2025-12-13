@@ -202,5 +202,3 @@ func ToManifestMap(layout *domain.Layout) (map[string]interface{}, error) {
 
 	return normalized, nil
 }
-
-

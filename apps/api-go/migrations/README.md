@@ -61,9 +61,20 @@ Contains SQL migration files for database schema management. These migrations de
 - Updates `preview_image` column
 - Updates `previewImage` in both `config` and `manifest` JSONB columns
 - This migration updates the data to reflect the new directory structure
+- **Note**: This migration references the `templates` table, which is renamed in migration 006
 
 **Down Migration** (`005_update_image_paths_to_layouts.down.sql`):
 - Reverts image paths from `/layouts/` back to `/templates/`
+
+### Rename Templates Table to Layouts (`006_rename_templates_table_to_layouts`)
+
+**Up Migration** (`006_rename_templates_table_to_layouts.up.sql`):
+- Renames the `templates` table to `layouts`
+- This migration completes the refactoring from templates to layouts terminology
+- **Note**: This migration must run AFTER migration 005, which references the `templates` table name
+
+**Down Migration** (`006_rename_templates_table_to_layouts.down.sql`):
+- Reverts the table rename from `layouts` back to `templates`
 
 ## Schema Overview
 
@@ -83,7 +94,7 @@ Contains SQL migration files for database schema management. These migrations de
    - userId (TEXT, FOREIGN KEY)
    - timestamps
 
-3. **templates** - Template/Layout definitions (table name kept as templates)
+3. **layouts** - Layout definitions (table renamed from "templates" to "layouts" in migration 006)
    - id (TEXT, PRIMARY KEY)
    - name, description, previewImage
    - tags (TEXT[])
@@ -134,6 +145,7 @@ The application automatically runs SQL migrations on startup:
    - Schema migrations (e.g., `002_add_template_manifest`, `004_rename_template_id_to_layout_id`)
    - Data migrations (e.g., `003_load_templates`) - pure SQL INSERT statements
    - Data updates (e.g., `005_update_image_paths_to_layouts`) - UPDATE statements
+   - Schema renames (e.g., `006_rename_templates_table_to_layouts`) - ALTER TABLE statements
 2. GORM AutoMigrate (ensures all models are synced)
 
 **Data Migrations:**
@@ -148,7 +160,7 @@ The application automatically runs SQL migrations on startup:
 - **Never modify existing migrations** that have been run in production
 - Always create new migrations for schema or data changes
 - Migration files are immutable once applied
-- Use new migrations to handle refactoring (e.g., migration 004 renames column, migration 005 updates paths)
+- Use new migrations to handle refactoring (e.g., migration 004 renames column, migration 005 updates paths, migration 006 renames table)
 
 ### GORM AutoMigrate
 

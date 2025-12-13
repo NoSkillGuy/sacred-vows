@@ -91,7 +91,7 @@
 }
 
 .hero-section,
-.templates-section,
+.layouts-section,
 .features-section,
 .how-it-works-section,
 .testimonials-section,
@@ -1154,10 +1154,10 @@
 }
 
 /* ===================================
-   Template Showcase Section
+   Layout Showcase Section
    =================================== */
 
-.templates-section {
+.layouts-section {
   padding: 5.5rem 4rem;
   background: var(--white);
   position: relative;
@@ -1167,7 +1167,7 @@
   align-items: center;
 }
 
-.templates-section::before {
+.layouts-section::before {
   content: '';
   position: absolute;
   top: 0;
@@ -1178,7 +1178,7 @@
   pointer-events: none;
 }
 
-.templates-actions {
+.layouts-actions {
   width: 100%;
   max-width: 1200px;
   margin: 1.5rem auto 2rem;
@@ -1218,7 +1218,7 @@
   box-shadow: var(--shadow-sm);
 }
 
-.template-search input {
+.layout-search input {
   border: 1px solid var(--rose-soft);
   background: var(--white);
   border-radius: 12px;
@@ -1229,21 +1229,21 @@
   width: 100%;
 }
 
-.templates-carousel-wrapper {
+.layouts-carousel-wrapper {
   position: relative;
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
 }
 
-.templates-grid {
+.layouts-grid {
   display: grid;
   width: 100%;
   grid-template-columns: repeat(3, minmax(300px, 1fr));
   gap: 1.5rem;
 }
 
-.template-card {
+.layout-card {
   position: relative;
   border-radius: 20px;
   overflow: hidden;
@@ -1256,12 +1256,12 @@
   will-change: transform, box-shadow;
 }
 
-.template-card:hover {
+.layout-card:hover {
   transform: translateY(-12px) scale(1.02);
   box-shadow: var(--shadow-xl);
 }
 
-.template-card::before {
+.layout-card::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -1276,11 +1276,11 @@
   pointer-events: none;
 }
 
-.template-card:hover::before {
+.layout-card:hover::before {
   opacity: 1;
 }
 
-.template-preview {
+.layout-preview {
   width: 100%;
   height: 100%;
   display: flex;
@@ -1289,7 +1289,7 @@
   padding: 1.5rem;
 }
 
-.template-inner {
+.layout-inner {
   width: 100%;
   height: 100%;
   border-radius: 12px;
@@ -1304,50 +1304,50 @@
   transition: transform 0.4s var(--ease-out-expo);
 }
 
-.template-card:hover .template-inner {
+.layout-card:hover .layout-inner {
   transform: scale(1.02);
 }
 
-/* Individual template styles */
-.template-royal-elegance .template-inner {
+/* Individual layout styles */
+.layout-royal-elegance .layout-inner {
   background: linear-gradient(180deg, #fff8f0 0%, #f5e6d3 100%);
   border: 2px solid var(--gold);
 }
 
-.template-eternal-bloom .template-inner {
+.layout-eternal-bloom .layout-inner {
   background: linear-gradient(180deg, #fef5f6 0%, #fde8ea 100%);
   border: 2px solid #e8b4b8;
 }
 
-.template-midnight-romance .template-inner {
+.layout-midnight-romance .layout-inner {
   background: linear-gradient(180deg, #2a2a3d 0%, #1a1a2e 100%);
   color: #fff;
   border: 2px solid var(--gold);
 }
 
-.template-garden-dreams .template-inner {
+.layout-garden-dreams .layout-inner {
   background: linear-gradient(180deg, #f5f9f5 0%, #e8f0e8 100%);
   border: 2px solid #8fa88f;
 }
 
-.template-classic-monogram .template-inner {
+.layout-classic-monogram .layout-inner {
   background: #ffffff;
   border: 2px solid #2c2c2c;
 }
 
-.template-sunset-serenade .template-inner {
+.layout-sunset-serenade .layout-inner {
   background: linear-gradient(180deg, #fff5eb 0%, #ffe4cc 100%);
   border: 2px solid #e6a87c;
 }
 
-.template-ornament {
+.layout-ornament {
   font-size: 1.5rem;
   margin-bottom: 0.75rem;
   opacity: 0.7;
   color: var(--gold);
 }
 
-.template-names {
+.layout-names {
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.4rem;
   font-weight: 600;
@@ -1359,7 +1359,7 @@
   justify-content: center;
 }
 
-.template-date {
+.layout-date {
   font-family: 'Great Vibes', cursive;
   font-size: 1.4rem;
   opacity: 0.8;
@@ -1369,7 +1369,7 @@
   justify-content: center;
 }
 
-.template-overlay {
+.layout-overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.82) 100%);
@@ -1382,7 +1382,7 @@
   border-radius: 20px;
 }
 
-.template-highlights {
+.layout-highlights {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -1390,7 +1390,7 @@
   margin-bottom: 1rem;
 }
 
-.template-pill {
+.layout-pill {
   background: rgba(255,255,255,0.24);
   color: #fff;
   padding: 0.35rem 0.65rem;
@@ -1399,14 +1399,14 @@
   border: 1px solid rgba(255,255,255,0.5);
 }
 
-.template-actions {
+.layout-actions {
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
   justify-content: center;
 }
 
-.template-overlay-btn {
+.layout-overlay-btn {
   background: var(--gold);
   color: var(--text-dark);
   border: none;
@@ -1417,7 +1417,7 @@
   box-shadow: var(--shadow-gold);
 }
 
-.template-overlay-secondary {
+.layout-overlay-secondary {
   background: rgba(255,255,255,0.08);
   color: #fff;
   border: 1.5px solid rgba(255,255,255,0.7);
@@ -1428,11 +1428,11 @@
   backdrop-filter: blur(6px);
 }
 
-.template-card:hover .template-overlay {
+.layout-card:hover .layout-overlay {
   opacity: 1;
 }
 
-.template-overlay-btn {
+.layout-overlay-btn {
   background: var(--white);
   color: var(--text-dark);
   border: none;
@@ -1447,19 +1447,19 @@
   opacity: 0;
 }
 
-.template-card:hover .template-overlay-btn {
+.layout-card:hover .layout-overlay-btn {
   transform: translateY(0);
   opacity: 1;
   transition-delay: 0.1s;
 }
 
-.template-overlay-btn:hover {
+.layout-overlay-btn:hover {
   background: var(--gold);
   color: var(--white);
   transform: scale(1.05);
 }
 
-.template-info {
+.layout-info {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -1473,7 +1473,7 @@
   justify-content: center;
 }
 
-.template-name {
+.layout-name {
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.15rem;
   font-weight: 600;
@@ -1485,13 +1485,13 @@
   justify-content: center;
 }
 
-.template-desc {
+.layout-desc {
   font-size: 0.8rem;
   color: var(--text-light);
   text-align: center;
 }
 
-.template-meta {
+.layout-meta {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -1500,7 +1500,7 @@
   justify-content: center;
 }
 
-.template-tag {
+.layout-tag {
   background: var(--blush);
   color: var(--text-dark);
   padding: 0.25rem 0.6rem;
@@ -1510,13 +1510,13 @@
   border: 1px solid var(--rose-soft);
 }
 
-.template-tag.badge {
+.layout-tag.badge {
   background: var(--gold-light);
   border-color: var(--gold);
   font-weight: 700;
 }
 
-.template-demo-modal {
+.layout-demo-modal {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.55);
@@ -1527,7 +1527,7 @@
   z-index: 300;
 }
 
-.template-demo-content {
+.layout-demo-content {
   background: var(--white);
   border-radius: 16px;
   max-width: 960px;
@@ -1539,7 +1539,7 @@
   flex-direction: column;
 }
 
-.template-demo-header {
+.layout-demo-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1547,7 +1547,7 @@
   border-bottom: 1px solid var(--rose-soft);
 }
 
-.template-demo-body {
+.layout-demo-body {
   padding: 1.5rem;
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1556,14 +1556,14 @@
   overflow: auto;
 }
 
-.template-demo-actions {
+.layout-demo-actions {
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
   justify-content: flex-start;
 }
 
-.template-demo-body .template-card.demo-mode {
+.layout-demo-body .layout-card.demo-mode {
   height: 100%;
   box-shadow: none;
   transform: none;
@@ -2598,18 +2598,18 @@
     font-size: 3.5rem;
   }
   
-  .templates-grid,
+  .layouts-grid,
   .features-grid,
   .testimonials-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .templates-actions {
+  .layouts-actions {
     flex-direction: column;
     align-items: flex-start;
   }
 
-  .template-search input {
+  .layout-search input {
     width: 100%;
   }
 
@@ -2734,7 +2734,7 @@
     margin-right: auto;
   }
   
-  .templates-grid,
+  .layouts-grid,
   .features-grid,
   .testimonials-grid {
     grid-template-columns: 1fr;
@@ -2743,11 +2743,11 @@
     margin-right: auto;
   }
   
-  .template-card {
+  .layout-card {
     aspect-ratio: 4/5;
   }
 
-  .templates-actions {
+  .layouts-actions {
     align-items: stretch;
   }
 
@@ -2760,7 +2760,7 @@
     align-items: flex-start;
   }
 
-  .template-demo-body {
+  .layout-demo-body {
     grid-template-columns: 1fr;
   }
   
@@ -2858,16 +2858,16 @@
 
 /* Touch device optimizations */
 @media (hover: none) {
-  .template-card:hover {
+  .layout-card:hover {
     transform: none;
   }
   
-  .template-overlay {
+  .layout-overlay {
     background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.6) 100%);
     opacity: 1;
   }
   
-  .template-overlay-btn {
+  .layout-overlay-btn {
     transform: none;
     opacity: 1;
   }

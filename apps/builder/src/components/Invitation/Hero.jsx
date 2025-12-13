@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 function Hero({ onRSVPClick, translations, currentLang, config = {} }) {
   const [countdown, setCountdown] = useState('');
   
-  // Read values directly from config without template defaults
+  // Read values directly from config without layout defaults
   const wedding = config?.wedding || {};
   const countdownTarget = wedding?.countdownTarget;
   const heroImage = config?.hero?.mainImage;

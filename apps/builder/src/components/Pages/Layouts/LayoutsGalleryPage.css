@@ -1,8 +1,8 @@
 /* ===================================
-   Templates Gallery Page Styles
+   Layouts Gallery Page Styles
    =================================== */
 
-.templates-gallery-page {
+.layouts-gallery-page {
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 1rem;
@@ -12,7 +12,7 @@
    Filters
    =================================== */
 
-.templates-gallery-page .template-filters {
+.layouts-gallery-page .layout-filters {
   display: flex;
   justify-content: center;
   gap: 0.75rem;
@@ -20,7 +20,7 @@
   flex-wrap: wrap;
 }
 
-.templates-gallery-page .filter-btn {
+.layouts-gallery-page .filter-btn {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -36,18 +36,18 @@
   transition: all 0.3s var(--ease-out-quart);
 }
 
-.templates-gallery-page .filter-btn:hover {
+.layouts-gallery-page .filter-btn:hover {
   border-color: var(--rose);
   color: var(--text-dark);
 }
 
-.templates-gallery-page .filter-btn.active {
+.layouts-gallery-page .filter-btn.active {
   background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
   border-color: var(--gold);
   color: var(--white);
 }
 
-.templates-gallery-page .filter-count {
+.layouts-gallery-page .filter-count {
   font-size: 0.75rem;
   font-weight: 600;
   padding: 0.15rem 0.5rem;
@@ -55,12 +55,12 @@
   border-radius: 100px;
 }
 
-.templates-gallery-page .filter-btn.active .filter-count {
+.layouts-gallery-page .filter-btn.active .filter-count {
   background: rgba(255, 255, 255, 0.25);
 }
 
 /* Category Links */
-.templates-gallery-page .category-links {
+.layouts-gallery-page .category-links {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -71,27 +71,27 @@
   border-radius: var(--radius-lg);
 }
 
-.templates-gallery-page .category-links p {
+.layouts-gallery-page .category-links p {
   font-size: 0.9rem;
   color: var(--text-muted);
 }
 
-.templates-gallery-page .category-links a {
+.layouts-gallery-page .category-links a {
   font-size: 0.9rem;
   color: var(--text-medium);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
-.templates-gallery-page .category-links a:hover {
+.layouts-gallery-page .category-links a:hover {
   color: var(--gold-dark);
 }
 
 /* ===================================
-   Templates Grid
+   Layouts Grid
    =================================== */
 
-.templates-gallery-page .templates-grid {
+.layouts-gallery-page .layouts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 360px));
   justify-content: center;
@@ -100,7 +100,7 @@
   margin-bottom: 5rem;
 }
 
-.templates-gallery-page .template-card {
+.layouts-gallery-page .layout-card {
   position: relative;
   width: 100%;
   max-width: 340px;
@@ -113,12 +113,12 @@
   border: 1px solid var(--builder-border-light);
 }
 
-.templates-gallery-page .template-card:hover {
+.layouts-gallery-page .layout-card:hover {
   transform: translateY(-10px);
   box-shadow: var(--shadow-xl);
 }
 
-.templates-gallery-page .popular-badge {
+.layouts-gallery-page .popular-badge {
   position: absolute;
   top: 1rem;
   right: 1rem;
@@ -133,7 +133,7 @@
   z-index: 10;
 }
 
-.templates-gallery-page .template-preview {
+.layouts-gallery-page .layout-preview {
   aspect-ratio: 3/4;
   padding: 1.5rem;
   display: flex;
@@ -142,7 +142,7 @@
   background: var(--cream);
 }
 
-.templates-gallery-page .template-inner {
+.layouts-gallery-page .layout-inner {
   width: 100%;
   height: 100%;
   border-radius: var(--radius-lg);
@@ -156,17 +156,17 @@
   transition: transform 0.4s var(--ease-out-expo);
 }
 
-.templates-gallery-page .template-card:hover .template-inner {
+.layouts-gallery-page .layout-card:hover .layout-inner {
   transform: scale(1.03);
 }
 
-.templates-gallery-page .template-ornament {
+.layouts-gallery-page .layout-ornament {
   font-size: 1.5rem;
   margin-bottom: 1rem;
   opacity: 0.8;
 }
 
-.templates-gallery-page .template-names {
+.layouts-gallery-page .layout-names {
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.35rem;
   font-weight: 600;
@@ -174,12 +174,12 @@
   margin-bottom: 0.5rem;
 }
 
-.templates-gallery-page .template-date {
+.layouts-gallery-page .layout-date {
   font-family: 'Great Vibes', cursive;
   font-size: 1.1rem;
 }
 
-.templates-gallery-page .template-overlay {
+.layouts-gallery-page .layout-overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.6) 100%);
@@ -191,11 +191,11 @@
   border-radius: var(--radius-xl);
 }
 
-.templates-gallery-page .template-card:hover .template-overlay {
+.layouts-gallery-page .layout-card:hover .layout-overlay {
   opacity: 1;
 }
 
-.templates-gallery-page .preview-btn {
+.layouts-gallery-page .preview-btn {
   background: var(--white);
   color: var(--text-dark);
   border: none;
@@ -210,38 +210,38 @@
   transition: all 0.4s var(--ease-out-expo);
 }
 
-.templates-gallery-page .template-card:hover .preview-btn {
+.layouts-gallery-page .layout-card:hover .preview-btn {
   transform: translateY(0);
   opacity: 1;
   transition-delay: 0.1s;
 }
 
-.templates-gallery-page .preview-btn:hover {
+.layouts-gallery-page .preview-btn:hover {
   background: var(--gold);
   color: var(--white);
   transform: scale(1.05);
 }
 
-.templates-gallery-page .template-info {
+.layouts-gallery-page .layout-info {
   padding: 1.25rem 1.5rem 1.5rem;
   text-align: center;
 }
 
-.templates-gallery-page .template-colors {
+.layouts-gallery-page .layout-colors {
   display: flex;
   justify-content: center;
   gap: 0.4rem;
   margin-bottom: 0.75rem;
 }
 
-.templates-gallery-page .color-dot {
+.layouts-gallery-page .color-dot {
   width: 16px;
   height: 16px;
   border-radius: 50%;
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.templates-gallery-page .template-info h3 {
+.layouts-gallery-page .layout-info h3 {
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.2rem;
   font-weight: 600;
@@ -249,13 +249,13 @@
   margin-bottom: 0.35rem;
 }
 
-.templates-gallery-page .template-info p {
+.layouts-gallery-page .layout-info p {
   font-size: 0.85rem;
   color: var(--text-light);
   margin-bottom: 0.75rem;
 }
 
-.templates-gallery-page .template-category {
+.layouts-gallery-page .layout-category {
   font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -316,7 +316,7 @@
    CTA Section
    =================================== */
 
-.templates-gallery-page .templates-cta {
+.layouts-gallery-page .layouts-cta {
   background: linear-gradient(135deg, #2d2d2d 0%, #1a1a2e 100%);
   border-radius: var(--radius-xl);
   padding: 4rem;
@@ -325,7 +325,7 @@
   overflow: hidden;
 }
 
-.templates-gallery-page .templates-cta::before {
+.layouts-gallery-page .layouts-cta::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -333,7 +333,7 @@
   pointer-events: none;
 }
 
-.templates-gallery-page .templates-cta h2 {
+.layouts-gallery-page .layouts-cta h2 {
   font-family: 'Cormorant Garamond', serif;
   font-size: 2.25rem;
   font-weight: 500;
@@ -342,14 +342,14 @@
   position: relative;
 }
 
-.templates-gallery-page .templates-cta p {
+.layouts-gallery-page .layouts-cta p {
   font-size: 1.05rem;
   color: rgba(255, 255, 255, 0.7);
   margin-bottom: 2rem;
   position: relative;
 }
 
-.templates-gallery-page .cta-buttons {
+.layouts-gallery-page .cta-buttons {
   display: flex;
   gap: 1rem;
   justify-content: center;
@@ -361,47 +361,47 @@
    =================================== */
 
 @media (max-width: 768px) {
-  .templates-gallery-page .template-filters {
+  .layouts-gallery-page .layout-filters {
     gap: 0.5rem;
   }
 
-  .templates-gallery-page .filter-btn {
+  .layouts-gallery-page .filter-btn {
     padding: 0.6rem 1rem;
     font-size: 0.85rem;
   }
 
-  .templates-gallery-page .category-links {
+  .layouts-gallery-page .category-links {
     flex-wrap: wrap;
     gap: 1rem;
   }
 
-  .templates-gallery-page .templates-grid {
+  .layouts-gallery-page .layouts-grid {
     grid-template-columns: 1fr;
     max-width: 400px;
     margin-left: auto;
     margin-right: auto;
   }
 
-  .templates-gallery-page .templates-cta {
+  .layouts-gallery-page .layouts-cta {
     padding: 3rem 1.5rem;
   }
 
-  .templates-gallery-page .templates-cta h2 {
+  .layouts-gallery-page .layouts-cta h2 {
     font-size: 1.75rem;
   }
 
-  .templates-gallery-page .cta-buttons {
+  .layouts-gallery-page .cta-buttons {
     flex-direction: column;
   }
 }
 
 @media (max-width: 480px) {
-  .templates-gallery-page .filter-btn {
+  .layouts-gallery-page .filter-btn {
     padding: 0.5rem 0.75rem;
     font-size: 0.8rem;
   }
 
-  .templates-gallery-page .filter-count {
+  .layouts-gallery-page .filter-count {
     display: none;
   }
 }

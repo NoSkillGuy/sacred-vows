@@ -19,7 +19,7 @@ const pressReleases = [
   },
   {
     date: 'October 15, 2024',
-    title: 'Sacred Vows Launches New Luxury Template Collection',
+    title: 'Sacred Vows Launches New Luxury Layout Collection',
     excerpt: 'Introducing our most elegant designs yet, featuring hand-crafted illustrations and premium animations.'
   },
   {

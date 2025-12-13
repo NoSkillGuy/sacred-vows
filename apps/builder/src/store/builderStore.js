@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { defaultWeddingConfig, defaultTemplateConfig, SECTION_TYPES } from '../config/wedding-config';
+import { defaultWeddingConfig, defaultLayoutConfig, SECTION_TYPES } from '../config/wedding-config';
 import { updateInvitation } from '../services/invitationService';
 import { getLayoutManifest } from '../services/layoutService';
 
@@ -21,18 +21,18 @@ function loadFromStorage() {
       const parsed = JSON.parse(stored);
       // Ensure layoutConfig exists for backward compatibility
       if (!parsed.layoutConfig) {
-        // Support old templateConfig for migration
-        if (parsed.templateConfig) {
-          parsed.layoutConfig = parsed.templateConfig;
-          delete parsed.templateConfig;
+        // Support old layoutConfig for migration
+        if (parsed.layoutConfig) {
+          parsed.layoutConfig = parsed.layoutConfig;
+          delete parsed.layoutConfig;
         } else {
-          parsed.layoutConfig = { ...defaultTemplateConfig };
+          parsed.layoutConfig = { ...defaultLayoutConfig };
         }
       }
-      // Migrate templateId to layoutId
-      if (parsed.templateId && !parsed.layoutId) {
-        parsed.layoutId = parsed.templateId;
-        delete parsed.templateId;
+      // Migrate layoutId to layoutId
+      if (parsed.layoutId && !parsed.layoutId) {
+        parsed.layoutId = parsed.layoutId;
+        delete parsed.layoutId;
       }
       return parsed;
     }
@@ -43,7 +43,7 @@ function loadFromStorage() {
     id: null,
     layoutId: 'royal-elegance',
     data: defaultWeddingConfig,
-    layoutConfig: { ...defaultTemplateConfig },
+    layoutConfig: { ...defaultLayoutConfig },
     translations: null,
   };
 }
@@ -150,14 +150,14 @@ export const useBuilderStore = create((set, get) => {
      * @param {Object} invitation - Invitation object from backend
      */
     setCurrentInvitation: (invitation) => {
-      // Support migration from templateConfig to layoutConfig
-      const layoutConfig = invitation.layoutConfig || invitation.templateConfig || {};
-      const layoutId = invitation.layoutId || invitation.templateId || 'royal-elegance';
+      // Support migration from layoutConfig to layoutConfig
+      const layoutConfig = invitation.layoutConfig || invitation.layoutConfig || {};
+      const layoutId = invitation.layoutId || invitation.layoutId || 'royal-elegance';
       const invitationWithConfig = {
         ...invitation,
         layoutId,
         layoutConfig: {
-          ...defaultTemplateConfig,
+          ...defaultLayoutConfig,
           ...layoutConfig,
         },
       };
@@ -614,13 +614,13 @@ export const useBuilderStore = create((set, get) => {
      * Set entire invitation
      */
     setInvitation: (invitation) => {
-      // Ensure layoutConfig exists, support migration from templateConfig
-      const layoutConfig = invitation.layoutConfig || invitation.templateConfig || {};
-      const layoutId = invitation.layoutId || invitation.templateId || 'royal-elegance';
+      // Ensure layoutConfig exists, support migration from layoutConfig
+      const layoutConfig = invitation.layoutConfig || invitation.layoutConfig || {};
+      const layoutId = invitation.layoutId || invitation.layoutId || 'royal-elegance';
       const invitationWithConfig = {
         ...invitation,
         layoutId,
-        layoutConfig: { ...defaultTemplateConfig, ...layoutConfig },
+        layoutConfig: { ...defaultLayoutConfig, ...layoutConfig },
       };
       set({ currentInvitation: invitationWithConfig });
       saveToStorage(invitationWithConfig);
@@ -642,7 +642,7 @@ export const useBuilderStore = create((set, get) => {
         id: null,
         layoutId: 'royal-elegance',
         data: defaultWeddingConfig,
-        layoutConfig: { ...defaultTemplateConfig },
+        layoutConfig: { ...defaultLayoutConfig },
         translations: null,
       };
       set({

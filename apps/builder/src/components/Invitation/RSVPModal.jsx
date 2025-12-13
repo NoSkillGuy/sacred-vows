@@ -48,9 +48,9 @@ function RSVPModal({ isOpen, onClose, translations, currentLang, config = {} }) 
     const formattedWeddingDates = formatDates(dates);
     const defaultMessage = `Hello! I would like to RSVP for the wedding of ${brideName} and ${groomName}.\n\nName: {name}\nArrival Date: {date}\n\nI confirm my attendance for the celebrations on ${formattedWeddingDates} at ${venueName}, ${venueCity}.`;
     
-    const messageTemplate = translations['rsvp.message'] || defaultMessage;
+    const messageLayout = translations['rsvp.message'] || defaultMessage;
     const message = encodeURIComponent(
-      messageTemplate.replace('{name}', name.trim()).replace('{date}', formattedDate)
+      messageLayout.replace('{name}', name.trim()).replace('{date}', formattedDate)
     );
 
     const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${message}`;

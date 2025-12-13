@@ -10,7 +10,7 @@ function resolveTheme(layout) {
 function LayoutCardUnified({
   layout,
   onPrimaryAction,
-  primaryLabel = 'Use This Template',
+  primaryLabel = 'Use This Layout',
   primaryDisabled = false,
   primaryLoading = false,
   onSecondaryAction,

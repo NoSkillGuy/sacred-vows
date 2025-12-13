@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
-import { trackCTA, trackExperiment, trackTemplateDemo, trackTemplateView } from '../../services/analyticsService';
+import { trackCTA, trackExperiment, trackLayoutDemo, trackLayoutView } from '../../services/analyticsService';
 import { getAllLayoutManifests } from '../../services/layoutService';
 import LayoutCardUnified from '../Layouts/LayoutCardUnified';
 
-// SVG Ornaments for each template style
+// SVG Ornaments for each layout style
 const OrnamentClassic = () => (
   <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M20 5C20 5 25 10 25 15C25 20 22 22 20 22C18 22 15 20 15 15C15 10 20 5 20 5Z" fill="currentColor" opacity="0.7"/>
@@ -150,7 +150,7 @@ function LayoutShowcase({ onSectionView }) {
 
   const handleDemo = (layout) => {
     setDemoLayout(layout);
-    trackTemplateDemo(layout.id);
+    trackLayoutDemo(layout.id);
   };
 
   return (
@@ -207,7 +207,7 @@ function LayoutShowcase({ onSectionView }) {
                 onSecondaryAction={handleDemo}
                 secondaryLabel="View Demo"
                 showSecondary
-                onCardClick={() => trackTemplateView(layout.id)}
+                onCardClick={() => trackLayoutView(layout.id)}
               />
             ))
           )}

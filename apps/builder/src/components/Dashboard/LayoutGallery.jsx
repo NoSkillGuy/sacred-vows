@@ -21,7 +21,7 @@ const StarIcon = () => (
   </svg>
 );
 
-const TemplateIcon = () => (
+const LayoutIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <rect x="3" y="3" width="18" height="18" rx="2"/>
     <path d="M3 9h18"/>
@@ -220,7 +220,7 @@ function LayoutGallery() {
         {!error && !loading && layouts.length === 0 && (
           <div className="gallery-empty">
             <div className="empty-icon">
-              <TemplateIcon />
+              <LayoutIcon />
             </div>
             <h3>No Layouts Available</h3>
             <p>There are no layouts available at the moment. Please check back later.</p>

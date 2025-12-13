@@ -27,7 +27,7 @@ const tutorials = [
     difficulty: 'Beginner',
     steps: [
       'Sign up for your free account',
-      'Browse and select a template',
+      'Browse and select a layout',
       'Add your wedding details',
       'Customize colors and fonts',
       'Preview and publish'
@@ -50,7 +50,7 @@ const tutorials = [
   {
     id: 3,
     category: 'Design',
-    title: 'Customizing Your Template',
+    title: 'Customizing Your Layout',
     description: 'Learn how to personalize your invitation with custom colors, fonts, and layouts.',
     duration: '10 min',
     difficulty: 'Intermediate',

@@ -34,8 +34,8 @@ func (InvitationModel) TableName() string {
 	return "invitations"
 }
 
-// LayoutModel represents the templates table (stores layout data)
-// Note: Table name is kept as "templates" for backward compatibility
+// LayoutModel represents the layouts table (stores layout data)
+// Note: Table was renamed from "templates" to "layouts" in migration 006
 type LayoutModel struct {
 	ID           string          `gorm:"primaryKey;type:text"`
 	Name         string          `gorm:"type:text;not null"`
@@ -51,7 +51,7 @@ type LayoutModel struct {
 }
 
 func (LayoutModel) TableName() string {
-	return "templates"
+	return "layouts"
 }
 
 // AssetModel represents the assets table

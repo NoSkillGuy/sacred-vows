@@ -69,7 +69,7 @@ const helpCategories = [
     description: 'Learn the basics of creating your wedding invitation',
     articles: [
       'Creating your first invitation',
-      'Choosing the right template',
+      'Choosing the right layout',
       'Customizing your design',
       'Adding your wedding details'
     ],
@@ -78,10 +78,10 @@ const helpCategories = [
   {
     id: 'design',
     icon: <PaletteIcon />,
-    title: 'Design & Templates',
+    title: 'Design & Layouts',
     description: 'Tips for customizing colors, fonts, and layouts',
     articles: [
-      'Working with templates',
+      'Working with layouts',
       'Changing colors and fonts',
       'Uploading images',
       'Adding photo galleries'
@@ -144,7 +144,7 @@ const helpCategories = [
 
 const popularArticles = [
   { title: 'How do I create my first wedding invitation?', category: 'Getting Started' },
-  { title: 'Can I change my template after starting?', category: 'Design' },
+  { title: 'Can I change my layout after starting?', category: 'Design' },
   { title: 'How do I share my invitation with guests?', category: 'Sharing' },
   { title: 'What\'s the difference between plans?', category: 'Billing' },
   { title: 'How does RSVP tracking work?', category: 'RSVP' },

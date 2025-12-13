@@ -25,11 +25,11 @@ const faqCategories = [
     faqs: [
       {
         question: 'How do I create my first wedding invitation?',
-        answer: 'Creating your first invitation is easy! Simply sign up for a free account, browse our template gallery, and select a design you love. Then customize it with your wedding details using our intuitive drag-and-drop editor. You can preview your invitation at any time and share it when ready.'
+        answer: 'Creating your first invitation is easy! Simply sign up for a free account, browse our layout gallery, and select a design you love. Then customize it with your wedding details using our intuitive drag-and-drop editor. You can preview your invitation at any time and share it when ready.'
       },
       {
         question: 'Do I need any design experience?',
-        answer: 'Not at all! Sacred Vows is designed for everyone. Our templates are professionally designed, and our editor makes customization simple. Just click, type, and drag to make changes. If you ever need help, our support team is always available.'
+        answer: 'Not at all! Sacred Vows is designed for everyone. Our layouts are professionally designed, and our editor makes customization simple. Just click, type, and drag to make changes. If you ever need help, our support team is always available.'
       },
       {
         question: 'How long does it take to create an invitation?',
@@ -42,21 +42,21 @@ const faqCategories = [
     ]
   },
   {
-    id: 'templates',
-    name: 'Templates & Design',
+    id: 'layouts',
+    name: 'Layouts & Design',
     icon: '🎨',
     faqs: [
       {
-        question: 'How many templates are available?',
-        answer: 'We offer over 50 professionally designed templates across various styles including Traditional, Modern, Minimal, Floral, and more. New templates are added regularly. Premium and Luxury plans unlock access to exclusive templates.'
+        question: 'How many layouts are available?',
+        answer: 'We offer over 50 professionally designed layouts across various styles including Traditional, Modern, Minimal, Floral, and more. New layouts are added regularly. Premium and Luxury plans unlock access to exclusive layouts.'
       },
       {
-        question: 'Can I switch templates after starting?',
-        answer: 'Yes! You can switch templates at any time, and your content will automatically transfer to the new design. This makes it easy to experiment with different looks until you find the perfect one.'
+        question: 'Can I switch layouts after starting?',
+        answer: 'Yes! You can switch layouts at any time, and your content will automatically transfer to the new design. This makes it easy to experiment with different looks until you find the perfect one.'
       },
       {
         question: 'Can I customize colors and fonts?',
-        answer: 'Premium and Luxury plans allow full customization of colors, fonts, and layouts. Free plan users can customize text content but use the template\'s preset design elements.'
+        answer: 'Premium and Luxury plans allow full customization of colors, fonts, and layouts. Free plan users can customize text content but use the layout\'s preset design elements.'
       },
       {
         question: 'Can I upload my own images?',
@@ -117,7 +117,7 @@ const faqCategories = [
     faqs: [
       {
         question: 'Is there really a free plan?',
-        answer: 'Yes! Our Starter plan is completely free forever. It includes one invitation design, basic templates, up to 50 guests, and essential RSVP features. No credit card required to sign up.'
+        answer: 'Yes! Our Starter plan is completely free forever. It includes one invitation design, basic layouts, up to 50 guests, and essential RSVP features. No credit card required to sign up.'
       },
       {
         question: 'Are paid plans a subscription or one-time payment?',

@@ -55,7 +55,7 @@ function SectionManager({ isOpen, onClose }) {
     getAllSections, 
     toggleSection, 
     reorderSections,
-    currentTemplateManifest 
+    currentLayoutManifest 
   } = useBuilderStore();
 
   const [sections, setSections] = useState([]);
@@ -70,8 +70,8 @@ function SectionManager({ isOpen, onClose }) {
 
   // Get section metadata (name, icon, description)
   const getSectionInfo = (sectionId) => {
-    // First check template manifest
-    const manifestSection = currentTemplateManifest?.sections?.find(s => s.id === sectionId);
+    // First check layout manifest
+    const manifestSection = currentLayoutManifest?.sections?.find(s => s.id === sectionId);
     if (manifestSection) {
       return manifestSection;
     }
@@ -87,7 +87,7 @@ function SectionManager({ isOpen, onClose }) {
 
   // Check if section is required
   const isRequired = (sectionId) => {
-    const manifestSection = currentTemplateManifest?.sections?.find(s => s.id === sectionId);
+    const manifestSection = currentLayoutManifest?.sections?.find(s => s.id === sectionId);
     return manifestSection?.required || SECTION_METADATA[sectionId]?.required || false;
   };
 

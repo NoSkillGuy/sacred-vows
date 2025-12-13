@@ -38,7 +38,7 @@ const pricingPlans = [
     icon: <HeartIcon />,
     features: [
       '1 invitation design',
-      'Basic templates',
+      'Basic layouts',
       'Share via link',
       'Up to 50 guests',
       'Basic RSVP tracking',
@@ -56,7 +56,7 @@ const pricingPlans = [
     icon: <SparkleIcon />,
     features: [
       'Unlimited invitation designs',
-      'All premium templates',
+      'All premium layouts',
       'Custom domain support',
       'Unlimited guests',
       'Advanced RSVP & analytics',
@@ -78,7 +78,7 @@ const pricingPlans = [
     icon: <CrownIcon />,
     features: [
       'Everything in Premium',
-      'Exclusive luxury templates',
+      'Exclusive luxury layouts',
       'Custom design consultation',
       'White-glove setup service',
       'Dedicated support agent',
@@ -213,7 +213,7 @@ function PricingPage() {
                   <td>Unlimited</td>
                 </tr>
                 <tr>
-                  <td>Template Access</td>
+                  <td>Layout Access</td>
                   <td>Basic (5)</td>
                   <td className="highlight">Premium (50+)</td>
                   <td>All + Exclusive</td>

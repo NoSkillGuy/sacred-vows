@@ -83,9 +83,9 @@ function HeroSection({ onSectionView }) {
     color: petalColors[Math.floor(Math.random() * petalColors.length)]
   }));
 
-  const scrollToTemplates = () => {
-    document.getElementById('templates')?.scrollIntoView({ behavior: 'smooth' });
-    trackCTA('scroll_to_templates', { source: 'hero' });
+  const scrollToLayouts = () => {
+    document.getElementById('layouts')?.scrollIntoView({ behavior: 'smooth' });
+    trackCTA('scroll_to_layouts', { source: 'hero' });
   };
 
   const toggleMobileMenu = () => {
@@ -153,7 +153,7 @@ function HeroSection({ onSectionView }) {
         
         {/* Desktop Navigation */}
         <div className="nav-links">
-          <a href="#templates">Templates</a>
+          <a href="#layouts">Layouts</a>
           <a href="#how-it-works">How It Works</a>
           <button className="nav-cta" onClick={() => { trackCTA('nav_start_free'); navigate('/signup'); }}>
             <span>Start Free</span>
@@ -177,7 +177,7 @@ function HeroSection({ onSectionView }) {
 
       {/* Mobile Navigation Overlay */}
       <div className={`mobile-nav ${mobileMenuOpen ? 'open' : ''}`}>
-        <a href="#templates" onClick={() => { closeMobileMenu(); trackCTA('mobile_nav_templates'); }}>Templates</a>
+        <a href="#layouts" onClick={() => { closeMobileMenu(); trackCTA('mobile_nav_layouts'); }}>Layouts</a>
         <a href="#how-it-works" onClick={() => { closeMobileMenu(); trackCTA('mobile_nav_how'); }}>How It Works</a>
         <button className="nav-cta" onClick={() => { closeMobileMenu(); trackCTA('mobile_nav_start_free'); navigate('/signup'); }}>
           <span>Start Free</span>
@@ -205,8 +205,8 @@ function HeroSection({ onSectionView }) {
               <span>Start Creating Free</span>
               <span className="cta-arrow">→</span>
             </button>
-            <button className="cta-secondary" onClick={scrollToTemplates}>
-              View Templates
+            <button className="cta-secondary" onClick={scrollToLayouts}>
+              View Layouts
             </button>
           </div>
           <p className="hero-trust">Private links, no spam. Live preview before sharing.</p>
@@ -218,7 +218,7 @@ function HeroSection({ onSectionView }) {
             <div className="stat-divider" />
             <div className="stat">
               <span className="stat-number">50+</span>
-              <span className="stat-label">Beautiful Templates</span>
+              <span className="stat-label">Beautiful Layouts</span>
             </div>
             <div className="stat-divider" />
             <div className="stat">
@@ -289,7 +289,7 @@ function HeroSection({ onSectionView }) {
       </div>
 
       {/* Scroll Indicator */}
-      <div className="scroll-indicator" onClick={scrollToTemplates}>
+      <div className="scroll-indicator" onClick={scrollToLayouts}>
         <span>Discover More</span>
         <div className="scroll-arrow">↓</div>
       </div>

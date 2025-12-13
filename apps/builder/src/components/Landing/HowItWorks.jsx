@@ -30,9 +30,9 @@ const steps = [
   {
     number: 1,
     Icon: PaletteIcon,
-    title: 'Choose Your Template',
+    title: 'Choose Your Layout',
     description: 'Browse our beautiful collection and select the design that speaks to your heart.',
-    target: '#templates',
+    target: '#layouts',
   },
   {
     number: 2,

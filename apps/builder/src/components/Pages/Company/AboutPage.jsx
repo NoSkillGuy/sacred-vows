@@ -65,7 +65,7 @@ const team = [
   {
     name: 'Arjun Mehta',
     role: 'Head of Design',
-    bio: 'Award-winning designer with 10+ years in luxury branding. Arjun brings timeless elegance to every template we create.',
+    bio: 'Award-winning designer with 10+ years in luxury branding. Arjun brings timeless elegance to every layout we create.',
     initial: 'AM'
   },
   {

@@ -170,7 +170,7 @@ export const defaultWeddingConfig = {
  * Default layout configuration
  * Per-layout settings for sections and theme
  */
-export const defaultTemplateConfig = {
+export const defaultLayoutConfig = {
   sections: createDefaultSections(),
   themes: [],
   theme: { ...DEFAULT_THEME },

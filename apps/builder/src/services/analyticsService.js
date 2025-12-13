@@ -57,9 +57,9 @@ export const trackEvent = (name, payload = {}) => {
 
 export const trackPageView = (meta = {}) => trackEvent('page_view', meta);
 export const trackCTA = (label, meta = {}) => trackEvent('cta_click', { label, ...meta });
-export const trackTemplateView = (layoutId, meta = {}) =>
+export const trackLayoutView = (layoutId, meta = {}) =>
   trackEvent('layout_view', { layoutId, ...meta });
-export const trackTemplateDemo = (layoutId, meta = {}) =>
+export const trackLayoutDemo = (layoutId, meta = {}) =>
   trackEvent('layout_demo', { layoutId, ...meta });
 export const trackSectionViewed = (sectionId, meta = {}) =>
   trackEvent('section_view', { sectionId, ...meta });

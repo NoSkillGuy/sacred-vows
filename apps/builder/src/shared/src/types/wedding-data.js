@@ -318,7 +318,7 @@ export const DEFAULT_THEME = {
  * @param {string} layoutId - Layout ID
  * @returns {LayoutConfig} Default layout configuration
  */
-export function createDefaultTemplateConfig(layoutId = 'royal-elegance') {
+export function createDefaultLayoutConfig(layoutId = 'royal-elegance') {
   return {
     sections: createDefaultSections(),
     theme: { ...DEFAULT_THEME },
@@ -332,5 +332,5 @@ export const WeddingDataSchema = {
   DEFAULT_SECTION_ORDER,
   DEFAULT_THEME,
   createDefaultSections,
-  createDefaultTemplateConfig,
+  createDefaultLayoutConfig,
 };
