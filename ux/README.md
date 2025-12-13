@@ -6,6 +6,7 @@ Welcome to the Sacred Vows design system documentation. This folder contains com
 
 | Document | Description |
 |----------|-------------|
+| [Design Philosophy](./LANDING_PAGE_DESIGN_PHILOSOPHY.md) | Core design principles and comprehensive design system overview |
 | [Brand Guidelines](./brand-guidelines.md) | Complete brand identity, mission, and values |
 | [Color Palette](./color-palette.md) | Color system with hex codes and usage |
 | [Typography](./typography.md) | Font families, scales, and usage guidelines |
@@ -45,6 +46,7 @@ Make beautiful, personalized wedding invitations accessible to every couple.
 ```
 ux/
 ├── README.md                    # This file
+├── LANDING_PAGE_DESIGN_PHILOSOPHY.md  # Core design principles and comprehensive design system
 ├── brand-guidelines.md          # Complete brand identity
 ├── color-palette.md             # Color system
 ├── typography.md                # Font specifications
