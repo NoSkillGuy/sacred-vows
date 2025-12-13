@@ -1,5 +1,5 @@
--- Rename templateId column to layoutId in invitations table
+-- Rename template_id column to layout_id in invitations table
 ALTER TABLE "invitations" 
-RENAME COLUMN "templateId" TO "layoutId";
+RENAME COLUMN "template_id" TO "layout_id";
 
 

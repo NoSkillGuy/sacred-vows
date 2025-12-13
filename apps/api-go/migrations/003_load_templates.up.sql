@@ -4,7 +4,7 @@
 -- This file is the source of truth for templates - edit directly to add/modify templates.
 
 -- Template: art-deco-glam
-INSERT INTO templates (id, name, description, preview_image, tags, version, config, manifest, is_active, created_at, updated_at)
+INSERT INTO templates (id, name, description, preview_image, tags, version, config, manifest, "isActive", created_at, updated_at)
 VALUES (
   'art-deco-glam',
   'Art Deco Glam',
@@ -136,7 +136,7 @@ $json$::JSONB,
 ON CONFLICT (id) DO NOTHING;
 
 -- Template: coastal-breeze
-INSERT INTO templates (id, name, description, preview_image, tags, version, config, manifest, is_active, created_at, updated_at)
+INSERT INTO templates (id, name, description, preview_image, tags, version, config, manifest, "isActive", created_at, updated_at)
 VALUES (
   'coastal-breeze',
   'Coastal Breeze',
@@ -268,7 +268,7 @@ $json$::JSONB,
 ON CONFLICT (id) DO NOTHING;
 
 -- Template: desert-sunset
-INSERT INTO templates (id, name, description, preview_image, tags, version, config, manifest, is_active, created_at, updated_at)
+INSERT INTO templates (id, name, description, preview_image, tags, version, config, manifest, "isActive", created_at, updated_at)
 VALUES (
   'desert-sunset',
   'Desert Sunset',
@@ -400,7 +400,7 @@ $json$::JSONB,
 ON CONFLICT (id) DO NOTHING;
 
 -- Template: garden-romance
-INSERT INTO templates (id, name, description, preview_image, tags, version, config, manifest, is_active, created_at, updated_at)
+INSERT INTO templates (id, name, description, preview_image, tags, version, config, manifest, "isActive", created_at, updated_at)
 VALUES (
   'garden-romance',
   'Garden Romance',
@@ -586,7 +586,7 @@ $json$::JSONB,
 ON CONFLICT (id) DO NOTHING;
 
 -- Template: heritage-red
-INSERT INTO templates (id, name, description, preview_image, tags, version, config, manifest, is_active, created_at, updated_at)
+INSERT INTO templates (id, name, description, preview_image, tags, version, config, manifest, "isActive", created_at, updated_at)
 VALUES (
   'heritage-red',
   'Heritage Red',
@@ -820,7 +820,7 @@ $json$::JSONB,
 ON CONFLICT (id) DO NOTHING;
 
 -- Template: luxury-noir
-INSERT INTO templates (id, name, description, preview_image, tags, version, config, manifest, is_active, created_at, updated_at)
+INSERT INTO templates (id, name, description, preview_image, tags, version, config, manifest, "isActive", created_at, updated_at)
 VALUES (
   'luxury-noir',
   'Luxury Noir',
@@ -891,7 +891,7 @@ $json$::JSONB,
 ON CONFLICT (id) DO NOTHING;
 
 -- Template: minimal-modern
-INSERT INTO templates (id, name, description, preview_image, tags, version, config, manifest, is_active, created_at, updated_at)
+INSERT INTO templates (id, name, description, preview_image, tags, version, config, manifest, "isActive", created_at, updated_at)
 VALUES (
   'minimal-modern',
   'Minimal Modern',
@@ -962,7 +962,7 @@ $json$::JSONB,
 ON CONFLICT (id) DO NOTHING;
 
 -- Template: pastel-bloom
-INSERT INTO templates (id, name, description, preview_image, tags, version, config, manifest, is_active, created_at, updated_at)
+INSERT INTO templates (id, name, description, preview_image, tags, version, config, manifest, "isActive", created_at, updated_at)
 VALUES (
   'pastel-bloom',
   'Pastel Bloom',
@@ -1094,7 +1094,7 @@ $json$::JSONB,
 ON CONFLICT (id) DO NOTHING;
 
 -- Template: royal-elegance
-INSERT INTO templates (id, name, description, preview_image, tags, version, config, manifest, is_active, created_at, updated_at)
+INSERT INTO templates (id, name, description, preview_image, tags, version, config, manifest, "isActive", created_at, updated_at)
 VALUES (
   'royal-elegance',
   'Royal Elegance',
@@ -1503,7 +1503,7 @@ $json$::JSONB,
 ON CONFLICT (id) DO NOTHING;
 
 -- Template: rustic-charm
-INSERT INTO templates (id, name, description, preview_image, tags, version, config, manifest, is_active, created_at, updated_at)
+INSERT INTO templates (id, name, description, preview_image, tags, version, config, manifest, "isActive", created_at, updated_at)
 VALUES (
   'rustic-charm',
   'Rustic Charm',
@@ -1574,7 +1574,7 @@ $json$::JSONB,
 ON CONFLICT (id) DO NOTHING;
 
 -- Template: south-indian-silk
-INSERT INTO templates (id, name, description, preview_image, tags, version, config, manifest, is_active, created_at, updated_at)
+INSERT INTO templates (id, name, description, preview_image, tags, version, config, manifest, "isActive", created_at, updated_at)
 VALUES (
   'south-indian-silk',
   'South Indian Silk',

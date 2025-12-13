@@ -47,11 +47,13 @@ import (
 )
 
 func main() {
+	fmt.Fprintf(os.Stderr, "[MAIN] Application starting...\n")
 	// Initialize logger
 	if err := logger.Init(); err != nil {
 		panic(fmt.Sprintf("Failed to initialize logger: %v", err))
 	}
 	defer logger.GetLogger().Sync()
+	fmt.Fprintf(os.Stderr, "[MAIN] Logger initialized\n")
 
 	// Load configuration
 	cfg, err := config.Load()

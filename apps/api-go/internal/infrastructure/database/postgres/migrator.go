@@ -43,17 +43,50 @@ func (d *DB) RunMigrations(ctx context.Context, migrationsDir string) error {
 		return fmt.Errorf("failed to load migrations: %w", err)
 	}
 
+	if len(migrations) == 0 {
+		return fmt.Errorf("no migrations found in directory %s", migrationsDir)
+	}
+
 	// Get applied migrations
 	applied, err := d.getAppliedMigrations(ctx, sqlDB)
 	if err != nil {
 		return fmt.Errorf("failed to get applied migrations: %w", err)
 	}
 
+	// Validate migration sequence to ensure no gaps
+	if err := validateMigrationSequence(applied, migrations); err != nil {
+		log.Error("Migration sequence validation failed", zap.Error(err))
+		return fmt.Errorf("migration validation failed: %w", err)
+	}
+
 	// Run pending migrations
+	nextExpectedVersion := getNextExpectedVersion(applied)
 	for _, migration := range migrations {
 		if applied[migration.Version] {
 			log.Info("Migration already applied", zap.Int("version", migration.Version), zap.String("name", migration.Name))
 			continue
+		}
+
+		// Validate that this migration is the next expected version
+		if migration.Version != nextExpectedVersion {
+			missingVersions := []int{}
+			for v := nextExpectedVersion; v < migration.Version; v++ {
+				if !applied[v] {
+					missingVersions = append(missingVersions, v)
+				}
+			}
+			errMsg := fmt.Sprintf(
+				"cannot run migration %d (%s): expected version %d next, but found version %d",
+				migration.Version,
+				migration.Name,
+				nextExpectedVersion,
+				migration.Version,
+			)
+			if len(missingVersions) > 0 {
+				errMsg += fmt.Sprintf(". Missing migrations: %v. Please run migrations in sequential order.", missingVersions)
+			}
+			log.Error("Migration version mismatch", zap.String("error", errMsg))
+			return fmt.Errorf(errMsg)
 		}
 
 		log.Info("Running migration", zap.Int("version", migration.Version), zap.String("name", migration.Name))
@@ -87,7 +120,6 @@ func (d *DB) RunMigrations(ctx context.Context, migrationsDir string) error {
 			if !hasNonComment {
 				continue
 			}
-
 			if _, err := tx.ExecContext(ctx, stmt); err != nil {
 				tx.Rollback()
 				log.Error("Migration statement failed",
@@ -112,6 +144,10 @@ func (d *DB) RunMigrations(ctx context.Context, migrationsDir string) error {
 		if err := tx.Commit(); err != nil {
 			return fmt.Errorf("failed to commit migration %d: %w", migration.Version, err)
 		}
+
+		// Update next expected version after successful migration
+		nextExpectedVersion = migration.Version + 1
+		applied[migration.Version] = true
 
 		log.Info("Migration completed", zap.Int("version", migration.Version), zap.String("name", migration.Name))
 	}
@@ -151,6 +187,62 @@ func (d *DB) getAppliedMigrations(ctx context.Context, sqlDB *sql.DB) (map[int]b
 	return applied, rows.Err()
 }
 
+// getNextExpectedVersion returns the next expected migration version (max applied + 1)
+// Returns 1 if no migrations have been applied yet
+func getNextExpectedVersion(applied map[int]bool) int {
+	if len(applied) == 0 {
+		return 1
+	}
+
+	maxVersion := 0
+	for version := range applied {
+		if version > maxVersion {
+			maxVersion = version
+		}
+	}
+
+	return maxVersion + 1
+}
+
+// validateMigrationSequence checks for gaps in applied migrations and ensures
+// migrations can run sequentially. Returns an error if gaps are detected.
+func validateMigrationSequence(applied map[int]bool, migrations []Migration) error {
+	if len(applied) == 0 {
+		// No migrations applied yet, validation passes
+		return nil
+	}
+
+	// Find the range of applied migrations
+	minApplied := -1
+	maxApplied := 0
+	for version := range applied {
+		if minApplied == -1 || version < minApplied {
+			minApplied = version
+		}
+		if version > maxApplied {
+			maxApplied = version
+		}
+	}
+
+	// Check for gaps in applied migrations
+	var missingVersions []int
+	for v := minApplied; v <= maxApplied; v++ {
+		if !applied[v] {
+			missingVersions = append(missingVersions, v)
+		}
+	}
+
+	if len(missingVersions) > 0 {
+		return fmt.Errorf(
+			"migration gap detected: versions %v are missing but versions before and after are applied. "+
+				"This indicates migrations were run out of order. Please ensure all migrations run sequentially.",
+			missingVersions,
+		)
+	}
+
+	return nil
+}
+
 func loadMigrations(migrationsDir string) ([]Migration, error) {
 	entries, err := os.ReadDir(migrationsDir)
 	if err != nil {
@@ -171,8 +263,20 @@ func loadMigrations(migrationsDir string) ([]Migration, error) {
 		}
 
 		// Parse version and direction from filename: 001_name.up.sql or 001_name.down.sql
-		baseName := strings.TrimSuffix(name, ext)
-		parts := strings.Split(baseName, "_")
+		baseName := strings.TrimSuffix(name, ext) // e.g., "001_initial_schema.up" or "001_initial_schema.down"
+		// Extract direction from the last part (after the last dot)
+		lastDotIndex := strings.LastIndex(baseName, ".")
+		if lastDotIndex == -1 {
+			continue
+		}
+		direction := baseName[lastDotIndex+1:] // e.g., "up" or "down"
+		if direction != "up" && direction != "down" {
+			continue
+		}
+
+		// Remove direction from baseName to get the version and name part
+		namePart := baseName[:lastDotIndex] // e.g., "001_initial_schema"
+		parts := strings.Split(namePart, "_")
 		if len(parts) < 2 {
 			continue
 		}
@@ -183,13 +287,8 @@ func loadMigrations(migrationsDir string) ([]Migration, error) {
 			continue
 		}
 
-		direction := parts[len(parts)-1] // "up" or "down"
-		if direction != "up" && direction != "down" {
-			continue
-		}
-
-		// Get migration name (everything between version and direction)
-		migrationName := strings.Join(parts[1:len(parts)-1], "_")
+		// Get migration name (everything after version, all parts joined)
+		migrationName := strings.Join(parts[1:], "_")
 
 		// Read migration file
 		content, err := os.ReadFile(filepath.Join(migrationsDir, name))
@@ -233,6 +332,7 @@ func splitSQLStatements(sql string) []string {
 	var current strings.Builder
 	var dollarTag string
 	inDollarQuote := false
+	dollarQuoteStartPos := -1 // Track where the dollar quote started
 
 	// Process character by character to properly handle dollar quotes
 	for i := 0; i < len(sql); i++ {
@@ -246,6 +346,7 @@ func splitSQLStatements(sql string) []string {
 				if sql[j] == '$' {
 					dollarTag = sql[tagStart : j+1]
 					inDollarQuote = true
+					dollarQuoteStartPos = current.Len()
 					current.WriteString(dollarTag)
 					i = j
 					break
@@ -256,18 +357,38 @@ func splitSQLStatements(sql string) []string {
 			}
 		} else if inDollarQuote {
 			current.WriteByte(char)
-			// Check if we've reached the closing tag
-			if i+1 >= len(dollarTag) && strings.HasSuffix(current.String(), dollarTag) {
-				inDollarQuote = false
-				dollarTag = ""
+			// Check if we've reached the closing tag by checking if current string ends with the dollar tag
+			// But only if we've read content after the opening tag
+			currentStr := current.String()
+			if len(currentStr) > len(dollarTag) && strings.HasSuffix(currentStr, dollarTag) {
+				// Make sure we're not just seeing the opening tag - check that we've read at least one char after it
+				suffixStart := len(currentStr) - len(dollarTag)
+				if suffixStart > dollarQuoteStartPos+len(dollarTag) {
+					inDollarQuote = false
+					dollarTag = ""
+					dollarQuoteStartPos = -1
+				}
 			}
 		} else {
 			current.WriteByte(char)
 			// If we hit a semicolon and we're not in a dollar quote, it's a statement boundary
 			if char == ';' {
 				stmt := strings.TrimSpace(current.String())
-				if stmt != "" && !strings.HasPrefix(strings.TrimSpace(stmt), "--") {
-					statements = append(statements, stmt)
+				if stmt != "" {
+					// Remove leading comment lines but keep the actual SQL
+					lines := strings.Split(stmt, "\n")
+					var sqlLines []string
+					for _, line := range lines {
+						trimmed := strings.TrimSpace(line)
+						if trimmed != "" && !strings.HasPrefix(trimmed, "--") {
+							sqlLines = append(sqlLines, line)
+						}
+					}
+					if len(sqlLines) > 0 {
+						// Rejoin non-comment lines
+						cleanStmt := strings.Join(sqlLines, "\n")
+						statements = append(statements, cleanStmt)
+					}
 				}
 				current.Reset()
 			}
@@ -276,7 +397,19 @@ func splitSQLStatements(sql string) []string {
 
 	// Add any remaining statement
 	if remaining := strings.TrimSpace(current.String()); remaining != "" {
-		statements = append(statements, remaining)
+		// Remove leading comment lines but keep the actual SQL
+		lines := strings.Split(remaining, "\n")
+		var sqlLines []string
+		for _, line := range lines {
+			trimmed := strings.TrimSpace(line)
+			if trimmed != "" && !strings.HasPrefix(trimmed, "--") {
+				sqlLines = append(sqlLines, line)
+			}
+		}
+		if len(sqlLines) > 0 {
+			cleanStmt := strings.Join(sqlLines, "\n")
+			statements = append(statements, cleanStmt)
+		}
 	}
 
 	return statements
