@@ -37,18 +37,57 @@ func NewInvitationHandler(
 }
 
 type CreateInvitationRequest struct {
-	LayoutID string          `json:"layoutId"`
-	Data     json.RawMessage `json:"data"`
-	Title    string          `json:"title"`
+	LayoutID string          `json:"layoutId" example:"royal-elegance" binding:"required"`
+	Data     json.RawMessage `json:"data" example:"{\"bride\":\"Jane\",\"groom\":\"John\"}" binding:"required"`
+	Title    string          `json:"title" example:"Our Wedding"`
 }
 
 type UpdateInvitationRequest struct {
-	Data     *json.RawMessage `json:"data"`
-	LayoutID *string          `json:"layoutId"`
-	Title    *string          `json:"title"`
-	Status   *string          `json:"status"`
+	Data     *json.RawMessage `json:"data" example:"{\"bride\":\"Jane\",\"groom\":\"John\"}"`
+	LayoutID *string          `json:"layoutId" example:"royal-elegance"`
+	Title    *string          `json:"title" example:"Our Wedding"`
+	Status   *string          `json:"status" example:"published"`
 }
 
+type InvitationDTO struct {
+	ID        string          `json:"id" example:"1234567890"`
+	LayoutID  string          `json:"layoutId" example:"royal-elegance"`
+	Data      json.RawMessage `json:"data" example:"{\"bride\":\"Jane\",\"groom\":\"John\"}"`
+	Title     *string         `json:"title,omitempty" example:"Our Wedding"`
+	Status    *string         `json:"status,omitempty" example:"published"`
+	UserID    string          `json:"userId" example:"user123"`
+	CreatedAt string          `json:"createdAt" example:"2024-01-01T00:00:00Z"`
+	UpdatedAt string          `json:"updatedAt" example:"2024-01-01T00:00:00Z"`
+}
+
+type InvitationPreviewDTO struct {
+	ID       string          `json:"id" example:"1234567890"`
+	LayoutID string          `json:"layoutId" example:"royal-elegance"`
+	Data     json.RawMessage `json:"data" example:"{\"bride\":\"Jane\",\"groom\":\"John\"}"`
+}
+
+type InvitationResponse struct {
+	Invitation *InvitationDTO `json:"invitation"`
+}
+
+type InvitationsResponse struct {
+	Invitations []InvitationDTO `json:"invitations"`
+}
+
+type MessageResponse struct {
+	Message string `json:"message" example:"Invitation deleted"`
+}
+
+// GetAll retrieves all invitations for the current user
+// @Summary      List invitations
+// @Description  Get all invitations for the current user. Supports optional authentication (anonymous users are supported).
+// @Tags         invitations
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200  {object}  InvitationsResponse  "List of invitations"
+// @Failure      500  {object}  ErrorResponse        "Internal server error"
+// @Router       /invitations [get]
 func (h *InvitationHandler) GetAll(c *gin.Context) {
 	userID, _ := c.Get("userID")
 	if userID == nil {
@@ -69,6 +108,16 @@ func (h *InvitationHandler) GetAll(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"invitations": output.Invitations})
 }
 
+// GetPreview retrieves a public invitation preview
+// @Summary      Get invitation preview
+// @Description  Get a public preview of an invitation by ID. No authentication required.
+// @Tags         invitations
+// @Accept       json
+// @Produce      json
+// @Param        id   path      string  true  "Invitation ID"
+// @Success      200  {object}  InvitationResponse  "Invitation preview"
+// @Failure      404  {object}  ErrorResponse       "Invitation not found"
+// @Router       /invitations/{id}/preview [get]
 func (h *InvitationHandler) GetPreview(c *gin.Context) {
 	id := c.Param("id")
 	output, err := h.getPreviewUC.Execute(c.Request.Context(), id)
@@ -85,6 +134,16 @@ func (h *InvitationHandler) GetPreview(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"invitation": output.Invitation})
 }
 
+// GetByID retrieves an invitation by ID
+// @Summary      Get invitation by ID
+// @Description  Get a specific invitation by its ID.
+// @Tags         invitations
+// @Accept       json
+// @Produce      json
+// @Param        id   path      string  true  "Invitation ID"
+// @Success      200  {object}  InvitationResponse  "Invitation details"
+// @Failure      404  {object}  ErrorResponse      "Invitation not found"
+// @Router       /invitations/{id} [get]
 func (h *InvitationHandler) GetByID(c *gin.Context) {
 	id := c.Param("id")
 	output, err := h.getByIDUC.Execute(c.Request.Context(), id)
@@ -101,6 +160,18 @@ func (h *InvitationHandler) GetByID(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"invitation": output.Invitation})
 }
 
+// Create creates a new invitation
+// @Summary      Create invitation
+// @Description  Create a new wedding invitation. Supports optional authentication (anonymous users are supported).
+// @Tags         invitations
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request  body      CreateInvitationRequest  true  "Invitation data"
+// @Success      201      {object}  InvitationResponse       "Invitation created"
+// @Failure      400      {object}  ErrorResponse           "Invalid request"
+// @Failure      500      {object}  ErrorResponse           "Internal server error"
+// @Router       /invitations [post]
 func (h *InvitationHandler) Create(c *gin.Context) {
 	var req CreateInvitationRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -138,6 +209,20 @@ func (h *InvitationHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"invitation": output.Invitation})
 }
 
+// Update updates an existing invitation
+// @Summary      Update invitation
+// @Description  Update an existing invitation. Supports optional authentication (anonymous users are supported).
+// @Tags         invitations
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id       path      string                  true  "Invitation ID"
+// @Param        request  body      UpdateInvitationRequest  true  "Updated invitation data"
+// @Success      200      {object}  InvitationResponse       "Invitation updated"
+// @Failure      400      {object}  ErrorResponse           "Invalid request"
+// @Failure      404      {object}  ErrorResponse           "Invitation not found"
+// @Failure      500      {object}  ErrorResponse           "Internal server error"
+// @Router       /invitations/{id} [put]
 func (h *InvitationHandler) Update(c *gin.Context) {
 	id := c.Param("id")
 	var req UpdateInvitationRequest
@@ -167,6 +252,17 @@ func (h *InvitationHandler) Update(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"invitation": output.Invitation})
 }
 
+// Delete deletes an invitation
+// @Summary      Delete invitation
+// @Description  Delete an invitation by ID. Supports optional authentication (anonymous users are supported).
+// @Tags         invitations
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id   path      string  true  "Invitation ID"
+// @Success      200  {object}  MessageResponse  "Invitation deleted"
+// @Failure      404  {object}  ErrorResponse   "Invitation not found"
+// @Router       /invitations/{id} [delete]
 func (h *InvitationHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 	if err := h.deleteUC.Execute(c.Request.Context(), id); err != nil {

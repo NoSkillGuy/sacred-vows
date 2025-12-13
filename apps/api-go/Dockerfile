@@ -9,6 +9,9 @@ WORKDIR /app
 # Install build dependencies
 RUN apk add --no-cache git
 
+# Install swag CLI for Swagger documentation generation
+RUN go install github.com/swaggo/swag/cmd/swag@latest
+
 # Copy go mod files first for better layer caching
 # This allows Docker to cache the dependency download layer separately
 COPY go.mod go.sum ./
@@ -19,6 +22,10 @@ RUN go mod download
 
 # Copy source code
 COPY . .
+
+# Generate Swagger documentation
+# This ensures docs are always up-to-date in the Docker image
+RUN swag init -g cmd/server/main.go -o docs
 
 # Build the application as a static binary
 # CGO_ENABLED=0 creates a statically linked binary that doesn't require C libraries
@@ -48,6 +55,9 @@ COPY --from=builder /app/bin/server /app/server
 
 # Copy migration files from the builder stage
 COPY --from=builder /app/migrations /app/migrations
+
+# Copy generated Swagger documentation from the builder stage
+COPY --from=builder /app/docs /app/docs
 
 # Create directories that will be mounted as volumes
 # These will be mounted to /app/uploads and /app/layouts

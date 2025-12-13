@@ -1,9 +1,9 @@
-.PHONY: build run test clean migrate-up migrate-down
+.PHONY: build run test clean migrate-up migrate-down swagger
 
-build:
+build: swagger
 	go build -o bin/server ./cmd/server
 
-run:
+run: swagger
 	go run ./cmd/server
 
 test:
@@ -17,3 +17,6 @@ migrate-up:
 
 migrate-down:
 	migrate -path migrations -database "$(DATABASE_URL)" down
+
+swagger:
+	swag init -g cmd/server/main.go -o docs

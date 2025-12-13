@@ -37,20 +37,51 @@ func NewAuthHandler(
 }
 
 type RegisterRequest struct {
-	Email    string  `json:"email" binding:"required"`
-	Password string  `json:"password" binding:"required"`
-	Name     *string `json:"name"`
+	Email    string  `json:"email" binding:"required" example:"user@example.com"`
+	Password string  `json:"password" binding:"required" example:"securePassword123"`
+	Name     *string `json:"name" example:"John Doe"`
 }
 
 type LoginRequest struct {
-	Email    string `json:"email" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Email    string `json:"email" binding:"required" example:"user@example.com"`
+	Password string `json:"password" binding:"required" example:"securePassword123"`
 }
 
 type GoogleVerifyRequest struct {
-	Credential string `json:"credential" binding:"required"`
+	Credential string `json:"credential" binding:"required" example:"eyJhbGciOiJSUzI1NiIsImtpZCI6IjEyMzQ1NiJ9..."`
 }
 
+type AuthResponse struct {
+	Token string   `json:"token" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."`
+	User  *UserDTO `json:"user"`
+}
+
+type UserDTO struct {
+	ID    string  `json:"id" example:"1234567890"`
+	Email string  `json:"email" example:"user@example.com"`
+	Name  *string `json:"name,omitempty" example:"John Doe"`
+}
+
+type UserResponse struct {
+	User *UserDTO `json:"user"`
+}
+
+type ErrorResponse struct {
+	Error string `json:"error" example:"Error message"`
+}
+
+// Register registers a new user
+// @Summary      Register a new user
+// @Description  Register a new user with email and password. Returns JWT token and user information.
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        request  body      RegisterRequest  true  "Registration request"
+// @Success      201      {object}  AuthResponse     "User registered successfully"
+// @Failure      400      {object}  ErrorResponse    "Invalid request"
+// @Failure      409      {object}  ErrorResponse    "User already exists"
+// @Failure      500      {object}  ErrorResponse    "Internal server error"
+// @Router       /auth/register [post]
 func (h *AuthHandler) Register(c *gin.Context) {
 	var req RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -87,6 +118,18 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	})
 }
 
+// Login authenticates a user
+// @Summary      User login
+// @Description  Authenticate a user with email and password. Returns JWT token and user information.
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        request  body      LoginRequest   true  "Login request"
+// @Success      200      {object}  AuthResponse    "Login successful"
+// @Failure      400      {object}  ErrorResponse  "Invalid request"
+// @Failure      401      {object}  ErrorResponse  "Invalid credentials"
+// @Failure      500      {object}  ErrorResponse  "Internal server error"
+// @Router       /auth/login [post]
 func (h *AuthHandler) Login(c *gin.Context) {
 	var req LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -122,6 +165,17 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	})
 }
 
+// GetCurrentUser gets the current authenticated user
+// @Summary      Get current user
+// @Description  Get information about the currently authenticated user.
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200      {object}  UserResponse    "User information"
+// @Failure      401      {object}  ErrorResponse  "Authentication required"
+// @Failure      404      {object}  ErrorResponse  "User not found"
+// @Router       /auth/me [get]
 func (h *AuthHandler) GetCurrentUser(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
@@ -145,11 +199,27 @@ func (h *AuthHandler) GetCurrentUser(c *gin.Context) {
 	})
 }
 
+// GoogleOAuth initiates Google OAuth flow
+// @Summary      Initiate Google OAuth
+// @Description  Redirects to Google OAuth consent screen to initiate authentication flow.
+// @Tags         auth
+// @Produce      json
+// @Success      307  "Redirect to Google OAuth"
+// @Router       /auth/google [get]
 func (h *AuthHandler) GoogleOAuth(c *gin.Context) {
 	authURL := h.googleOAuth.GetAuthURL()
 	c.Redirect(http.StatusTemporaryRedirect, authURL)
 }
 
+// GoogleCallback handles Google OAuth callback
+// @Summary      Google OAuth callback
+// @Description  Handles the callback from Google OAuth and redirects to frontend with token.
+// @Tags         auth
+// @Produce      json
+// @Param        code   query     string  true  "OAuth authorization code"
+// @Success      307    "Redirect to frontend with token"
+// @Failure      307    "Redirect to frontend with error"
+// @Router       /auth/google/callback [get]
 func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 	code := c.Query("code")
 	frontendURL := h.googleOAuth.GetFrontendURL()
@@ -174,6 +244,18 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 	c.Redirect(http.StatusTemporaryRedirect, frontendURL+"/builder?token="+token)
 }
 
+// GoogleVerify verifies Google ID token
+// @Summary      Verify Google ID token
+// @Description  Verifies a Google ID token from frontend Sign-In button and returns JWT token.
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        request  body      GoogleVerifyRequest  true  "Google credential token"
+// @Success      200      {object}  AuthResponse          "Verification successful"
+// @Failure      400      {object}  ErrorResponse        "Invalid request"
+// @Failure      401      {object}  ErrorResponse        "Invalid Google credential"
+// @Failure      500      {object}  ErrorResponse        "Internal server error"
+// @Router       /auth/google/verify [post]
 func (h *AuthHandler) GoogleVerify(c *gin.Context) {
 	var req GoogleVerifyRequest
 	if err := c.ShouldBindJSON(&req); err != nil {

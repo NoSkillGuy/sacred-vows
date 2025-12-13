@@ -143,8 +143,85 @@ if !exists {
 - **Domain Errors**: Error types
 - **Middleware**: Authentication, CORS, error handling
 
+## Swagger Documentation
+
+All handlers include Swagger/OpenAPI annotations for automatic API documentation generation. The annotations follow the swaggo/swag format.
+
+### Annotation Format
+
+Each handler method includes Swagger annotations in comments above the function:
+
+```go
+// HandlerMethodName handles the endpoint
+// @Summary      Brief description
+// @Description  Detailed description
+// @Tags         tag-name
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id   path      string  true  "Parameter description"
+// @Param        body body      RequestModel true "Request body"
+// @Success      200  {object}  ResponseModel "Success response"
+// @Failure      400  {object}  ErrorResponse "Bad request"
+// @Router       /api/endpoint/{id} [get]
+func (h *Handler) HandlerMethod(c *gin.Context) {
+    // Implementation
+}
+```
+
+### Common Annotations
+
+- `@Summary` - Brief one-line description of the endpoint
+- `@Description` - Detailed description of what the endpoint does
+- `@Tags` - Group endpoints (e.g., "auth", "invitations", "layouts")
+- `@Accept` - Content types the endpoint accepts (json, multipart/form-data)
+- `@Produce` - Content types the endpoint returns (json)
+- `@Security` - Authentication requirement (BearerAuth for JWT)
+- `@Param` - Request parameters (path, query, body, formData)
+- `@Success` - Success response with status code, response type, and description
+- `@Failure` - Error responses with status codes and error types
+- `@Router` - Route path and HTTP method
+
+### Response Models
+
+Response models are defined as struct types in handler files with JSON tags and example values:
+
+```go
+type ResponseModel struct {
+    ID    string `json:"id" example:"1234567890"`
+    Name  string `json:"name" example:"Example Name"`
+    Email string `json:"email" example:"user@example.com"`
+}
+```
+
+### Generating Documentation
+
+To generate Swagger documentation:
+
+```bash
+make swagger
+```
+
+This creates the `docs/` directory with:
+- `swagger.json` - OpenAPI specification
+- `swagger.yaml` - OpenAPI specification (YAML)
+- `docs.go` - Generated Go code
+
+### Accessing Documentation
+
+Once generated and the server is running, access Swagger UI at:
+- `http://localhost:3000/swagger/index.html`
+
+### Authentication in Swagger
+
+Endpoints requiring authentication use `@Security BearerAuth`. In Swagger UI:
+1. Click "Authorize" button
+2. Enter JWT token as: `Bearer <token>`
+3. Click "Authorize" to authenticate
+
 ## Related Files
 
 - Router: `internal/interfaces/http/router.go`
 - Middleware: `internal/interfaces/http/middleware/`
 - Use Cases: `internal/usecase/`
+- Swagger Tests: `swagger_test.go`

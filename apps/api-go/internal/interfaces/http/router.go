@@ -8,6 +8,8 @@ import (
 	"github.com/sacred-vows/api-go/internal/interfaces/http/handlers"
 	"github.com/sacred-vows/api-go/internal/interfaces/http/middleware"
 	"github.com/sacred-vows/api-go/pkg/logger"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Router struct {
@@ -114,6 +116,9 @@ func (r *Router) Setup() *gin.Engine {
 			analytics.GET("/:invitationId", r.analyticsHandler.GetByInvitation)
 		}
 	}
+
+	// Swagger documentation
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// 404 handler
 	router.NoRoute(func(c *gin.Context) {

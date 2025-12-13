@@ -29,6 +29,17 @@ func NewLayoutHandler(
 	}
 }
 
+// GetAll retrieves all available layouts
+// @Summary      List layouts
+// @Description  Get all available layouts with optional filtering by category and featured status.
+// @Tags         layouts
+// @Accept       json
+// @Produce      json
+// @Param        category  query     string  false  "Filter by category (e.g., 'elegant', 'modern')"
+// @Param        featured  query     string  false  "Filter featured layouts (true/false)"
+// @Success      200       {object}  map[string]interface{}  "Layouts and categories"
+// @Failure      500       {object}  ErrorResponse           "Internal server error"
+// @Router       /layouts [get]
 func (h *LayoutHandler) GetAll(c *gin.Context) {
 	category := c.Query("category")
 	featuredStr := c.Query("featured")
@@ -69,6 +80,15 @@ func (h *LayoutHandler) GetAll(c *gin.Context) {
 	})
 }
 
+// GetManifests retrieves all layout manifests
+// @Summary      Get all manifests
+// @Description  Get manifests for all available layouts.
+// @Tags         layouts
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  map[string]interface{}  "All layout manifests"
+// @Failure      500  {object}  ErrorResponse           "Internal server error"
+// @Router       /layouts/manifests [get]
 func (h *LayoutHandler) GetManifests(c *gin.Context) {
 	output, err := h.getManifestsUC.Execute(c.Request.Context())
 	if err != nil {
@@ -84,6 +104,17 @@ func (h *LayoutHandler) GetManifests(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"manifests": output.Manifests})
 }
 
+// GetManifest retrieves a specific layout manifest
+// @Summary      Get layout manifest
+// @Description  Get the manifest for a specific layout by ID.
+// @Tags         layouts
+// @Accept       json
+// @Produce      json
+// @Param        id   path      string  true  "Layout ID"
+// @Success      200  {object}  map[string]interface{}  "Layout manifest"
+// @Failure      404  {object}  ErrorResponse           "Layout not found"
+// @Failure      500  {object}  ErrorResponse           "Internal server error"
+// @Router       /layouts/{id}/manifest [get]
 func (h *LayoutHandler) GetManifest(c *gin.Context) {
 	id := c.Param("id")
 	output, err := h.getManifestUC.Execute(c.Request.Context(), id)
@@ -100,6 +131,17 @@ func (h *LayoutHandler) GetManifest(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"manifest": output.Manifest})
 }
 
+// GetByID retrieves a layout by ID
+// @Summary      Get layout by ID
+// @Description  Get a specific layout by its ID.
+// @Tags         layouts
+// @Accept       json
+// @Produce      json
+// @Param        id   path      string  true  "Layout ID"
+// @Success      200  {object}  map[string]interface{}  "Layout details"
+// @Failure      404  {object}  ErrorResponse           "Layout not found"
+// @Failure      500  {object}  ErrorResponse           "Internal server error"
+// @Router       /layouts/{id} [get]
 func (h *LayoutHandler) GetByID(c *gin.Context) {
 	id := c.Param("id")
 	output, err := h.getByIDUC.Execute(c.Request.Context(), id)

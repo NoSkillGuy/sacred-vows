@@ -175,6 +175,68 @@ docker run -p 3000:3000 api-go
 ### Health Check
 - `GET /health` - Health check endpoint
 
+### Swagger Documentation
+- `GET /swagger/index.html` - Swagger UI interface
+
+## Swagger Documentation
+
+The API includes comprehensive Swagger/OpenAPI documentation that can be accessed via the Swagger UI.
+
+### Generating Swagger Documentation
+
+To generate or update the Swagger documentation:
+
+```bash
+# Using Make
+make swagger
+
+# Or directly
+swag init -g cmd/server/main.go -o docs
+```
+
+This command scans the codebase for Swagger annotations and generates:
+- `docs/swagger.json` - OpenAPI specification in JSON format
+- `docs/swagger.yaml` - OpenAPI specification in YAML format
+- `docs/docs.go` - Go code containing the documentation
+
+### Accessing Swagger UI
+
+Once the server is running, access the Swagger UI at:
+- **URL**: `http://localhost:3000/swagger/index.html`
+
+The Swagger UI provides:
+- Interactive API documentation
+- Try-it-out functionality for all endpoints
+- Request/response schema definitions
+- Authentication support (JWT Bearer token)
+
+### Swagger Annotations
+
+All API endpoints are documented using Swagger annotations in the handler files:
+- `@Summary` - Brief endpoint description
+- `@Description` - Detailed endpoint description
+- `@Tags` - Endpoint grouping
+- `@Param` - Request parameters (path, query, body)
+- `@Success` - Success response codes and schemas
+- `@Failure` - Error response codes and schemas
+- `@Security` - Authentication requirements
+- `@Router` - Route path and HTTP method
+
+### Authentication in Swagger
+
+The Swagger UI supports JWT Bearer token authentication:
+1. Click the "Authorize" button in Swagger UI
+2. Enter your JWT token in the format: `Bearer <your-token>`
+3. Click "Authorize" to authenticate
+4. All authenticated requests will include the token in the Authorization header
+
+### Updating Documentation
+
+When adding new endpoints or modifying existing ones:
+1. Add or update Swagger annotations in the handler file
+2. Run `make swagger` to regenerate documentation
+3. Restart the server to see changes in Swagger UI
+
 ## Development
 
 ### Code Structure
@@ -215,6 +277,7 @@ Migrations are handled automatically by GORM AutoMigrate on startup. For manual 
 - **OAuth2** - Google OAuth integration
 - **Zap** - Structured logging
 - **Bcrypt** - Password hashing
+- **Swagger** - API documentation (swaggo/swag, gin-swagger)
 
 ## Implementation Details
 

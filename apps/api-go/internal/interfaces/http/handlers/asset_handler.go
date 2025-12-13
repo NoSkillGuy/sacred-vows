@@ -33,9 +33,41 @@ func NewAssetHandler(
 }
 
 type DeleteAssetRequest struct {
-	URL string `json:"url" binding:"required"`
+	URL string `json:"url" binding:"required" example:"/uploads/abc123.jpg"`
 }
 
+type AssetDTO struct {
+	ID           string `json:"id" example:"1234567890"`
+	URL          string `json:"url" example:"/uploads/abc123.jpg"`
+	Filename     string `json:"filename" example:"abc123.jpg"`
+	OriginalName string `json:"originalName" example:"photo.jpg"`
+	Size         int64  `json:"size" example:"1024000"`
+	MimeType     string `json:"mimetype" example:"image/jpeg"`
+	UserID       string `json:"userId" example:"user123"`
+	CreatedAt    string `json:"createdAt" example:"2024-01-01T00:00:00Z"`
+}
+
+type UploadAssetResponse struct {
+	URL   string    `json:"url" example:"/uploads/abc123.jpg"`
+	Asset *AssetDTO `json:"asset"`
+}
+
+type AssetsResponse struct {
+	Assets []AssetDTO `json:"assets"`
+}
+
+// Upload uploads a new asset file
+// @Summary      Upload asset
+// @Description  Upload a new asset file (image). Supports optional authentication (anonymous users are supported).
+// @Tags         assets
+// @Accept       multipart/form-data
+// @Produce      json
+// @Security     BearerAuth
+// @Param        image  formData  file    true  "Image file to upload"
+// @Success      200    {object}  UploadAssetResponse  "Asset uploaded successfully"
+// @Failure      400    {object}  ErrorResponse       "Invalid file or request"
+// @Failure      500    {object}  ErrorResponse       "Internal server error"
+// @Router       /assets/upload [post]
 func (h *AssetHandler) Upload(c *gin.Context) {
 	file, err := c.FormFile("image")
 	if err != nil {
@@ -100,6 +132,16 @@ func (h *AssetHandler) Upload(c *gin.Context) {
 	})
 }
 
+// GetAll retrieves all assets for the current user
+// @Summary      List assets
+// @Description  Get all assets for the current user. Supports optional authentication (anonymous users are supported).
+// @Tags         assets
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200  {object}  AssetsResponse   "List of assets"
+// @Failure      500  {object}  ErrorResponse   "Internal server error"
+// @Router       /assets [get]
 func (h *AssetHandler) GetAll(c *gin.Context) {
 	userID, _ := c.Get("userID")
 	if userID == nil {
@@ -120,6 +162,18 @@ func (h *AssetHandler) GetAll(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"assets": output.Assets})
 }
 
+// Delete deletes an asset
+// @Summary      Delete asset
+// @Description  Delete an asset by URL. Supports optional authentication (anonymous users are supported).
+// @Tags         assets
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request  body      DeleteAssetRequest  true  "Asset URL to delete"
+// @Success      200      {object}  MessageResponse     "Asset deleted"
+// @Failure      400      {object}  ErrorResponse       "Invalid request"
+// @Failure      404      {object}  ErrorResponse       "Asset not found"
+// @Router       /assets/delete [delete]
 func (h *AssetHandler) Delete(c *gin.Context) {
 	var req DeleteAssetRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
