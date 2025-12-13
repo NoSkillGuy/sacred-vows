@@ -8,8 +8,8 @@ The platform consists of:
 
 - **Builder App** (`apps/builder`) - React-based UI for creating invitations
 - **API Server** (`apps/api`) - Express.js backend with authentication and data management
-- **Template Engine** (`packages/template-engine`) - Template rendering system
-- **Shared Types** (`packages/shared`) - Shared type definitions and utilities
+- **Template Engine** (`apps/builder/src/template-engine`) - Template rendering system
+- **Shared Types** (`apps/builder/src/shared`) - Shared type definitions and utilities
 
 ## Getting Started
 
@@ -94,13 +94,16 @@ wedding-invitation-builder/
 │       │   ├── middleware/  # Express middleware
 │       │   └── services/    # Business logic
 │       └── package.json
-├── packages/
-│   ├── template-engine/  # Template rendering engine
-│   └── shared/           # Shared utilities
+├── apps/
+│   ├── builder/
+│   │   └── src/
+│   │       ├── template-engine/  # Template rendering engine
+│   │       └── shared/            # Shared utilities
+│   └── api/
+│       └── prisma/
+│           └── schema.prisma      # Prisma schema
 ├── templates/
 │   └── royal-elegance/   # Template definitions
-├── database/
-│   └── schema.prisma     # Prisma schema
 └── docker-compose.yml    # Docker setup
 ```
 

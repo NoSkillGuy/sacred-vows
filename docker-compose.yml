@@ -34,7 +34,6 @@ services:
     volumes:
       - ./apps/api:/app
       - /app/node_modules
-      - ./uploads:/app/uploads
       - ./apps/builder/templates:/app/templates
 
 volumes:

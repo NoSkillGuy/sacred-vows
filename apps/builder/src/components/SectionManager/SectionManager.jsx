@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useBuilderStore, SECTION_TYPES } from '../../store/builderStore';
-import { SECTION_METADATA } from '../../../../../packages/shared/src/types/wedding-data.js';
+import { SECTION_METADATA } from '@shared/types/wedding-data.js';
 import './SectionManager.css';
 
 // SVG Icons

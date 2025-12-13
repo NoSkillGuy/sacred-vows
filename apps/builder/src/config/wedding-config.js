@@ -12,7 +12,7 @@ import {
   DEFAULT_SECTION_ORDER, 
   createDefaultSections,
   DEFAULT_THEME 
-} from '../../../../packages/shared/src/types/wedding-data.js';
+} from '@shared/types/wedding-data.js';
 
 /**
  * Default universal wedding content data

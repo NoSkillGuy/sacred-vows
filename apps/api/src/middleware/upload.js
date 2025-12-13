@@ -6,7 +6,7 @@ import path from 'path';
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     // In production, this would be handled by cloud storage
-    cb(null, 'uploads/');
+    cb(null, './uploads/');
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);

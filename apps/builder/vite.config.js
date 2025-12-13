@@ -7,8 +7,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@shared': path.resolve(__dirname, '../../packages/shared/src'),
-      '@template-engine': path.resolve(__dirname, '../../packages/template-engine/src'),
+      '@shared': path.resolve(__dirname, './src/shared/src'),
+      '@template-engine': path.resolve(__dirname, './src/template-engine/src'),
     },
   },
   publicDir: 'public',
