@@ -1,6 +1,8 @@
 # Migration Guide: From API to API-Go
 
-This guide helps you migrate from the original Node.js API (`apps/api`) to the Go implementation (`apps/api-go`).
+> **Note**: This migration has been completed. The Go API (`apps/api-go`) is now the primary API implementation. This document is kept for historical reference.
+
+This guide documented the migration from the original Node.js API (`apps/api`) to the Go implementation (`apps/api-go`).
 
 ## Overview
 

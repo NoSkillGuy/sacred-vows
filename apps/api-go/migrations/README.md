@@ -108,12 +108,12 @@ migrate -path migrations -database "$DATABASE_URL" down
 
 ## Schema Source
 
-The schema is based on the Prisma schema from `apps/api/prisma/schema.prisma` and has been converted to PostgreSQL-compatible SQL.
+The schema has been designed for PostgreSQL and is defined in the migration files and GORM models.
 
 ## Related Files
 
 - GORM Models: `internal/infrastructure/database/postgres/models.go`
-- Prisma Schema: `apps/api/prisma/schema.prisma` (original source)
+- Migration Files: `001_initial_schema.up.sql` and `001_initial_schema.down.sql`
 
 ## Best Practices
 

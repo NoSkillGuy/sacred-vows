@@ -216,35 +216,15 @@ Migrations are handled automatically by GORM AutoMigrate on startup. For manual 
 - **Zap** - Structured logging
 - **Bcrypt** - Password hashing
 
-## Migration from Original API
+## Implementation Details
 
-This Go implementation is a complete replacement for the original Node.js/Express API (`apps/api`). All endpoints have been implemented with feature parity.
-
-### Key Differences
+### Key Features
 
 1. **Title and Status Fields**: Stored in the `_meta` field within the JSON `data` column, but returned as top-level fields in responses for compatibility.
 
-2. **Google OAuth Verify**: Now fully implemented using `google.golang.org/api/idtoken` for proper ID token verification.
+2. **Google OAuth Verify**: Fully implemented using `google.golang.org/api/idtoken` for proper ID token verification.
 
-3. **Database**: Uses PostgreSQL with GORM instead of Prisma. The schema is equivalent.
-
-### Migration Steps
-
-1. **Verify Feature Parity**: See `VERIFICATION.md` for comprehensive test cases.
-
-2. **Update Environment Variables**: Ensure all required environment variables are set (see `.env.example`).
-
-3. **Database Migration**: The database schema is compatible. If migrating from the original API, ensure the database structure matches.
-
-4. **Update Frontend**: The API endpoints and request/response formats are identical, so no frontend changes should be required.
-
-5. **Testing**: Run the verification tests in `VERIFICATION.md` to ensure everything works correctly.
-
-6. **Deployment**: Deploy api-go and route traffic gradually, monitoring for any issues.
-
-### Verification
-
-See `VERIFICATION.md` for detailed endpoint verification tests and expected request/response formats.
+3. **Database**: Uses PostgreSQL with GORM. The schema is automatically migrated on startup using GORM AutoMigrate.
 
 ## License
 

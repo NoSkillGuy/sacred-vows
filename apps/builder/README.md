@@ -7,7 +7,7 @@ A full-featured wedding invitation builder platform that allows users to create,
 The platform consists of:
 
 - **Builder App** (`apps/builder`) - React-based UI for creating invitations
-- **API Server** (`apps/api`) - Express.js backend with authentication and data management
+- **API Server** (`apps/api-go`) - Go backend with authentication and data management
 - **Template Engine** (`apps/builder/src/template-engine`) - Template rendering system
 - **Shared Types** (`apps/builder/src/shared`) - Shared type definitions and utilities
 
@@ -31,9 +31,9 @@ npm install
 cd apps/builder
 npm install
 
-# API server
-cd ../api
-npm install
+# API server (Go)
+cd ../api-go
+go mod download
 ```
 
 2. **Set up database:**
@@ -42,32 +42,24 @@ npm install
 # Using Docker Compose
 docker-compose up -d postgres
 
-# Or set up PostgreSQL manually and update DATABASE_URL in apps/api/.env
+# Or set up PostgreSQL manually and update DATABASE_URL in apps/api-go/.env
 ```
 
 3. **Configure environment:**
 
 ```bash
 # Copy example env file
-cp apps/api/.env.example apps/api/.env
+cp apps/api-go/.env.example apps/api-go/.env
 
-# Edit apps/api/.env with your configuration
+# Edit apps/api-go/.env with your configuration
 ```
 
-4. **Run database migrations:**
+4. **Start development servers:**
 
 ```bash
-cd apps/api
-npx prisma generate
-npx prisma migrate dev
-```
-
-5. **Start development servers:**
-
-```bash
-# Terminal 1: Start API server
-cd apps/api
-npm run dev
+# Terminal 1: Start API server (Go)
+cd apps/api-go
+go run cmd/server/main.go
 
 # Terminal 2: Start builder app
 cd apps/builder
@@ -76,6 +68,8 @@ npm run dev
 # Terminal 3: Start main invitation app (for preview)
 npm run dev
 ```
+
+**Note**: The Go API automatically runs database migrations on startup using GORM AutoMigrate.
 
 ## Project Structure
 
@@ -88,20 +82,15 @@ wedding-invitation-builder/
 │   │   │   ├── services/    # API services
 │   │   │   └── store/      # Zustand state management
 │   │   └── package.json
-│   └── api/              # Backend API server
-│       ├── src/
-│       │   ├── routes/      # API routes
-│       │   ├── middleware/  # Express middleware
-│       │   └── services/    # Business logic
-│       └── package.json
+│   └── api-go/           # Backend API server (Go)
+│       ├── cmd/server/   # Application entry point
+│       ├── internal/     # Internal packages
+│       └── migrations/   # Database migrations
 ├── apps/
 │   ├── builder/
 │   │   └── src/
 │   │       ├── template-engine/  # Template rendering engine
 │   │       └── shared/            # Shared utilities
-│   └── api/
-│       └── prisma/
-│           └── schema.prisma      # Prisma schema
 ├── templates/
 │   └── royal-elegance/   # Template definitions
 └── docker-compose.yml    # Docker setup
@@ -178,12 +167,13 @@ npm run build
 ### API Server (Railway/Render/AWS)
 
 1. Set environment variables
-2. Run migrations:
+2. Build and deploy:
 ```bash
-npx prisma migrate deploy
+cd apps/api-go
+go build -o bin/server cmd/server/main.go
 ```
 
-3. Deploy using Docker or platform-specific methods
+3. Deploy using Docker or platform-specific methods. The API automatically runs migrations on startup.
 
 ### Database
 
@@ -191,12 +181,18 @@ Use a managed PostgreSQL service (Railway, Supabase, AWS RDS, etc.)
 
 ## Environment Variables
 
-### API Server (.env)
+### API Server (apps/api-go/.env)
 
 ```
 DATABASE_URL=postgresql://user:password@localhost:5432/wedding_builder
 JWT_SECRET=your-secret-key
 PORT=3000
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+GOOGLE_REDIRECT_URI=http://localhost:3000/api/auth/google/callback
+FRONTEND_URL=http://localhost:5173
+UPLOAD_PATH=./uploads
+TEMPLATES_DIR=./templates
 ```
 
 ### Builder App (.env)
