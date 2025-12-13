@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ThemeModal from './ThemeModal';
 import GalleryModal from './GalleryModal';
-import TemplateSwitcher from './TemplateSwitcher';
+import LayoutSwitcher from './LayoutSwitcher';
 import ExportModal from '../Export/ExportModal';
 import SectionManager from '../SectionManager/SectionManager';
 import { useBuilderStore } from '../../store/builderStore';
@@ -109,7 +109,7 @@ function Toolbar({ editMode, onEditModeToggle, deviceMode, onDeviceModeChange })
   const [showGalleryModal, setShowGalleryModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
   const [showSectionManager, setShowSectionManager] = useState(false);
-  const [showTemplateSwitcher, setShowTemplateSwitcher] = useState(false);
+  const [showLayoutSwitcher, setShowLayoutSwitcher] = useState(false);
 
   return (
     <>
@@ -177,13 +177,13 @@ function Toolbar({ editMode, onEditModeToggle, deviceMode, onDeviceModeChange })
         <div className="toolbar-right">
           <button
             className="toolbar-btn"
-            onClick={() => setShowTemplateSwitcher(true)}
-            title="Change Template"
+            onClick={() => setShowLayoutSwitcher(true)}
+            title="Change Layout"
           >
             <span className="btn-icon">
               <TemplateIcon />
             </span>
-            <span className="btn-label">Template</span>
+            <span className="btn-label">Layout</span>
           </button>
 
           <button
@@ -234,9 +234,9 @@ function Toolbar({ editMode, onEditModeToggle, deviceMode, onDeviceModeChange })
         </div>
       </div>
 
-      <TemplateSwitcher
-        isOpen={showTemplateSwitcher}
-        onClose={() => setShowTemplateSwitcher(false)}
+      <LayoutSwitcher
+        isOpen={showLayoutSwitcher}
+        onClose={() => setShowLayoutSwitcher(false)}
       />
       <SectionManager
         isOpen={showSectionManager}

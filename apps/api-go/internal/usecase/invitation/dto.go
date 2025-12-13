@@ -9,31 +9,31 @@ import (
 
 // InvitationDTO represents an invitation data transfer object
 type InvitationDTO struct {
-	ID         string          `json:"id"`
-	TemplateID string          `json:"templateId"`
-	Data       json.RawMessage `json:"data"`
-	Title      *string         `json:"title,omitempty"`
-	Status     *string         `json:"status,omitempty"`
-	UserID     string          `json:"userId"`
-	CreatedAt  time.Time       `json:"createdAt"`
-	UpdatedAt  time.Time       `json:"updatedAt"`
+	ID        string          `json:"id"`
+	LayoutID  string          `json:"layoutId"`
+	Data      json.RawMessage `json:"data"`
+	Title     *string         `json:"title,omitempty"`
+	Status    *string         `json:"status,omitempty"`
+	UserID    string          `json:"userId"`
+	CreatedAt time.Time       `json:"createdAt"`
+	UpdatedAt time.Time       `json:"updatedAt"`
 }
 
 // InvitationPreviewDTO represents a preview invitation DTO
 type InvitationPreviewDTO struct {
-	ID         string          `json:"id"`
-	TemplateID string          `json:"templateId"`
-	Data       json.RawMessage `json:"data"`
+	ID       string          `json:"id"`
+	LayoutID string          `json:"layoutId"`
+	Data     json.RawMessage `json:"data"`
 }
 
 func toInvitationDTO(invitation *domain.Invitation) *InvitationDTO {
 	dto := &InvitationDTO{
-		ID:         invitation.ID,
-		TemplateID: invitation.TemplateID,
-		Data:       invitation.Data,
-		UserID:     invitation.UserID,
-		CreatedAt:  invitation.CreatedAt,
-		UpdatedAt:  invitation.UpdatedAt,
+		ID:        invitation.ID,
+		LayoutID:  invitation.LayoutID,
+		Data:      invitation.Data,
+		UserID:    invitation.UserID,
+		CreatedAt: invitation.CreatedAt,
+		UpdatedAt: invitation.UpdatedAt,
 	}
 
 	// Extract title and status from data if they exist

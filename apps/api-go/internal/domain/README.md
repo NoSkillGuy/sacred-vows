@@ -40,18 +40,18 @@ Represents a wedding invitation.
 
 **Properties:**
 - `ID`: Unique identifier
-- `TemplateID`: Reference to template
+- `LayoutID`: Reference to layout
 - `Data`: JSON configuration data
 - `UserID`: Owner of the invitation
 - `CreatedAt`, `UpdatedAt`: Timestamps
 
 **Business Rules:**
-- TemplateID is required
+- LayoutID is required
 - UserID is required
 - Data is stored as JSON
 
-### Template (`template.go`)
-Represents a template definition stored in the database.
+### Layout (`layout.go`)
+Represents a layout definition stored in the database.
 
 **Properties:**
 - `ID`, `Name`, `Description`

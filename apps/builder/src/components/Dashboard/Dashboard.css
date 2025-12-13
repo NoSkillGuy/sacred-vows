@@ -848,7 +848,8 @@
    Empty State
    =================================== */
 
-.dashboard-empty {
+.dashboard-empty,
+.gallery-empty {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -858,17 +859,28 @@
   background: var(--white);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-sm);
+  margin: 2rem 0;
 }
 
-.dashboard-empty-icon {
+.dashboard-empty-icon,
+.gallery-empty .empty-icon {
   width: 4.5rem;
   height: 4.5rem;
   margin-bottom: 1.25rem;
   color: var(--rose);
   opacity: 0.4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.dashboard-empty h3 {
+.gallery-empty .empty-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.dashboard-empty h3,
+.gallery-empty h3 {
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.75rem;
   font-weight: 600;
@@ -876,7 +888,46 @@
   margin-bottom: 0.5rem;
 }
 
-.dashboard-empty p {
+.dashboard-empty p,
+.gallery-empty p {
+  color: var(--text-muted);
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+  max-width: 400px;
+}
+
+/* ===================================
+   Error State
+   =================================== */
+
+.gallery-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  margin: 2rem 0;
+  border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.gallery-error .error-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.gallery-error h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin-bottom: 0.5rem;
+}
+
+.gallery-error p {
   color: var(--text-muted);
   font-size: 1rem;
   margin-bottom: 1.5rem;

@@ -19,11 +19,11 @@ func NewUpdateInvitationUseCase(invitationRepo repository.InvitationRepository) 
 }
 
 type UpdateInvitationInput struct {
-	ID         string
-	TemplateID *string
-	Data       *json.RawMessage
-	Title      *string
-	Status     *string
+	ID       string
+	LayoutID *string
+	Data     *json.RawMessage
+	Title    *string
+	Status   *string
 }
 
 type UpdateInvitationOutput struct {
@@ -36,8 +36,8 @@ func (uc *UpdateInvitationUseCase) Execute(ctx context.Context, input UpdateInvi
 		return nil, errors.Wrap(errors.ErrNotFound.Code, "Invitation not found", err)
 	}
 
-	if input.TemplateID != nil {
-		invitation.TemplateID = *input.TemplateID
+	if input.LayoutID != nil {
+		invitation.LayoutID = *input.LayoutID
 	}
 
 	// Handle data update - merge with title/status if provided

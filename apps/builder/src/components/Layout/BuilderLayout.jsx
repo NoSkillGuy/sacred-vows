@@ -9,7 +9,7 @@ import './BuilderLayout.css';
 function BuilderLayout() {
   const { invitationId } = useParams();
   const navigate = useNavigate();
-  const { setCurrentInvitation, loadTemplateManifest } = useBuilderStore();
+  const { setCurrentInvitation, loadLayoutManifest } = useBuilderStore();
   const [editMode, setEditMode] = useState(true);
   const [deviceMode, setDeviceMode] = useState('desktop');
   const [invitation, setInvitation] = useState(null);
@@ -32,7 +32,7 @@ function BuilderLayout() {
       const data = await getInvitation(invitationId);
       setInvitation(data);
       setCurrentInvitation(data);
-      await loadTemplateManifest();
+      await loadLayoutManifest();
     } catch (err) {
       console.error('Failed to load invitation:', err);
       setError('Failed to load invitation');

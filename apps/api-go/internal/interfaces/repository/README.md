@@ -38,16 +38,16 @@ Invitation data operations:
 - `Update(ctx, invitation)` - Update invitation
 - `Delete(ctx, id)` - Delete invitation
 
-### TemplateRepository (`template_repository.go`)
+### LayoutRepository (`layout_repository.go`)
 
-Template data operations for database-stored templates:
-- `Create(ctx, template)` - Create template
+Layout data operations for database-stored layouts:
+- `Create(ctx, layout)` - Create layout
 - `FindByID(ctx, id)` - Find by ID
-- `FindAll(ctx)` - Find all active templates
-- `Update(ctx, template)` - Update template
-- `Delete(ctx, id)` - Delete template
+- `FindAll(ctx)` - Find all active layouts
+- `Update(ctx, layout)` - Update layout
+- `Delete(ctx, id)` - Delete layout
 
-**Note:** Templates are stored in the database with both `manifest` and `config` as JSONB columns. Templates are loaded via SQL migration `003_load_templates.up.sql` which contains all template data embedded in the migration file.
+**Note:** Layouts are stored in the database with both `manifest` and `config` as JSONB columns. Layouts are loaded via SQL migration `003_load_layouts.up.sql` which contains all layout data embedded in the migration file.
 
 ### AssetRepository (`asset_repository.go`)
 

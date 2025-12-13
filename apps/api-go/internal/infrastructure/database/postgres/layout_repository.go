@@ -11,16 +11,16 @@ import (
 	"gorm.io/gorm"
 )
 
-type templateRepository struct {
+type layoutRepository struct {
 	db *gorm.DB
 }
 
-func NewTemplateRepository(db *gorm.DB) repository.TemplateRepository {
-	return &templateRepository{db: db}
+func NewLayoutRepository(db *gorm.DB) repository.LayoutRepository {
+	return &layoutRepository{db: db}
 }
 
-func (r *templateRepository) Create(ctx context.Context, template *domain.Template) error {
-	model, err := toTemplateModel(template)
+func (r *layoutRepository) Create(ctx context.Context, layout *domain.Layout) error {
+	model, err := toLayoutModel(layout)
 	if err != nil {
 		return err
 	}
@@ -29,7 +29,7 @@ func (r *templateRepository) Create(ctx context.Context, template *domain.Templa
 	return r.db.WithContext(ctx).Create(model).Error
 }
 
-func (r *templateRepository) FindByID(ctx context.Context, id string) (*domain.Template, error) {
+func (r *layoutRepository) FindByID(ctx context.Context, id string) (*domain.Layout, error) {
 	var model TemplateModel
 	if err := r.db.WithContext(ctx).Where("id = ?", id).First(&model).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -37,53 +37,53 @@ func (r *templateRepository) FindByID(ctx context.Context, id string) (*domain.T
 		}
 		return nil, err
 	}
-	return toTemplateDomain(&model)
+	return toLayoutDomain(&model)
 }
 
-func (r *templateRepository) FindAll(ctx context.Context) ([]*domain.Template, error) {
+func (r *layoutRepository) FindAll(ctx context.Context) ([]*domain.Layout, error) {
 	var models []TemplateModel
 	// Database column is "isActive" (camelCase with quotes) - use quoted name in query
 	if err := r.db.WithContext(ctx).Where("\"isActive\" = ?", true).Find(&models).Error; err != nil {
 		return nil, err
 	}
 
-	templates := make([]*domain.Template, len(models))
+	layouts := make([]*domain.Layout, len(models))
 	for i, model := range models {
-		template, err := toTemplateDomain(&model)
+		layout, err := toLayoutDomain(&model)
 		if err != nil {
 			return nil, err
 		}
-		templates[i] = template
+		layouts[i] = layout
 	}
-	return templates, nil
+	return layouts, nil
 }
 
-func (r *templateRepository) Update(ctx context.Context, template *domain.Template) error {
-	model, err := toTemplateModel(template)
+func (r *layoutRepository) Update(ctx context.Context, layout *domain.Layout) error {
+	model, err := toLayoutModel(layout)
 	if err != nil {
 		return err
 	}
 	model.UpdatedAt = time.Now()
-	return r.db.WithContext(ctx).Model(&TemplateModel{}).Where("id = ?", template.ID).Updates(model).Error
+	return r.db.WithContext(ctx).Model(&TemplateModel{}).Where("id = ?", layout.ID).Updates(model).Error
 }
 
-func (r *templateRepository) Delete(ctx context.Context, id string) error {
+func (r *layoutRepository) Delete(ctx context.Context, id string) error {
 	return r.db.WithContext(ctx).Delete(&TemplateModel{}, "id = ?", id).Error
 }
 
-func toTemplateModel(template *domain.Template) (*TemplateModel, error) {
+func toLayoutModel(layout *domain.Layout) (*TemplateModel, error) {
 	model := &TemplateModel{
-		ID:           template.ID,
-		Name:         template.Name,
-		Description:  template.Description,
-		PreviewImage: template.PreviewImage,
-		Version:      template.Version,
-		IsActive:     template.IsActive,
+		ID:           layout.ID,
+		Name:         layout.Name,
+		Description:  layout.Description,
+		PreviewImage: layout.PreviewImage,
+		Version:      layout.Version,
+		IsActive:     layout.IsActive,
 	}
 
 	// Convert Tags []string to JSON
-	if len(template.Tags) > 0 {
-		tagsJSON, err := json.Marshal(template.Tags)
+	if len(layout.Tags) > 0 {
+		tagsJSON, err := json.Marshal(layout.Tags)
 		if err != nil {
 			return nil, err
 		}
@@ -91,22 +91,22 @@ func toTemplateModel(template *domain.Template) (*TemplateModel, error) {
 	}
 
 	// Convert Config *json.RawMessage to *datatypes.JSON
-	if template.Config != nil {
-		configJSON := datatypes.JSON(*template.Config)
+	if layout.Config != nil {
+		configJSON := datatypes.JSON(*layout.Config)
 		model.Config = &configJSON
 	}
 
 	// Convert Manifest *json.RawMessage to *datatypes.JSON
-	if template.Manifest != nil {
-		manifestJSON := datatypes.JSON(*template.Manifest)
+	if layout.Manifest != nil {
+		manifestJSON := datatypes.JSON(*layout.Manifest)
 		model.Manifest = &manifestJSON
 	}
 
 	return model, nil
 }
 
-func toTemplateDomain(model *TemplateModel) (*domain.Template, error) {
-	template := &domain.Template{
+func toLayoutDomain(model *TemplateModel) (*domain.Layout, error) {
+	layout := &domain.Layout{
 		ID:           model.ID,
 		Name:         model.Name,
 		Description:  model.Description,
@@ -123,7 +123,7 @@ func toTemplateDomain(model *TemplateModel) (*domain.Template, error) {
 		if err := json.Unmarshal(model.Tags, &tags); err != nil {
 			return nil, err
 		}
-		template.Tags = tags
+		layout.Tags = tags
 	}
 
 	// Convert Config *datatypes.JSON to *json.RawMessage
@@ -133,7 +133,7 @@ func toTemplateDomain(model *TemplateModel) (*domain.Template, error) {
 			return nil, err
 		}
 		configRaw := json.RawMessage(configBytes)
-		template.Config = &configRaw
+		layout.Config = &configRaw
 	}
 
 	// Convert Manifest *datatypes.JSON to *json.RawMessage
@@ -143,8 +143,8 @@ func toTemplateDomain(model *TemplateModel) (*domain.Template, error) {
 			return nil, err
 		}
 		manifestRaw := json.RawMessage(manifestBytes)
-		template.Manifest = &manifestRaw
+		layout.Manifest = &manifestRaw
 	}
 
-	return template, nil
+	return layout, nil
 }

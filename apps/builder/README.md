@@ -8,7 +8,7 @@ The platform consists of:
 
 - **Builder App** (`apps/builder`) - React-based UI for creating invitations
 - **API Server** (`apps/api-go`) - Go backend with authentication and data management
-- **Template Engine** (`apps/builder/src/template-engine`) - Template rendering system
+- **Layout Engine** (`apps/builder/src/template-engine`) - Layout rendering system
 - **Shared Types** (`apps/builder/src/shared`) - Shared type definitions and utilities
 
 ## Getting Started
@@ -89,10 +89,10 @@ wedding-invitation-builder/
 ├── apps/
 │   ├── builder/
 │   │   └── src/
-│   │       ├── template-engine/  # Template rendering engine
+│   │       ├── template-engine/  # Layout rendering engine
 │   │       └── shared/            # Shared utilities
-├── templates/
-│   └── royal-elegance/   # Template definitions
+├── layouts/
+│   └── royal-elegance/   # Layout definitions
 └── docker-compose.yml    # Docker setup
 ```
 
@@ -118,10 +118,10 @@ wedding-invitation-builder/
 - RSVP tracking
 - Analytics
 
-### Template System
+### Layout System
 
-- Configurable template engine
-- Dynamic template loading
+- Configurable layout engine
+- Dynamic layout loading
 - User data merging
 
 ## API Endpoints
@@ -192,7 +192,7 @@ GOOGLE_CLIENT_SECRET=your-google-client-secret
 GOOGLE_REDIRECT_URI=http://localhost:3000/api/auth/google/callback
 FRONTEND_URL=http://localhost:5173
 UPLOAD_PATH=./uploads
-TEMPLATES_DIR=./templates
+LAYOUTS_DIR=./layouts
 ```
 
 ### Builder App (.env)

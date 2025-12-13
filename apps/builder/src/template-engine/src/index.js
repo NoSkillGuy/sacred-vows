@@ -1,4 +1,4 @@
-export { loadTemplate, mergeTemplateData, validateTemplateConfig } from './loadTemplate.js';
-export { TemplateRenderer } from './TemplateRenderer.jsx';
-export { default as TemplateRendererDefault } from './TemplateRenderer.jsx';
+export { loadLayout, mergeLayoutData, validateLayoutConfig } from './loadLayout.js';
+export { LayoutRenderer } from './LayoutRenderer.jsx';
+export { default as LayoutRendererDefault } from './LayoutRenderer.jsx';
 

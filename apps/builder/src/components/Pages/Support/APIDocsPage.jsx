@@ -66,8 +66,8 @@ const endpoints = [
   },
   {
     method: 'GET',
-    path: '/api/templates',
-    description: 'List all available templates'
+    path: '/api/layouts',
+    description: 'List all available layouts'
   },
   {
     method: 'GET',
@@ -192,7 +192,7 @@ function APIDocsPage() {
   "title": "Sarah & Michael's Wedding",
   "date": "2025-12-15",
   "venue": "The Grand Palace",
-  "template": "royal-elegance",
+    "layoutId": "royal-elegance",
   "rsvp_count": 127,
   "created_at": "2024-06-15T10:30:00Z",
   "status": "published"

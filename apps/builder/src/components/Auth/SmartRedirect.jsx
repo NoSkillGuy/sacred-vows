@@ -6,7 +6,7 @@ import { getInvitations } from '../../services/invitationService';
  * SmartRedirect Component
  * Redirects users based on their state:
  * - Users with existing invitations → Dashboard
- * - New users (no invitations) → Template Gallery
+ * - New users (no invitations) → Layout Gallery
  */
 function SmartRedirect() {
   const [loading, setLoading] = useState(true);
@@ -22,7 +22,7 @@ function SmartRedirect() {
       setHasInvitations(invitations && invitations.length > 0);
     } catch (error) {
       console.error('Failed to check user state:', error);
-      // Default to templates if we can't determine state
+      // Default to layouts if we can't determine state
       setHasInvitations(false);
     } finally {
       setLoading(false);
@@ -82,7 +82,7 @@ function SmartRedirect() {
   }
 
   // Redirect based on user state
-  return <Navigate to={hasInvitations ? '/dashboard' : '/templates'} replace />;
+  return <Navigate to={hasInvitations ? '/dashboard' : '/layouts'} replace />;
 }
 
 export default SmartRedirect;

@@ -100,7 +100,7 @@ See `.env.example` for all required environment variables:
 - `GOOGLE_REDIRECT_URI` - Google OAuth redirect URI
 - `FRONTEND_URL` - Frontend application URL
 - `UPLOAD_PATH` - Path for file uploads (default: ./uploads)
-- `TEMPLATES_DIR` - Path to templates directory
+- `LAYOUTS_DIR` - Path to layouts directory
 
 ## Running the Application
 
@@ -153,11 +153,11 @@ docker run -p 3000:3000 api-go
 - `PUT /api/invitations/:id` - Update invitation
 - `DELETE /api/invitations/:id` - Delete invitation
 
-### Templates
-- `GET /api/templates` - List templates
-- `GET /api/templates/:id` - Get template
-- `GET /api/templates/:id/manifest` - Get template manifest
-- `GET /api/templates/manifests` - Get all manifests
+### Layouts
+- `GET /api/layouts` - List layouts
+- `GET /api/layouts/:id` - Get layout
+- `GET /api/layouts/:id/manifest` - Get layout manifest
+- `GET /api/layouts/manifests` - Get all manifests
 
 ### Assets
 - `POST /api/assets/upload` - Upload asset

@@ -4,24 +4,24 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sacred-vows/api-go/internal/usecase/template"
+	"github.com/sacred-vows/api-go/internal/usecase/layout"
 	"github.com/sacred-vows/api-go/pkg/errors"
 )
 
-type TemplateHandler struct {
-	getAllUC       *template.GetAllTemplatesUseCase
-	getByIDUC      *template.GetTemplateByIDUseCase
-	getManifestUC  *template.GetTemplateManifestUseCase
-	getManifestsUC *template.GetManifestsUseCase
+type LayoutHandler struct {
+	getAllUC       *layout.GetAllLayoutsUseCase
+	getByIDUC      *layout.GetLayoutByIDUseCase
+	getManifestUC  *layout.GetLayoutManifestUseCase
+	getManifestsUC *layout.GetManifestsUseCase
 }
 
-func NewTemplateHandler(
-	getAllUC *template.GetAllTemplatesUseCase,
-	getByIDUC *template.GetTemplateByIDUseCase,
-	getManifestUC *template.GetTemplateManifestUseCase,
-	getManifestsUC *template.GetManifestsUseCase,
-) *TemplateHandler {
-	return &TemplateHandler{
+func NewLayoutHandler(
+	getAllUC *layout.GetAllLayoutsUseCase,
+	getByIDUC *layout.GetLayoutByIDUseCase,
+	getManifestUC *layout.GetLayoutManifestUseCase,
+	getManifestsUC *layout.GetManifestsUseCase,
+) *LayoutHandler {
+	return &LayoutHandler{
 		getAllUC:       getAllUC,
 		getByIDUC:      getByIDUC,
 		getManifestUC:  getManifestUC,
@@ -29,7 +29,7 @@ func NewTemplateHandler(
 	}
 }
 
-func (h *TemplateHandler) GetAll(c *gin.Context) {
+func (h *LayoutHandler) GetAll(c *gin.Context) {
 	category := c.Query("category")
 	featuredStr := c.Query("featured")
 
@@ -44,7 +44,7 @@ func (h *TemplateHandler) GetAll(c *gin.Context) {
 		featuredPtr = &featured
 	}
 
-	output, err := h.getAllUC.Execute(c.Request.Context(), template.GetAllTemplatesInput{
+	output, err := h.getAllUC.Execute(c.Request.Context(), layout.GetAllLayoutsInput{
 		Category: categoryPtr,
 		Featured: featuredPtr,
 	})
@@ -57,19 +57,19 @@ func (h *TemplateHandler) GetAll(c *gin.Context) {
 		}
 		// Log the actual error for debugging
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error":   "Failed to get templates",
+			"error":   "Failed to get layouts",
 			"details": err.Error(),
 		})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"templates":  output.Templates,
+		"layouts":    output.Layouts,
 		"categories": output.Categories,
 	})
 }
 
-func (h *TemplateHandler) GetManifests(c *gin.Context) {
+func (h *LayoutHandler) GetManifests(c *gin.Context) {
 	output, err := h.getManifestsUC.Execute(c.Request.Context())
 	if err != nil {
 		appErr, ok := err.(*errors.AppError)
@@ -84,7 +84,7 @@ func (h *TemplateHandler) GetManifests(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"manifests": output.Manifests})
 }
 
-func (h *TemplateHandler) GetManifest(c *gin.Context) {
+func (h *LayoutHandler) GetManifest(c *gin.Context) {
 	id := c.Param("id")
 	output, err := h.getManifestUC.Execute(c.Request.Context(), id)
 	if err != nil {
@@ -93,14 +93,14 @@ func (h *TemplateHandler) GetManifest(c *gin.Context) {
 			c.JSON(appErr.Code, appErr.ToResponse())
 			return
 		}
-		c.JSON(http.StatusNotFound, gin.H{"error": "Template not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Layout not found"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"manifest": output.Manifest})
 }
 
-func (h *TemplateHandler) GetByID(c *gin.Context) {
+func (h *LayoutHandler) GetByID(c *gin.Context) {
 	id := c.Param("id")
 	output, err := h.getByIDUC.Execute(c.Request.Context(), id)
 	if err != nil {
@@ -109,9 +109,9 @@ func (h *TemplateHandler) GetByID(c *gin.Context) {
 			c.JSON(appErr.Code, appErr.ToResponse())
 			return
 		}
-		c.JSON(http.StatusNotFound, gin.H{"error": "Template not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "Layout not found"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"template": output.Template})
+	c.JSON(http.StatusOK, gin.H{"layout": output.Layout})
 }

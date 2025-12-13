@@ -1,16 +1,16 @@
 /**
- * Template Configuration Schema
- * Defines the structure for template metadata and configuration
+ * Layout Configuration Schema
+ * Defines the structure for layout metadata and configuration
  */
 
 /**
- * @typedef {Object} TemplateMetadata
- * @property {string} name - Template display name
- * @property {string} description - Template description
+ * @typedef {Object} LayoutMetadata
+ * @property {string} name - Layout display name
+ * @property {string} description - Layout description
  * @property {string} previewImage - URL to preview image
- * @property {string[]} tags - Template tags for categorization
- * @property {string} author - Template author
- * @property {string} version - Template version
+ * @property {string[]} tags - Layout tags for categorization
+ * @property {string} author - Layout author
+ * @property {string} version - Layout version
  */
 
 /**
@@ -93,16 +93,15 @@
  */
 
 /**
- * @typedef {Object} TemplateConfig
- * @property {string} id - Unique template identifier
- * @property {string} name - Template name
- * @property {string} version - Template version
- * @property {TemplateMetadata} metadata - Template metadata
+ * @typedef {Object} LayoutConfig
+ * @property {string} id - Unique layout identifier
+ * @property {string} name - Layout name
+ * @property {string} version - Layout version
+ * @property {LayoutMetadata} metadata - Layout metadata
  * @property {SectionConfig[]} sections - Section configurations
  * @property {ThemeConfig} theme - Theme configuration
  */
 
-export const TemplateConfigSchema = {
+export const LayoutConfigSchema = {
   // Schema validation can be added here
 };
-

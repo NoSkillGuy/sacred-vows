@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useBuilderStore } from '../../store/builderStore';
-import { getTemplates, getTemplateManifest } from '../../services/templateService';
-import TemplateCardUnified from '../Templates/TemplateCardUnified';
-import './TemplateSwitcher.css';
+import { getLayouts, getLayoutManifest } from '../../services/layoutService';
+import LayoutCardUnified from '../Layouts/LayoutCardUnified';
+import './LayoutSwitcher.css';
 
 // SVG Icons
 const CloseIcon = () => (
@@ -20,62 +20,62 @@ const WarningIcon = () => (
   </svg>
 );
 
-function TemplateSwitcher({ isOpen, onClose }) {
+function LayoutSwitcher({ isOpen, onClose }) {
   const { 
     currentInvitation, 
-    switchTemplate,
+    switchLayout,
   } = useBuilderStore();
   
-  const [templates, setTemplates] = useState([]);
+  const [layouts, setLayouts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [switching, setSwitching] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [selectedLayout, setSelectedLayout] = useState(null);
 
   useEffect(() => {
     if (isOpen) {
-      loadTemplates();
+      loadLayouts();
     }
   }, [isOpen]);
 
-  async function loadTemplates() {
+  async function loadLayouts() {
     try {
       setLoading(true);
-      const data = await getTemplates();
-      setTemplates(data.templates || []);
+      const data = await getLayouts();
+      setLayouts(data.layouts || []);
     } catch (error) {
-      console.error('Failed to load templates:', error);
+      console.error('Failed to load layouts:', error);
     } finally {
       setLoading(false);
     }
   }
 
-  const handleTemplateClick = (template) => {
-    if (!template.isAvailable) return;
-    if (template.id === currentInvitation.templateId) return;
+  const handleLayoutClick = (layout) => {
+    if (!layout.isAvailable) return;
+    if (layout.id === currentInvitation.layoutId) return;
     
-    setSelectedTemplate(template);
+    setSelectedLayout(layout);
     setShowConfirmation(true);
   };
 
   const handleConfirmSwitch = async () => {
-    if (!selectedTemplate) return;
+    if (!selectedLayout) return;
     
     try {
       setSwitching(true);
       
-      // Load the new template's manifest
-      const manifest = await getTemplateManifest(selectedTemplate.id);
+      // Load the new layout's manifest
+      const manifest = await getLayoutManifest(selectedLayout.id);
       
-      // Switch template (preserves content data)
-      await switchTemplate(selectedTemplate.id, manifest);
+      // Switch layout (preserves content data)
+      await switchLayout(selectedLayout.id, manifest);
       
       setShowConfirmation(false);
-      setSelectedTemplate(null);
+      setSelectedLayout(null);
       onClose();
     } catch (error) {
-      console.error('Failed to switch template:', error);
-      alert('Failed to switch template. Please try again.');
+      console.error('Failed to switch layout:', error);
+      alert('Failed to switch layout. Please try again.');
     } finally {
       setSwitching(false);
     }
@@ -83,46 +83,46 @@ function TemplateSwitcher({ isOpen, onClose }) {
 
   const handleCancelSwitch = () => {
     setShowConfirmation(false);
-    setSelectedTemplate(null);
+    setSelectedLayout(null);
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="template-switcher-overlay" onClick={onClose}>
-      <div className="template-switcher-modal" onClick={e => e.stopPropagation()}>
+    <div className="layout-switcher-overlay" onClick={onClose}>
+      <div className="layout-switcher-modal" onClick={e => e.stopPropagation()}>
         {/* Header */}
-        <div className="template-switcher-header">
+        <div className="layout-switcher-header">
           <div>
-            <h3>Change Template</h3>
-            <p>Your content will be preserved when switching templates</p>
+            <h3>Change Layout</h3>
+            <p>Your content will be preserved when switching layouts</p>
           </div>
-          <button className="template-switcher-close" onClick={onClose}>
+          <button className="layout-switcher-close" onClick={onClose}>
             <CloseIcon />
           </button>
         </div>
 
-        {/* Template Grid */}
-        <div className="template-switcher-body">
+        {/* Layout Grid */}
+        <div className="layout-switcher-body">
           {loading ? (
-            <div className="template-switcher-loading">
+            <div className="layout-switcher-loading">
               <div className="loading-spinner"></div>
-              <p>Loading templates...</p>
+              <p>Loading layouts...</p>
             </div>
           ) : (
-            <div className="template-switcher-grid">
-              {templates.map((template) => {
-                const isActive = template.id === currentInvitation.templateId;
-                const isReady = template.status === 'ready' || template.isAvailable;
+            <div className="layout-switcher-grid">
+              {layouts.map((layout) => {
+                const isActive = layout.id === currentInvitation.layoutId;
+                const isReady = layout.status === 'ready' || layout.isAvailable;
                 return (
-                  <TemplateCardUnified
-                    key={template.id}
-                    template={template}
+                  <LayoutCardUnified
+                    key={layout.id}
+                    layout={layout}
                     active={isActive}
                     showActiveBadge
-                    onCardClick={() => handleTemplateClick(template)}
-                    onPrimaryAction={handleTemplateClick}
-                    primaryLabel={isActive ? 'Current Template' : isReady ? 'Switch Template' : 'Coming Soon'}
+                    onCardClick={() => handleLayoutClick(layout)}
+                    onPrimaryAction={handleLayoutClick}
+                    primaryLabel={isActive ? 'Current Layout' : isReady ? 'Switch Layout' : 'Coming Soon'}
                     primaryDisabled={!isReady}
                   />
                 );
@@ -132,16 +132,16 @@ function TemplateSwitcher({ isOpen, onClose }) {
         </div>
 
         {/* Confirmation Dialog */}
-        {showConfirmation && selectedTemplate && (
-          <div className="template-switch-confirm">
+        {showConfirmation && selectedLayout && (
+          <div className="layout-switch-confirm">
             <div className="confirm-content">
               <div className="confirm-icon">
                 <WarningIcon />
               </div>
-              <h4>Switch to {selectedTemplate.name}?</h4>
+              <h4>Switch to {selectedLayout.name}?</h4>
               <p>
                 Your content (names, dates, photos, etc.) will be preserved. 
-                However, the section order and theme will reset to the new template's defaults.
+                However, the section order and theme will reset to the new layout's defaults.
               </p>
               <div className="confirm-actions">
                 <button 
@@ -162,7 +162,7 @@ function TemplateSwitcher({ isOpen, onClose }) {
                       Switching...
                     </>
                   ) : (
-                    'Switch Template'
+                    'Switch Layout'
                   )}
                 </button>
               </div>
@@ -174,5 +174,5 @@ function TemplateSwitcher({ isOpen, onClose }) {
   );
 }
 
-export default TemplateSwitcher;
+export default LayoutSwitcher;
 

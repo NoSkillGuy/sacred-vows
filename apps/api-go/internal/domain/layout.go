@@ -5,8 +5,8 @@ import (
 	"time"
 )
 
-// Template represents a template entity
-type Template struct {
+// Layout represents a layout entity
+type Layout struct {
 	ID           string
 	Name         string
 	Description  *string
@@ -20,10 +20,10 @@ type Template struct {
 	UpdatedAt    time.Time
 }
 
-// Validate validates template entity
-func (t *Template) Validate() error {
-	if t.Name == "" {
-		return ErrInvalidTemplateName
+// Validate validates layout entity
+func (l *Layout) Validate() error {
+	if l.Name == "" {
+		return ErrInvalidLayoutName
 	}
 	return nil
 }

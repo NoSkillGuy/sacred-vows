@@ -21,12 +21,12 @@ func NewInvitationRepository(db *gorm.DB) repository.InvitationRepository {
 
 func (r *invitationRepository) Create(ctx context.Context, invitation *domain.Invitation) error {
 	model := &InvitationModel{
-		ID:         invitation.ID,
-		TemplateID: invitation.TemplateID,
-		Data:       datatypes.JSON(invitation.Data),
-		UserID:     invitation.UserID,
-		CreatedAt:  time.Now(),
-		UpdatedAt:  time.Now(),
+		ID:        invitation.ID,
+		LayoutID:  invitation.LayoutID,
+		Data:      datatypes.JSON(invitation.Data),
+		UserID:    invitation.UserID,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 	return r.db.WithContext(ctx).Create(model).Error
 }
@@ -61,11 +61,11 @@ func (r *invitationRepository) FindByUserID(ctx context.Context, userID string) 
 
 func (r *invitationRepository) Update(ctx context.Context, invitation *domain.Invitation) error {
 	model := &InvitationModel{
-		ID:         invitation.ID,
-		TemplateID: invitation.TemplateID,
-		Data:       datatypes.JSON(invitation.Data),
-		UserID:     invitation.UserID,
-		UpdatedAt:  time.Now(),
+		ID:        invitation.ID,
+		LayoutID:  invitation.LayoutID,
+		Data:      datatypes.JSON(invitation.Data),
+		UserID:    invitation.UserID,
+		UpdatedAt: time.Now(),
 	}
 	return r.db.WithContext(ctx).Model(&InvitationModel{}).Where("id = ?", invitation.ID).Updates(model).Error
 }
@@ -80,11 +80,11 @@ func toInvitationDomain(model *InvitationModel) (*domain.Invitation, error) {
 		return nil, err
 	}
 	return &domain.Invitation{
-		ID:         model.ID,
-		TemplateID: model.TemplateID,
-		Data:       json.RawMessage(data),
-		UserID:     model.UserID,
-		CreatedAt:  model.CreatedAt,
-		UpdatedAt:  model.UpdatedAt,
+		ID:        model.ID,
+		LayoutID:  model.LayoutID,
+		Data:      json.RawMessage(data),
+		UserID:    model.UserID,
+		CreatedAt: model.CreatedAt,
+		UpdatedAt: model.UpdatedAt,
 	}, nil
 }

@@ -19,8 +19,8 @@ import (
 	"github.com/sacred-vows/api-go/internal/usecase/asset"
 	authUC "github.com/sacred-vows/api-go/internal/usecase/auth"
 	"github.com/sacred-vows/api-go/internal/usecase/invitation"
+	"github.com/sacred-vows/api-go/internal/usecase/layout"
 	"github.com/sacred-vows/api-go/internal/usecase/rsvp"
-	"github.com/sacred-vows/api-go/internal/usecase/template"
 	"github.com/sacred-vows/api-go/pkg/logger"
 	"go.uber.org/zap"
 )
@@ -60,7 +60,7 @@ func main() {
 	if err := db.RunMigrations(ctx, migrationsDir); err != nil {
 		logger.GetLogger().Error("Failed to run SQL migrations", zap.Error(err))
 		// Continue anyway - GORM AutoMigrate will handle schema changes
-		// But data migrations (like loading templates) may fail
+		// But data migrations (like loading layouts) may fail
 	}
 
 	// Run GORM AutoMigrate
@@ -78,7 +78,7 @@ func main() {
 	// Initialize repositories
 	userRepo := postgres.NewUserRepository(db.DB)
 	invitationRepo := postgres.NewInvitationRepository(db.DB)
-	templateRepo := postgres.NewTemplateRepository(db.DB)
+	layoutRepo := postgres.NewLayoutRepository(db.DB)
 	assetRepo := postgres.NewAssetRepository(db.DB)
 	rsvpRepo := postgres.NewRSVPRepository(db.DB)
 	analyticsRepo := postgres.NewAnalyticsRepository(db.DB)
@@ -104,10 +104,10 @@ func main() {
 	updateInvitationUC := invitation.NewUpdateInvitationUseCase(invitationRepo)
 	deleteInvitationUC := invitation.NewDeleteInvitationUseCase(invitationRepo)
 
-	getAllTemplatesUC := template.NewGetAllTemplatesUseCase(templateRepo)
-	getTemplateByIDUC := template.NewGetTemplateByIDUseCase(templateRepo)
-	getTemplateManifestUC := template.NewGetTemplateManifestUseCase(templateRepo)
-	getManifestsUC := template.NewGetManifestsUseCase(templateRepo)
+	getAllLayoutsUC := layout.NewGetAllLayoutsUseCase(layoutRepo)
+	getLayoutByIDUC := layout.NewGetLayoutByIDUseCase(layoutRepo)
+	getLayoutManifestUC := layout.NewGetLayoutManifestUseCase(layoutRepo)
+	getManifestsUC := layout.NewGetManifestsUseCase(layoutRepo)
 
 	uploadAssetUC := asset.NewUploadAssetUseCase(assetRepo, cfg.Storage.UploadPath, cfg.Storage.MaxFileSize, cfg.Storage.AllowedTypes)
 	getAllAssetsUC := asset.NewGetAllAssetsUseCase(assetRepo)
@@ -122,13 +122,13 @@ func main() {
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(registerUC, loginUC, getCurrentUserUC, googleOAuthUC, jwtService, googleOAuthService)
 	invitationHandler := handlers.NewInvitationHandler(createInvitationUC, getInvitationByIDUC, getAllInvitationsUC, getInvitationPreviewUC, updateInvitationUC, deleteInvitationUC)
-	templateHandler := handlers.NewTemplateHandler(getAllTemplatesUC, getTemplateByIDUC, getTemplateManifestUC, getManifestsUC)
+	layoutHandler := handlers.NewLayoutHandler(getAllLayoutsUC, getLayoutByIDUC, getLayoutManifestUC, getManifestsUC)
 	assetHandler := handlers.NewAssetHandler(uploadAssetUC, getAllAssetsUC, deleteAssetUC, fileStorage)
 	rsvpHandler := handlers.NewRSVPHandler(submitRSVPUC, getRSVPByInvitationUC)
 	analyticsHandler := handlers.NewAnalyticsHandler(trackViewUC, getAnalyticsByInvitationUC)
 
 	// Setup router
-	router := httpRouter.NewRouter(authHandler, invitationHandler, templateHandler, assetHandler, rsvpHandler, analyticsHandler, jwtService)
+	router := httpRouter.NewRouter(authHandler, invitationHandler, layoutHandler, assetHandler, rsvpHandler, analyticsHandler, jwtService)
 	engine := router.Setup()
 
 	// Create HTTP server

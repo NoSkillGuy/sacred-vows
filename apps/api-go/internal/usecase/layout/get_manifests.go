@@ -1,4 +1,4 @@
-package template
+package layout
 
 import (
 	"context"
@@ -7,12 +7,12 @@ import (
 )
 
 type GetManifestsUseCase struct {
-	templateRepo repository.TemplateRepository
+	layoutRepo repository.LayoutRepository
 }
 
-func NewGetManifestsUseCase(templateRepo repository.TemplateRepository) *GetManifestsUseCase {
+func NewGetManifestsUseCase(layoutRepo repository.LayoutRepository) *GetManifestsUseCase {
 	return &GetManifestsUseCase{
-		templateRepo: templateRepo,
+		layoutRepo: layoutRepo,
 	}
 }
 
@@ -21,21 +21,21 @@ type GetManifestsOutput struct {
 }
 
 func (uc *GetManifestsUseCase) Execute(ctx context.Context) (*GetManifestsOutput, error) {
-	templates, err := uc.templateRepo.FindAll(ctx)
+	layouts, err := uc.layoutRepo.FindAll(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	var manifests []map[string]interface{}
-	for _, template := range templates {
+	for _, layout := range layouts {
 		// Convert to DTO to check status
-		dto, err := ToTemplateSummaryDTO(template)
+		dto, err := ToLayoutSummaryDTO(layout)
 		if err != nil {
-			// Skip templates with invalid manifest
+			// Skip layouts with invalid manifest
 			continue
 		}
 
-		// Filter out coming-soon templates - only show ready templates
+		// Filter out coming-soon layouts - only show ready layouts
 		isReady := false
 		if dto.Status != nil && *dto.Status == "ready" {
 			isReady = true
@@ -48,7 +48,7 @@ func (uc *GetManifestsUseCase) Execute(ctx context.Context) (*GetManifestsOutput
 		}
 
 		// Convert to map using ToManifestMap
-		manifestMap, err := ToManifestMap(template)
+		manifestMap, err := ToManifestMap(layout)
 		if err != nil || manifestMap == nil {
 			continue
 		}

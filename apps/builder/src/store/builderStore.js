@@ -1,15 +1,15 @@
 import { create } from 'zustand';
 import { defaultWeddingConfig, defaultTemplateConfig, SECTION_TYPES } from '../config/wedding-config';
 import { updateInvitation } from '../services/invitationService';
-import { getTemplateManifest } from '../services/templateService';
+import { getLayoutManifest } from '../services/layoutService';
 
 /**
  * Builder Store
  * Manages state for the wedding invitation builder
  * 
  * Data Structure:
- * - currentInvitation.data: Universal content data (preserved across templates)
- * - currentInvitation.templateConfig: Template-specific config (sections, theme)
+ * - currentInvitation.data: Universal content data (preserved across layouts)
+ * - currentInvitation.layoutConfig: Layout-specific config (sections, theme)
  */
 const STORAGE_KEY = 'wedding-builder-autosave';
 
@@ -19,9 +19,20 @@ function loadFromStorage() {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       const parsed = JSON.parse(stored);
-      // Ensure templateConfig exists for backward compatibility
-      if (!parsed.templateConfig) {
-        parsed.templateConfig = { ...defaultTemplateConfig };
+      // Ensure layoutConfig exists for backward compatibility
+      if (!parsed.layoutConfig) {
+        // Support old templateConfig for migration
+        if (parsed.templateConfig) {
+          parsed.layoutConfig = parsed.templateConfig;
+          delete parsed.templateConfig;
+        } else {
+          parsed.layoutConfig = { ...defaultTemplateConfig };
+        }
+      }
+      // Migrate templateId to layoutId
+      if (parsed.templateId && !parsed.layoutId) {
+        parsed.layoutId = parsed.templateId;
+        delete parsed.templateId;
       }
       return parsed;
     }
@@ -30,9 +41,9 @@ function loadFromStorage() {
   }
   return {
     id: null,
-    templateId: 'royal-elegance',
+    layoutId: 'royal-elegance',
     data: defaultWeddingConfig,
-    templateConfig: { ...defaultTemplateConfig },
+    layoutConfig: { ...defaultTemplateConfig },
     translations: null,
   };
 }
@@ -64,7 +75,7 @@ export const useBuilderStore = create((set, get) => {
           set({ saving: true });
           await updateInvitation(updatedInvitation.id, {
             data: updatedInvitation.data,
-            templateConfig: updatedInvitation.templateConfig,
+            layoutConfig: updatedInvitation.layoutConfig,
           });
           set({ saving: false });
         } catch (error) {
@@ -79,8 +90,8 @@ export const useBuilderStore = create((set, get) => {
     // Current invitation being edited
     currentInvitation: initialInvitation,
 
-    // Current template manifest (loaded from API/file)
-    currentTemplateManifest: null,
+    // Current layout manifest (loaded from API/file)
+    currentLayoutManifest: null,
 
     // Loading and error states
     loading: false,
@@ -89,20 +100,20 @@ export const useBuilderStore = create((set, get) => {
     lastSavedAt: null,
 
     // =========================================================================
-    // TEMPLATE MANIFEST MANAGEMENT
+    // LAYOUT MANIFEST MANAGEMENT
     // =========================================================================
 
     /**
-     * Load template manifest for current template
+     * Load layout manifest for current layout
      */
-    loadTemplateManifest: async () => {
+    loadLayoutManifest: async () => {
       const { currentInvitation } = get();
       try {
-        const manifest = await getTemplateManifest(currentInvitation.templateId);
-        // If manifest has theme presets, sync them into templateConfig for use in UI
+        const manifest = await getLayoutManifest(currentInvitation.layoutId);
+        // If manifest has theme presets, sync them into layoutConfig for use in UI
         if (manifest?.themes?.length) {
           const defaultTheme = manifest.themes.find(t => t.isDefault) || manifest.themes[0];
-          const existingTheme = currentInvitation.templateConfig?.theme || {};
+          const existingTheme = currentInvitation.layoutConfig?.theme || {};
           const hasPreset = Boolean(existingTheme.preset);
 
           const themeWithPreset = hasPreset || !defaultTheme ? existingTheme : {
@@ -113,8 +124,8 @@ export const useBuilderStore = create((set, get) => {
 
           const updatedInvitation = {
             ...currentInvitation,
-            templateConfig: {
-              ...currentInvitation.templateConfig,
+            layoutConfig: {
+              ...currentInvitation.layoutConfig,
               themes: manifest.themes,
               theme: themeWithPreset,
             },
@@ -126,10 +137,10 @@ export const useBuilderStore = create((set, get) => {
           set({ currentInvitation: updatedInvitation });
         }
 
-        set({ currentTemplateManifest: manifest });
+        set({ currentLayoutManifest: manifest });
         return manifest;
       } catch (error) {
-        console.error('Failed to load template manifest:', error);
+        console.error('Failed to load layout manifest:', error);
         return null;
       }
     },
@@ -139,11 +150,15 @@ export const useBuilderStore = create((set, get) => {
      * @param {Object} invitation - Invitation object from backend
      */
     setCurrentInvitation: (invitation) => {
+      // Support migration from templateConfig to layoutConfig
+      const layoutConfig = invitation.layoutConfig || invitation.templateConfig || {};
+      const layoutId = invitation.layoutId || invitation.templateId || 'royal-elegance';
       const invitationWithConfig = {
         ...invitation,
-        templateConfig: {
+        layoutId,
+        layoutConfig: {
           ...defaultTemplateConfig,
-          ...invitation.templateConfig,
+          ...layoutConfig,
         },
       };
       set({ currentInvitation: invitationWithConfig });
@@ -151,10 +166,10 @@ export const useBuilderStore = create((set, get) => {
     },
 
     /**
-     * Set template manifest directly (for when loaded externally)
+     * Set layout manifest directly (for when loaded externally)
      */
-    setTemplateManifest: (manifest) => {
-      set({ currentTemplateManifest: manifest });
+    setLayoutManifest: (manifest) => {
+      set({ currentLayoutManifest: manifest });
     },
 
     // =========================================================================
@@ -166,7 +181,7 @@ export const useBuilderStore = create((set, get) => {
      */
     getEnabledSections: () => {
       const { currentInvitation } = get();
-      const sections = currentInvitation.templateConfig?.sections || [];
+      const sections = currentInvitation.layoutConfig?.sections || [];
       return sections
         .filter(s => s.enabled)
         .sort((a, b) => a.order - b.order);
@@ -177,7 +192,7 @@ export const useBuilderStore = create((set, get) => {
      */
     getAllSections: () => {
       const { currentInvitation } = get();
-      return (currentInvitation.templateConfig?.sections || [])
+      return (currentInvitation.layoutConfig?.sections || [])
         .slice()
         .sort((a, b) => a.order - b.order);
     },
@@ -188,7 +203,7 @@ export const useBuilderStore = create((set, get) => {
      */
     reorderSections: (newOrder) => {
       const { currentInvitation } = get();
-      const sections = [...(currentInvitation.templateConfig?.sections || [])];
+      const sections = [...(currentInvitation.layoutConfig?.sections || [])];
       
       // Update order for each section based on new order array
       const updatedSections = sections.map(section => ({
@@ -198,8 +213,8 @@ export const useBuilderStore = create((set, get) => {
 
       const updatedInvitation = {
         ...currentInvitation,
-        templateConfig: {
-          ...currentInvitation.templateConfig,
+        layoutConfig: {
+          ...currentInvitation.layoutConfig,
           sections: updatedSections,
         },
       };
@@ -213,14 +228,14 @@ export const useBuilderStore = create((set, get) => {
      * @param {string} sectionId - Section ID to toggle
      */
     toggleSection: (sectionId) => {
-      const { currentInvitation, currentTemplateManifest } = get();
-      const sections = [...(currentInvitation.templateConfig?.sections || [])];
+      const { currentInvitation, currentLayoutManifest } = get();
+      const sections = [...(currentInvitation.layoutConfig?.sections || [])];
       
       const sectionIndex = sections.findIndex(s => s.id === sectionId);
       if (sectionIndex === -1) return;
 
       // Check if section is required (can't disable required sections)
-      const manifestSection = currentTemplateManifest?.sections?.find(s => s.id === sectionId);
+      const manifestSection = currentLayoutManifest?.sections?.find(s => s.id === sectionId);
       if (manifestSection?.required && sections[sectionIndex].enabled) {
         console.warn(`Cannot disable required section: ${sectionId}`);
         return;
@@ -233,8 +248,8 @@ export const useBuilderStore = create((set, get) => {
 
       const updatedInvitation = {
         ...currentInvitation,
-        templateConfig: {
-          ...currentInvitation.templateConfig,
+        layoutConfig: {
+          ...currentInvitation.layoutConfig,
           sections,
         },
       };
@@ -249,7 +264,7 @@ export const useBuilderStore = create((set, get) => {
      */
     enableSection: (sectionId) => {
       const { currentInvitation } = get();
-      const sections = [...(currentInvitation.templateConfig?.sections || [])];
+      const sections = [...(currentInvitation.layoutConfig?.sections || [])];
       
       const sectionIndex = sections.findIndex(s => s.id === sectionId);
       if (sectionIndex !== -1) {
@@ -270,8 +285,8 @@ export const useBuilderStore = create((set, get) => {
 
       const updatedInvitation = {
         ...currentInvitation,
-        templateConfig: {
-          ...currentInvitation.templateConfig,
+        layoutConfig: {
+          ...currentInvitation.layoutConfig,
           sections,
         },
       };
@@ -285,11 +300,11 @@ export const useBuilderStore = create((set, get) => {
      * @param {string} sectionId - Section ID to disable
      */
     disableSection: (sectionId) => {
-      const { currentInvitation, currentTemplateManifest } = get();
-      const sections = [...(currentInvitation.templateConfig?.sections || [])];
+      const { currentInvitation, currentLayoutManifest } = get();
+      const sections = [...(currentInvitation.layoutConfig?.sections || [])];
       
       // Check if section is required
-      const manifestSection = currentTemplateManifest?.sections?.find(s => s.id === sectionId);
+      const manifestSection = currentLayoutManifest?.sections?.find(s => s.id === sectionId);
       if (manifestSection?.required) {
         console.warn(`Cannot disable required section: ${sectionId}`);
         return;
@@ -305,8 +320,8 @@ export const useBuilderStore = create((set, get) => {
 
       const updatedInvitation = {
         ...currentInvitation,
-        templateConfig: {
-          ...currentInvitation.templateConfig,
+        layoutConfig: {
+          ...currentInvitation.layoutConfig,
           sections,
         },
       };
@@ -324,18 +339,18 @@ export const useBuilderStore = create((set, get) => {
      */
     getTheme: () => {
       const { currentInvitation } = get();
-      return currentInvitation.templateConfig?.theme || currentInvitation.data?.theme || {};
+      return currentInvitation.layoutConfig?.theme || currentInvitation.data?.theme || {};
     },
 
     /**
-     * Apply a theme preset from template manifest
+     * Apply a theme preset from layout manifest
      * @param {string} presetId - Theme preset ID
      */
     applyThemePreset: (presetId) => {
-      const { currentInvitation, currentTemplateManifest } = get();
+      const { currentInvitation, currentLayoutManifest } = get();
       
-      const preset = currentTemplateManifest?.themes?.find(t => t.id === presetId)
-        || currentInvitation?.templateConfig?.themes?.find(t => t.id === presetId);
+      const preset = currentLayoutManifest?.themes?.find(t => t.id === presetId)
+        || currentInvitation?.layoutConfig?.themes?.find(t => t.id === presetId);
       if (!preset) {
         console.warn(`Theme preset not found: ${presetId}`);
         return;
@@ -343,8 +358,8 @@ export const useBuilderStore = create((set, get) => {
 
       const updatedInvitation = {
         ...currentInvitation,
-        templateConfig: {
-          ...currentInvitation.templateConfig,
+        layoutConfig: {
+          ...currentInvitation.layoutConfig,
           theme: {
             preset: presetId,
             colors: { ...preset.colors },
@@ -372,7 +387,7 @@ export const useBuilderStore = create((set, get) => {
      */
     updateThemeColors: (colors) => {
       const { currentInvitation } = get();
-      const currentTheme = currentInvitation.templateConfig?.theme || {};
+      const currentTheme = currentInvitation.layoutConfig?.theme || {};
 
       const updatedTheme = {
         ...currentTheme,
@@ -385,8 +400,8 @@ export const useBuilderStore = create((set, get) => {
 
       const updatedInvitation = {
         ...currentInvitation,
-        templateConfig: {
-          ...currentInvitation.templateConfig,
+        layoutConfig: {
+          ...currentInvitation.layoutConfig,
           theme: updatedTheme,
         },
         data: {
@@ -405,7 +420,7 @@ export const useBuilderStore = create((set, get) => {
      */
     updateThemeFonts: (fonts) => {
       const { currentInvitation } = get();
-      const currentTheme = currentInvitation.templateConfig?.theme || {};
+      const currentTheme = currentInvitation.layoutConfig?.theme || {};
 
       const updatedTheme = {
         ...currentTheme,
@@ -418,8 +433,8 @@ export const useBuilderStore = create((set, get) => {
 
       const updatedInvitation = {
         ...currentInvitation,
-        templateConfig: {
-          ...currentInvitation.templateConfig,
+        layoutConfig: {
+          ...currentInvitation.layoutConfig,
           theme: updatedTheme,
         },
         data: {
@@ -441,8 +456,8 @@ export const useBuilderStore = create((set, get) => {
 
       const updatedInvitation = {
         ...currentInvitation,
-        templateConfig: {
-          ...currentInvitation.templateConfig,
+        layoutConfig: {
+          ...currentInvitation.layoutConfig,
           theme,
         },
         data: {
@@ -456,22 +471,22 @@ export const useBuilderStore = create((set, get) => {
     },
 
     // =========================================================================
-    // TEMPLATE SWITCHING
+    // LAYOUT SWITCHING
     // =========================================================================
 
     /**
-     * Switch to a different template
-     * Preserves universal content data, resets template-specific config
-     * @param {string} newTemplateId - New template ID
-     * @param {Object} newManifest - New template manifest
+     * Switch to a different layout
+     * Preserves universal content data, resets layout-specific config
+     * @param {string} newLayoutId - New layout ID
+     * @param {Object} newManifest - New layout manifest
      */
-    switchTemplate: async (newTemplateId, newManifest) => {
+    switchLayout: async (newLayoutId, newManifest) => {
       const { currentInvitation } = get();
       
-      // Get default theme from new template
+      // Get default theme from new layout
       const defaultTheme = newManifest?.themes?.find(t => t.isDefault) || newManifest?.themes?.[0];
       
-      // Get default sections from new template
+      // Get default sections from new layout
       const defaultSections = (newManifest?.defaultSectionOrder || []).map((id, index) => {
         const sectionDef = newManifest?.sections?.find(s => s.id === id);
         return {
@@ -483,7 +498,7 @@ export const useBuilderStore = create((set, get) => {
 
       const updatedInvitation = {
         ...currentInvitation,
-        templateId: newTemplateId,
+        layoutId: newLayoutId,
         // Preserve universal content data
         data: {
           ...currentInvitation.data,
@@ -494,21 +509,21 @@ export const useBuilderStore = create((set, get) => {
             fonts: { ...defaultTheme.fonts },
           } : currentInvitation.data.theme,
         },
-        // Reset template config to new template defaults
-        templateConfig: {
+        // Reset layout config to new layout defaults
+        layoutConfig: {
           sections: defaultSections,
-          themes: newManifest?.themes || currentInvitation.templateConfig?.themes,
+          themes: newManifest?.themes || currentInvitation.layoutConfig?.themes,
           theme: defaultTheme ? {
             preset: defaultTheme.id,
             colors: { ...defaultTheme.colors },
             fonts: { ...defaultTheme.fonts },
-          } : currentInvitation.templateConfig?.theme,
+          } : currentInvitation.layoutConfig?.theme,
         },
       };
 
       set({ 
         currentInvitation: updatedInvitation,
-        currentTemplateManifest: newManifest,
+        currentLayoutManifest: newManifest,
       });
       triggerAutosave(updatedInvitation);
     },
@@ -599,10 +614,13 @@ export const useBuilderStore = create((set, get) => {
      * Set entire invitation
      */
     setInvitation: (invitation) => {
-      // Ensure templateConfig exists
+      // Ensure layoutConfig exists, support migration from templateConfig
+      const layoutConfig = invitation.layoutConfig || invitation.templateConfig || {};
+      const layoutId = invitation.layoutId || invitation.templateId || 'royal-elegance';
       const invitationWithConfig = {
         ...invitation,
-        templateConfig: invitation.templateConfig || { ...defaultTemplateConfig },
+        layoutId,
+        layoutConfig: { ...defaultTemplateConfig, ...layoutConfig },
       };
       set({ currentInvitation: invitationWithConfig });
       saveToStorage(invitationWithConfig);
@@ -622,9 +640,9 @@ export const useBuilderStore = create((set, get) => {
       clearTimeout(autoSaveTimer);
       const defaultInvitation = {
         id: null,
-        templateId: 'royal-elegance',
+        layoutId: 'royal-elegance',
         data: defaultWeddingConfig,
-        templateConfig: { ...defaultTemplateConfig },
+        layoutConfig: { ...defaultTemplateConfig },
         translations: null,
       };
       set({

@@ -6,9 +6,9 @@ import "errors"
 var (
 	ErrInvalidEmail         = errors.New("invalid email")
 	ErrInvalidPassword      = errors.New("invalid password")
-	ErrInvalidTemplateID    = errors.New("invalid template ID")
+	ErrInvalidLayoutID      = errors.New("invalid layout ID")
 	ErrInvalidUserID        = errors.New("invalid user ID")
-	ErrInvalidTemplateName  = errors.New("invalid template name")
+	ErrInvalidLayoutName    = errors.New("invalid layout name")
 	ErrInvalidAssetURL      = errors.New("invalid asset URL")
 	ErrInvalidFilename      = errors.New("invalid filename")
 	ErrInvalidInvitationID  = errors.New("invalid invitation ID")

@@ -13,7 +13,7 @@ import (
 type Router struct {
 	authHandler       *handlers.AuthHandler
 	invitationHandler *handlers.InvitationHandler
-	templateHandler   *handlers.TemplateHandler
+	layoutHandler     *handlers.LayoutHandler
 	assetHandler      *handlers.AssetHandler
 	rsvpHandler       *handlers.RSVPHandler
 	analyticsHandler  *handlers.AnalyticsHandler
@@ -23,7 +23,7 @@ type Router struct {
 func NewRouter(
 	authHandler *handlers.AuthHandler,
 	invitationHandler *handlers.InvitationHandler,
-	templateHandler *handlers.TemplateHandler,
+	layoutHandler *handlers.LayoutHandler,
 	assetHandler *handlers.AssetHandler,
 	rsvpHandler *handlers.RSVPHandler,
 	analyticsHandler *handlers.AnalyticsHandler,
@@ -32,7 +32,7 @@ func NewRouter(
 	return &Router{
 		authHandler:       authHandler,
 		invitationHandler: invitationHandler,
-		templateHandler:   templateHandler,
+		layoutHandler:     layoutHandler,
 		assetHandler:      assetHandler,
 		rsvpHandler:       rsvpHandler,
 		analyticsHandler:  analyticsHandler,
@@ -83,13 +83,13 @@ func (r *Router) Setup() *gin.Engine {
 			invitations.DELETE("/:id", middleware.OptionalAuth(r.jwtService), r.invitationHandler.Delete)
 		}
 
-		// Template routes
-		templates := api.Group("/templates")
+		// Layout routes
+		layouts := api.Group("/layouts")
 		{
-			templates.GET("", r.templateHandler.GetAll)
-			templates.GET("/manifests", r.templateHandler.GetManifests)
-			templates.GET("/:id/manifest", r.templateHandler.GetManifest)
-			templates.GET("/:id", r.templateHandler.GetByID)
+			layouts.GET("", r.layoutHandler.GetAll)
+			layouts.GET("/manifests", r.layoutHandler.GetManifests)
+			layouts.GET("/:id/manifest", r.layoutHandler.GetManifest)
+			layouts.GET("/:id", r.layoutHandler.GetByID)
 		}
 
 		// Asset routes

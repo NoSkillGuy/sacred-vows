@@ -77,7 +77,7 @@ See `.env.example` for all available variables:
 - `GOOGLE_REDIRECT_URI` (optional)
 - `FRONTEND_URL` (optional)
 - `UPLOAD_PATH` (optional)
-- `TEMPLATES_DIR` (optional)
+- `LAYOUTS_DIR` (optional)
 
 ## Dependencies
 

@@ -45,17 +45,17 @@ Handles invitation endpoints:
 - JSON data handling
 - User ID extraction from context
 
-### TemplateHandler (`template_handler.go`)
+### LayoutHandler (`layout_handler.go`)
 
-Handles template endpoints:
-- `GetAll` - GET /api/templates
-- `GetManifests` - GET /api/templates/manifests
-- `GetManifest` - GET /api/templates/:id/manifest
-- `GetByID` - GET /api/templates/:id
+Handles layout endpoints:
+- `GetAll` - GET /api/layouts
+- `GetManifests` - GET /api/layouts/manifests
+- `GetManifest` - GET /api/layouts/:id/manifest
+- `GetByID` - GET /api/layouts/:id
 
 **Features:**
 - Query parameter filtering (category, featured)
-- File system template loading
+- File system layout loading
 - Manifest normalization
 
 ### AssetHandler (`asset_handler.go`)

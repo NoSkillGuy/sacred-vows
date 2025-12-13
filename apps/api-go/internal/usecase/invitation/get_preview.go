@@ -29,9 +29,9 @@ func (uc *GetInvitationPreviewUseCase) Execute(ctx context.Context, id string) (
 
 	return &GetInvitationPreviewOutput{
 		Invitation: &InvitationPreviewDTO{
-			ID:         invitation.ID,
-			TemplateID: invitation.TemplateID,
-			Data:       invitation.Data,
+			ID:       invitation.ID,
+			LayoutID: invitation.LayoutID,
+			Data:     invitation.Data,
 		},
 	}, nil
 }

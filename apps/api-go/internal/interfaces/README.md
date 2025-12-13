@@ -31,7 +31,7 @@ interfaces/
 Convert HTTP requests to use case calls and format responses:
 - `auth_handler.go` - Authentication endpoints
 - `invitation_handler.go` - Invitation endpoints
-- `template_handler.go` - Template endpoints
+- `layout_handler.go` - Layout endpoints
 - `asset_handler.go` - Asset endpoints
 - `rsvp_handler.go` - RSVP endpoints
 - `analytics_handler.go` - Analytics endpoints
@@ -52,7 +52,7 @@ Defines all HTTP routes and applies middleware.
 Define contracts for data access:
 - `user_repository.go`
 - `invitation_repository.go`
-- `template_repository.go`
+- `layout_repository.go`
 - `asset_repository.go`
 - `rsvp_repository.go`
 - `analytics_repository.go`

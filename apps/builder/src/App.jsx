@@ -6,7 +6,7 @@ import SignupPage from './components/Auth/SignupPage';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 import SmartRedirect from './components/Auth/SmartRedirect';
 import Dashboard from './components/Dashboard/Dashboard';
-import TemplateGallery from './components/Dashboard/TemplateGallery';
+import LayoutGallery from './components/Dashboard/LayoutGallery';
 
 // Static Pages
 import PricingPage from './components/Pages/Support/PricingPage';
@@ -21,8 +21,8 @@ import BlogPage from './components/Pages/Company/BlogPage';
 import CareersPage from './components/Pages/Company/CareersPage';
 import PressPage from './components/Pages/Company/PressPage';
 
-import TemplatesGalleryPage from './components/Pages/Templates/TemplatesGalleryPage';
-import TemplateCategoryPage from './components/Pages/Templates/TemplateCategoryPage';
+import LayoutsGalleryPage from './components/Pages/Layouts/LayoutsGalleryPage';
+import LayoutCategoryPage from './components/Pages/Layouts/LayoutCategoryPage';
 
 import PrivacyPage from './components/Pages/Legal/PrivacyPage';
 import TermsPage from './components/Pages/Legal/TermsPage';
@@ -37,9 +37,9 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         
-        {/* Static Pages - Templates */}
-        <Route path="/templates-gallery" element={<TemplatesGalleryPage />} />
-        <Route path="/templates/:category" element={<TemplateCategoryPage />} />
+        {/* Static Pages - Layouts */}
+        <Route path="/layouts-gallery" element={<LayoutsGalleryPage />} />
+        <Route path="/layouts/:category" element={<LayoutCategoryPage />} />
         
         {/* Static Pages - Support */}
         <Route path="/pricing" element={<PricingPage />} />
@@ -80,12 +80,12 @@ function App() {
           } 
         />
         
-        {/* Template Gallery - browse and select templates */}
+        {/* Layout Gallery - browse and select layouts */}
         <Route 
-          path="/templates" 
+          path="/layouts" 
           element={
             <ProtectedRoute>
-              <TemplateGallery />
+              <LayoutGallery />
             </ProtectedRoute>
           } 
         />

@@ -293,26 +293,26 @@ func min(a, b int) int {
 	return b
 }
 
-// MigrateTemplatesFromFiles migrates templates from file system to database
-func MigrateTemplatesFromFiles(ctx context.Context, db *gorm.DB, templatesDir string, templateRepo repository.TemplateRepository) error {
+// MigrateLayoutsFromFiles migrates layouts from file system to database
+func MigrateLayoutsFromFiles(ctx context.Context, db *gorm.DB, layoutsDir string, layoutRepo repository.LayoutRepository) error {
 	log := logger.GetLogger()
 
 	// Check if templates table is empty
 	var count int64
 	if err := db.WithContext(ctx).Model(&TemplateModel{}).Count(&count).Error; err != nil {
-		return fmt.Errorf("failed to check templates count: %w", err)
+		return fmt.Errorf("failed to check layouts count: %w", err)
 	}
 
 	if count > 0 {
-		log.Info("Templates already exist in database, skipping migration")
+		log.Info("Layouts already exist in database, skipping migration")
 		return nil
 	}
 
-	log.Info("Starting template migration from files", zap.String("templatesDir", templatesDir))
+	log.Info("Starting layout migration from files", zap.String("layoutsDir", layoutsDir))
 
-	entries, err := os.ReadDir(templatesDir)
+	entries, err := os.ReadDir(layoutsDir)
 	if err != nil {
-		return fmt.Errorf("failed to read templates directory: %w", err)
+		return fmt.Errorf("failed to read layouts directory: %w", err)
 	}
 
 	successCount := 0
@@ -323,16 +323,16 @@ func MigrateTemplatesFromFiles(ctx context.Context, db *gorm.DB, templatesDir st
 			continue
 		}
 
-		templateID := entry.Name()
-		templatePath := filepath.Join(templatesDir, templateID)
+		layoutID := entry.Name()
+		layoutPath := filepath.Join(layoutsDir, layoutID)
 
 		// Check if manifest.json exists
-		manifestPath := filepath.Join(templatePath, "manifest.json")
-		configPath := filepath.Join(templatePath, "config.json")
+		manifestPath := filepath.Join(layoutPath, "manifest.json")
+		configPath := filepath.Join(layoutPath, "config.json")
 
 		manifestData, err := os.ReadFile(manifestPath)
 		if err != nil {
-			log.Warn("Skipping template (manifest.json not found)", zap.String("templateId", templateID))
+			log.Warn("Skipping layout (manifest.json not found)", zap.String("layoutId", layoutID))
 			errorCount++
 			continue
 		}
@@ -342,20 +342,20 @@ func MigrateTemplatesFromFiles(ctx context.Context, db *gorm.DB, templatesDir st
 		if _, err := os.Stat(configPath); err == nil {
 			configData, err = os.ReadFile(configPath)
 			if err != nil {
-				log.Warn("Config.json exists but could not be read", zap.String("templateId", templateID), zap.Error(err))
+				log.Warn("Config.json exists but could not be read", zap.String("layoutId", layoutID), zap.Error(err))
 			}
 		}
 
 		// Parse manifest to extract basic fields
 		var manifest map[string]interface{}
 		if err := json.Unmarshal(manifestData, &manifest); err != nil {
-			log.Warn("Failed to parse manifest.json", zap.String("templateId", templateID), zap.Error(err))
+			log.Warn("Failed to parse manifest.json", zap.String("layoutId", layoutID), zap.Error(err))
 			errorCount++
 			continue
 		}
 
-		// Extract template fields
-		name := templateID
+		// Extract layout fields
+		name := layoutID
 		if nameStr, ok := manifest["name"].(string); ok {
 			name = nameStr
 		}
@@ -384,7 +384,7 @@ func MigrateTemplatesFromFiles(ctx context.Context, db *gorm.DB, templatesDir st
 			version = versionStr
 		}
 
-		// Create domain template
+		// Create domain layout
 		manifestRaw := json.RawMessage(manifestData)
 		var configRaw *json.RawMessage
 		if len(configData) > 0 {
@@ -392,8 +392,8 @@ func MigrateTemplatesFromFiles(ctx context.Context, db *gorm.DB, templatesDir st
 			configRaw = &configRawVal
 		}
 
-		template := &domain.Template{
-			ID:           templateID,
+		layout := &domain.Layout{
+			ID:           layoutID,
 			Name:         name,
 			Description:  description,
 			PreviewImage: previewImage,
@@ -404,31 +404,31 @@ func MigrateTemplatesFromFiles(ctx context.Context, db *gorm.DB, templatesDir st
 			IsActive:     true,
 		}
 
-		// Check if template already exists
-		existing, err := templateRepo.FindByID(ctx, templateID)
+		// Check if layout already exists
+		existing, err := layoutRepo.FindByID(ctx, layoutID)
 		if err != nil {
-			log.Warn("Error checking for existing template", zap.String("templateId", templateID), zap.Error(err))
+			log.Warn("Error checking for existing layout", zap.String("layoutId", layoutID), zap.Error(err))
 			errorCount++
 			continue
 		}
 
 		if existing != nil {
-			log.Info("Template already exists, skipping", zap.String("templateId", templateID))
+			log.Info("Layout already exists, skipping", zap.String("layoutId", layoutID))
 			continue
 		}
 
-		// Insert template
-		if err := templateRepo.Create(ctx, template); err != nil {
-			log.Warn("Failed to create template", zap.String("templateId", templateID), zap.Error(err))
+		// Insert layout
+		if err := layoutRepo.Create(ctx, layout); err != nil {
+			log.Warn("Failed to create layout", zap.String("layoutId", layoutID), zap.Error(err))
 			errorCount++
 			continue
 		}
 
 		successCount++
-		log.Info("Migrated template", zap.String("templateId", templateID))
+		log.Info("Migrated layout", zap.String("layoutId", layoutID))
 	}
 
-	log.Info("Template migration completed",
+	log.Info("Layout migration completed",
 		zap.Int("success", successCount),
 		zap.Int("errors", errorCount))
 

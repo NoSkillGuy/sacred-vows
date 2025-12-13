@@ -24,7 +24,7 @@ const fontOptions = [
 function ThemeModal({ isOpen, onClose }) {
   const { 
     currentInvitation, 
-    currentTemplateManifest,
+    currentLayoutManifest,
     applyThemePreset,
     updateThemeColors,
     updateThemeFonts,
@@ -37,8 +37,8 @@ function ThemeModal({ isOpen, onClose }) {
   const fonts = theme.fonts || {};
   const currentPreset = theme.preset || 'custom';
 
-  // Get theme presets from manifest; if manifest has none, fall back to template config
-  const themePresets = (currentTemplateManifest?.themes?.length ? currentTemplateManifest.themes : currentInvitation?.templateConfig?.themes) || [];
+  // Get theme presets from manifest; if manifest has none, fall back to layout config
+  const themePresets = (currentLayoutManifest?.themes?.length ? currentLayoutManifest.themes : currentInvitation?.layoutConfig?.themes) || [];
 
   const [formData, setFormData] = useState({
     primaryColor: colors.primary || '#000000',
@@ -65,7 +65,7 @@ function ThemeModal({ isOpen, onClose }) {
       bodyFont: themeFonts.body || '',
       scriptFont: themeFonts.script || '',
     });
-  }, [currentInvitation.templateConfig?.theme]);
+  }, [currentInvitation.layoutConfig?.theme]);
 
   const handleColorChange = (field, value) => {
     const colorMap = {
@@ -116,18 +116,18 @@ function ThemeModal({ isOpen, onClose }) {
         </div>
 
         <div className="theme-modal-body">
-          {/* Template Theme Presets */}
+          {/* Layout Theme Presets */}
           <div className="theme-section">
             <h4 className="theme-section-title">
               Theme Presets
-              {currentTemplateManifest && (
+              {currentLayoutManifest && (
                 <span className="theme-section-subtitle">
-                  for {currentTemplateManifest.name}
+                  for {currentLayoutManifest.name}
                 </span>
               )}
             </h4>
             {themePresets.length === 0 ? (
-              <p className="muted">No theme presets defined for this template.</p>
+              <p className="muted">No theme presets defined for this layout.</p>
             ) : (
               <div className="theme-presets-grid">
                 {themePresets.map((preset) => (

@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { getTemplates } from '../../services/templateService';
+import { getLayouts } from '../../services/layoutService';
 import { createInvitation } from '../../services/invitationService';
 import { getCurrentUser, logout } from '../../services/authService';
-import TemplateCardUnified from '../Templates/TemplateCardUnified';
+import LayoutCardUnified from '../Layouts/LayoutCardUnified';
 import './Dashboard.css';
 
 // SVG Icons
@@ -46,19 +46,20 @@ const DashboardIcon = () => (
   </svg>
 );
 
-function TemplateGallery() {
+function LayoutGallery() {
   const navigate = useNavigate();
-  const [templates, setTemplates] = useState([]);
+  const [layouts, setLayouts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [creating, setCreating] = useState(null);
   const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
-    loadTemplates();
+    loadLayouts();
     loadUser();
   }, [selectedCategory]);
 
@@ -72,16 +73,20 @@ function TemplateGallery() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  async function loadTemplates() {
+  async function loadLayouts() {
     try {
       setLoading(true);
-      const data = await getTemplates({ 
+      setError(null);
+      const data = await getLayouts({ 
         category: selectedCategory !== 'all' ? selectedCategory : undefined 
       });
-      setTemplates(data.templates);
-      setCategories(data.categories);
+      setLayouts(data?.layouts || []);
+      setCategories(data?.categories || ['all']);
     } catch (error) {
-      console.error('Failed to load templates:', error);
+      console.error('Failed to load layouts:', error);
+      setError(error.message || 'Failed to load layouts. Please try again.');
+      setLayouts([]);
+      setCategories(['all']);
     } finally {
       setLoading(false);
     }
@@ -92,13 +97,13 @@ function TemplateGallery() {
     setUser(currentUser);
   }
 
-  async function handleSelectTemplate(template) {
-    if (!template.isAvailable) return;
+  async function handleSelectLayout(layout) {
+    if (!layout.isAvailable) return;
     
     try {
-      setCreating(template.id);
+      setCreating(layout.id);
       const invitation = await createInvitation({
-        templateId: template.id,
+        layoutId: layout.id,
         title: 'My Wedding Invitation',
       });
       navigate(`/builder/${invitation.id}`);
@@ -122,13 +127,13 @@ function TemplateGallery() {
 
   if (loading) {
     return (
-      <div className="template-gallery-page">
+      <div className="layout-gallery-page">
         <div className="gallery-container">
           <div className="page-loading">
             <div className="page-loading-spinner">
               <RingsIcon />
             </div>
-            <p>Loading beautiful templates...</p>
+            <p>Loading beautiful layouts...</p>
           </div>
         </div>
       </div>
@@ -136,7 +141,7 @@ function TemplateGallery() {
   }
 
   return (
-    <div className="template-gallery-page">
+    <div className="layout-gallery-page">
       <div className="gallery-container">
         {/* Header */}
         <header className="gallery-header">
@@ -179,9 +184,9 @@ function TemplateGallery() {
 
         {/* Intro */}
         <div className="gallery-intro">
-          <h2>Choose Your Perfect Template</h2>
+          <h2>Choose Your Perfect Layout</h2>
           <p>
-            Select from our beautifully crafted wedding invitation templates. 
+            Select from our beautifully crafted wedding invitation layouts. 
             Each design is customizable to match your unique love story.
           </p>
         </div>
@@ -199,27 +204,52 @@ function TemplateGallery() {
           ))}
         </div>
 
-        {/* Template Grid */}
-        <div className="template-grid">
-          {templates.map((template) => {
-            const isCreating = creating === template.id;
-            const isReady = template.status === 'ready' || template.isAvailable;
-            return (
-              <TemplateCardUnified
-                key={template.id}
-                template={template}
-                onPrimaryAction={handleSelectTemplate}
-                primaryLabel={isCreating ? 'Creating...' : isReady ? 'Select Template' : 'Coming Soon'}
-                primaryDisabled={!isReady || isCreating}
-                primaryLoading={isCreating}
-              />
-            );
-          })}
-        </div>
+        {/* Error State */}
+        {error && (
+          <div className="gallery-error">
+            <div className="error-icon">⚠️</div>
+            <h3>Unable to Load Layouts</h3>
+            <p>{error}</p>
+            <button className="btn btn-primary" onClick={loadLayouts}>
+              Try Again
+            </button>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!error && !loading && layouts.length === 0 && (
+          <div className="gallery-empty">
+            <div className="empty-icon">
+              <TemplateIcon />
+            </div>
+            <h3>No Layouts Available</h3>
+            <p>There are no layouts available at the moment. Please check back later.</p>
+          </div>
+        )}
+
+        {/* Layout Grid */}
+        {!error && layouts.length > 0 && (
+          <div className="layout-grid">
+            {layouts.map((layout) => {
+              const isCreating = creating === layout.id;
+              const isReady = layout.status === 'ready' || layout.isAvailable;
+              return (
+                <LayoutCardUnified
+                  key={layout.id}
+                  layout={layout}
+                  onPrimaryAction={handleSelectLayout}
+                  primaryLabel={isCreating ? 'Creating...' : isReady ? 'Select Layout' : 'Coming Soon'}
+                  primaryDisabled={!isReady || isCreating}
+                  primaryLoading={isCreating}
+                />
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-export default TemplateGallery;
+export default LayoutGallery;
 

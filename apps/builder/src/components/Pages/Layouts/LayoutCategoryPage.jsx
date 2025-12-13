@@ -1,13 +1,13 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import PageLayout from '../PageLayout';
-import './TemplatesGalleryPage.css';
+import './LayoutsGalleryPage.css';
 
-// Template data organized by category
-const templatesByCategory = {
+// Layout data organized by category
+const layoutsByCategory = {
   traditional: {
     name: 'Traditional',
-    description: 'Classic elegance meets timeless design. Our traditional templates feature refined ornaments, elegant typography, and sophisticated color palettes that honor wedding traditions.',
-    templates: [
+    description: 'Classic elegance meets timeless design. Our traditional layouts feature refined ornaments, elegant typography, and sophisticated color palettes that honor wedding traditions.',
+    layouts: [
       {
         id: 'royal-elegance',
         name: 'Royal Elegance',
@@ -48,7 +48,7 @@ const templatesByCategory = {
   modern: {
     name: 'Modern',
     description: 'Contemporary designs for the modern couple. Bold typography, clean lines, and innovative layouts that make a statement.',
-    templates: [
+    layouts: [
       {
         id: 'midnight-romance',
         name: 'Midnight Romance',
@@ -88,8 +88,8 @@ const templatesByCategory = {
   },
   minimal: {
     name: 'Minimal',
-    description: 'Less is more. Our minimal templates focus on typography, whitespace, and subtle details for couples who appreciate refined simplicity.',
-    templates: [
+    description: 'Less is more. Our minimal layouts focus on typography, whitespace, and subtle details for couples who appreciate refined simplicity.',
+    layouts: [
       {
         id: 'classic-monogram',
         name: 'Classic Monogram',
@@ -130,7 +130,7 @@ const templatesByCategory = {
   floral: {
     name: 'Floral',
     description: 'Nature-inspired beauty with romantic florals. From delicate watercolors to bold botanical prints, find the perfect floral design for your celebration.',
-    templates: [
+    layouts: [
       {
         id: 'eternal-bloom',
         name: 'Eternal Bloom',
@@ -177,23 +177,23 @@ const templatesByCategory = {
   }
 };
 
-function TemplateCategoryPage() {
+function LayoutCategoryPage() {
   const { category } = useParams();
   const navigate = useNavigate();
   
-  const categoryData = templatesByCategory[category];
+  const categoryData = layoutsByCategory[category];
 
   if (!categoryData) {
     return (
       <PageLayout
         title="Category Not Found"
-        subtitle="The template category you're looking for doesn't exist."
-        breadcrumbs={[{ label: 'Templates', path: '/templates-gallery' }, { label: 'Not Found' }]}
+        subtitle="The layout category you're looking for doesn't exist."
+        breadcrumbs={[{ label: 'Layouts', path: '/layouts-gallery' }, { label: 'Not Found' }]}
       >
-        <div className="templates-gallery-page">
+        <div className="layouts-gallery-page">
           <div style={{ textAlign: 'center', padding: '4rem 2rem' }}>
-            <Link to="/templates-gallery" className="page-btn page-btn-primary">
-              View All Templates
+            <Link to="/layouts-gallery" className="page-btn page-btn-primary">
+              View All Layouts
             </Link>
           </div>
         </div>
@@ -206,60 +206,60 @@ function TemplateCategoryPage() {
       title={`${categoryData.name} Wedding Invitations`}
       subtitle={categoryData.description}
       breadcrumbs={[
-        { label: 'Templates', path: '/templates-gallery' },
+        { label: 'Layouts', path: '/layouts-gallery' },
         { label: categoryData.name }
       ]}
     >
-      <div className="templates-gallery-page">
+      <div className="layouts-gallery-page">
         {/* Category Navigation */}
         <div className="category-links">
           <p>Other styles:</p>
-          {Object.entries(templatesByCategory)
+          {Object.entries(layoutsByCategory)
             .filter(([key]) => key !== category)
             .map(([key, value]) => (
-              <Link key={key} to={`/templates/${key}`}>
+              <Link key={key} to={`/layouts/${key}`}>
                 {value.name}
               </Link>
             ))}
-          <Link to="/templates-gallery">All Templates</Link>
+          <Link to="/layouts-gallery">All Layouts</Link>
         </div>
 
-        {/* Templates Grid */}
-        <div className="templates-grid">
-          {categoryData.templates.map(template => (
-            <div key={template.id} className="template-card">
-              {template.popular && (
+        {/* Layouts Grid */}
+        <div className="layouts-grid">
+          {categoryData.layouts.map(layout => (
+            <div key={layout.id} className="layout-card">
+              {layout.popular && (
                 <div className="popular-badge">Popular</div>
               )}
               
-              <div className="template-preview">
+              <div className="layout-preview">
                 <div 
-                  className="template-inner"
+                  className="layout-inner"
                   style={{
-                    background: `linear-gradient(180deg, ${template.colors[1]} 0%, ${template.colors[2]} 100%)`,
-                    borderColor: template.colors[0]
+                    background: `linear-gradient(180deg, ${layout.colors[1]} 0%, ${layout.colors[2]} 100%)`,
+                    borderColor: layout.colors[0]
                   }}
                 >
-                  <div className="template-ornament" style={{ color: template.colors[0] }}>✦</div>
-                  <div className="template-names">Sarah & Michael</div>
-                  <div className="template-date" style={{ color: template.colors[0] }}>
+                  <div className="layout-ornament" style={{ color: layout.colors[0] }}>✦</div>
+                  <div className="layout-names">Sarah & Michael</div>
+                  <div className="layout-date" style={{ color: layout.colors[0] }}>
                     December 15, 2025
                   </div>
                 </div>
               </div>
 
-              <div className="template-overlay">
+              <div className="layout-overlay">
                 <button 
                   className="preview-btn"
                   onClick={() => navigate('/signup')}
                 >
-                  Use This Template
+                  Use This Layout
                 </button>
               </div>
 
-              <div className="template-info">
-                <div className="template-colors">
-                  {template.colors.map((color, i) => (
+              <div className="layout-info">
+                <div className="layout-colors">
+                  {layout.colors.map((color, i) => (
                     <span 
                       key={i} 
                       className="color-dot"
@@ -267,17 +267,17 @@ function TemplateCategoryPage() {
                     />
                   ))}
                 </div>
-                <h3>{template.name}</h3>
-                <p>{template.description}</p>
+                <h3>{layout.name}</h3>
+                <p>{layout.description}</p>
               </div>
             </div>
           ))}
         </div>
 
         {/* CTA Section */}
-        <section className="templates-cta">
+        <section className="layouts-cta">
           <h2>Love These {categoryData.name} Designs?</h2>
-          <p>Sign up free and start customizing your perfect template today.</p>
+          <p>Sign up free and start customizing your perfect layout today.</p>
           <div className="cta-buttons">
             <button 
               className="page-btn page-btn-primary"
@@ -286,8 +286,8 @@ function TemplateCategoryPage() {
               Start Creating Free
               <span>→</span>
             </button>
-            <Link to="/templates-gallery" className="page-btn page-btn-secondary">
-              Browse All Templates
+            <Link to="/layouts-gallery" className="page-btn page-btn-secondary">
+              Browse All Layouts
             </Link>
           </div>
         </section>
@@ -296,5 +296,5 @@ function TemplateCategoryPage() {
   );
 }
 
-export default TemplateCategoryPage;
+export default LayoutCategoryPage;
 

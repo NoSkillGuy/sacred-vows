@@ -1,8 +1,8 @@
 import React from 'react';
-import { loadTemplate, mergeTemplateData } from './loadTemplate';
+import { loadLayout, mergeLayoutData } from './loadLayout';
 import { applyThemeToDocument, mergeBrandThemes } from '../../shared/src/theme/applyTheme';
 
-const DEFAULT_TEMPLATE_ID = 'royal-elegance';
+const DEFAULT_LAYOUT_ID = 'royal-elegance';
 
 function mergeSections(baseSections = [], overrides = []) {
   const sectionMap = new Map(
@@ -33,12 +33,12 @@ function orderSections(sections = [], defaultOrder = []) {
     });
 }
 
-function resolveTheme(templateTheme = {}, manifest = {}, userTheme = {}) {
+function resolveTheme(layoutTheme = {}, manifest = {}, userTheme = {}) {
   const manifestDefault = manifest.themes?.find((theme) => theme.isDefault) || {};
-  const merged = mergeBrandThemes(manifestDefault, templateTheme, userTheme);
+  const merged = mergeBrandThemes(manifestDefault, layoutTheme, userTheme);
   return {
     ...merged,
-    preset: userTheme?.preset || templateTheme?.preset || manifestDefault.id || merged.preset || 'custom',
+    preset: userTheme?.preset || layoutTheme?.preset || manifestDefault.id || merged.preset || 'custom',
   };
 }
 
@@ -56,10 +56,10 @@ function getSectionProps(sectionId, commonProps) {
 }
 
 /**
- * Template Renderer Component
- * Renders a template with provided data
+ * Layout Renderer Component
+ * Renders a layout with provided data
  */
-export function TemplateRenderer({ templateId, userData, translations, currentLang, onRSVPClick, onLanguageClick }) {
+export function LayoutRenderer({ layoutId, userData, translations, currentLang, onRSVPClick, onLanguageClick }) {
   const [mergedConfig, setMergedConfig] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
@@ -68,18 +68,18 @@ export function TemplateRenderer({ templateId, userData, translations, currentLa
     async function load() {
       try {
         setLoading(true);
-        const templateToLoad = templateId || DEFAULT_TEMPLATE_ID;
-        const definition = await loadTemplate(templateToLoad);
+        const layoutToLoad = layoutId || DEFAULT_LAYOUT_ID;
+        const definition = await loadLayout(layoutToLoad);
 
         // Universal content base (sample data for now)
         const { defaultWeddingConfig } = await import('../../../src/config/wedding-config');
-        const contentConfig = mergeTemplateData(defaultWeddingConfig, userData || {});
+        const contentConfig = mergeLayoutData(defaultWeddingConfig, userData || {});
 
         // Section ordering and theme resolution
-        const userTemplateConfig = userData?.templateConfig || {};
+        const userLayoutConfig = userData?.layoutConfig || {};
         const combinedSections = mergeSections(
           definition.config?.sections || [],
-          userTemplateConfig.sections || [],
+          userLayoutConfig.sections || [],
         );
         const orderedSections = orderSections(
           combinedSections,
@@ -88,15 +88,15 @@ export function TemplateRenderer({ templateId, userData, translations, currentLa
         const theme = resolveTheme(
           definition.config?.theme || {},
           definition.manifest || {},
-          userTemplateConfig.theme || {},
+          userLayoutConfig.theme || {},
         );
 
         const merged = {
           ...contentConfig,
           sections: orderedSections,
           theme,
-          templateMeta: {
-            id: definition.config?.id || definition.manifest?.id || templateToLoad,
+          layoutMeta: {
+            id: definition.config?.id || definition.manifest?.id || layoutToLoad,
             name: definition.config?.name || definition.manifest?.name,
             version: definition.config?.version || definition.manifest?.version,
             metadata: definition.config?.metadata,
@@ -107,7 +107,7 @@ export function TemplateRenderer({ templateId, userData, translations, currentLa
         setMergedConfig(merged);
         setError(null);
       } catch (err) {
-        console.error('Error loading template:', err);
+        console.error('Error loading layout:', err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -115,7 +115,7 @@ export function TemplateRenderer({ templateId, userData, translations, currentLa
     }
 
     load();
-  }, [templateId, userData]);
+  }, [layoutId, userData]);
 
   React.useEffect(() => {
     if (mergedConfig?.theme) {
@@ -124,19 +124,19 @@ export function TemplateRenderer({ templateId, userData, translations, currentLa
   }, [mergedConfig?.theme]);
 
   if (loading) {
-    return <div>Loading template...</div>;
+    return <div>Loading layout...</div>;
   }
 
   if (error) {
-    return <div>Error loading template: {error}</div>;
+    return <div>Error loading layout: {error}</div>;
   }
 
   if (!mergedConfig) {
-    return <div>No template configuration available</div>;
+    return <div>No layout configuration available</div>;
   }
 
-  // Dynamically import template components
-  const TemplateComponents = React.lazy(() => 
+  // Dynamically import layout components
+  const LayoutComponents = React.lazy(() => 
     import('../../../src/components').then(components => ({
       default: () => (
         <main className="page-shell">
@@ -188,10 +188,9 @@ export function TemplateRenderer({ templateId, userData, translations, currentLa
 
   return (
     <React.Suspense fallback={<div>Loading...</div>}>
-      <TemplateComponents />
+      <LayoutComponents />
     </React.Suspense>
   );
 }
 
-export default TemplateRenderer;
-
+export default LayoutRenderer;

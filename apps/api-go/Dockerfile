@@ -50,8 +50,8 @@ COPY --from=builder /app/bin/server /app/server
 COPY --from=builder /app/migrations /app/migrations
 
 # Create directories that will be mounted as volumes
-# These will be mounted to /app/uploads and /app/templates
-RUN mkdir -p /app/uploads /app/templates
+# These will be mounted to /app/uploads and /app/layouts
+RUN mkdir -p /app/uploads /app/layouts
 
 # Ensure the binary is executable
 RUN chmod +x /app/server

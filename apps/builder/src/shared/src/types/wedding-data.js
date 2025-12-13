@@ -3,13 +3,13 @@
  * Defines the structure for wedding invitation data
  * 
  * This schema separates:
- * 1. Universal Content Data - Shared across all templates (couple, events, venue, etc.)
- * 2. Template Configuration - Per-template settings (sections, themes)
+ * 1. Universal Content Data - Shared across all layouts (couple, events, venue, etc.)
+ * 2. Layout Configuration - Per-layout settings (sections, themes)
  */
 
 // ============================================================================
 // UNIVERSAL CONTENT DATA TYPES
-// These are shared across all templates
+// These are shared across all layouts
 // ============================================================================
 
 /**
@@ -104,8 +104,8 @@
  */
 
 // ============================================================================
-// TEMPLATE CONFIGURATION TYPES
-// These are per-template settings
+// LAYOUT CONFIGURATION TYPES
+// These are per-layout settings
 // ============================================================================
 
 /**
@@ -139,7 +139,7 @@
  */
 
 /**
- * @typedef {Object} TemplateConfig
+ * @typedef {Object} LayoutConfig
  * @property {SectionConfig[]} sections - Section configurations
  * @property {ThemeConfig} theme - Theme configuration
  */
@@ -150,7 +150,7 @@
 
 /**
  * Universal Wedding Content Data
- * This data is preserved when switching templates
+ * This data is preserved when switching layouts
  * 
  * @typedef {Object} UniversalWeddingData
  * @property {BrandingInfo} branding - Branding information
@@ -171,15 +171,15 @@
  * 
  * @typedef {Object} InvitationData
  * @property {string} id - Invitation ID
- * @property {string} templateId - Current template ID
+ * @property {string} layoutId - Current layout ID
  * @property {UniversalWeddingData} data - Universal content data
- * @property {TemplateConfig} templateConfig - Template-specific configuration
+ * @property {LayoutConfig} layoutConfig - Layout-specific configuration
  * @property {Object} translations - Multi-language translations (optional)
  */
 
 // ============================================================================
 // SECTION DEFINITIONS
-// Standard sections available across all templates
+// Standard sections available across all layouts
 // ============================================================================
 
 /**
@@ -314,11 +314,11 @@ export const DEFAULT_THEME = {
 };
 
 /**
- * Create default template configuration
- * @param {string} templateId - Template ID
- * @returns {TemplateConfig} Default template configuration
+ * Create default layout configuration
+ * @param {string} layoutId - Layout ID
+ * @returns {LayoutConfig} Default layout configuration
  */
-export function createDefaultTemplateConfig(templateId = 'royal-elegance') {
+export function createDefaultTemplateConfig(layoutId = 'royal-elegance') {
   return {
     sections: createDefaultSections(),
     theme: { ...DEFAULT_THEME },

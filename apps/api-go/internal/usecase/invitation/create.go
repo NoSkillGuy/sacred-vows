@@ -21,10 +21,10 @@ func NewCreateInvitationUseCase(invitationRepo repository.InvitationRepository) 
 }
 
 type CreateInvitationInput struct {
-	TemplateID string
-	Data       json.RawMessage
-	Title      *string
-	UserID     string
+	LayoutID string
+	Data     json.RawMessage
+	Title    *string
+	UserID   string
 }
 
 type CreateInvitationOutput struct {
@@ -42,12 +42,12 @@ func (uc *CreateInvitationUseCase) Execute(ctx context.Context, input CreateInvi
 		return nil, errors.Wrap(errors.ErrBadRequest.Code, "Invalid invitation data", err)
 	}
 
-	templateID := input.TemplateID
-	if templateID == "" {
-		templateID = "royal-elegance"
+	layoutID := input.LayoutID
+	if layoutID == "" {
+		layoutID = "royal-elegance"
 	}
 
-	invitation, err := domain.NewInvitation(templateID, input.UserID, dataWithMeta)
+	invitation, err := domain.NewInvitation(layoutID, input.UserID, dataWithMeta)
 	if err != nil {
 		return nil, errors.Wrap(errors.ErrBadRequest.Code, "Invalid invitation data", err)
 	}

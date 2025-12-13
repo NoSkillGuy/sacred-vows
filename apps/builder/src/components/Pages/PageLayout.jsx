@@ -27,7 +27,7 @@ function PageLayout({ children, title, subtitle, breadcrumbs = [] }) {
           </Link>
           
           <div className="nav-links">
-            <Link to="/templates-gallery">Templates</Link>
+            <Link to="/layouts-gallery">Layouts</Link>
             <Link to="/pricing">Pricing</Link>
             <Link to="/about">About</Link>
             <Link to="/help">Support</Link>

@@ -37,16 +37,16 @@ func NewInvitationHandler(
 }
 
 type CreateInvitationRequest struct {
-	TemplateID string          `json:"templateId"`
-	Data       json.RawMessage `json:"data"`
-	Title      string          `json:"title"`
+	LayoutID string          `json:"layoutId"`
+	Data     json.RawMessage `json:"data"`
+	Title    string          `json:"title"`
 }
 
 type UpdateInvitationRequest struct {
-	Data       *json.RawMessage `json:"data"`
-	TemplateID *string          `json:"templateId"`
-	Title      *string          `json:"title"`
-	Status     *string          `json:"status"`
+	Data     *json.RawMessage `json:"data"`
+	LayoutID *string          `json:"layoutId"`
+	Title    *string          `json:"title"`
+	Status   *string          `json:"status"`
 }
 
 func (h *InvitationHandler) GetAll(c *gin.Context) {
@@ -119,10 +119,10 @@ func (h *InvitationHandler) Create(c *gin.Context) {
 	}
 
 	output, err := h.createUC.Execute(c.Request.Context(), invitation.CreateInvitationInput{
-		TemplateID: req.TemplateID,
-		Data:       req.Data,
-		Title:      titlePtr,
-		UserID:     userID.(string),
+		LayoutID: req.LayoutID,
+		Data:     req.Data,
+		Title:    titlePtr,
+		UserID:   userID.(string),
 	})
 
 	if err != nil {
@@ -147,11 +147,11 @@ func (h *InvitationHandler) Update(c *gin.Context) {
 	}
 
 	output, err := h.updateUC.Execute(c.Request.Context(), invitation.UpdateInvitationInput{
-		ID:         id,
-		TemplateID: req.TemplateID,
-		Data:       req.Data,
-		Title:      req.Title,
-		Status:     req.Status,
+		ID:       id,
+		LayoutID: req.LayoutID,
+		Data:     req.Data,
+		Title:    req.Title,
+		Status:   req.Status,
 	})
 
 	if err != nil {

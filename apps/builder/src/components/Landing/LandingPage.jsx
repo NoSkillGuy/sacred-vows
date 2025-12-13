@@ -1,5 +1,5 @@
 import HeroSection from './HeroSection';
-import TemplateShowcase from './TemplateShowcase';
+import LayoutShowcase from './LayoutShowcase';
 import HowItWorks from './HowItWorks';
 import Testimonials from './Testimonials';
 import CTASection from './CTASection';
@@ -19,7 +19,7 @@ function LandingPage() {
   return (
     <div className="landing-page">
       <HeroSection onSectionView={handleSectionVisible} />
-      <TemplateShowcase onSectionView={handleSectionVisible} />
+      <LayoutShowcase onSectionView={handleSectionVisible} />
       <HowItWorks onSectionView={handleSectionVisible} />
       <Testimonials onSectionView={handleSectionVisible} />
       <CTASection onSectionView={handleSectionVisible} />

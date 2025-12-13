@@ -25,7 +25,7 @@ Each feature area has its own subdirectory with related use cases:
 
 - `auth/` - Authentication use cases
 - `invitation/` - Invitation management
-- `template/` - Template operations
+- `layout/` - Layout operations
 - `asset/` - Asset management
 - `rsvp/` - RSVP handling
 - `analytics/` - Analytics tracking
@@ -72,10 +72,10 @@ func (uc *UseCaseNameUseCase) Execute(ctx context.Context, input UseCaseNameInpu
 - `UpdateInvitationUseCase` - Update invitation
 - `DeleteInvitationUseCase` - Delete invitation
 
-### Templates (`template/`)
-- `GetAllTemplatesUseCase` - List templates with filtering
-- `GetTemplateByIDUseCase` - Get template details
-- `GetTemplateManifestUseCase` - Get template manifest
+### Layouts (`layout/`)
+- `GetAllLayoutsUseCase` - List layouts with filtering
+- `GetLayoutByIDUseCase` - Get layout details
+- `GetLayoutManifestUseCase` - Get layout manifest
 - `GetManifestsUseCase` - Get all manifests
 
 ### Assets (`asset/`)

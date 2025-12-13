@@ -1,4 +1,4 @@
-package template
+package layout
 
 import (
 	"context"
@@ -6,38 +6,38 @@ import (
 	"github.com/sacred-vows/api-go/internal/interfaces/repository"
 )
 
-type GetAllTemplatesUseCase struct {
-	templateRepo repository.TemplateRepository
+type GetAllLayoutsUseCase struct {
+	layoutRepo repository.LayoutRepository
 }
 
-func NewGetAllTemplatesUseCase(templateRepo repository.TemplateRepository) *GetAllTemplatesUseCase {
-	return &GetAllTemplatesUseCase{
-		templateRepo: templateRepo,
+func NewGetAllLayoutsUseCase(layoutRepo repository.LayoutRepository) *GetAllLayoutsUseCase {
+	return &GetAllLayoutsUseCase{
+		layoutRepo: layoutRepo,
 	}
 }
 
-type GetAllTemplatesInput struct {
+type GetAllLayoutsInput struct {
 	Category *string
 	Featured *bool
 }
 
-type GetAllTemplatesOutput struct {
-	Templates  []*TemplateSummaryDTO
+type GetAllLayoutsOutput struct {
+	Layouts    []*LayoutSummaryDTO
 	Categories []string
 }
 
-func (uc *GetAllTemplatesUseCase) Execute(ctx context.Context, input GetAllTemplatesInput) (*GetAllTemplatesOutput, error) {
-	catalog, err := uc.getTemplateCatalog()
+func (uc *GetAllLayoutsUseCase) Execute(ctx context.Context, input GetAllLayoutsInput) (*GetAllLayoutsOutput, error) {
+	catalog, err := uc.getLayoutCatalog()
 	if err != nil {
 		return nil, err
 	}
 
-	var filteredTemplates []*TemplateSummaryDTO
+	var filteredLayouts []*LayoutSummaryDTO
 	categories := make(map[string]bool)
 	categories["all"] = true
 
 	for _, manifest := range catalog {
-		// Filter out coming-soon templates - only show ready templates
+		// Filter out coming-soon layouts - only show ready layouts
 		isReady := false
 		if manifest.Status != nil && *manifest.Status == "ready" {
 			isReady = true
@@ -62,7 +62,7 @@ func (uc *GetAllTemplatesUseCase) Execute(ctx context.Context, input GetAllTempl
 			}
 		}
 
-		filteredTemplates = append(filteredTemplates, manifest)
+		filteredLayouts = append(filteredLayouts, manifest)
 		if manifest.Category != nil {
 			categories[*manifest.Category] = true
 		}
@@ -73,23 +73,23 @@ func (uc *GetAllTemplatesUseCase) Execute(ctx context.Context, input GetAllTempl
 		categoryList = append(categoryList, cat)
 	}
 
-	return &GetAllTemplatesOutput{
-		Templates:  filteredTemplates,
+	return &GetAllLayoutsOutput{
+		Layouts:    filteredLayouts,
 		Categories: categoryList,
 	}, nil
 }
 
-func (uc *GetAllTemplatesUseCase) getTemplateCatalog() ([]*TemplateSummaryDTO, error) {
-	templates, err := uc.templateRepo.FindAll(context.Background())
+func (uc *GetAllLayoutsUseCase) getLayoutCatalog() ([]*LayoutSummaryDTO, error) {
+	layouts, err := uc.layoutRepo.FindAll(context.Background())
 	if err != nil {
 		return nil, err
 	}
 
-	var catalog []*TemplateSummaryDTO
-	for _, template := range templates {
-		dto, err := ToTemplateSummaryDTO(template)
+	var catalog []*LayoutSummaryDTO
+	for _, layout := range layouts {
+		dto, err := ToLayoutSummaryDTO(layout)
 		if err != nil {
-			// Skip templates with invalid manifest
+			// Skip layouts with invalid manifest
 			continue
 		}
 		catalog = append(catalog, dto)

@@ -1,14 +1,14 @@
 import React, { useMemo } from 'react';
-import './TemplateCardUnified.css';
+import './LayoutCardUnified.css';
 
-function resolveTheme(template) {
-  if (template.defaultTheme) return template.defaultTheme;
-  const themes = template.themes || [];
+function resolveTheme(layout) {
+  if (layout.defaultTheme) return layout.defaultTheme;
+  const themes = layout.themes || [];
   return themes.find((theme) => theme?.isDefault) || themes[0] || null;
 }
 
-function TemplateCardUnified({
-  template,
+function LayoutCardUnified({
+  layout,
   onPrimaryAction,
   primaryLabel = 'Use This Template',
   primaryDisabled = false,
@@ -21,23 +21,23 @@ function TemplateCardUnified({
   showActiveBadge = false,
   badgeOverride,
 }) {
-  const resolvedTheme = useMemo(() => resolveTheme(template), [template]);
+  const resolvedTheme = useMemo(() => resolveTheme(layout), [layout]);
   const colors = resolvedTheme?.colors;
   const requiredColorKeys = ['primary', 'background', 'accent', 'text'];
   const hasAllColors = requiredColorKeys.every((key) => colors?.[key]);
 
   if (!resolvedTheme || !hasAllColors) {
-    console.warn('Template missing required theme colors', template?.id || template?.name);
+    console.warn('Layout missing required theme colors', layout?.id || layout?.name);
     return null;
   }
 
   const { primary, background, accent, text } = colors;
-  const displayNames = template.names || template.name;
-  const displayDate = template.date || null;
+  const displayNames = layout.names || layout.name;
+  const displayDate = layout.date || null;
 
   const baseTags = [
-    ...(template.tags || []),
-    template.isFeatured ? 'featured' : null,
+    ...(layout.tags || []),
+    layout.isFeatured ? 'featured' : null,
   ].filter(Boolean);
 
   const seenTags = new Set();
@@ -51,33 +51,33 @@ function TemplateCardUnified({
   });
 
   const categoryTag =
-    template.category && !seenTags.has(String(template.category).trim().toLowerCase())
-      ? template.category
+    layout.category && !seenTags.has(String(layout.category).trim().toLowerCase())
+      ? layout.category
       : null;
 
   const displayTags = tags.slice(0, 4);
-  const isReady = template.status === 'ready' || template.isAvailable;
+  const isReady = layout.status === 'ready' || layout.isAvailable;
   const badge =
     badgeOverride ||
-    (!isReady ? 'Coming Soon' : template.isFeatured ? 'Featured' : null);
+    (!isReady ? 'Coming Soon' : layout.isFeatured ? 'Featured' : null);
 
   const handleCardClick = () => {
-    if (onCardClick) onCardClick(template);
+    if (onCardClick) onCardClick(layout);
   };
 
   const handlePrimary = (e) => {
     e.stopPropagation();
-    if (onPrimaryAction) onPrimaryAction(template);
+    if (onPrimaryAction) onPrimaryAction(layout);
   };
 
   const handleSecondary = (e) => {
     e.stopPropagation();
-    if (onSecondaryAction) onSecondaryAction(template);
+    if (onSecondaryAction) onSecondaryAction(layout);
   };
 
   return (
     <div
-      className={`template-card-unified ${!isReady ? 'coming-soon' : ''} ${active ? 'active' : ''}`}
+      className={`layout-card-unified ${!isReady ? 'coming-soon' : ''} ${active ? 'active' : ''}`}
       onClick={handleCardClick}
     >
       {badge && (
@@ -149,8 +149,8 @@ function TemplateCardUnified({
             />
           ))}
         </div>
-        <h3>{template.name}</h3>
-        <p>{template.description}</p>
+        <h3>{layout.name}</h3>
+        <p>{layout.description}</p>
         <div className="unified-meta">
           {categoryTag && <span className="unified-tag">{categoryTag}</span>}
           {displayTags.map((tag) => (
@@ -164,4 +164,4 @@ function TemplateCardUnified({
   );
 }
 
-export default TemplateCardUnified;
+export default LayoutCardUnified;

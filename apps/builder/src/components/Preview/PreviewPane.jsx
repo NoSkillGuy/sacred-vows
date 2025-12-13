@@ -89,11 +89,11 @@ function PreviewPane({ editMode = true, deviceMode = 'desktop' }) {
   // Get enabled sections in order
   const enabledSections = useMemo(() => {
     return getEnabledSections();
-  }, [currentInvitation.templateConfig?.sections]);
+  }, [currentInvitation.layoutConfig?.sections]);
 
   // Apply theme to CSS variables
   useEffect(() => {
-    const theme = currentInvitation?.templateConfig?.theme || currentInvitation?.data?.theme || {};
+    const theme = currentInvitation?.layoutConfig?.theme || currentInvitation?.data?.theme || {};
     const colors = theme.colors || {};
     const fonts = theme.fonts || {};
     const root = document.documentElement;
@@ -121,7 +121,7 @@ function PreviewPane({ editMode = true, deviceMode = 'desktop' }) {
     if (fonts.body) root.style.setProperty('--font-body', fonts.body);
     if (fonts.script) root.style.setProperty('--font-script', fonts.script);
     if (fonts.body) document.body.style.setProperty('font-family', fonts.body);
-  }, [currentInvitation?.templateConfig?.theme]);
+  }, [currentInvitation?.layoutConfig?.theme]);
 
   const handleRSVPClick = () => {
     setShowRSVPModal(true);

@@ -1,6 +1,6 @@
 /**
- * Template Service
- * Handles API calls for template operations
+ * Layout Service
+ * Handles API calls for layout operations
  */
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
@@ -20,109 +20,109 @@ function getHeaders() {
 }
 
 /**
- * Get all templates
+ * Get all layouts
  * @param {Object} options - Filter options
  * @param {string} options.category - Filter by category
  * @param {boolean} options.featured - Filter featured only
- * @returns {Promise<{templates: Array, categories: Array}>}
+ * @returns {Promise<{layouts: Array, categories: Array}>}
  */
-export async function getTemplates(options = {}) {
+export async function getLayouts(options = {}) {
   try {
-    const response = await fetch(`${API_BASE_URL}/templates/manifests`, {
+    const response = await fetch(`${API_BASE_URL}/layouts/manifests`, {
       method: 'GET',
       headers: getHeaders(),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch template manifests');
+      throw new Error('Failed to fetch layout manifests');
     }
 
     const data = await response.json();
     const manifests = data.manifests || [];
 
-    const categories = ['all', ...new Set(manifests.map((t) => t.category).filter(Boolean))];
+    const categories = ['all', ...new Set(manifests.map((l) => l.category).filter(Boolean))];
 
     let filtered = manifests;
 
     if (options.category && options.category !== 'all') {
-      filtered = filtered.filter((t) => t.category === options.category);
+      filtered = filtered.filter((l) => l.category === options.category);
     }
 
     if (options.featured) {
-      filtered = filtered.filter((t) => t.isFeatured);
+      filtered = filtered.filter((l) => l.isFeatured);
     }
 
     return {
-      templates: filtered,
+      layouts: filtered,
       categories,
     };
   } catch (error) {
-    console.error('Get templates error:', error);
+    console.error('Get layouts error:', error);
     throw error;
   }
 }
 
 /**
- * Get single template by ID
- * @param {string} id - Template ID
- * @returns {Promise<Object>} Template object
+ * Get single layout by ID
+ * @param {string} id - Layout ID
+ * @returns {Promise<Object>} Layout object
  */
-export async function getTemplate(id) {
+export async function getLayout(id) {
   try {
-    const response = await fetch(`${API_BASE_URL}/templates/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/layouts/${id}`, {
       method: 'GET',
       headers: getHeaders(),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch template');
+      throw new Error('Failed to fetch layout');
     }
 
     const data = await response.json();
-    return data.template;
+    return data.layout;
   } catch (error) {
-    console.error('Get template error:', error);
+    console.error('Get layout error:', error);
     throw error;
   }
 }
 
 /**
- * Get template manifest (full configuration including sections and themes)
- * @param {string} id - Template ID
- * @returns {Promise<Object>} Template manifest object
+ * Get layout manifest (full configuration including sections and themes)
+ * @param {string} id - Layout ID
+ * @returns {Promise<Object>} Layout manifest object
  */
-export async function getTemplateManifest(id) {
+export async function getLayoutManifest(id) {
   try {
-    const response = await fetch(`${API_BASE_URL}/templates/${id}/manifest`, {
+    const response = await fetch(`${API_BASE_URL}/layouts/${id}/manifest`, {
       method: 'GET',
       headers: getHeaders(),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch template manifest');
+      throw new Error('Failed to fetch layout manifest');
     }
 
     const data = await response.json();
     return data.manifest;
   } catch (error) {
-    console.error('Get template manifest error:', error);
+    console.error('Get layout manifest error:', error);
     throw error;
   }
 }
 
 /**
- * Get all available template manifests (for template switching)
- * @returns {Promise<Object[]>} Array of template manifests
+ * Get all available layout manifests (for layout switching)
+ * @returns {Promise<Object[]>} Array of layout manifests
  */
-export async function getAllTemplateManifests() {
+export async function getAllLayoutManifests() {
   try {
-    const response = await fetch(`${API_BASE_URL}/templates/manifests`, {
+    const response = await fetch(`${API_BASE_URL}/layouts/manifests`, {
       method: 'GET',
       headers: getHeaders(),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch template manifests');
+      throw new Error('Failed to fetch layout manifests');
     }
 
     const data = await response.json();
@@ -130,7 +130,7 @@ export async function getAllTemplateManifests() {
 
     return manifests;
   } catch (error) {
-    console.error('Get template manifests error:', error);
+    console.error('Get layout manifests error:', error);
     throw error;
   }
 }

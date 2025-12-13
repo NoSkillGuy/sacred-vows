@@ -3,8 +3,8 @@
  * Contains all default data for the wedding invitation builder
  * 
  * This configuration is separated into:
- * 1. Universal Content Data - Shared across all templates
- * 2. Template Configuration - Per-template settings (sections, themes)
+ * 1. Universal Content Data - Shared across all layouts
+ * 2. Layout Configuration - Per-layout settings (sections, themes)
  */
 
 import { 
@@ -16,7 +16,7 @@ import {
 
 /**
  * Default universal wedding content data
- * This data is preserved when switching templates
+ * This data is preserved when switching layouts
  */
 export const defaultWeddingConfig = {
   branding: {
@@ -162,13 +162,13 @@ export const defaultWeddingConfig = {
     mainImage: '/assets/photos/couple/11.jpeg'
   },
 
-  // Theme is now part of templateConfig, but keep here for backward compatibility
+  // Theme is now part of layoutConfig, but keep here for backward compatibility
   theme: DEFAULT_THEME,
 };
 
 /**
- * Default template configuration
- * Per-template settings for sections and theme
+ * Default layout configuration
+ * Per-layout settings for sections and theme
  */
 export const defaultTemplateConfig = {
   sections: createDefaultSections(),

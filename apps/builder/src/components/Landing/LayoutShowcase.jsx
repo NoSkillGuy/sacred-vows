@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
 import { trackCTA, trackExperiment, trackTemplateDemo, trackTemplateView } from '../../services/analyticsService';
-import { getAllTemplateManifests } from '../../services/templateService';
-import TemplateCardUnified from '../Templates/TemplateCardUnified';
+import { getAllLayoutManifests } from '../../services/layoutService';
+import LayoutCardUnified from '../Layouts/LayoutCardUnified';
 
 // SVG Ornaments for each template style
 const OrnamentClassic = () => (
@@ -67,28 +67,28 @@ const defaultColors = {
   background: '#fff8f0',
 };
 
-function TemplateShowcase({ onSectionView }) {
+function LayoutShowcase({ onSectionView }) {
   const navigate = useNavigate();
-  const [templates, setTemplates] = useState([]);
+  const [layouts, setLayouts] = useState([]);
   const [activeFilter, setActiveFilter] = useState('all');
   const [query, setQuery] = useState('');
-  const [demoTemplate, setDemoTemplate] = useState(null);
+  const [demoLayout, setDemoLayout] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (onSectionView) onSectionView('templates');
-    trackExperiment('templates_filters', 'chips_search_v1');
-    loadTemplates();
+    if (onSectionView) onSectionView('layouts');
+    trackExperiment('layouts_filters', 'chips_search_v1');
+    loadLayouts();
   }, [onSectionView]);
 
-  async function loadTemplates() {
+  async function loadLayouts() {
     try {
       setLoading(true);
-      const manifests = await getAllTemplateManifests();
-      const templatesList = manifests || [];
-      setTemplates(templatesList);
+      const manifests = await getAllLayoutManifests();
+      const layoutsList = manifests || [];
+      setLayouts(layoutsList);
     } catch (error) {
-      console.error('Failed to load templates', error);
+      console.error('Failed to load layouts', error);
     } finally {
       setLoading(false);
     }
@@ -96,7 +96,7 @@ function TemplateShowcase({ onSectionView }) {
 
   const filters = useMemo(() => {
     const categories = Array.from(
-      new Set(templates.map((template) => template.category).filter(Boolean))
+      new Set(layouts.map((layout) => layout.category).filter(Boolean))
     );
 
     return [
@@ -104,68 +104,68 @@ function TemplateShowcase({ onSectionView }) {
       { id: 'popular', label: 'Popular' },
       ...categories.map((category) => ({ id: category, label: category.charAt(0).toUpperCase() + category.slice(1) })),
     ];
-  }, [templates]);
+  }, [layouts]);
 
-  const enrichedTemplates = useMemo(() => {
-    return templates.map((template) => {
-      const Ornament = ornamentByCategory[template.category] || OrnamentSun;
-      const defaultTheme = template.themes?.find((theme) => theme.isDefault) || template.themes?.[0];
+  const enrichedLayouts = useMemo(() => {
+    return layouts.map((layout) => {
+      const Ornament = ornamentByCategory[layout.category] || OrnamentSun;
+      const defaultTheme = layout.themes?.find((theme) => theme.isDefault) || layout.themes?.[0];
       const colors = defaultTheme?.colors || {};
       const accent = colors.accent || colors.primary || defaultColors.accent;
       const tags = [
-        ...(template.tags || []),
-        template.isFeatured ? 'popular' : null,
+        ...(layout.tags || []),
+        layout.isFeatured ? 'popular' : null,
       ].filter(Boolean).slice(0, 3);
 
       return {
-        ...template,
+        ...layout,
         Ornament,
         ornamentColor: accent,
-        names: template.names || template.name,
-        date: template.date || null,
-        className: template.className || `template-${template.id}`,
+        names: layout.names || layout.name,
+        date: layout.date || null,
+        className: layout.className || `layout-${layout.id}`,
         tags,
-        isReady: template.status === 'ready' || template.isAvailable,
+        isReady: layout.status === 'ready' || layout.isAvailable,
       };
     });
-  }, [templates]);
+  }, [layouts]);
 
-  const filteredTemplates = useMemo(() => {
-    const filtered = enrichedTemplates.filter((template) => {
+  const filteredLayouts = useMemo(() => {
+    const filtered = enrichedLayouts.filter((layout) => {
       const matchesFilter =
         activeFilter === 'all' ||
-        template.category === activeFilter ||
-        template.tags?.includes(activeFilter);
-      const matchesQuery = template.name.toLowerCase().includes(query.toLowerCase());
+        layout.category === activeFilter ||
+        layout.tags?.includes(activeFilter);
+      const matchesQuery = layout.name.toLowerCase().includes(query.toLowerCase());
       return matchesFilter && matchesQuery;
     });
     return filtered;
-  }, [activeFilter, query, enrichedTemplates]);
+  }, [activeFilter, query, enrichedLayouts]);
 
-  const handleCustomize = (template) => {
-    if (!template.isReady) return;
-    trackCTA('templates_customize', { templateId: template.id });
-    navigate('/signup', { state: { templateId: template.id } });
+  const handleCustomize = (layout) => {
+    if (!layout.isReady) return;
+    trackCTA('layouts_customize', { layoutId: layout.id });
+    navigate('/signup', { state: { layoutId: layout.id } });
   };
 
-  const handleDemo = (template) => {
-    setDemoTemplate(template);
-    trackTemplateDemo(template.id);
+  const handleDemo = (layout) => {
+    setDemoLayout(layout);
+    trackTemplateDemo(layout.id);
   };
 
   return (
-    <section id="templates" className="templates-section">
+    <section id="layouts" className="layouts-section">
       <div className="section-header">
         <p className="section-label">Our Collection</p>
-        <h2 className="section-title">Beautiful Templates for Every Love Story</h2>
+        <h2 className="section-title">Beautiful Layouts for Every Love Story</h2>
         <p className="section-subtitle">
           Choose from our handcrafted collection of stunning invitation designs, 
           each thoughtfully created to capture the unique essence of your celebration.
         </p>
       </div>
 
-      <div className="templates-actions">
-        <div className="filter-chips" role="tablist" aria-label="Template categories">
+      <div className="layouts-actions">
+        <div className="filter-chips" role="tablist" aria-label="Layout categories">
           {filters.map((filter) => (
             <button
               key={filter.id}
@@ -178,80 +178,80 @@ function TemplateShowcase({ onSectionView }) {
             </button>
           ))}
         </div>
-        <div className="template-search">
+        <div className="layout-search">
           <input
             type="search"
-            placeholder="Search templates"
+            placeholder="Search layouts"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            aria-label="Search templates"
+            aria-label="Search layouts"
           />
         </div>
       </div>
 
-      <div className="templates-carousel-wrapper">
-        <div className="templates-grid">
+      <div className="layouts-carousel-wrapper">
+        <div className="layouts-grid">
           {loading ? (
-            <div className="templates-loading">
+            <div className="layouts-loading">
               <div className="loading-spinner" />
-              <p>Loading templates...</p>
+              <p>Loading layouts...</p>
             </div>
           ) : (
-            filteredTemplates.map((template) => (
-              <TemplateCardUnified
-                key={template.id}
-                template={template}
+            filteredLayouts.map((layout) => (
+              <LayoutCardUnified
+                key={layout.id}
+                layout={layout}
                 onPrimaryAction={handleCustomize}
-                primaryLabel={template.isReady ? 'Customize This Design' : 'Coming Soon'}
-                primaryDisabled={!template.isReady}
+                primaryLabel={layout.isReady ? 'Customize This Design' : 'Coming Soon'}
+                primaryDisabled={!layout.isReady}
                 onSecondaryAction={handleDemo}
                 secondaryLabel="View Demo"
                 showSecondary
-                onCardClick={() => trackTemplateView(template.id)}
+                onCardClick={() => trackTemplateView(layout.id)}
               />
             ))
           )}
         </div>
       </div>
 
-      {demoTemplate && (
+      {demoLayout && (
         <div
-          className="template-demo-modal"
+          className="layout-demo-modal"
           role="dialog"
           aria-modal="true"
           onClick={(e) => {
-            if (e.target === e.currentTarget) setDemoTemplate(null);
+            if (e.target === e.currentTarget) setDemoLayout(null);
           }}
         >
-          <div className="template-demo-content">
-            <div className="template-demo-header">
+          <div className="layout-demo-content">
+            <div className="layout-demo-header">
               <div>
                 <p className="section-label">Live preview</p>
-                <h3>{demoTemplate.name}</h3>
-                <p className="template-desc">{demoTemplate.description}</p>
+                <h3>{demoLayout.name}</h3>
+                <p className="layout-desc">{demoLayout.description}</p>
               </div>
-              <button className="close-btn" aria-label="Close preview" onClick={() => setDemoTemplate(null)}>×</button>
+              <button className="close-btn" aria-label="Close preview" onClick={() => setDemoLayout(null)}>×</button>
             </div>
-            <div className="template-demo-body">
-              <div className={`template-card ${demoTemplate.className} demo-mode`}>
-                <div className="template-preview">
-                  <div className="template-inner">
-                    <div className="template-ornament" style={{ color: demoTemplate.ornamentColor }}>
-                      <demoTemplate.Ornament />
+            <div className="layout-demo-body">
+              <div className={`layout-card ${demoLayout.className} demo-mode`}>
+                <div className="layout-preview">
+                  <div className="layout-inner">
+                    <div className="layout-ornament" style={{ color: demoLayout.ornamentColor }}>
+                      <demoLayout.Ornament />
                     </div>
-                    <div className="template-names">{demoTemplate.names}</div>
-                    <div className="template-date">{demoTemplate.date}</div>
-                    <div className="template-ornament" style={{ color: demoTemplate.ornamentColor, transform: 'rotate(180deg)' }}>
-                      <demoTemplate.Ornament />
+                    <div className="layout-names">{demoLayout.names}</div>
+                    <div className="layout-date">{demoLayout.date}</div>
+                    <div className="layout-ornament" style={{ color: demoLayout.ornamentColor, transform: 'rotate(180deg)' }}>
+                      <demoLayout.Ornament />
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="template-demo-actions">
-                <button className="cta-primary" onClick={() => handleCustomize(demoTemplate)}>
-                  Start with this template
+              <div className="layout-demo-actions">
+                <button className="cta-primary" onClick={() => handleCustomize(demoLayout)}>
+                  Start with this layout
                 </button>
-                <button className="cta-secondary" onClick={() => setDemoTemplate(null)}>
+                <button className="cta-secondary" onClick={() => setDemoLayout(null)}>
                   Close
                 </button>
               </div>
@@ -263,4 +263,4 @@ function TemplateShowcase({ onSectionView }) {
   );
 }
 
-export default TemplateShowcase;
+export default LayoutShowcase;

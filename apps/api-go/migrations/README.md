@@ -45,6 +45,26 @@ Contains SQL migration files for database schema management. These migrations de
 **Down Migration** (`003_load_templates.down.sql`):
 - Removes all templates from the database
 
+### Rename Template ID to Layout ID (`004_rename_template_id_to_layout_id`)
+
+**Up Migration** (`004_rename_template_id_to_layout_id.up.sql`):
+- Renames `templateId` column to `layoutId` in `invitations` table
+- This migration handles the schema change for the refactoring
+
+**Down Migration** (`004_rename_template_id_to_layout_id.down.sql`):
+- Reverts the column rename back to `templateId`
+
+### Update Image Paths to Layouts (`005_update_image_paths_to_layouts`)
+
+**Up Migration** (`005_update_image_paths_to_layouts.up.sql`):
+- Updates image paths in JSON data from `/templates/` to `/layouts/`
+- Updates `preview_image` column
+- Updates `previewImage` in both `config` and `manifest` JSONB columns
+- This migration updates the data to reflect the new directory structure
+
+**Down Migration** (`005_update_image_paths_to_layouts.down.sql`):
+- Reverts image paths from `/layouts/` back to `/templates/`
+
 ## Schema Overview
 
 ### Tables
@@ -58,12 +78,12 @@ Contains SQL migration files for database schema management. These migrations de
 
 2. **invitations** - Wedding invitations
    - id (TEXT, PRIMARY KEY)
-   - templateId (TEXT, default: 'royal-elegance')
+   - templateId (TEXT, default: 'royal-elegance') - renamed to layoutId in migration 004
    - data (JSONB)
    - userId (TEXT, FOREIGN KEY)
    - timestamps
 
-3. **templates** - Template definitions
+3. **templates** - Template/Layout definitions (table name kept as templates)
    - id (TEXT, PRIMARY KEY)
    - name, description, previewImage
    - tags (TEXT[])
@@ -106,22 +126,29 @@ Contains SQL migration files for database schema management. These migrations de
 
 The application automatically runs SQL migrations on startup:
 1. **SQL Migrations**: Checks for pending migrations in the `migrations/` directory and runs them
-2. **Data Migrations**: Special migrations (like `003_load_templates`) execute Go code to load data
+2. **Data Migrations**: Special migrations (like `003_load_templates`) contain SQL INSERT statements
 3. **GORM AutoMigrate**: Runs after SQL migrations to ensure schema is up to date
 
 **Migration Order:**
 1. SQL migrations (from `migrations/*.sql` files)
-   - Schema migrations (e.g., `002_add_template_manifest`)
+   - Schema migrations (e.g., `002_add_template_manifest`, `004_rename_template_id_to_layout_id`)
    - Data migrations (e.g., `003_load_templates`) - pure SQL INSERT statements
+   - Data updates (e.g., `005_update_image_paths_to_layouts`) - UPDATE statements
 2. GORM AutoMigrate (ensures all models are synced)
 
 **Data Migrations:**
-- Migration `003_load_templates` contains SQL INSERT statements for all templates
+- Migration `003_load_templates` contains SQL INSERT statements for all templates/layouts
 - Templates are embedded directly in the migration SQL file (source of truth)
 - Templates are loaded with both `manifest` and `config` as JSONB columns
 - Migration is idempotent (uses `ON CONFLICT DO NOTHING`) and tracked in `schema_migrations` table
 - To add or modify templates, edit the migration file directly
 - The templates folder can be removed after migration runs
+
+**Important Migration Principles:**
+- **Never modify existing migrations** that have been run in production
+- Always create new migrations for schema or data changes
+- Migration files are immutable once applied
+- Use new migrations to handle refactoring (e.g., migration 004 renames column, migration 005 updates paths)
 
 ### GORM AutoMigrate
 

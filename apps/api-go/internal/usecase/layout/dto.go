@@ -1,7 +1,7 @@
-package template
+package layout
 
-// TemplateSummaryDTO represents a template summary data transfer object
-type TemplateSummaryDTO struct {
+// LayoutSummaryDTO represents a layout summary data transfer object
+type LayoutSummaryDTO struct {
 	ID           string        `json:"id"`
 	Name         string        `json:"name"`
 	Description  *string       `json:"description,omitempty"`

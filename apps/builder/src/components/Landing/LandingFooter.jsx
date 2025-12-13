@@ -59,8 +59,8 @@ function LandingFooter({ onSectionView }) {
           <button className="cta-button" onClick={() => { trackCTA('footer_start'); navigate('/signup'); }}>
             Start free →
           </button>
-          <button className="cta-secondary" onClick={() => { trackCTA('footer_templates'); navigate('/templates-gallery'); }}>
-            Browse templates
+          <button className="cta-secondary" onClick={() => { trackCTA('footer_layouts'); navigate('/layouts-gallery'); }}>
+            Browse layouts
           </button>
         </div>
       </div>
@@ -94,13 +94,13 @@ function LandingFooter({ onSectionView }) {
         </div>
 
         <div className="footer-column">
-          <h4>Templates</h4>
+          <h4>Layouts</h4>
           <ul>
-            <li><Link to="/templates-gallery">All Templates</Link></li>
-            <li><Link to="/templates/traditional">Traditional</Link></li>
-            <li><Link to="/templates/modern">Modern</Link></li>
-            <li><Link to="/templates/minimal">Minimal</Link></li>
-            <li><Link to="/templates/floral">Floral</Link></li>
+            <li><Link to="/layouts-gallery">All Layouts</Link></li>
+            <li><Link to="/layouts/traditional">Traditional</Link></li>
+            <li><Link to="/layouts/modern">Modern</Link></li>
+            <li><Link to="/layouts/minimal">Minimal</Link></li>
+            <li><Link to="/layouts/floral">Floral</Link></li>
           </ul>
         </div>
 

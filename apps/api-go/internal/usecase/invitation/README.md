@@ -11,7 +11,7 @@ Handles all business logic related to wedding invitations including creation, re
 Creates a new wedding invitation.
 
 **Input:**
-- `TemplateID`: Template identifier (defaults to "royal-elegance")
+- `LayoutID`: Layout identifier (defaults to "royal-elegance")
 - `Data`: JSON configuration data
 - `UserID`: Owner user ID
 
@@ -56,13 +56,13 @@ Lists all invitations for a user.
 
 ### GetInvitationPreviewUseCase (`get_preview.go`)
 
-Gets preview data for an invitation (template ID and data only).
+Gets preview data for an invitation (layout ID and data only).
 
 **Input:**
 - `ID`: Invitation identifier
 
 **Output:**
-- `Invitation`: Preview DTO (ID, TemplateID, Data only)
+- `Invitation`: Preview DTO (ID, LayoutID, Data only)
 
 **Process:**
 1. Find invitation by ID
@@ -75,7 +75,7 @@ Updates an existing invitation.
 
 **Input:**
 - `ID`: Invitation identifier
-- `TemplateID`: Optional new template ID
+- `LayoutID`: Optional new layout ID
 - `Data`: Optional new data
 
 **Output:**

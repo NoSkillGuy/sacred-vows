@@ -288,7 +288,7 @@ function Dashboard() {
           </div>
 
           <div className="header-actions">
-            <Link to="/templates" className="btn btn-primary">
+            <Link to="/layouts" className="btn btn-primary">
               <PlusIcon />
               <span>New Invitation</span>
             </Link>
@@ -319,18 +319,18 @@ function Dashboard() {
           <div className="quickstart-copy">
             <p className="section-label">Quick start</p>
             <h2>Launch your invitation in 3 steps</h2>
-            <p className="section-subtitle">Pick a template, add details, share your link.</p>
+            <p className="section-subtitle">Pick a layout, add details, share your link.</p>
           </div>
           <div className="quickstart-actions">
-            <button className="btn btn-primary" onClick={() => navigate('/templates')}>
+            <button className="btn btn-primary" onClick={() => navigate('/layouts')}>
               <PlusIcon />
-              Choose template
+              Choose layout
             </button>
             <button className="btn btn-secondary" onClick={() => navigate('/dashboard')}>
               <EyeIcon />
               Preview later
             </button>
-            <button className="btn btn-ghost" onClick={() => navigate('/templates')}>
+            <button className="btn btn-ghost" onClick={() => navigate('/layouts')}>
               See examples
             </button>
           </div>
@@ -374,8 +374,8 @@ function Dashboard() {
           <div className="dashboard-empty">
             <HeartIcon className="dashboard-empty-icon" />
             <h3>No Invitations Yet</h3>
-            <p>Start creating your beautiful wedding invitation. Choose from our premium templates.</p>
-            <Link to="/templates" className="btn btn-primary">
+            <p>Start creating your beautiful wedding invitation. Choose from our premium layouts.</p>
+            <Link to="/layouts" className="btn btn-primary">
               <PlusIcon />
               Create Your First Invitation
             </Link>
@@ -388,12 +388,12 @@ function Dashboard() {
             
             <div className="invitations-grid">
               {/* Create New Card */}
-              <Link to="/templates" className="create-new-card">
+              <Link to="/layouts" className="create-new-card">
                 <div className="create-new-icon">
                   <PlusIcon />
                 </div>
                 <span className="create-new-text">Create New</span>
-                <span className="create-new-subtext">Start from a template</span>
+                <span className="create-new-subtext">Start from a layout</span>
               </Link>
               
               {/* Invitation Cards */}
@@ -416,7 +416,7 @@ function Dashboard() {
 }
 
 function InvitationCard({ invitation, onEdit, onDelete, onTitleUpdate, formatDate }) {
-  const { id, title, data, status, templateId, createdAt } = invitation;
+  const { id, title, data, status, layoutId, createdAt } = invitation;
   
   // Extract couple names from data if available (used as fallback)
   const coupleData = data?.couple || {};
@@ -431,7 +431,7 @@ function InvitationCard({ invitation, onEdit, onDelete, onTitleUpdate, formatDat
     <article className="invitation-card">
       <div className="invitation-preview">
         {/* Preview placeholder - could be an actual preview image */}
-        <div className="template-preview-placeholder" style={{ display: 'flex' }}>
+        <div className="layout-preview-placeholder" style={{ display: 'flex' }}>
           <RingsIcon />
         </div>
         <span className={`invitation-status ${status || 'draft'}`}>
@@ -452,8 +452,8 @@ function InvitationCard({ invitation, onEdit, onDelete, onTitleUpdate, formatDat
           <CalendarIcon />
           {formatDate(weddingDate)}
         </div>
-        <div className="invitation-template">
-          Template: {templateId || 'Royal Elegance'}
+        <div className="invitation-layout">
+          Layout: {layoutId || 'Royal Elegance'}
         </div>
         
         <div className="invitation-actions">

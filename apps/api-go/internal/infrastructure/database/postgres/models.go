@@ -22,19 +22,20 @@ func (UserModel) TableName() string {
 
 // InvitationModel represents the invitations table
 type InvitationModel struct {
-	ID         string         `gorm:"primaryKey;type:text"`
-	TemplateID string         `gorm:"type:text;not null;default:'royal-elegance'"`
-	Data       datatypes.JSON `gorm:"type:jsonb;not null"`
-	UserID     string         `gorm:"type:text;not null;index"`
-	CreatedAt  time.Time      `gorm:"autoCreateTime"`
-	UpdatedAt  time.Time      `gorm:"autoUpdateTime"`
+	ID        string         `gorm:"primaryKey;type:text"`
+	LayoutID  string         `gorm:"type:text;not null;default:'royal-elegance'"`
+	Data      datatypes.JSON `gorm:"type:jsonb;not null"`
+	UserID    string         `gorm:"type:text;not null;index"`
+	CreatedAt time.Time      `gorm:"autoCreateTime"`
+	UpdatedAt time.Time      `gorm:"autoUpdateTime"`
 }
 
 func (InvitationModel) TableName() string {
 	return "invitations"
 }
 
-// TemplateModel represents the templates table
+// TemplateModel represents the templates table (stores layout data)
+// Note: Table name is kept as "templates" for backward compatibility
 type TemplateModel struct {
 	ID           string          `gorm:"primaryKey;type:text"`
 	Name         string          `gorm:"type:text;not null"`
