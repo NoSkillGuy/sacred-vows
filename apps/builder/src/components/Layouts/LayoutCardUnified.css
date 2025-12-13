@@ -1,6 +1,6 @@
 /* Unified Template Card (used across landing, gallery, dashboard, switcher) */
 
-.template-card-unified {
+.layout-card-unified {
   position: relative;
   width: 100%;
   max-width: 360px;
@@ -14,7 +14,7 @@
   cursor: pointer;
 }
 
-.template-card-unified:hover {
+.layout-card-unified:hover {
   transform: translateY(-8px);
   box-shadow: var(--shadow-xl);
 }
@@ -76,7 +76,7 @@
   transition: transform 0.4s var(--ease-out-expo);
 }
 
-.template-card-unified:hover .unified-inner {
+.layout-card-unified:hover .unified-inner {
   transform: scale(1.03);
 }
 
@@ -111,7 +111,7 @@
   border-radius: var(--radius-xl);
 }
 
-.template-card-unified:hover .unified-overlay {
+.layout-card-unified:hover .unified-overlay {
   opacity: 1;
 }
 
@@ -135,12 +135,12 @@
   transition: all 0.4s var(--ease-out-expo);
 }
 
-.template-card-unified:hover .unified-btn {
+.layout-card-unified:hover .unified-btn {
   transform: translateY(0);
   opacity: 1;
 }
 
-.template-card-unified:hover .unified-btn.primary {
+.layout-card-unified:hover .unified-btn.primary {
   transition-delay: 0.1s;
 }
 
@@ -224,8 +224,54 @@
   color: var(--rose-dark);
 }
 
-.template-card-unified.coming-soon {
+.layout-card-unified.coming-soon {
   cursor: default;
 }
 
+/* ===================================
+   Responsive Design for Layout Cards
+   =================================== */
+
+@media (max-width: 1024px) {
+  .layout-card-unified {
+    max-width: 340px;
+  }
+}
+
+@media (max-width: 768px) {
+  .layout-card-unified {
+    max-width: 100%;
+  }
+  
+  .unified-preview {
+    aspect-ratio: 3/4;
+  }
+  
+  .unified-actions {
+    flex-direction: column;
+  }
+  
+  .unified-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .unified-info {
+    padding: 1rem 1.25rem 1.25rem;
+  }
+  
+  .unified-info h3 {
+    font-size: 1rem;
+  }
+  
+  .unified-meta {
+    gap: 0.25rem;
+  }
+  
+  .unified-tag {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.625rem;
+  }
+}
 

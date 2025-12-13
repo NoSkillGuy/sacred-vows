@@ -635,6 +635,15 @@
   gap: 1.5rem;
 }
 
+/* Layout Grid - for /layouts page */
+.layout-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 360px));
+  justify-content: center;
+  gap: 2rem;
+  padding: 1rem 0;
+}
+
 /* Invitation Card */
 .invitation-card {
   background: var(--white);
@@ -1052,6 +1061,13 @@
     grid-template-columns: 1fr;
   }
   
+  .layout-grid {
+    grid-template-columns: 1fr;
+    max-width: 380px;
+    margin: 0 auto;
+    gap: 1.5rem;
+  }
+  
   .dashboard-stats {
     grid-template-columns: 1fr;
   }
@@ -1070,6 +1086,12 @@
   
   .invitation-actions {
     flex-direction: column;
+  }
+  
+  .layout-grid {
+    grid-template-columns: 1fr;
+    max-width: 100%;
+    gap: 1.25rem;
   }
   
   .user-dropdown {
