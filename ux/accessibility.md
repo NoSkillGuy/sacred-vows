@@ -198,7 +198,7 @@ Announce dynamic content changes:
 </div>
 
 <div role="status" aria-live="polite">
-  Loading templates...
+  Loading layouts...
 </div>
 ```
 

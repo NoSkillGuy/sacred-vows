@@ -80,8 +80,8 @@ Active voice is clearer and more engaging.
 ✗ "Your invitation has been saved by the system."
 ✓ "We've saved your invitation."
 
-✗ "Templates can be customized by you."
-✓ "You can customize any template."
+✗ "Layouts can be customized by you."
+✓ "You can customize any layout."
 ```
 
 ### Address the User
@@ -117,8 +117,8 @@ Vague language creates confusion.
 
 ```
 ✓ "Create your perfect invitation"
-✓ "Choose a template you love"
-✗ "Welcome To The Template Selection Page"
+✓ "Choose a layout you love"
+✗ "Welcome To The Layout Selection Page"
 ```
 
 ### Button Labels
@@ -243,7 +243,7 @@ Be thoughtful about:
 | Term | Instead of |
 |------|------------|
 | Wedding invitation | E-vite, digital card |
-| Template | Theme, skin |
+| Layout | Theme, skin |
 | Guests | Invitees, recipients |
 | RSVP | Response, reply |
 | Dashboard | Control panel, admin |
@@ -279,7 +279,7 @@ Be thoughtful about:
 >
 > Welcome to Sacred Vows! We're honored to be part of your wedding journey.
 >
-> Creating your perfect invitation is just a few clicks away. Browse our collection of elegant templates, personalize with your love story details, and share with guests in minutes.
+> Creating your perfect invitation is just a few clicks away. Browse our collection of elegant layouts, personalize with your love story details, and share with guests in minutes.
 >
 > Ready to get started? [Create your invitation →]
 >

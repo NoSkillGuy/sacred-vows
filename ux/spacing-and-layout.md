@@ -79,29 +79,29 @@ Base unit: 8px (0.5rem)
   gap: 2rem;
 }
 
-.grid-2 { grid-template-columns: repeat(2, 1fr); }
-.grid-3 { grid-template-columns: repeat(3, 1fr); }
-.grid-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-2 { grid-layout-columns: repeat(2, 1fr); }
+.grid-3 { grid-layout-columns: repeat(3, 1fr); }
+.grid-4 { grid-layout-columns: repeat(4, 1fr); }
 ```
 
 ### Responsive Behavior
 ```css
 /* Desktop: 3 columns */
 .grid-3 {
-  grid-template-columns: repeat(3, 1fr);
+  grid-layout-columns: repeat(3, 1fr);
 }
 
 /* Tablet: 2 columns */
 @media (max-width: 1024px) {
   .grid-3 {
-    grid-template-columns: repeat(2, 1fr);
+    grid-layout-columns: repeat(2, 1fr);
   }
 }
 
 /* Mobile: 1 column */
 @media (max-width: 768px) {
   .grid-3 {
-    grid-template-columns: 1fr;
+    grid-layout-columns: 1fr;
   }
 }
 ```
@@ -206,11 +206,11 @@ Base unit: 8px (0.5rem)
 
 /* 3-column → 2-column → 1-column */
 @media (max-width: 1024px) {
-  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-layout-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 768px) {
-  .grid-3 { grid-template-columns: 1fr; }
+  .grid-3 { grid-layout-columns: 1fr; }
 }
 ```
 

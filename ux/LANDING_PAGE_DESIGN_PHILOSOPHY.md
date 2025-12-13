@@ -266,7 +266,7 @@ All icons are custom SVG designs for:
 - Cross pattern for CTA section
 
 **Ornaments:**
-- Custom SVG ornaments per template style
+- Custom SVG ornaments per layout style
 - Gold accents for premium feel
 - Rotated variants for symmetry
 

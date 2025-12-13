@@ -8,7 +8,7 @@ The platform consists of:
 
 - **Builder App** (`apps/builder`) - React-based UI for creating invitations
 - **API Server** (`apps/api-go`) - Go backend with authentication and data management
-- **Layout Engine** (`apps/builder/src/template-engine`) - Layout rendering system
+- **Layout Engine** (`apps/builder/src/layout-engine`) - Layout rendering system
 - **Shared Types** (`apps/builder/src/shared`) - Shared type definitions and utilities
 
 ## Getting Started
@@ -89,7 +89,7 @@ wedding-invitation-builder/
 ├── apps/
 │   ├── builder/
 │   │   └── src/
-│   │       ├── template-engine/  # Layout rendering engine
+│   │       ├── layout-engine/  # Layout rendering engine
 │   │       └── shared/            # Shared utilities
 ├── layouts/
 │   └── royal-elegance/   # Layout definitions

@@ -30,7 +30,7 @@ Provides PostgreSQL database implementation using GORM. Implements all repositor
 Database models that map to PostgreSQL tables:
 - `UserModel` - Users table
 - `InvitationModel` - Invitations table
-- `LayoutModel` - Layouts table (renamed from templates in migration 006)
+- `LayoutModel` - Layouts table (renamed from layouts in migration 006)
 - `AssetModel` - Assets table
 - `RSVPResponseModel` - RSVP responses table
 - `AnalyticsModel` - Analytics table
@@ -72,8 +72,8 @@ toUserDomain(model) -> *domain.User
 
 Handles JSON fields using GORM's `datatypes.JSON`:
 - `Invitation.Data` - JSONB column
-- `Template.Config` - JSONB column
-- `Template.Tags` - Text array
+- `Layout.Config` - JSONB column
+- `Layout.Tags` - Text array
 
 ## Migrations
 

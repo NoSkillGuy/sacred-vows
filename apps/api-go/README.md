@@ -1,6 +1,6 @@
 # Wedding Invitation Builder API - Go
 
-A Go implementation of the wedding invitation builder API following Clean Architecture principles. This API provides endpoints for managing wedding invitations, templates, assets, RSVP responses, and analytics.
+A Go implementation of the wedding invitation builder API following Clean Architecture principles. This API provides endpoints for managing wedding invitations, layouts, assets, RSVP responses, and analytics.
 
 ## Architecture
 
@@ -37,10 +37,10 @@ apps/api-go/
   - Title and status field support (stored in JSON data)
   - Preview endpoint for public access
   - Optional authentication (supports anonymous users)
-- Template management (file system based)
-  - List templates with filtering (category, featured)
-  - Get template manifests
-  - Template catalog support
+- Layout management (file system based)
+  - List layouts with filtering (category, featured)
+  - Get layout manifests
+  - Layout catalog support
 - Asset upload and management
   - File upload with validation
   - File type and size validation

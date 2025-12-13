@@ -145,11 +145,11 @@ With icon and hover accent.
 }
 ```
 
-### Template Card
-For template previews with overlay.
+### Layout Card
+For layout previews with overlay.
 
 ```css
-.template-card {
+.layout-card {
   position: relative;
   border-radius: 20px;
   overflow: hidden;
@@ -157,12 +157,12 @@ For template previews with overlay.
   transition: all 0.5s var(--ease-out-expo);
 }
 
-.template-card:hover {
+.layout-card:hover {
   transform: translateY(-12px) scale(1.02);
   box-shadow: var(--shadow-xl);
 }
 
-.template-overlay {
+.layout-overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.7) 100%);
@@ -170,7 +170,7 @@ For template previews with overlay.
   transition: opacity 0.4s ease;
 }
 
-.template-card:hover .template-overlay {
+.layout-card:hover .layout-overlay {
   opacity: 1;
 }
 ```

@@ -103,8 +103,8 @@ See [Typography](./typography.md) for complete specifications.
 - Subtle animations (floating petals, gradient shifts)
 - Glass-morphism for navigation elements
 
-#### Invitation Templates
-- Each template maintains brand essence while offering variety
+#### Invitation Layouts
+- Each layout maintains brand essence while offering variety
 - Color palettes coordinate with wedding themes
 - Typography follows hierarchy guidelines
 - Premium features use gold accents

@@ -7,13 +7,13 @@ import (
 	"github.com/sacred-vows/api-go/internal/domain"
 )
 
-// normalizeImagePath converts /templates/ paths to /layouts/ paths
+// normalizeImagePath converts /layouts/ paths to /layouts/ paths
 // This ensures backward compatibility with old data while using new paths
 func normalizeImagePath(path string) string {
 	if path == "" {
 		return path
 	}
-	return strings.ReplaceAll(path, "/templates/", "/layouts/")
+	return strings.ReplaceAll(path, "/layouts/", "/layouts/")
 }
 
 // ToLayoutSummaryDTO converts a domain.Layout to LayoutSummaryDTO

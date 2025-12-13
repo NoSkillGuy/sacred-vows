@@ -90,7 +90,7 @@ The `ToLayoutSummaryDTO` function converts `domain.Layout` to `LayoutSummaryDTO`
 
 ## Database Schema
 
-Layouts are stored in the `layouts` table (renamed from `templates` in migration 006) with:
+Layouts are stored in the `layouts` table (renamed from `layouts` in migration 006) with:
 - `id`: Layout identifier (primary key)
 - `name`: Layout name
 - `description`: Layout description

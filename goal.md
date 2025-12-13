@@ -1,18 +1,18 @@
 # Wedding Invitation Builder Platform - Goals & Objectives
 
 ## Vision
-Transform the current wedding invitation website into a comprehensive, template-based builder platform that allows users to create, customize, and deploy their own wedding invitations through an intuitive web interface.
+Transform the current wedding invitation website into a comprehensive, layout-based builder platform that allows users to create, customize, and deploy their own wedding invitations through an intuitive web interface.
 
 ## Core Goals
 
-### 1. Template-Based Architecture
-- **Goal**: Create a flexible, reusable template system
+### 1. Layout-Based Architecture
+- **Goal**: Create a flexible, reusable layout system
 - **Objectives**:
-  - Separate template code from user data
-  - Support multiple invitation templates
-  - Enable easy creation of new templates
-  - Maintain template versioning
-  - Allow template customization (colors, fonts, layouts)
+  - Separate layout code from user data
+  - Support multiple invitation layouts
+  - Enable easy creation of new layouts
+  - Maintain layout versioning
+  - Allow layout customization (colors, fonts, layouts)
 
 ### 2. Real-Time Preview System
 - **Goal**: Provide instant visual feedback as users edit
@@ -100,7 +100,7 @@ Transform the current wedding invitation website into a comprehensive, template-
 
 ### Architecture
 - **Monorepo structure** for better code organization
-- **Component reusability** across templates
+- **Component reusability** across layouts
 - **Type safety** with TypeScript interfaces
 - **Modular design** for easy maintenance
 
@@ -108,7 +108,7 @@ Transform the current wedding invitation website into a comprehensive, template-
 - **Fast load times** (< 3 seconds)
 - **Optimized images** and assets
 - **Code splitting** for better performance
-- **Lazy loading** for templates
+- **Lazy loading** for layouts
 
 ### Quality
 - **Pixel-perfect preview** matching actual website
@@ -118,7 +118,7 @@ Transform the current wedding invitation website into a comprehensive, template-
 
 ### Developer Experience
 - **Clear documentation**
-- **Easy template creation** process
+- **Easy layout creation** process
 - **Type-safe APIs**
 - **Comprehensive error handling**
 
@@ -132,7 +132,7 @@ Transform the current wedding invitation website into a comprehensive, template-
 
 ### Flexibility
 - **Extensive customization** options
-- **Multiple template choices**
+- **Multiple layout choices**
 - **Easy content editing**
 - **Quick preview** of changes
 
@@ -151,7 +151,7 @@ Transform the current wedding invitation website into a comprehensive, template-
 - **Cost-effective hosting**
 
 ### Extensibility
-- **Easy to add new templates**
+- **Easy to add new layouts**
 - **Plugin architecture** for features
 - **API for integrations**
 - **Future feature additions**
@@ -172,14 +172,14 @@ Transform the current wedding invitation website into a comprehensive, template-
 
 ### Business Metrics
 - Number of invitations created
-- Template usage distribution
+- Layout usage distribution
 - Export/deployment success rate
 - User retention
 
 ## Future Enhancements (Roadmap)
 
 ### Phase 1 (Current)
-- ✅ Template abstraction
+- ✅ Layout abstraction
 - ✅ Builder UI foundation
 - ✅ Real-time preview
 - ✅ Basic form components
@@ -193,8 +193,8 @@ Transform the current wedding invitation website into a comprehensive, template-
 - [ ] RSVP system backend
 
 ### Phase 3 (Future)
-- [ ] Advanced template editor
-- [ ] Template marketplace
+- [ ] Advanced layout editor
+- [ ] Layout marketplace
 - [ ] Email notifications
 - [ ] Advanced analytics
 - [ ] Mobile app
@@ -202,7 +202,7 @@ Transform the current wedding invitation website into a comprehensive, template-
 ### Phase 4 (Vision)
 - [ ] AI-powered suggestions
 - [ ] Collaborative editing
-- [ ] Template designer tools
+- [ ] Layout designer tools
 - [ ] White-label solutions
 - [ ] Enterprise features
 
@@ -219,7 +219,7 @@ Transform the current wedding invitation website into a comprehensive, template-
 
 - All changes should maintain backward compatibility
 - Preview must always match the actual website exactly
-- No breaking changes to existing templates
+- No breaking changes to existing layouts
 - Progressive enhancement approach
 - Mobile-first responsive design
 
