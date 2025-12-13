@@ -2,18 +2,17 @@ package template
 
 import (
 	"context"
-	"encoding/json"
-	"os"
-	"path/filepath"
+
+	"github.com/sacred-vows/api-go/internal/interfaces/repository"
 )
 
 type GetAllTemplatesUseCase struct {
-	templatesDir string
+	templateRepo repository.TemplateRepository
 }
 
-func NewGetAllTemplatesUseCase(templatesDir string) *GetAllTemplatesUseCase {
+func NewGetAllTemplatesUseCase(templateRepo repository.TemplateRepository) *GetAllTemplatesUseCase {
 	return &GetAllTemplatesUseCase{
-		templatesDir: templatesDir,
+		templateRepo: templateRepo,
 	}
 }
 
@@ -81,125 +80,20 @@ func (uc *GetAllTemplatesUseCase) Execute(ctx context.Context, input GetAllTempl
 }
 
 func (uc *GetAllTemplatesUseCase) getTemplateCatalog() ([]*TemplateSummaryDTO, error) {
-	templateIds, err := uc.getTemplateIds()
+	templates, err := uc.templateRepo.FindAll(context.Background())
 	if err != nil {
 		return nil, err
 	}
 
 	var catalog []*TemplateSummaryDTO
-	for _, templateId := range templateIds {
-		manifest, err := uc.loadManifest(templateId)
-		if err != nil || manifest == nil {
+	for _, template := range templates {
+		dto, err := ToTemplateSummaryDTO(template)
+		if err != nil {
+			// Skip templates with invalid manifest
 			continue
 		}
-		catalog = append(catalog, manifest)
+		catalog = append(catalog, dto)
 	}
 
 	return catalog, nil
-}
-
-func (uc *GetAllTemplatesUseCase) getTemplateIds() ([]string, error) {
-	entries, err := os.ReadDir(uc.templatesDir)
-	if err != nil {
-		return nil, err
-	}
-
-	var templateIds []string
-	for _, entry := range entries {
-		if entry.IsDir() {
-			fullPath := filepath.Join(uc.templatesDir, entry.Name())
-			info, err := os.Stat(fullPath)
-			if err == nil && info.IsDir() {
-				templateIds = append(templateIds, entry.Name())
-			}
-		}
-	}
-
-	return templateIds, nil
-}
-
-func (uc *GetAllTemplatesUseCase) loadManifest(templateId string) (*TemplateSummaryDTO, error) {
-	manifestPath := filepath.Join(uc.templatesDir, templateId, "manifest.json")
-
-	data, err := os.ReadFile(manifestPath)
-	if err != nil {
-		return nil, err
-	}
-
-	var raw map[string]interface{}
-	if err := json.Unmarshal(data, &raw); err != nil {
-		return nil, err
-	}
-
-	return uc.normalizeManifest(raw, templateId), nil
-}
-
-func (uc *GetAllTemplatesUseCase) normalizeManifest(input map[string]interface{}, templateId string) *TemplateSummaryDTO {
-	manifest := &TemplateSummaryDTO{
-		ID:   templateId,
-		Name: templateId,
-	}
-
-	if id, ok := input["id"].(string); ok {
-		manifest.ID = id
-	}
-	if name, ok := input["name"].(string); ok {
-		manifest.Name = name
-	}
-	if desc, ok := input["description"].(string); ok {
-		manifest.Description = &desc
-	}
-	if preview, ok := input["previewImage"].(string); ok {
-		manifest.PreviewImage = &preview
-	}
-	if tags, ok := input["tags"].([]interface{}); ok {
-		manifest.Tags = make([]string, 0, len(tags))
-		for i, tag := range tags {
-			if i >= 3 {
-				break
-			}
-			if tagStr, ok := tag.(string); ok {
-				manifest.Tags = append(manifest.Tags, tagStr)
-			}
-		}
-	}
-	if category, ok := input["category"].(string); ok {
-		manifest.Category = &category
-	}
-	if version, ok := input["version"].(string); ok {
-		manifest.Version = &version
-	}
-
-	// Handle status
-	if status, ok := input["status"].(string); ok {
-		manifest.Status = &status
-	} else if isAvailable, ok := input["isAvailable"].(bool); ok && isAvailable {
-		status := "ready"
-		manifest.Status = &status
-	} else if isComingSoon, ok := input["isComingSoon"].(bool); ok && isComingSoon {
-		status := "coming-soon"
-		manifest.Status = &status
-	} else {
-		status := "hidden"
-		manifest.Status = &status
-	}
-
-	if manifest.Status != nil {
-		isAvailable := *manifest.Status == "ready"
-		isComingSoon := *manifest.Status == "coming-soon"
-		manifest.IsAvailable = &isAvailable
-		manifest.IsComingSoon = &isComingSoon
-	}
-
-	if isFeatured, ok := input["isFeatured"].(bool); ok {
-		manifest.IsFeatured = &isFeatured
-	}
-
-	// Handle themes
-	if themes, ok := input["themes"].([]interface{}); ok {
-		manifest.Themes = make([]interface{}, len(themes))
-		copy(manifest.Themes, themes)
-	}
-
-	return manifest
 }

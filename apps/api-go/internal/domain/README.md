@@ -51,7 +51,7 @@ Represents a wedding invitation.
 - Data is stored as JSON
 
 ### Template (`template.go`)
-Represents a template definition (stored in database, but also loaded from file system).
+Represents a template definition stored in the database.
 
 **Properties:**
 - `ID`, `Name`, `Description`

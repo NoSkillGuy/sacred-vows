@@ -20,6 +20,31 @@ Contains SQL migration files for database schema management. These migrations de
 - Drops all tables
 - Uses IF EXISTS for safety
 
+### Add Template Manifest (`002_add_template_manifest`)
+
+**Up Migration** (`002_add_template_manifest.up.sql`):
+- Adds `manifest` JSONB column to `templates` table
+- Allows storing template manifest data separately from config
+- Uses IF NOT EXISTS for idempotency
+
+**Down Migration** (`002_add_template_manifest.down.sql`):
+- Removes `manifest` column from `templates` table
+- Uses IF EXISTS for safety
+
+### Load Templates (`003_load_templates`)
+
+**Up Migration** (`003_load_templates.up.sql`):
+- Data migration that loads all templates into the database
+- Contains all template data embedded directly in the SQL file
+- Inserts templates into the `templates` table with both manifest and config as JSONB
+- Uses `ON CONFLICT DO NOTHING` for idempotency
+- **This migration file is the source of truth for templates**
+- To add or modify templates, edit this migration file directly
+- The templates folder (`apps/builder/templates`) can be removed after this migration runs
+
+**Down Migration** (`003_load_templates.down.sql`):
+- Removes all templates from the database
+
 ## Schema Overview
 
 ### Tables
@@ -42,7 +67,7 @@ Contains SQL migration files for database schema management. These migrations de
    - id (TEXT, PRIMARY KEY)
    - name, description, previewImage
    - tags (TEXT[])
-   - version, config (JSONB)
+   - version, config (JSONB), manifest (JSONB)
    - isActive (BOOLEAN)
    - timestamps
 
@@ -77,9 +102,30 @@ Contains SQL migration files for database schema management. These migrations de
 
 ## Migration Tools
 
-### GORM AutoMigrate (Current)
+### Automatic Migration on Startup
 
-The application uses GORM AutoMigrate which automatically:
+The application automatically runs SQL migrations on startup:
+1. **SQL Migrations**: Checks for pending migrations in the `migrations/` directory and runs them
+2. **Data Migrations**: Special migrations (like `003_load_templates`) execute Go code to load data
+3. **GORM AutoMigrate**: Runs after SQL migrations to ensure schema is up to date
+
+**Migration Order:**
+1. SQL migrations (from `migrations/*.sql` files)
+   - Schema migrations (e.g., `002_add_template_manifest`)
+   - Data migrations (e.g., `003_load_templates`) - pure SQL INSERT statements
+2. GORM AutoMigrate (ensures all models are synced)
+
+**Data Migrations:**
+- Migration `003_load_templates` contains SQL INSERT statements for all templates
+- Templates are embedded directly in the migration SQL file (source of truth)
+- Templates are loaded with both `manifest` and `config` as JSONB columns
+- Migration is idempotent (uses `ON CONFLICT DO NOTHING`) and tracked in `schema_migrations` table
+- To add or modify templates, edit the migration file directly
+- The templates folder can be removed after migration runs
+
+### GORM AutoMigrate
+
+GORM AutoMigrate automatically:
 - Creates tables if they don't exist
 - Adds missing columns
 - Creates indexes

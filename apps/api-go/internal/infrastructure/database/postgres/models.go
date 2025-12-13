@@ -43,7 +43,8 @@ type TemplateModel struct {
 	Tags         datatypes.JSON  `gorm:"type:text[]"`
 	Version      string          `gorm:"type:text;not null;default:'1.0.0'"`
 	Config       *datatypes.JSON `gorm:"type:jsonb"`
-	IsActive     bool            `gorm:"default:true"`
+	Manifest     *datatypes.JSON `gorm:"type:jsonb"`
+	IsActive     bool            `gorm:"column:isActive;default:true"`
 	CreatedAt    time.Time       `gorm:"autoCreateTime"`
 	UpdatedAt    time.Time       `gorm:"autoUpdateTime"`
 }

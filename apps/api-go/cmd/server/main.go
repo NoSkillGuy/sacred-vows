@@ -45,7 +45,25 @@ func main() {
 	}
 	defer db.Close()
 
-	// Run migrations
+	// Run SQL migrations
+	ctx := context.Background()
+	// Migrations folder path - in Docker it's /app/migrations, locally it's ../../migrations
+	migrationsDir := os.Getenv("MIGRATIONS_DIR")
+	if migrationsDir == "" {
+		// Try Docker path first, then local path
+		if _, err := os.Stat("/app/migrations"); err == nil {
+			migrationsDir = "/app/migrations"
+		} else {
+			migrationsDir = "../../migrations"
+		}
+	}
+	if err := db.RunMigrations(ctx, migrationsDir); err != nil {
+		logger.GetLogger().Error("Failed to run SQL migrations", zap.Error(err))
+		// Continue anyway - GORM AutoMigrate will handle schema changes
+		// But data migrations (like loading templates) may fail
+	}
+
+	// Run GORM AutoMigrate
 	if err := db.AutoMigrate(
 		&postgres.UserModel{},
 		&postgres.InvitationModel{},
@@ -54,12 +72,13 @@ func main() {
 		&postgres.RSVPResponseModel{},
 		&postgres.AnalyticsModel{},
 	); err != nil {
-		logger.GetLogger().Fatal("Failed to run migrations", zap.Error(err))
+		logger.GetLogger().Fatal("Failed to run GORM migrations", zap.Error(err))
 	}
 
 	// Initialize repositories
 	userRepo := postgres.NewUserRepository(db.DB)
 	invitationRepo := postgres.NewInvitationRepository(db.DB)
+	templateRepo := postgres.NewTemplateRepository(db.DB)
 	assetRepo := postgres.NewAssetRepository(db.DB)
 	rsvpRepo := postgres.NewRSVPRepository(db.DB)
 	analyticsRepo := postgres.NewAnalyticsRepository(db.DB)
@@ -70,12 +89,6 @@ func main() {
 	fileStorage, err := storage.NewFileStorage(cfg.Storage.UploadPath, cfg.Storage.MaxFileSize, cfg.Storage.AllowedTypes)
 	if err != nil {
 		logger.GetLogger().Fatal("Failed to initialize file storage", zap.Error(err))
-	}
-
-	// Get templates directory
-	templatesDir := os.Getenv("TEMPLATES_DIR")
-	if templatesDir == "" {
-		templatesDir = "../../builder/templates"
 	}
 
 	// Initialize use cases
@@ -91,10 +104,10 @@ func main() {
 	updateInvitationUC := invitation.NewUpdateInvitationUseCase(invitationRepo)
 	deleteInvitationUC := invitation.NewDeleteInvitationUseCase(invitationRepo)
 
-	getAllTemplatesUC := template.NewGetAllTemplatesUseCase(templatesDir)
-	getTemplateByIDUC := template.NewGetTemplateByIDUseCase(templatesDir)
-	getTemplateManifestUC := template.NewGetTemplateManifestUseCase(templatesDir)
-	getManifestsUC := template.NewGetManifestsUseCase(templatesDir)
+	getAllTemplatesUC := template.NewGetAllTemplatesUseCase(templateRepo)
+	getTemplateByIDUC := template.NewGetTemplateByIDUseCase(templateRepo)
+	getTemplateManifestUC := template.NewGetTemplateManifestUseCase(templateRepo)
+	getManifestsUC := template.NewGetManifestsUseCase(templateRepo)
 
 	uploadAssetUC := asset.NewUploadAssetUseCase(assetRepo, cfg.Storage.UploadPath, cfg.Storage.MaxFileSize, cfg.Storage.AllowedTypes)
 	getAllAssetsUC := asset.NewGetAllAssetsUseCase(assetRepo)

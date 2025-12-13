@@ -14,6 +14,7 @@ type Template struct {
 	Tags         []string
 	Version      string
 	Config       *json.RawMessage
+	Manifest     *json.RawMessage
 	IsActive     bool
 	CreatedAt    time.Time
 	UpdatedAt    time.Time

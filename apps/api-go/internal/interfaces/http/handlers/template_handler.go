@@ -55,7 +55,11 @@ func (h *TemplateHandler) GetAll(c *gin.Context) {
 			c.JSON(appErr.Code, appErr.ToResponse())
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get templates"})
+		// Log the actual error for debugging
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Failed to get templates",
+			"details": err.Error(),
+		})
 		return
 	}
 

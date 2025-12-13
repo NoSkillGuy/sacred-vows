@@ -40,14 +40,14 @@ Invitation data operations:
 
 ### TemplateRepository (`template_repository.go`)
 
-Template data operations (for database-stored templates):
+Template data operations for database-stored templates:
 - `Create(ctx, template)` - Create template
 - `FindByID(ctx, id)` - Find by ID
-- `FindAll(ctx)` - Find all templates
+- `FindAll(ctx)` - Find all active templates
 - `Update(ctx, template)` - Update template
 - `Delete(ctx, id)` - Delete template
 
-**Note:** Templates are primarily loaded from file system, but this interface exists for database-stored templates.
+**Note:** Templates are stored in the database with both `manifest` and `config` as JSONB columns. Templates are loaded via SQL migration `003_load_templates.up.sql` which contains all template data embedded in the migration file.
 
 ### AssetRepository (`asset_repository.go`)
 
