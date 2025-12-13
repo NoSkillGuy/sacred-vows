@@ -151,3 +151,5 @@ export function formatPrice(price, currency = 'INR') {
     currency: currency,
   }).format(price);
 }
+
+

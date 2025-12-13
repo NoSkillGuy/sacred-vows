@@ -29,6 +29,7 @@ import (
 	"syscall"
 	"time"
 
+	_ "github.com/sacred-vows/api-go/docs" // Swagger documentation
 	"github.com/sacred-vows/api-go/internal/infrastructure/auth"
 	"github.com/sacred-vows/api-go/internal/infrastructure/config"
 	"github.com/sacred-vows/api-go/internal/infrastructure/database/postgres"

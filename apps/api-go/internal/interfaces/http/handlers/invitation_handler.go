@@ -3,11 +3,57 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sacred-vows/api-go/internal/usecase/invitation"
 	"github.com/sacred-vows/api-go/pkg/errors"
 )
+
+// JSONData represents JSON data as a string for Swagger compatibility
+// It can be converted to/from json.RawMessage
+type JSONData string
+
+// ToRawMessage converts JSONData to json.RawMessage
+func (j JSONData) ToRawMessage() json.RawMessage {
+	return json.RawMessage(j)
+}
+
+// JSONDataFromRawMessage creates JSONData from json.RawMessage
+func JSONDataFromRawMessage(raw json.RawMessage) JSONData {
+	return JSONData(raw)
+}
+
+// toHandlerInvitationDTO converts use case InvitationDTO to handler InvitationDTO
+func toHandlerInvitationDTO(dto *invitation.InvitationDTO) *InvitationDTO {
+	if dto == nil {
+		return nil
+	}
+	createdAt := dto.CreatedAt.Format(time.RFC3339)
+	updatedAt := dto.UpdatedAt.Format(time.RFC3339)
+	return &InvitationDTO{
+		ID:        dto.ID,
+		LayoutID:  dto.LayoutID,
+		Data:      JSONDataFromRawMessage(dto.Data),
+		Title:     dto.Title,
+		Status:    dto.Status,
+		UserID:    dto.UserID,
+		CreatedAt: createdAt,
+		UpdatedAt: updatedAt,
+	}
+}
+
+// toHandlerInvitationPreviewDTO converts use case InvitationPreviewDTO to handler InvitationPreviewDTO
+func toHandlerInvitationPreviewDTO(dto *invitation.InvitationPreviewDTO) *InvitationPreviewDTO {
+	if dto == nil {
+		return nil
+	}
+	return &InvitationPreviewDTO{
+		ID:       dto.ID,
+		LayoutID: dto.LayoutID,
+		Data:     JSONDataFromRawMessage(dto.Data),
+	}
+}
 
 type InvitationHandler struct {
 	createUC     *invitation.CreateInvitationUseCase
@@ -37,33 +83,33 @@ func NewInvitationHandler(
 }
 
 type CreateInvitationRequest struct {
-	LayoutID string          `json:"layoutId" example:"royal-elegance" binding:"required"`
-	Data     json.RawMessage `json:"data" example:"{\"bride\":\"Jane\",\"groom\":\"John\"}" binding:"required"`
-	Title    string          `json:"title" example:"Our Wedding"`
+	LayoutID string   `json:"layoutId" example:"royal-elegance" binding:"required"`
+	Data     JSONData `json:"data" swagtype:"string" example:"{\"bride\":\"Jane\",\"groom\":\"John\"}" binding:"required"`
+	Title    string   `json:"title" example:"Our Wedding"`
 }
 
 type UpdateInvitationRequest struct {
-	Data     *json.RawMessage `json:"data" example:"{\"bride\":\"Jane\",\"groom\":\"John\"}"`
-	LayoutID *string          `json:"layoutId" example:"royal-elegance"`
-	Title    *string          `json:"title" example:"Our Wedding"`
-	Status   *string          `json:"status" example:"published"`
+	Data     *JSONData `json:"data" swagtype:"string" example:"{\"bride\":\"Jane\",\"groom\":\"John\"}"`
+	LayoutID *string   `json:"layoutId" example:"royal-elegance"`
+	Title    *string   `json:"title" example:"Our Wedding"`
+	Status   *string   `json:"status" example:"published"`
 }
 
 type InvitationDTO struct {
-	ID        string          `json:"id" example:"1234567890"`
-	LayoutID  string          `json:"layoutId" example:"royal-elegance"`
-	Data      json.RawMessage `json:"data" example:"{\"bride\":\"Jane\",\"groom\":\"John\"}"`
-	Title     *string         `json:"title,omitempty" example:"Our Wedding"`
-	Status    *string         `json:"status,omitempty" example:"published"`
-	UserID    string          `json:"userId" example:"user123"`
-	CreatedAt string          `json:"createdAt" example:"2024-01-01T00:00:00Z"`
-	UpdatedAt string          `json:"updatedAt" example:"2024-01-01T00:00:00Z"`
+	ID        string   `json:"id" example:"1234567890"`
+	LayoutID  string   `json:"layoutId" example:"royal-elegance"`
+	Data      JSONData `json:"data" swagtype:"string" example:"{\"bride\":\"Jane\",\"groom\":\"John\"}"`
+	Title     *string  `json:"title,omitempty" example:"Our Wedding"`
+	Status    *string  `json:"status,omitempty" example:"published"`
+	UserID    string   `json:"userId" example:"user123"`
+	CreatedAt string   `json:"createdAt" example:"2024-01-01T00:00:00Z"`
+	UpdatedAt string   `json:"updatedAt" example:"2024-01-01T00:00:00Z"`
 }
 
 type InvitationPreviewDTO struct {
-	ID       string          `json:"id" example:"1234567890"`
-	LayoutID string          `json:"layoutId" example:"royal-elegance"`
-	Data     json.RawMessage `json:"data" example:"{\"bride\":\"Jane\",\"groom\":\"John\"}"`
+	ID       string   `json:"id" example:"1234567890"`
+	LayoutID string   `json:"layoutId" example:"royal-elegance"`
+	Data     JSONData `json:"data" swagtype:"string" example:"{\"bride\":\"Jane\",\"groom\":\"John\"}"`
 }
 
 type InvitationResponse struct {
@@ -105,7 +151,12 @@ func (h *InvitationHandler) GetAll(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"invitations": output.Invitations})
+	// Convert use case DTOs to handler DTOs
+	handlerInvitations := make([]InvitationDTO, len(output.Invitations))
+	for i, inv := range output.Invitations {
+		handlerInvitations[i] = *toHandlerInvitationDTO(inv)
+	}
+	c.JSON(http.StatusOK, gin.H{"invitations": handlerInvitations})
 }
 
 // GetPreview retrieves a public invitation preview
@@ -131,7 +182,15 @@ func (h *InvitationHandler) GetPreview(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"invitation": output.Invitation})
+	// GetPreview returns InvitationPreviewDTO, convert it
+	previewDTO := toHandlerInvitationPreviewDTO(output.Invitation)
+	// Convert to full DTO for response (Swagger expects InvitationResponse)
+	fullDTO := &InvitationDTO{
+		ID:       previewDTO.ID,
+		LayoutID: previewDTO.LayoutID,
+		Data:     previewDTO.Data,
+	}
+	c.JSON(http.StatusOK, gin.H{"invitation": fullDTO})
 }
 
 // GetByID retrieves an invitation by ID
@@ -157,7 +216,7 @@ func (h *InvitationHandler) GetByID(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"invitation": output.Invitation})
+	c.JSON(http.StatusOK, gin.H{"invitation": toHandlerInvitationDTO(output.Invitation)})
 }
 
 // Create creates a new invitation
@@ -191,7 +250,7 @@ func (h *InvitationHandler) Create(c *gin.Context) {
 
 	output, err := h.createUC.Execute(c.Request.Context(), invitation.CreateInvitationInput{
 		LayoutID: req.LayoutID,
-		Data:     req.Data,
+		Data:     req.Data.ToRawMessage(),
 		Title:    titlePtr,
 		UserID:   userID.(string),
 	})
@@ -206,7 +265,7 @@ func (h *InvitationHandler) Create(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"invitation": output.Invitation})
+	c.JSON(http.StatusCreated, gin.H{"invitation": toHandlerInvitationDTO(output.Invitation)})
 }
 
 // Update updates an existing invitation
@@ -231,10 +290,16 @@ func (h *InvitationHandler) Update(c *gin.Context) {
 		return
 	}
 
+	var dataPtr *json.RawMessage
+	if req.Data != nil {
+		raw := (*req.Data).ToRawMessage()
+		dataPtr = &raw
+	}
+
 	output, err := h.updateUC.Execute(c.Request.Context(), invitation.UpdateInvitationInput{
 		ID:       id,
 		LayoutID: req.LayoutID,
-		Data:     req.Data,
+		Data:     dataPtr,
 		Title:    req.Title,
 		Status:   req.Status,
 	})
@@ -249,7 +314,7 @@ func (h *InvitationHandler) Update(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"invitation": output.Invitation})
+	c.JSON(http.StatusOK, gin.H{"invitation": toHandlerInvitationDTO(output.Invitation)})
 }
 
 // Delete deletes an invitation

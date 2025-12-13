@@ -97,3 +97,5 @@ func (uc *GetAllLayoutsUseCase) getLayoutCatalog() ([]*LayoutSummaryDTO, error) 
 
 	return catalog, nil
 }
+
+

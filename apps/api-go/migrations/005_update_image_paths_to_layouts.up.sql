@@ -33,3 +33,5 @@ SET manifest = jsonb_set(
   to_jsonb(REPLACE(manifest->'metadata'->>'previewImage', '/templates/', '/layouts/'))
 )
 WHERE manifest->'metadata'->>'previewImage' LIKE '/templates/%';
+
+

@@ -107,3 +107,5 @@ Layouts are stored in the `templates` table with:
 - Repository: `internal/infrastructure/database/postgres/layout_repository.go`
 - Domain: `internal/domain/layout.go`
 - Normalization: `internal/usecase/layout/normalize.go`
+
+

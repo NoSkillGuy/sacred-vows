@@ -105,3 +105,5 @@
 export const LayoutConfigSchema = {
   // Schema validation can be added here
 };
+
+

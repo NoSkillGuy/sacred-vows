@@ -42,3 +42,5 @@ func (uc *GetLayoutManifestUseCase) Execute(ctx context.Context, id string) (*Ge
 		Manifest: manifest,
 	}, nil
 }
+
+
