@@ -22,8 +22,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: postgresql://wedding_builder:wedding_builder_password@postgres:5432/wedding_builder?schema=public
-      JWT_SECRET: your-secret-key-change-in-production
+      DATABASE_URL: postgresql://wedding_builder:wedding_builder_password@postgres:5432/wedding_builder
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-key-min-32-chars-long-for-security}
       PORT: 3000
       TEMPLATES_DIR: /root/templates
       UPLOAD_PATH: /root/uploads
