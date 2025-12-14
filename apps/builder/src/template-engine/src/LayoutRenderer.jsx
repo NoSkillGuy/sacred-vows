@@ -2,7 +2,7 @@ import React from 'react';
 import { loadLayout, mergeLayoutData } from './loadLayout';
 import { applyThemeToDocument, mergeBrandThemes } from '../../shared/src/theme/applyTheme';
 
-const DEFAULT_LAYOUT_ID = 'royal-elegance';
+const DEFAULT_LAYOUT_ID = 'classic-scroll';
 
 function mergeSections(baseSections = [], overrides = []) {
   const sectionMap = new Map(

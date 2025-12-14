@@ -23,7 +23,7 @@ func (UserModel) TableName() string {
 // InvitationModel represents the invitations table
 type InvitationModel struct {
 	ID        string         `gorm:"primaryKey;type:text"`
-	LayoutID  string         `gorm:"type:text;not null;default:'royal-elegance'"`
+	LayoutID  string         `gorm:"type:text;not null;default:'classic-scroll'"`
 	Data      datatypes.JSON `gorm:"type:jsonb;not null"`
 	UserID    string         `gorm:"type:text;not null;index"`
 	CreatedAt time.Time      `gorm:"autoCreateTime"`

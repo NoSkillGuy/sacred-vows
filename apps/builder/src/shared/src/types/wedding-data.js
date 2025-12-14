@@ -318,7 +318,7 @@ export const DEFAULT_THEME = {
  * @param {string} layoutId - Layout ID
  * @returns {LayoutConfig} Default layout configuration
  */
-export function createDefaultLayoutConfig(layoutId = 'royal-elegance') {
+export function createDefaultLayoutConfig(layoutId = 'classic-scroll') {
   return {
     sections: createDefaultSections(),
     theme: { ...DEFAULT_THEME },

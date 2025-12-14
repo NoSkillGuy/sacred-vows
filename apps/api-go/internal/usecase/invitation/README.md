@@ -11,7 +11,7 @@ Handles all business logic related to wedding invitations including creation, re
 Creates a new wedding invitation.
 
 **Input:**
-- `LayoutID`: Layout identifier (defaults to "royal-elegance")
+- `LayoutID`: Layout identifier (defaults to "classic-scroll")
 - `Data`: JSON configuration data
 - `UserID`: Owner user ID
 

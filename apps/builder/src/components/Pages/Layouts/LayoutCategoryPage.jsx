@@ -9,9 +9,9 @@ const layoutsByCategory = {
     description: 'Classic elegance meets timeless design. Our traditional layouts feature refined ornaments, elegant typography, and sophisticated color palettes that honor wedding traditions.',
     layouts: [
       {
-        id: 'royal-elegance',
-        name: 'Royal Elegance',
-        description: 'Timeless gold accents with classic styling',
+        id: 'classic-scroll',
+        name: 'Classic Scroll',
+        description: 'Classic single-column vertical scroll with traditional elegance',
         colors: ['#d4af37', '#fff8f0', '#f5e6d3'],
         popular: true
       },

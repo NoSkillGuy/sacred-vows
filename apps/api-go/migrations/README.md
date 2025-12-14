@@ -89,7 +89,7 @@ Contains SQL migration files for database schema management. These migrations de
 
 2. **invitations** - Wedding invitations
    - id (TEXT, PRIMARY KEY)
-   - layoutId (TEXT, default: 'royal-elegance') - renamed to layoutId in migration 004
+   - layoutId (TEXT, default: 'classic-scroll') - renamed to layoutId in migration 004
    - data (JSONB)
    - userId (TEXT, FOREIGN KEY)
    - timestamps

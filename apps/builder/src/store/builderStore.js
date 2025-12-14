@@ -41,7 +41,7 @@ function loadFromStorage() {
   }
   return {
     id: null,
-    layoutId: 'royal-elegance',
+    layoutId: 'classic-scroll',
     data: defaultWeddingConfig,
     layoutConfig: { ...defaultLayoutConfig },
     translations: null,
@@ -152,7 +152,7 @@ export const useBuilderStore = create((set, get) => {
     setCurrentInvitation: (invitation) => {
       // Support migration from layoutConfig to layoutConfig
       const layoutConfig = invitation.layoutConfig || invitation.layoutConfig || {};
-      const layoutId = invitation.layoutId || invitation.layoutId || 'royal-elegance';
+      const layoutId = invitation.layoutId || invitation.layoutId || 'classic-scroll';
       const invitationWithConfig = {
         ...invitation,
         layoutId,
@@ -616,7 +616,7 @@ export const useBuilderStore = create((set, get) => {
     setInvitation: (invitation) => {
       // Ensure layoutConfig exists, support migration from layoutConfig
       const layoutConfig = invitation.layoutConfig || invitation.layoutConfig || {};
-      const layoutId = invitation.layoutId || invitation.layoutId || 'royal-elegance';
+      const layoutId = invitation.layoutId || invitation.layoutId || 'classic-scroll';
       const invitationWithConfig = {
         ...invitation,
         layoutId,
@@ -640,7 +640,7 @@ export const useBuilderStore = create((set, get) => {
       clearTimeout(autoSaveTimer);
       const defaultInvitation = {
         id: null,
-        layoutId: 'royal-elegance',
+        layoutId: 'classic-scroll',
         data: defaultWeddingConfig,
         layoutConfig: { ...defaultLayoutConfig },
         translations: null,

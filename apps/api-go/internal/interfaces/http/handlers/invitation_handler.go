@@ -83,21 +83,21 @@ func NewInvitationHandler(
 }
 
 type CreateInvitationRequest struct {
-	LayoutID string   `json:"layoutId" example:"royal-elegance" binding:"required"`
+	LayoutID string   `json:"layoutId" example:"classic-scroll" binding:"required"`
 	Data     JSONData `json:"data" swagtype:"string" example:"{\"bride\":\"Jane\",\"groom\":\"John\"}" binding:"required"`
 	Title    string   `json:"title" example:"Our Wedding"`
 }
 
 type UpdateInvitationRequest struct {
 	Data     *JSONData `json:"data" swagtype:"string" example:"{\"bride\":\"Jane\",\"groom\":\"John\"}"`
-	LayoutID *string   `json:"layoutId" example:"royal-elegance"`
+	LayoutID *string   `json:"layoutId" example:"classic-scroll"`
 	Title    *string   `json:"title" example:"Our Wedding"`
 	Status   *string   `json:"status" example:"published"`
 }
 
 type InvitationDTO struct {
 	ID        string   `json:"id" example:"1234567890"`
-	LayoutID  string   `json:"layoutId" example:"royal-elegance"`
+	LayoutID  string   `json:"layoutId" example:"classic-scroll"`
 	Data      JSONData `json:"data" swagtype:"string" example:"{\"bride\":\"Jane\",\"groom\":\"John\"}"`
 	Title     *string  `json:"title,omitempty" example:"Our Wedding"`
 	Status    *string  `json:"status,omitempty" example:"published"`
@@ -108,7 +108,7 @@ type InvitationDTO struct {
 
 type InvitationPreviewDTO struct {
 	ID       string   `json:"id" example:"1234567890"`
-	LayoutID string   `json:"layoutId" example:"royal-elegance"`
+	LayoutID string   `json:"layoutId" example:"classic-scroll"`
 	Data     JSONData `json:"data" swagtype:"string" example:"{\"bride\":\"Jane\",\"groom\":\"John\"}"`
 }
 

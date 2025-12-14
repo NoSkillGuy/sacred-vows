@@ -192,7 +192,7 @@ function APIDocsPage() {
   "title": "Sarah & Michael's Wedding",
   "date": "2025-12-15",
   "venue": "The Grand Palace",
-    "layoutId": "royal-elegance",
+    "layoutId": "classic-scroll",
   "rsvp_count": 127,
   "created_at": "2024-06-15T10:30:00Z",
   "status": "published"

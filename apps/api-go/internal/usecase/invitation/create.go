@@ -44,7 +44,7 @@ func (uc *CreateInvitationUseCase) Execute(ctx context.Context, input CreateInvi
 
 	layoutID := input.LayoutID
 	if layoutID == "" {
-		layoutID = "royal-elegance"
+		layoutID = "classic-scroll"
 	}
 
 	invitation, err := domain.NewInvitation(layoutID, input.UserID, dataWithMeta)

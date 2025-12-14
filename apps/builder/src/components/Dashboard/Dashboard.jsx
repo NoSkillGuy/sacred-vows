@@ -453,7 +453,7 @@ function InvitationCard({ invitation, onEdit, onDelete, onTitleUpdate, formatDat
           {formatDate(weddingDate)}
         </div>
         <div className="invitation-layout">
-          Layout: {layoutId || 'Royal Elegance'}
+          Layout: {layoutId || 'Classic Scroll'}
         </div>
         
         <div className="invitation-actions">

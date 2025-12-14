@@ -12,9 +12,9 @@ export async function loadLayout(layoutId) {
   try {
     // In production, this would fetch from API or load from file system
     const layoutMap = {
-      'royal-elegance': {
-        config: () => import('../../../layouts/royal-elegance/config.json'),
-        manifest: () => import('../../../layouts/royal-elegance/manifest.json'),
+      'classic-scroll': {
+        config: () => import('../../../layouts/classic-scroll/config.json'),
+        manifest: () => import('../../../layouts/classic-scroll/manifest.json'),
       },
       'heritage-red': {
         config: () => import('../../../layouts/heritage-red/config.json'),

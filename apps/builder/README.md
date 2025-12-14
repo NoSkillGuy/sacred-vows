@@ -92,7 +92,7 @@ wedding-invitation-builder/
 │   │       ├── layout-engine/  # Layout rendering engine
 │   │       └── shared/            # Shared utilities
 ├── layouts/
-│   └── royal-elegance/   # Layout definitions
+│   └── classic-scroll/   # Layout definitions
 └── docker-compose.yml    # Docker setup
 ```
 

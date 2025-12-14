@@ -1309,7 +1309,7 @@
 }
 
 /* Individual layout styles */
-.layout-royal-elegance .layout-inner {
+.layout-classic-scroll .layout-inner {
   background: linear-gradient(180deg, #fff8f0 0%, #f5e6d3 100%);
   border: 2px solid var(--gold);
 }
