@@ -32,8 +32,6 @@ function LayoutCardUnified({
   }
 
   const { primary, background, accent, text } = colors;
-  const displayNames = layout.names || layout.name;
-  const displayDate = layout.date || null;
 
   const baseTags = [
     ...(layout.tags || []),
@@ -90,21 +88,56 @@ function LayoutCardUnified({
         <div className="unified-active-badge">Current</div>
       )}
 
-      <div className="unified-preview">
-        <div
-          className="unified-inner"
-          style={{
-            background: `linear-gradient(180deg, ${background} 0%, ${accent} 100%)`,
-            borderColor: primary,
-          }}
-        >
-          <div className="unified-ornament" style={{ color: primary }}>✦</div>
-          <div className="unified-names" style={{ color: text }}>{displayNames}</div>
-          {displayDate ? (
-            <div className="unified-date" style={{ color: primary }}>
-              {displayDate}
+      <div className="unified-preview-pane">
+        {/* Classic scroll layout preview (background) */}
+        <div className="unified-scroll-preview">
+            <div className="unified-scroll-section">
+              <div className="unified-scroll-line wide" />
+              <div className="unified-scroll-line" />
+              <div className="unified-scroll-line short" />
             </div>
-          ) : null}
+            
+            <div className="unified-scroll-divider" />
+            
+            <div className="unified-scroll-section">
+              <div className="unified-scroll-line wide" />
+              <div className="unified-scroll-line" />
+            </div>
+            
+            <div className="unified-scroll-divider" />
+            
+            <div className="unified-scroll-section">
+              <div className="unified-scroll-line" />
+              <div className="unified-scroll-line short" />
+            </div>
+            
+            <div className="unified-scroll-divider" />
+            
+            <div className="unified-scroll-section">
+              <div className="unified-scroll-line wide" />
+              <div className="unified-scroll-line" />
+            </div>
+            
+            <div className="unified-scroll-divider" />
+            
+            <div className="unified-scroll-section">
+              <div className="unified-scroll-line" />
+              <div className="unified-scroll-line short" />
+            </div>
+          </div>
+          
+        {/* Layout name and description (overlay) */}
+        <div className="unified-preview-header">
+          <h3 className="unified-preview-title">{layout.name}</h3>
+          <p className="unified-preview-description">{layout.description}</p>
+          <div className="unified-preview-meta">
+            {categoryTag && <span className="unified-preview-tag">{categoryTag}</span>}
+            {displayTags.map((tag) => (
+              <span key={tag} className="unified-preview-tag badge">
+                {tag}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -139,27 +172,6 @@ function LayoutCardUnified({
         </div>
       )}
 
-      <div className="unified-info">
-        <div className="unified-colors">
-          {[primary, background, accent].map((color, i) => (
-            <span
-              key={color + i}
-              className="color-dot"
-              style={{ backgroundColor: color }}
-            />
-          ))}
-        </div>
-        <h3>{layout.name}</h3>
-        <p>{layout.description}</p>
-        <div className="unified-meta">
-          {categoryTag && <span className="unified-tag">{categoryTag}</span>}
-          {displayTags.map((tag) => (
-            <span key={tag} className="unified-tag badge">
-              {tag}
-            </span>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
