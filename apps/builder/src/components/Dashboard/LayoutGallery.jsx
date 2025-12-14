@@ -105,6 +105,7 @@ function LayoutGallery() {
       const invitation = await createInvitation({
         layoutId: layout.id,
         title: 'My Wedding Invitation',
+        data: JSON.stringify({}),
       });
       navigate(`/builder/${invitation.id}`);
     } catch (error) {

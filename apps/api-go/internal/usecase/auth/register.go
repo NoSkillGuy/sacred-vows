@@ -6,6 +6,7 @@ import (
 	"github.com/sacred-vows/api-go/internal/domain"
 	"github.com/sacred-vows/api-go/internal/interfaces/repository"
 	"github.com/sacred-vows/api-go/pkg/errors"
+	"github.com/segmentio/ksuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -48,6 +49,9 @@ func (uc *RegisterUseCase) Execute(ctx context.Context, input RegisterInput) (*R
 	if err != nil {
 		return nil, errors.Wrap(errors.ErrBadRequest.Code, "Invalid user data", err)
 	}
+
+	// Generate user ID
+	user.ID = ksuid.New().String()
 
 	// Save user
 	if err := uc.userRepo.Create(ctx, user); err != nil {
