@@ -3,6 +3,40 @@ import './PersonalizationModal.css';
 
 const STORAGE_KEY = 'landing-personalization-data';
 
+// Default values for preview
+const DEFAULT_BRIDE_NAME = 'Priya';
+const DEFAULT_GROOM_NAME = 'Rahul';
+const DEFAULT_DATE = 'December 15, 2025';
+const DEFAULT_VENUE = 'The Grand Palace, Mumbai';
+
+// Ornament SVG component
+const OrnamentSVG = () => (
+  <svg viewBox="0 0 60 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M30 20C30 20 20 10 10 10C5 10 0 15 0 20C0 25 5 30 10 30C20 30 30 20 30 20Z" fill="currentColor"/>
+    <path d="M30 20C30 20 40 10 50 10C55 10 60 15 60 20C60 25 55 30 50 30C40 30 30 20 30 20Z" fill="currentColor"/>
+    <circle cx="30" cy="20" r="4" fill="currentColor"/>
+  </svg>
+);
+
+// Format date to UPPERCASE format (e.g., "DECEMBER 15, 2025")
+function formatDate(dateStr) {
+  if (!dateStr) return null;
+  
+  try {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return null;
+    
+    return date.toLocaleDateString('en-US', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    }).toUpperCase();
+  } catch (error) {
+    console.error('Date formatting error:', error);
+    return null;
+  }
+}
+
 function PersonalizationModal({ isOpen, onClose, onSave }) {
   const [brideName, setBrideName] = useState('');
   const [groomName, setGroomName] = useState('');
@@ -70,6 +104,14 @@ function PersonalizationModal({ isOpen, onClose, onSave }) {
     }
   }, [isOpen, onClose]);
 
+  // Get display values with fallbacks for preview
+  const displayBrideName = brideName.trim() || DEFAULT_BRIDE_NAME;
+  const displayGroomName = groomName.trim() || DEFAULT_GROOM_NAME;
+  const displayDate = weddingDate 
+    ? (formatDate(weddingDate) || DEFAULT_DATE)
+    : DEFAULT_DATE;
+  const displayVenue = venue.trim() || DEFAULT_VENUE;
+
   if (!isOpen) return null;
 
   return (
@@ -96,84 +138,109 @@ function PersonalizationModal({ isOpen, onClose, onSave }) {
         </div>
 
         <div className="personalization-modal-body">
-          <p className="personalization-explanation">
-            We'd love to personalize your preview! Share your details below to see them in the live preview card.
-          </p>
+          <div className="personalization-modal-layout">
+            {/* Form Section */}
+            <div className="personalization-form-section">
+              <p className="personalization-explanation">
+                We'd love to personalize your preview! Share your details below to see them update in real-time.
+              </p>
 
-          <form onSubmit={handleSave}>
-            <div className="form-group">
-              <label htmlFor="bride-name" className="form-label">
-                Bride's Name
-              </label>
-              <input
-                type="text"
-                id="bride-name"
-                className="form-input"
-                value={brideName}
-                onChange={(e) => setBrideName(e.target.value)}
-                placeholder="Enter bride's name"
-                autoComplete="name"
-              />
+              <form onSubmit={handleSave}>
+                <div className="form-group">
+                  <label htmlFor="bride-name" className="form-label">
+                    Bride's Name
+                  </label>
+                  <input
+                    type="text"
+                    id="bride-name"
+                    className="form-input"
+                    value={brideName}
+                    onChange={(e) => setBrideName(e.target.value)}
+                    placeholder="Enter bride's name"
+                    autoComplete="name"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="groom-name" className="form-label">
+                    Groom's Name
+                  </label>
+                  <input
+                    type="text"
+                    id="groom-name"
+                    className="form-input"
+                    value={groomName}
+                    onChange={(e) => setGroomName(e.target.value)}
+                    placeholder="Enter groom's name"
+                    autoComplete="name"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="wedding-date" className="form-label">
+                    Wedding Date
+                  </label>
+                  <input
+                    type="date"
+                    id="wedding-date"
+                    className="form-input"
+                    value={weddingDate}
+                    onChange={(e) => setWeddingDate(e.target.value)}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="venue" className="form-label">
+                    Venue / Place
+                  </label>
+                  <input
+                    type="text"
+                    id="venue"
+                    className="form-input"
+                    value={venue}
+                    onChange={(e) => setVenue(e.target.value)}
+                    placeholder="Enter wedding venue or place"
+                  />
+                </div>
+
+                <div className="personalization-modal-footer">
+                  <button 
+                    type="button" 
+                    className="btn btn-secondary" 
+                    onClick={handleSkip}
+                  >
+                    Skip
+                  </button>
+                  <button 
+                    type="submit" 
+                    className="btn btn-primary"
+                  >
+                    Save & Preview
+                  </button>
+                </div>
+              </form>
             </div>
 
-            <div className="form-group">
-              <label htmlFor="groom-name" className="form-label">
-                Groom's Name
-              </label>
-              <input
-                type="text"
-                id="groom-name"
-                className="form-input"
-                value={groomName}
-                onChange={(e) => setGroomName(e.target.value)}
-                placeholder="Enter groom's name"
-                autoComplete="name"
-              />
+            {/* Live Preview Section */}
+            <div className="personalization-preview-section">
+              <div className="preview-label">Live Preview</div>
+              <div className="modal-preview-card">
+                <div className="modal-preview-inner">
+                  <div className="modal-preview-ornament">
+                    <OrnamentSVG />
+                  </div>
+                  <div className="modal-preview-names">{displayBrideName}</div>
+                  <div className="modal-preview-and">&</div>
+                  <div className="modal-preview-names">{displayGroomName}</div>
+                  <div className="modal-preview-date">{displayDate}</div>
+                  <div className="modal-preview-venue">{displayVenue}</div>
+                  <div className="modal-preview-ornament" style={{ transform: 'rotate(180deg)' }}>
+                    <OrnamentSVG />
+                  </div>
+                </div>
+              </div>
             </div>
-
-            <div className="form-group">
-              <label htmlFor="wedding-date" className="form-label">
-                Wedding Date
-              </label>
-              <input
-                type="date"
-                id="wedding-date"
-                className="form-input"
-                value={weddingDate}
-                onChange={(e) => setWeddingDate(e.target.value)}
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="venue" className="form-label">
-                Venue / Place
-              </label>
-              <input
-                type="text"
-                id="venue"
-                className="form-input"
-                value={venue}
-                onChange={(e) => setVenue(e.target.value)}
-                placeholder="Enter wedding venue or place"
-              />
-            </div>
-
-            <div className="personalization-modal-footer">
-              <button 
-                type="button" 
-                className="btn btn-secondary" 
-                onClick={handleSkip}
-              >
-                Skip
-              </button>
-              <button 
-                type="submit" 
-                className="btn btn-primary"
-              >
-                Save & Preview
-              </button>
-            </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>
