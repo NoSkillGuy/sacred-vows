@@ -104,13 +104,25 @@ function HeroSection({ onSectionView }) {
         const data = JSON.parse(stored);
         setPersonalizationData(data);
       } else {
-        // Show modal if no data exists
-        setShowPersonalizationModal(true);
+        // Show modal after 15 seconds to give users time to understand the website
+        const timer = setTimeout(() => {
+          setShowPersonalizationModal(true);
+        }, 15000); // 15 seconds delay
+
+        return () => {
+          clearTimeout(timer);
+        };
       }
     } catch (error) {
       console.error('Failed to load personalization data:', error);
-      // Show modal on error
-      setShowPersonalizationModal(true);
+      // Show modal after 15 seconds on error as well
+      const timer = setTimeout(() => {
+        setShowPersonalizationModal(true);
+      }, 15000);
+
+      return () => {
+        clearTimeout(timer);
+      };
     }
   }, []);
 
