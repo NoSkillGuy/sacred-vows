@@ -252,39 +252,6 @@ function HeroSection({ onSectionView }) {
             </div>
             <div className="showcase-glow" />
           </div>
-          <div className="hero-preview-pane">
-            <div className="preview-bar">
-              <span className="preview-dot" />
-              <span className="preview-dot" />
-              <span className="preview-dot" />
-              <span className="preview-title">Invitation builder preview</span>
-            </div>
-            <div className="preview-body">
-              <div className="preview-left">
-                <div className="preview-card">
-                  <div className="preview-heading" />
-                  <div className="preview-line wide" />
-                  <div className="preview-line" />
-                  <div className="preview-line short" />
-                </div>
-                <div className="preview-card secondary">
-                  <div className="preview-line wide" />
-                  <div className="preview-line" />
-                </div>
-              </div>
-              <div className="preview-right">
-                <div className="preview-phone">
-                  <div className="preview-phone-top" />
-                  <div className="preview-phone-body">
-                    <div className="preview-phone-line wide" />
-                    <div className="preview-phone-line" />
-                    <div className="preview-phone-line" />
-                    <div className="preview-phone-line short" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
