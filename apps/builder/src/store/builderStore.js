@@ -133,10 +133,20 @@ export const useBuilderStore = create((set, get) => {
           return null;
         }
         
+        // Set manifest first so validation can access it
+        set({ currentLayoutManifest: manifest });
+        
+        // Validate and sync sections against manifest
+        const { validateSectionsAgainstManifest } = get();
+        validateSectionsAgainstManifest(manifest);
+        
+        // Get updated invitation after section validation
+        const { currentInvitation: updatedInvitationAfterValidation } = get();
+        
         // If manifest has theme presets, sync them into layoutConfig for use in UI
         if (manifest?.themes?.length) {
           const defaultTheme = manifest.themes.find(t => t.isDefault) || manifest.themes[0];
-          const existingTheme = currentInvitation.layoutConfig?.theme || {};
+          const existingTheme = updatedInvitationAfterValidation.layoutConfig?.theme || {};
           const hasPreset = Boolean(existingTheme.preset);
 
           const themeWithPreset = hasPreset || !defaultTheme ? existingTheme : {
@@ -146,21 +156,20 @@ export const useBuilderStore = create((set, get) => {
           };
 
           const updatedInvitation = {
-            ...currentInvitation,
+            ...updatedInvitationAfterValidation,
             layoutConfig: {
-              ...currentInvitation.layoutConfig,
+              ...updatedInvitationAfterValidation.layoutConfig,
               themes: manifest.themes,
               theme: themeWithPreset,
             },
             data: {
-              ...currentInvitation.data,
+              ...updatedInvitationAfterValidation.data,
               theme: themeWithPreset,
             },
           };
           set({ currentInvitation: updatedInvitation });
         }
 
-        set({ currentLayoutManifest: manifest });
         return manifest;
       } catch (error) {
         console.error('Failed to load layout manifest:', error);
@@ -209,11 +218,82 @@ export const useBuilderStore = create((set, get) => {
     // =========================================================================
 
     /**
+     * Validate and sync sections against layout manifest
+     * Removes sections not in manifest, adds missing sections, preserves user preferences
+     * @param {Object} manifest - Layout manifest
+     * @returns {Array} Validated sections array
+     */
+    validateSectionsAgainstManifest: (manifest) => {
+      const { currentInvitation } = get();
+      if (!manifest || !manifest.sections || !Array.isArray(manifest.sections)) {
+        // If no manifest or invalid manifest, return current sections (backward compatibility)
+        return currentInvitation.layoutConfig?.sections || [];
+      }
+
+      const currentSections = currentInvitation.layoutConfig?.sections || [];
+      const manifestSectionIds = manifest.sections.map(s => s.id);
+      
+      // Create a map of current sections by ID for quick lookup
+      const currentSectionsMap = new Map();
+      currentSections.forEach(section => {
+        currentSectionsMap.set(section.id, section);
+      });
+
+      // Build validated sections array based on manifest order
+      const validatedSections = manifest.sections.map((manifestSection, index) => {
+        const existingSection = currentSectionsMap.get(manifestSection.id);
+        
+        if (existingSection) {
+          // Preserve user's enabled/disabled state, but ensure order matches manifest
+          return {
+            ...existingSection,
+            order: index,
+          };
+        } else {
+          // Add missing section with default enabled state from manifest
+          return {
+            id: manifestSection.id,
+            enabled: manifestSection.enabled !== false && manifestSection.defaultEnabled !== false,
+            order: index,
+          };
+        }
+      });
+
+      // Update invitation if sections changed
+      const currentIds = currentSections.map(s => s.id).sort().join(',');
+      const validatedIds = validatedSections.map(s => s.id).sort().join(',');
+      const currentOrders = currentSections.map(s => `${s.id}:${s.order}`).sort().join(',');
+      const validatedOrders = validatedSections.map(s => `${s.id}:${s.order}`).sort().join(',');
+
+      if (currentIds !== validatedIds || currentOrders !== validatedOrders) {
+        const updatedInvitation = {
+          ...currentInvitation,
+          layoutConfig: {
+            ...currentInvitation.layoutConfig,
+            sections: validatedSections,
+          },
+        };
+        set({ currentInvitation: updatedInvitation });
+        // Don't trigger autosave here to avoid unnecessary saves during initialization
+      }
+
+      return validatedSections;
+    },
+
+    /**
      * Get ordered list of enabled sections
+     * Filters sections to only include those defined in current layout manifest
      */
     getEnabledSections: () => {
-      const { currentInvitation } = get();
-      const sections = currentInvitation.layoutConfig?.sections || [];
+      const { currentInvitation, currentLayoutManifest } = get();
+      let sections = currentInvitation.layoutConfig?.sections || [];
+      
+      // Filter by manifest if available
+      if (currentLayoutManifest?.sections && Array.isArray(currentLayoutManifest.sections)) {
+        const manifestSectionIds = new Set(currentLayoutManifest.sections.map(s => s.id));
+        sections = sections.filter(s => manifestSectionIds.has(s.id));
+      }
+      
       return sections
         .filter(s => s.enabled)
         .sort((a, b) => a.order - b.order);
@@ -221,12 +301,34 @@ export const useBuilderStore = create((set, get) => {
 
     /**
      * Get all sections (enabled and disabled)
+     * Filters sections to only include those defined in current layout manifest
      */
     getAllSections: () => {
-      const { currentInvitation } = get();
-      return (currentInvitation.layoutConfig?.sections || [])
-        .slice()
-        .sort((a, b) => a.order - b.order);
+      const { currentInvitation, currentLayoutManifest } = get();
+      let sections = currentInvitation.layoutConfig?.sections || [];
+      
+      // Filter by manifest if available
+      if (currentLayoutManifest?.sections && Array.isArray(currentLayoutManifest.sections)) {
+        const manifestSectionIds = new Set(currentLayoutManifest.sections.map(s => s.id));
+        sections = sections.filter(s => manifestSectionIds.has(s.id));
+        
+        // Ensure sections maintain manifest order
+        const manifestOrder = new Map();
+        currentLayoutManifest.sections.forEach((s, index) => {
+          manifestOrder.set(s.id, index);
+        });
+        
+        sections = sections.sort((a, b) => {
+          const orderA = manifestOrder.get(a.id) ?? a.order;
+          const orderB = manifestOrder.get(b.id) ?? b.order;
+          return orderA - orderB;
+        });
+      } else {
+        // Fallback to current behavior if manifest not loaded
+        sections = sections.slice().sort((a, b) => a.order - b.order);
+      }
+      
+      return sections;
     },
 
     /**
@@ -518,15 +620,26 @@ export const useBuilderStore = create((set, get) => {
       // Get default theme from new layout
       const defaultTheme = newManifest?.themes?.find(t => t.isDefault) || newManifest?.themes?.[0];
       
-      // Get default sections from new layout
-      const defaultSections = (newManifest?.defaultSectionOrder || []).map((id, index) => {
-        const sectionDef = newManifest?.sections?.find(s => s.id === id);
-        return {
-          id,
-          enabled: sectionDef?.defaultEnabled !== false,
-          order: index,
-        };
-      });
+      // Get default sections from new layout manifest
+      // Use manifest.sections array directly, maintaining their order
+      let defaultSections = [];
+      if (newManifest?.sections && Array.isArray(newManifest.sections)) {
+        defaultSections = newManifest.sections.map((sectionDef, index) => ({
+          id: sectionDef.id,
+          enabled: sectionDef.enabled !== false && sectionDef.defaultEnabled !== false,
+          order: sectionDef.order !== undefined ? sectionDef.order : index,
+        }));
+      } else if (newManifest?.defaultSectionOrder && Array.isArray(newManifest.defaultSectionOrder)) {
+        // Fallback to defaultSectionOrder if sections array not available
+        defaultSections = newManifest.defaultSectionOrder.map((id, index) => {
+          const sectionDef = newManifest?.sections?.find(s => s.id === id);
+          return {
+            id,
+            enabled: sectionDef?.defaultEnabled !== false,
+            order: index,
+          };
+        });
+      }
 
       const updatedInvitation = {
         ...currentInvitation,

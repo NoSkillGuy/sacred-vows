@@ -63,10 +63,11 @@ function SectionManager({ isOpen, onClose }) {
   const [dragOverItem, setDragOverItem] = useState(null);
 
   // Load sections when component mounts or store changes
+  // Include currentLayoutManifest in dependencies to re-render when layout changes
   useEffect(() => {
     const allSections = getAllSections();
     setSections(allSections);
-  }, [getAllSections]);
+  }, [getAllSections, currentLayoutManifest]);
 
   // Get section metadata (name, icon, description)
   const getSectionInfo = (sectionId) => {
