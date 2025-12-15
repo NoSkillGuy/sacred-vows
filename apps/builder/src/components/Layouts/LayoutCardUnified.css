@@ -6,6 +6,7 @@
   max-width: 360px;
   margin: 0 auto;
   background: var(--cream);
+  border: 1px solid var(--rose-soft);
   border-radius: 20px;
   overflow: hidden;
   box-shadow: var(--shadow-md);
@@ -79,7 +80,6 @@
   aspect-ratio: 3/4;
   width: 100%;
   background: var(--white);
-  border: 1px solid var(--rose-soft);
   border-radius: 16px;
   box-shadow: var(--shadow-md);
   overflow: hidden;
