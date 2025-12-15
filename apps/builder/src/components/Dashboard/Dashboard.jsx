@@ -226,8 +226,9 @@ function Dashboard() {
 
   // Calculate stats
   const totalInvitations = invitations.length;
+  // Treat undefined/null status as 'draft' for defensive filtering
   const publishedCount = invitations.filter(inv => inv.status === 'published').length;
-  const draftCount = invitations.filter(inv => inv.status === 'draft').length;
+  const draftCount = invitations.filter(inv => !inv.status || inv.status === 'draft').length;
 
   useEffect(() => {
     if (loading) return;

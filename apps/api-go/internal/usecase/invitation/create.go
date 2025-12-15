@@ -36,8 +36,11 @@ func (uc *CreateInvitationUseCase) Execute(ctx context.Context, input CreateInvi
 		input.Data = json.RawMessage("{}")
 	}
 
-	// Merge title into data if provided
-	dataWithMeta, err := mergeMetadataIntoData(input.Data, input.Title, nil)
+	// Default status to "draft" for new invitations
+	defaultStatus := "draft"
+
+	// Merge title and default status into data if provided
+	dataWithMeta, err := mergeMetadataIntoData(input.Data, input.Title, &defaultStatus)
 	if err != nil {
 		return nil, errors.Wrap(errors.ErrBadRequest.Code, "Invalid invitation data", err)
 	}
