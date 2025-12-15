@@ -893,6 +893,36 @@
   justify-content: center;
 }
 
+.showcase-names.showcase-editable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  position: relative;
+}
+
+.showcase-names.showcase-editable:hover {
+  background: rgba(212, 175, 55, 0.1);
+  transform: scale(1.02);
+}
+
+.showcase-names.showcase-editable-input {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  letter-spacing: 1px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid var(--gold);
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  width: 100%;
+  max-width: 200px;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+}
+
 .showcase-and {
   font-family: 'Great Vibes', cursive;
   font-size: 2.5rem;
@@ -918,6 +948,46 @@
   justify-content: center;
 }
 
+.showcase-date.showcase-editable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.showcase-date.showcase-editable:hover {
+  background: rgba(212, 175, 55, 0.1);
+  transform: scale(1.02);
+}
+
+.showcase-date.showcase-editable-input {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--gold-dark);
+  letter-spacing: 1px;
+  text-transform: none;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid var(--gold);
+  border-radius: 4px;
+  padding: 0.5rem;
+  width: 100%;
+  max-width: 220px;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+  margin-top: 1rem;
+}
+
+.showcase-date.showcase-editable-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.showcase-date.showcase-editable-input::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
 .showcase-venue {
   font-size: 0.85rem;
   color: var(--text-light);
@@ -927,6 +997,34 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.showcase-venue.showcase-editable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.showcase-venue.showcase-editable:hover {
+  background: rgba(212, 175, 55, 0.1);
+  transform: scale(1.02);
+}
+
+.showcase-venue.showcase-editable-input {
+  font-size: 0.85rem;
+  color: var(--text-light);
+  letter-spacing: 1px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid var(--gold);
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  width: 100%;
+  max-width: 250px;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+  margin-top: 0.5rem;
 }
 
 .showcase-glow {

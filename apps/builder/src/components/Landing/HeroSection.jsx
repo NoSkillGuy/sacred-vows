@@ -94,7 +94,15 @@ function HeroSection({ onSectionView }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showPersonalizationModal, setShowPersonalizationModal] = useState(false);
   const [personalizationData, setPersonalizationData] = useState(null);
+  const [editingField, setEditingField] = useState(null);
+  const [editValue, setEditValue] = useState('');
   const sectionRef = useRef(null);
+  
+  // Refs for input fields
+  const brideInputRef = useRef(null);
+  const groomInputRef = useRef(null);
+  const dateInputRef = useRef(null);
+  const venueInputRef = useRef(null);
 
   // Load personalization data from localStorage on mount
   useEffect(() => {
@@ -138,6 +146,70 @@ function HeroSection({ onSectionView }) {
     setPersonalizationData(data);
     setShowPersonalizationModal(false);
   };
+
+  // Save personalization data to localStorage
+  const savePersonalizationData = (data) => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      setPersonalizationData(data);
+    } catch (error) {
+      console.error('Failed to save personalization data:', error);
+    }
+  };
+
+  // Handle field editing
+  const startEditing = (field, currentValue) => {
+    setEditingField(field);
+    setEditValue(currentValue);
+  };
+
+  const cancelEditing = () => {
+    setEditingField(null);
+    setEditValue('');
+  };
+
+  const saveField = (field) => {
+    if (editingField !== field) return;
+
+    const updatedData = {
+      brideName: personalizationData?.brideName || '',
+      groomName: personalizationData?.groomName || '',
+      weddingDate: personalizationData?.weddingDate || '',
+      venue: personalizationData?.venue || '',
+      [field]: editValue.trim(),
+    };
+
+    savePersonalizationData(updatedData);
+    setEditingField(null);
+    setEditValue('');
+  };
+
+  const handleFieldKeyDown = (e, field) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      saveField(field);
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      cancelEditing();
+    }
+  };
+
+  // Focus input when editing starts
+  useEffect(() => {
+    if (editingField === 'brideName' && brideInputRef.current) {
+      brideInputRef.current.focus();
+      brideInputRef.current.select();
+    } else if (editingField === 'groomName' && groomInputRef.current) {
+      groomInputRef.current.focus();
+      groomInputRef.current.select();
+    } else if (editingField === 'weddingDate' && dateInputRef.current) {
+      dateInputRef.current.focus();
+      dateInputRef.current.select();
+    } else if (editingField === 'venue' && venueInputRef.current) {
+      venueInputRef.current.focus();
+      venueInputRef.current.select();
+    }
+  }, [editingField]);
 
   // Get display values with fallbacks
   const brideName = personalizationData?.brideName || DEFAULT_BRIDE_NAME;
@@ -320,11 +392,86 @@ function HeroSection({ onSectionView }) {
                 <div className="showcase-ornament">
                   <OrnamentSVG />
                 </div>
-                <div className="showcase-names">{brideName}</div>
+                {editingField === 'brideName' ? (
+                  <input
+                    ref={brideInputRef}
+                    type="text"
+                    className="showcase-names showcase-editable-input"
+                    value={editValue}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    onBlur={() => saveField('brideName')}
+                    onKeyDown={(e) => handleFieldKeyDown(e, 'brideName')}
+                    placeholder={DEFAULT_BRIDE_NAME}
+                  />
+                ) : (
+                  <div 
+                    className="showcase-names showcase-editable"
+                    onClick={() => startEditing('brideName', brideName)}
+                    title="Click to edit"
+                  >
+                    {brideName}
+                  </div>
+                )}
                 <div className="showcase-and">&</div>
-                <div className="showcase-names">{groomName}</div>
-                <div className="showcase-date">{displayDate}</div>
-                <div className="showcase-venue">{venue}</div>
+                {editingField === 'groomName' ? (
+                  <input
+                    ref={groomInputRef}
+                    type="text"
+                    className="showcase-names showcase-editable-input"
+                    value={editValue}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    onBlur={() => saveField('groomName')}
+                    onKeyDown={(e) => handleFieldKeyDown(e, 'groomName')}
+                    placeholder={DEFAULT_GROOM_NAME}
+                  />
+                ) : (
+                  <div 
+                    className="showcase-names showcase-editable"
+                    onClick={() => startEditing('groomName', groomName)}
+                    title="Click to edit"
+                  >
+                    {groomName}
+                  </div>
+                )}
+                {editingField === 'weddingDate' ? (
+                  <input
+                    ref={dateInputRef}
+                    type="date"
+                    className="showcase-date showcase-editable-input"
+                    value={editValue || ''}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    onBlur={() => saveField('weddingDate')}
+                    onKeyDown={(e) => handleFieldKeyDown(e, 'weddingDate')}
+                  />
+                ) : (
+                  <div 
+                    className="showcase-date showcase-editable"
+                    onClick={() => startEditing('weddingDate', personalizationData?.weddingDate || '')}
+                    title="Click to edit"
+                  >
+                    {displayDate}
+                  </div>
+                )}
+                {editingField === 'venue' ? (
+                  <input
+                    ref={venueInputRef}
+                    type="text"
+                    className="showcase-venue showcase-editable-input"
+                    value={editValue}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    onBlur={() => saveField('venue')}
+                    onKeyDown={(e) => handleFieldKeyDown(e, 'venue')}
+                    placeholder={DEFAULT_VENUE}
+                  />
+                ) : (
+                  <div 
+                    className="showcase-venue showcase-editable"
+                    onClick={() => startEditing('venue', venue)}
+                    title="Click to edit"
+                  >
+                    {venue}
+                  </div>
+                )}
                 <div className="showcase-ornament" style={{ transform: 'rotate(180deg)' }}>
                   <OrnamentSVG />
                 </div>
