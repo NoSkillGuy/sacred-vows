@@ -804,7 +804,7 @@
 .showcase-wrapper {
   position: relative;
   transform-style: preserve-3d;
-  animation: showcaseFloat 6s ease-in-out infinite;
+  /* animation: showcaseFloat 6s ease-in-out infinite; */
 }
 
 @keyframes showcaseFloat {
