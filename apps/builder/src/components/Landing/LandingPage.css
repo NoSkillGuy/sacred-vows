@@ -899,10 +899,11 @@
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
   position: relative;
+  user-select: none;
 }
 
 .showcase-names.showcase-editable:hover {
-  background: rgba(212, 175, 55, 0.1);
+  background: rgba(212, 175, 55, 0.15);
   transform: scale(1.02);
 }
 
@@ -953,10 +954,15 @@
   transition: all 0.2s ease;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
+  user-select: none;
+  min-height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .showcase-date.showcase-editable:hover {
-  background: rgba(212, 175, 55, 0.1);
+  background: rgba(212, 175, 55, 0.15);
   transform: scale(1.02);
 }
 
@@ -1004,10 +1010,15 @@
   transition: all 0.2s ease;
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
+  user-select: none;
+  min-height: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .showcase-venue.showcase-editable:hover {
-  background: rgba(212, 175, 55, 0.1);
+  background: rgba(212, 175, 55, 0.15);
   transform: scale(1.02);
 }
 

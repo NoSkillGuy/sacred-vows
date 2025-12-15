@@ -160,7 +160,12 @@ function HeroSection({ onSectionView }) {
   // Handle field editing
   const startEditing = (field, currentValue) => {
     setEditingField(field);
-    setEditValue(currentValue);
+    // For date field, use the raw date value if available, otherwise empty string
+    if (field === 'weddingDate') {
+      setEditValue(currentValue || '');
+    } else {
+      setEditValue(currentValue || '');
+    }
   };
 
   const cancelEditing = () => {
@@ -406,8 +411,11 @@ function HeroSection({ onSectionView }) {
                 ) : (
                   <div 
                     className="showcase-names showcase-editable"
-                    onClick={() => startEditing('brideName', brideName)}
-                    title="Click to edit"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      startEditing('brideName', brideName);
+                    }}
+                    title="Click to edit bride's name"
                   >
                     {brideName}
                   </div>
@@ -427,8 +435,11 @@ function HeroSection({ onSectionView }) {
                 ) : (
                   <div 
                     className="showcase-names showcase-editable"
-                    onClick={() => startEditing('groomName', groomName)}
-                    title="Click to edit"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      startEditing('groomName', groomName);
+                    }}
+                    title="Click to edit groom's name"
                   >
                     {groomName}
                   </div>
@@ -446,8 +457,11 @@ function HeroSection({ onSectionView }) {
                 ) : (
                   <div 
                     className="showcase-date showcase-editable"
-                    onClick={() => startEditing('weddingDate', personalizationData?.weddingDate || '')}
-                    title="Click to edit"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      startEditing('weddingDate', personalizationData?.weddingDate || '');
+                    }}
+                    title="Click to edit date"
                   >
                     {displayDate}
                   </div>
@@ -466,8 +480,11 @@ function HeroSection({ onSectionView }) {
                 ) : (
                   <div 
                     className="showcase-venue showcase-editable"
-                    onClick={() => startEditing('venue', venue)}
-                    title="Click to edit"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      startEditing('venue', venue);
+                    }}
+                    title="Click to edit venue"
                   >
                     {venue}
                   </div>
