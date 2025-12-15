@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
 import { trackCTA } from '../../services/analyticsService';
+import PersonalizationModal from './PersonalizationModal';
 
 // SVG Components for premium look
 const RingIcon = () => (
@@ -60,11 +61,58 @@ const OrnamentSVG = () => (
 // Petal colors for variety
 const petalColors = ['#f5d0d3', '#e8b4b8', '#fce4e2', '#d4969c', '#c9a1a6'];
 
+const STORAGE_KEY = 'landing-personalization-data';
+
+// Default values
+const DEFAULT_BRIDE_NAME = 'Priya';
+const DEFAULT_GROOM_NAME = 'Rahul';
+const DEFAULT_DATE = 'December 15, 2025';
+const DEFAULT_VENUE = 'The Grand Palace, Mumbai';
+
+// Format date to UPPERCASE format (e.g., "DECEMBER 15, 2025")
+function formatDate(dateStr) {
+  if (!dateStr) return null;
+  
+  try {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return null;
+    
+    return date.toLocaleDateString('en-US', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    }).toUpperCase();
+  } catch (error) {
+    console.error('Date formatting error:', error);
+    return null;
+  }
+}
+
 function HeroSection({ onSectionView }) {
   const navigate = useNavigate();
   const [mounted, setMounted] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showPersonalizationModal, setShowPersonalizationModal] = useState(false);
+  const [personalizationData, setPersonalizationData] = useState(null);
   const sectionRef = useRef(null);
+
+  // Load personalization data from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const data = JSON.parse(stored);
+        setPersonalizationData(data);
+      } else {
+        // Show modal if no data exists
+        setShowPersonalizationModal(true);
+      }
+    } catch (error) {
+      console.error('Failed to load personalization data:', error);
+      // Show modal on error
+      setShowPersonalizationModal(true);
+    }
+  }, []);
 
   useEffect(() => {
     setMounted(true);
@@ -72,6 +120,20 @@ function HeroSection({ onSectionView }) {
       onSectionView('hero');
     }
   }, []);
+
+  // Handle personalization data save
+  const handlePersonalizationSave = (data) => {
+    setPersonalizationData(data);
+    setShowPersonalizationModal(false);
+  };
+
+  // Get display values with fallbacks
+  const brideName = personalizationData?.brideName || DEFAULT_BRIDE_NAME;
+  const groomName = personalizationData?.groomName || DEFAULT_GROOM_NAME;
+  const displayDate = personalizationData?.weddingDate 
+    ? formatDate(personalizationData.weddingDate) || DEFAULT_DATE
+    : DEFAULT_DATE;
+  const venue = personalizationData?.venue || DEFAULT_VENUE;
 
   // Generate petals with random properties
   const petals = [...Array(15)].map((_, i) => ({
@@ -98,6 +160,12 @@ function HeroSection({ onSectionView }) {
 
   return (
     <section ref={sectionRef} className="hero-section">
+      {/* Personalization Modal */}
+      <PersonalizationModal
+        isOpen={showPersonalizationModal}
+        onClose={() => setShowPersonalizationModal(false)}
+        onSave={handlePersonalizationSave}
+      />
       {/* Animated gradient background */}
       <div className="hero-bg" />
       
@@ -240,11 +308,11 @@ function HeroSection({ onSectionView }) {
                 <div className="showcase-ornament">
                   <OrnamentSVG />
                 </div>
-                <div className="showcase-names">Priya</div>
+                <div className="showcase-names">{brideName}</div>
                 <div className="showcase-and">&</div>
-                <div className="showcase-names">Rahul</div>
-                <div className="showcase-date">December 15, 2025</div>
-                <div className="showcase-venue">The Grand Palace, Mumbai</div>
+                <div className="showcase-names">{groomName}</div>
+                <div className="showcase-date">{displayDate}</div>
+                <div className="showcase-venue">{venue}</div>
                 <div className="showcase-ornament" style={{ transform: 'rotate(180deg)' }}>
                   <OrnamentSVG />
                 </div>
