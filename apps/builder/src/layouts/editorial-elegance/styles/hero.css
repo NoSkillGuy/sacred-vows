@@ -1,0 +1,110 @@
+/* Editorial Hero - Full Viewport Cover */
+.ee-hero {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 600px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Background Media */
+.ee-hero-media {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.ee-hero-image,
+.ee-hero-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Subtle overlay - only if needed for text contrast */
+.ee-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.15); /* Very light, 10-15% max */
+  z-index: 2;
+}
+
+/* Hero Content */
+.ee-hero-content {
+  position: relative;
+  z-index: 3;
+  text-align: center;
+  color: #fff;
+  padding: var(--ee-space-md);
+}
+
+/* Alignment variations */
+.ee-hero[data-alignment="bottom-left"] .ee-hero-content {
+  position: absolute;
+  bottom: var(--ee-space-lg);
+  left: var(--ee-space-md);
+  text-align: left;
+}
+
+.ee-hero[data-alignment="center"] .ee-hero-content {
+  text-align: center;
+}
+
+/* Text styling */
+.ee-hero-names {
+  margin: 0 0 var(--ee-space-sm);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.ee-hero-date,
+.ee-hero-location {
+  color: rgba(255, 255, 255, 0.95);
+  margin: var(--ee-space-xs) 0;
+}
+
+/* Scroll Indicator */
+.ee-scroll-indicator {
+  position: absolute;
+  bottom: var(--ee-space-md);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  animation: scroll-bounce 2s ease-in-out infinite;
+}
+
+.ee-scroll-line {
+  width: 1px;
+  height: 48px;
+  background: linear-gradient(to bottom, 
+    rgba(255, 255, 255, 0.8), 
+    rgba(255, 255, 255, 0.2)
+  );
+}
+
+@keyframes scroll-bounce {
+  0%, 100% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, 8px); }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .ee-hero {
+    min-height: 100vh;
+  }
+  
+  .ee-hero-content {
+    padding: var(--ee-space-sm);
+  }
+  
+  .ee-hero[data-alignment="bottom-left"] .ee-hero-content {
+    bottom: var(--ee-space-md);
+    left: var(--ee-space-sm);
+  }
+}
+

@@ -14,15 +14,15 @@ function ExportModal({ isOpen, onClose }) {
     setExporting(true);
     try {
       if (exportFormat === 'json') {
-        // Export as JSON backup
-        exportInvitationAsJSON(currentInvitation.data);
+        // Export as JSON backup - pass full invitation object
+        exportInvitationAsJSON(currentInvitation);
         onClose();
         setExporting(false);
         return;
       }
 
-      // Export as static site ZIP
-      await exportInvitationAsZip(currentInvitation.data, translations);
+      // Export as static site ZIP - pass full invitation object with layoutId
+      await exportInvitationAsZip(currentInvitation, translations);
       
       // Show success message
       alert('✅ Invitation exported successfully!\n\nNext steps:\n1. Extract the ZIP file\n2. Upload to Vercel/Netlify or your hosting\n3. Share the URL with your guests!');

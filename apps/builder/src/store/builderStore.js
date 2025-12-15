@@ -1,7 +1,11 @@
 import { create } from 'zustand';
 import { defaultWeddingConfig, defaultLayoutConfig, SECTION_TYPES } from '../config/wedding-config';
 import { updateInvitation } from '../services/invitationService';
-import { getLayoutManifest } from '../services/layoutService';
+import { getLayoutManifest as getLayoutManifestFromAPI } from '../services/layoutService';
+import { getLayout, getLayoutManifest as getLayoutManifestFromRegistry, hasLayout } from '../layouts/registry';
+// Import layouts to ensure they're registered
+import '../layouts/classic-scroll';
+import '../layouts/editorial-elegance';
 
 /**
  * Builder Store
@@ -105,11 +109,30 @@ export const useBuilderStore = create((set, get) => {
 
     /**
      * Load layout manifest for current layout
+     * First tries the registry, then falls back to API
      */
     loadLayoutManifest: async () => {
       const { currentInvitation } = get();
+      const layoutId = currentInvitation.layoutId || 'classic-scroll';
+      
       try {
-        const manifest = await getLayoutManifest(currentInvitation.layoutId);
+        let manifest = null;
+        
+        // First, try to get manifest from registry (local)
+        if (hasLayout(layoutId)) {
+          manifest = getLayoutManifestFromRegistry(layoutId);
+          console.log(`Loaded layout manifest from registry: ${layoutId}`);
+        } else {
+          // Fallback to API
+          console.log(`Layout ${layoutId} not in registry, fetching from API`);
+          manifest = await getLayoutManifestFromAPI(layoutId);
+        }
+        
+        if (!manifest) {
+          console.error(`Failed to load manifest for layout: ${layoutId}`);
+          return null;
+        }
+        
         // If manifest has theme presets, sync them into layoutConfig for use in UI
         if (manifest?.themes?.length) {
           const defaultTheme = manifest.themes.find(t => t.isDefault) || manifest.themes[0];
@@ -143,6 +166,15 @@ export const useBuilderStore = create((set, get) => {
         console.error('Failed to load layout manifest:', error);
         return null;
       }
+    },
+    
+    /**
+     * Get layout from registry
+     * @param {string} layoutId - Layout identifier
+     * @returns {Object|null} Layout object or null
+     */
+    getLayoutFromRegistry: (layoutId) => {
+      return getLayout(layoutId);
     },
 
     /**

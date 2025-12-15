@@ -103,6 +103,42 @@
  * @property {string} subtitle - Brand subtitle
  */
 
+/**
+ * @typedef {Object} WeddingPartyMember
+ * @property {string} name - Member name
+ * @property {string} role - Role (optional, for internal use)
+ * @property {string} image - Image URL
+ * @property {string} bio - One-line bio (max 100 chars)
+ */
+
+/**
+ * @typedef {Object} WeddingPartyInfo
+ * @property {WeddingPartyMember} bride - Bride info
+ * @property {WeddingPartyMember} groom - Groom info
+ * @property {WeddingPartyMember[]} members - Optional party members
+ */
+
+/**
+ * @typedef {Object} VideoConfig
+ * @property {string} url - Video URL (YouTube, Vimeo, or direct)
+ * @property {string} poster - Poster image for video
+ * @property {boolean} muted - Muted playback (default: true)
+ * @property {boolean} loop - Loop video (default: true)
+ */
+
+/**
+ * @typedef {Object} EditorialIntroConfig
+ * @property {string} text - Editorial intro text (3-4 lines max)
+ * @property {string} image - Portrait image URL
+ * @property {string} alignment - 'left' | 'right'
+ */
+
+/**
+ * @typedef {Object} ImageFilterConfig
+ * @property {string} filter - 'none' | 'bw' | 'sepia' | 'desaturated'
+ * @property {number} intensity - 0-100
+ */
+
 // ============================================================================
 // LAYOUT CONFIGURATION TYPES
 // These are per-layout settings

@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { getInvitations, deleteInvitation, updateInvitation } from '../../services/invitationService';
 import { getCurrentUser, logout } from '../../services/authService';
 import { useToast } from '../Toast/ToastProvider';
-import EditableText from '../WYSIWYG/EditableText';
+import EditableText from '../../layouts/classic-scroll/components/shared/EditableText';
 import './Dashboard.css';
 
 // SVG Icons

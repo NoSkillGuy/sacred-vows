@@ -1,0 +1,47 @@
+.editable-text {
+  position: relative;
+  cursor: text;
+  transition: all 0.2s ease;
+  outline: none;
+  border-radius: 2px;
+  min-height: 1.2em;
+}
+
+.editable-text:hover,
+.editable-text.hovered {
+  background-color: rgba(212, 175, 55, 0.1);
+  outline: 2px dashed rgba(212, 175, 55, 0.5);
+  outline-offset: 2px;
+}
+
+.editable-text.editing {
+  background-color: rgba(255, 255, 255, 0.95);
+  outline: 2px solid #d4af37;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.2);
+  padding: 2px 4px;
+  border-radius: 4px;
+  min-width: 50px;
+}
+
+.editable-placeholder {
+  color: #999;
+  font-style: italic;
+  opacity: 0.6;
+}
+
+.editable-text[contenteditable="true"]:focus {
+  outline: 2px solid #d4af37;
+  outline-offset: 2px;
+}
+
+/* Prevent editing indicators on nested editable elements */
+.editable-text .editable-text {
+  outline: none !important;
+  background: transparent !important;
+}
+
+.editable-text.editing .editable-text {
+  pointer-events: none;
+}
+

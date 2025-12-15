@@ -1,0 +1,65 @@
+/* Editorial Elegance - Strict Color Palette */
+:root {
+  /* Base Colors - STRICT (DO NOT add more) */
+  --ee-color-bg: #FAF9F7; /* Ivory off-white */
+  --ee-color-text: #1C1C1C; /* Near black */
+  --ee-color-secondary: #6B6B6B; /* Soft grey */
+  --ee-color-accent: #C6A15B; /* Champagne gold - SUBTLE USE ONLY */
+  --ee-color-divider: #E6E6E6; /* Divider lines */
+  
+  /* Spacing Scale - Magazine Breathing Room */
+  --ee-space-xs: 12px;
+  --ee-space-sm: 24px;
+  --ee-space-md: 48px;
+  --ee-space-lg: 80px;
+  --ee-space-xl: 120px;
+  --ee-space-section: clamp(80px, 10vh, 160px);
+  
+  /* Layout Constraints */
+  --ee-max-width-text: 680px; /* Editorial text width */
+  --ee-max-width-card: 1200px; /* Event cards, etc */
+  
+  /* Accent Usage - MINIMAL */
+  --ee-accent-line: 1px solid var(--ee-color-accent);
+  --ee-accent-hover: var(--ee-color-accent);
+}
+
+/* Base Layout */
+.editorial-elegance {
+  background-color: var(--ee-color-bg);
+  color: var(--ee-color-text);
+  min-height: 100vh;
+}
+
+/* Thin Divider Lines */
+.ee-divider {
+  width: 60px;
+  height: 1px;
+  background-color: var(--ee-color-accent);
+  margin: var(--ee-space-sm) auto;
+}
+
+/* Accent usage - borders only */
+.ee-accent-border {
+  border: var(--ee-accent-line);
+}
+
+/* Hover states - subtle accent */
+.ee-link {
+  color: var(--ee-color-text);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+.ee-link:hover {
+  border-bottom-color: var(--ee-color-accent);
+}
+
+/* Section spacing - generous */
+.ee-section {
+  padding: var(--ee-space-section) var(--ee-space-sm);
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
