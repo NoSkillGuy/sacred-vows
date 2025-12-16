@@ -125,10 +125,6 @@ type InvitationsResponse struct {
 	Invitations []InvitationDTO `json:"invitations"`
 }
 
-type MessageResponse struct {
-	Message string `json:"message" example:"Invitation deleted"`
-}
-
 // GetAll retrieves all invitations for the current user
 // @Summary      List invitations
 // @Description  Get all invitations for the current user. Supports optional authentication (anonymous users are supported).

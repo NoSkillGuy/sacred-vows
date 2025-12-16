@@ -5,23 +5,23 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sacred-vows/api-go/internal/domain"
 	authinfra "github.com/sacred-vows/api-go/internal/infrastructure/auth"
 	"github.com/sacred-vows/api-go/internal/infrastructure/database/postgres"
-	authuc "github.com/sacred-vows/api-go/internal/usecase/auth"
-	"github.com/sacred-vows/api-go/internal/domain"
 	"github.com/sacred-vows/api-go/internal/interfaces/repository"
+	authuc "github.com/sacred-vows/api-go/internal/usecase/auth"
 	"github.com/sacred-vows/api-go/pkg/errors"
 )
 
 type AuthHandler struct {
-	registerUC        *authuc.RegisterUseCase
-	loginUC           *authuc.LoginUseCase
-	getCurrentUserUC  *authuc.GetCurrentUserUseCase
-	googleOAuthUC     *authuc.GoogleOAuthUseCase
-	refreshTokenUC    *authuc.RefreshTokenUseCase
-	refreshTokenRepo  repository.RefreshTokenRepository
-	jwtService        *authinfra.JWTService
-	googleOAuth       *authinfra.GoogleOAuthService
+	registerUC       *authuc.RegisterUseCase
+	loginUC          *authuc.LoginUseCase
+	getCurrentUserUC *authuc.GetCurrentUserUseCase
+	googleOAuthUC    *authuc.GoogleOAuthUseCase
+	refreshTokenUC   *authuc.RefreshTokenUseCase
+	refreshTokenRepo repository.RefreshTokenRepository
+	jwtService       *authinfra.JWTService
+	googleOAuth      *authinfra.GoogleOAuthService
 }
 
 func NewAuthHandler(
@@ -74,10 +74,6 @@ type UserDTO struct {
 
 type UserResponse struct {
 	User *UserDTO `json:"user"`
-}
-
-type ErrorResponse struct {
-	Error string `json:"error" example:"Error message"`
 }
 
 // Register registers a new user
@@ -227,8 +223,8 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 		refreshExpiration,
 		"/api/auth",
 		"",
-		true,  // Secure (HTTPS only)
-		true,  // HttpOnly (not accessible via JavaScript)
+		true, // Secure (HTTPS only)
+		true, // HttpOnly (not accessible via JavaScript)
 	)
 
 	c.JSON(http.StatusOK, gin.H{
@@ -267,8 +263,8 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 		-1, // Expire immediately
 		"/api/auth",
 		"",
-		true,  // Secure (HTTPS only)
-		true,  // HttpOnly (not accessible via JavaScript)
+		true, // Secure (HTTPS only)
+		true, // HttpOnly (not accessible via JavaScript)
 	)
 
 	c.JSON(http.StatusOK, gin.H{
@@ -312,10 +308,10 @@ func (h *AuthHandler) GetCurrentUser(c *gin.Context) {
 
 // GoogleOAuth initiates Google OAuth flow
 // @Summary      Initiate Google OAuth
-// @Description  Redirects to Google OAuth consent screen to initiate authentication flow.
+// @Description  Redirects to Google OAuth consent screen to initiate authentication flow. This endpoint starts the OAuth 2.0 authorization code flow.
 // @Tags         auth
 // @Produce      json
-// @Success      307  "Redirect to Google OAuth"
+// @Success      307  "Redirect to Google OAuth consent screen"
 // @Router       /auth/google [get]
 func (h *AuthHandler) GoogleOAuth(c *gin.Context) {
 	authURL := h.googleOAuth.GetAuthURL()
@@ -324,12 +320,12 @@ func (h *AuthHandler) GoogleOAuth(c *gin.Context) {
 
 // GoogleCallback handles Google OAuth callback
 // @Summary      Google OAuth callback
-// @Description  Handles the callback from Google OAuth and redirects to frontend with token.
+// @Description  Handles the callback from Google OAuth after user authorization. Exchanges the authorization code for user information, creates/updates the user account, and redirects to the frontend with a JWT token. If any step fails, redirects to frontend with an error parameter.
 // @Tags         auth
 // @Produce      json
-// @Param        code   query     string  true  "OAuth authorization code"
-// @Success      307    "Redirect to frontend with token"
-// @Failure      307    "Redirect to frontend with error"
+// @Param        code   query     string  true  "OAuth authorization code from Google"
+// @Success      307    "Redirect to frontend with token (format: /builder?token=JWT_TOKEN)"
+// @Failure      307    "Redirect to frontend with error (format: /login?error=ERROR_TYPE)"
 // @Router       /auth/google/callback [get]
 func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 	code := c.Query("code")
@@ -440,8 +436,8 @@ func (h *AuthHandler) setRefreshTokenCookie(c *gin.Context, userID, email string
 		refreshExpiration,
 		"/api/auth",
 		"",
-		true,  // Secure (HTTPS only)
-		true,  // HttpOnly (not accessible via JavaScript)
+		true, // Secure (HTTPS only)
+		true, // HttpOnly (not accessible via JavaScript)
 	)
 
 	return nil

@@ -1,8 +1,6 @@
 package http
 
 import (
-	"time"
-
 	"github.com/gin-gonic/gin"
 	"github.com/sacred-vows/api-go/internal/infrastructure/auth"
 	"github.com/sacred-vows/api-go/internal/interfaces/http/handlers"
@@ -56,12 +54,7 @@ func (r *Router) Setup() *gin.Engine {
 	router.Use(logger.GinLogger())
 
 	// Health check
-	router.GET("/health", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"status":    "ok",
-			"timestamp": time.Now().Format(time.RFC3339),
-		})
-	})
+	router.GET("/health", handlers.HealthCheck)
 
 	// API routes
 	api := router.Group("/api")
