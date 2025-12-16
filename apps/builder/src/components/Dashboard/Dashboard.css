@@ -138,6 +138,10 @@
   margin: 0.25rem 0;
 }
 
+.quickstart-copy .section-subtitle {
+  display: flex;
+}
+
 .quickstart-actions {
   display: flex;
   gap: 0.75rem;
