@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { login } from '../../services/authService';
+import { login, isAuthenticated, getCurrentUserFromAPI } from '../../services/authService';
 import { usePetals } from './usePetals';
 import './AuthPage.css';
 
@@ -54,6 +54,25 @@ function LoginPage() {
 
   // Generate petals once per mount to avoid animation resets
   const petals = usePetals(10);
+
+  // Check if user is already authenticated on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      if (isAuthenticated()) {
+        try {
+          // Verify token is still valid
+          await getCurrentUserFromAPI();
+          // If valid, redirect to app
+          navigate('/app', { replace: true });
+        } catch (error) {
+          // Token is invalid, stay on login page
+          console.error('Token validation failed:', error);
+        }
+      }
+    };
+
+    checkAuth();
+  }, [navigate]);
 
   const handleChange = (e) => {
     setFormData({

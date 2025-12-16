@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState, useRef } from 'react';
 import { trackCTA } from '../../services/analyticsService';
+import { isAuthenticated, getCurrentUserFromAPI } from '../../services/authService';
 import PersonalizationModal from './PersonalizationModal';
 
 // SVG Components for premium look
@@ -247,6 +248,28 @@ function HeroSection({ onSectionView }) {
     setMobileMenuOpen(false);
   };
 
+  // Handle sign in button click with authentication check
+  const handleSignIn = async () => {
+    trackCTA('nav_sign_in');
+    
+    // Check if user is already authenticated
+    if (isAuthenticated()) {
+      try {
+        // Verify token is still valid
+        await getCurrentUserFromAPI();
+        // If valid, redirect to app
+        navigate('/app');
+        return;
+      } catch (error) {
+        // Token is invalid, proceed to login page
+        console.error('Token validation failed:', error);
+      }
+    }
+    
+    // Not authenticated or token invalid, go to login page
+    navigate('/login');
+  };
+
   return (
     <section ref={sectionRef} className="hero-section">
       {/* Personalization Modal */}
@@ -315,7 +338,7 @@ function HeroSection({ onSectionView }) {
           <button className="nav-cta" onClick={() => { trackCTA('nav_start_free'); navigate('/signup'); }}>
             <span>Start Free</span>
           </button>
-          <button className="nav-login" onClick={() => { trackCTA('nav_sign_in'); navigate('/login'); }}>
+          <button className="nav-login" onClick={handleSignIn}>
             <span>Sign In</span>
           </button>
         </div>
@@ -339,7 +362,7 @@ function HeroSection({ onSectionView }) {
         <button className="nav-cta" onClick={() => { closeMobileMenu(); trackCTA('mobile_nav_start_free'); navigate('/signup'); }}>
           <span>Start Free</span>
         </button>
-        <button className="nav-login" onClick={() => { closeMobileMenu(); trackCTA('mobile_nav_sign_in'); navigate('/login'); }}>
+        <button className="nav-login" onClick={() => { closeMobileMenu(); handleSignIn(); }}>
           <span>Sign In</span>
         </button>
       </div>
