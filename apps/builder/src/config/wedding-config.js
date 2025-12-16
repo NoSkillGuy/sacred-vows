@@ -34,7 +34,7 @@ export const defaultWeddingConfig = {
         mother: 'Mrs. Geeta Singh',
         father: 'Mr. Sanjay Kumar Singh'
       },
-      image: '/assets/photos/bride/1.jpeg'
+      image: '/assets/photos/couple1/bride/1.jpeg'
     },
     groom: {
       name: 'Dr Saurabh Singh',
@@ -43,7 +43,7 @@ export const defaultWeddingConfig = {
         mother: 'Mrs. Vibha Singh',
         father: 'Mr. Ashok Kumar Singh'
       },
-      image: '/assets/photos/groom/1.jpeg'
+      image: '/assets/photos/couple1/groom/1.jpeg'
     }
   },
   
@@ -124,12 +124,12 @@ export const defaultWeddingConfig = {
   
   gallery: {
     images: [
-      { src: '/assets/photos/couple/21.jpeg', alt: 'Couple photo 1', category: 'couple', orientation: 'portrait' },
-      { src: '/assets/photos/family/22.jpeg', alt: 'Couple photo 2 (portrait)', category: 'family', orientation: 'portrait' },
-      { src: '/assets/photos/couple/23.jpeg', alt: 'Friends and candid moment', category: 'couple', orientation: 'portrait' },
-      { src: '/assets/photos/couple/24.jpeg', alt: 'Traditional attire', category: 'couple', orientation: 'portrait' },
-      { src: '/assets/photos/couple/25.jpeg', alt: 'Favourite memory together', category: 'couple', orientation: 'portrait' },
-      { src: '/assets/photos/couple/26.jpeg', alt: 'Special capture', category: 'couple', orientation: 'portrait' }
+      { src: '/assets/photos/couple1/couple/21.jpeg', alt: 'Couple photo 1', category: 'couple', orientation: 'portrait' },
+      { src: '/assets/photos/couple1/family/22.jpeg', alt: 'Couple photo 2 (portrait)', category: 'family', orientation: 'portrait' },
+      { src: '/assets/photos/couple1/couple/23.jpeg', alt: 'Friends and candid moment', category: 'couple', orientation: 'portrait' },
+      { src: '/assets/photos/couple1/couple/24.jpeg', alt: 'Traditional attire', category: 'couple', orientation: 'portrait' },
+      { src: '/assets/photos/couple1/couple/25.jpeg', alt: 'Favourite memory together', category: 'couple', orientation: 'portrait' },
+      { src: '/assets/photos/couple1/couple/26.jpeg', alt: 'Special capture', category: 'couple', orientation: 'portrait' }
     ]
   },
   
@@ -159,7 +159,7 @@ export const defaultWeddingConfig = {
   },
   
   hero: {
-    mainImage: '/assets/photos/couple/11.jpeg'
+    mainImage: '/assets/photos/couple1/couple/11.jpeg'
   },
 
   // Theme is now part of layoutConfig, but keep here for backward compatibility

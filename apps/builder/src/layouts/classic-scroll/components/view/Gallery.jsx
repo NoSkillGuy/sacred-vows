@@ -1,12 +1,12 @@
 function Gallery({ translations, currentLang, config = {} }) {
   const gallery = config.gallery || {};
   const galleryImages = gallery.images || [
-    { src: '/assets/photos/couple/21.jpeg', alt: 'Couple photo 1', orientation: 'portrait' },
-    { src: '/assets/photos/family/22.jpeg', alt: 'Couple photo 2 (portrait)', orientation: 'portrait' },
-    { src: '/assets/photos/couple/23.jpeg', alt: 'Friends and candid moment', orientation: 'portrait' },
-    { src: '/assets/photos/couple/24.jpeg', alt: 'Traditional attire', orientation: 'portrait' },
-    { src: '/assets/photos/couple/25.jpeg', alt: 'Favourite memory together', orientation: 'portrait' },
-    { src: '/assets/photos/couple/26.jpeg', alt: 'Special capture', orientation: 'portrait' }
+    { src: '/assets/photos/couple1/couple/21.jpeg', alt: 'Couple photo 1', orientation: 'portrait' },
+    { src: '/assets/photos/couple1/family/22.jpeg', alt: 'Couple photo 2 (portrait)', orientation: 'portrait' },
+    { src: '/assets/photos/couple1/couple/23.jpeg', alt: 'Friends and candid moment', orientation: 'portrait' },
+    { src: '/assets/photos/couple1/couple/24.jpeg', alt: 'Traditional attire', orientation: 'portrait' },
+    { src: '/assets/photos/couple1/couple/25.jpeg', alt: 'Favourite memory together', orientation: 'portrait' },
+    { src: '/assets/photos/couple1/couple/26.jpeg', alt: 'Special capture', orientation: 'portrait' }
   ];
 
   // Get custom translations - handle nested paths

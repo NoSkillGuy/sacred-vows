@@ -4,28 +4,28 @@ import './GalleryModal.css';
 
 const defaultImages = [
   { category: 'couple', images: [
-    '/assets/photos/couple/1.jpeg',
-    '/assets/photos/couple/2.jpeg',
-    '/assets/photos/couple/3.jpeg',
-    '/assets/photos/couple/4.jpeg',
-    '/assets/photos/couple/5.jpeg',
-    '/assets/photos/couple/6.jpeg',
-    '/assets/photos/couple/7.jpeg',
-    '/assets/photos/couple/8.jpeg',
+    '/assets/photos/couple1/couple/1.jpeg',
+    '/assets/photos/couple1/couple/2.jpeg',
+    '/assets/photos/couple1/couple/3.jpeg',
+    '/assets/photos/couple1/couple/4.jpeg',
+    '/assets/photos/couple1/couple/5.jpeg',
+    '/assets/photos/couple1/couple/6.jpeg',
+    '/assets/photos/couple1/couple/7.jpeg',
+    '/assets/photos/couple1/couple/8.jpeg',
   ]},
   { category: 'bride', images: [
-    '/assets/photos/bride/1.jpeg',
-    '/assets/photos/bride/2.jpeg',
-    '/assets/photos/bride/3.jpeg',
+    '/assets/photos/couple1/bride/1.jpeg',
+    '/assets/photos/couple1/bride/2.jpeg',
+    '/assets/photos/couple1/bride/3.jpeg',
   ]},
   { category: 'groom', images: [
-    '/assets/photos/groom/1.jpeg',
-    '/assets/photos/groom/2.jpeg',
+    '/assets/photos/couple1/groom/1.jpeg',
+    '/assets/photos/couple1/groom/2.jpeg',
   ]},
   { category: 'family', images: [
-    '/assets/photos/family/1.jpeg',
-    '/assets/photos/family/2.jpeg',
-    '/assets/photos/family/3.jpeg',
+    '/assets/photos/couple1/family/1.jpeg',
+    '/assets/photos/couple1/family/2.jpeg',
+    '/assets/photos/couple1/family/3.jpeg',
   ]},
 ];
 

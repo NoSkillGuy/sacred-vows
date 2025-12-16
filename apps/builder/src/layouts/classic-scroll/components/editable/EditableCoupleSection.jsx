@@ -12,12 +12,12 @@ function EditableCoupleSection({ translations, currentLang, config = {}, onUpdat
   const brideName = bride.name || 'Capt (Dr) Priya Singh';
   const brideMother = bride.parents?.mother || 'Mrs. Geeta Singh';
   const brideFather = bride.parents?.father || 'Mr. Sanjay Kumar Singh';
-  const brideImage = bride.image || '/assets/photos/bride/1.jpeg';
+  const brideImage = bride.image || '/assets/photos/couple1/bride/1.jpeg';
   
   const groomName = groom.name || 'Dr Saurabh Singh';
   const groomMother = groom.parents?.mother || 'Mrs. Vibha Singh';
   const groomFather = groom.parents?.father || 'Mr. Ashok Kumar Singh';
-  const groomImage = groom.image || '/assets/photos/groom/1.jpeg';
+  const groomImage = groom.image || '/assets/photos/couple1/groom/1.jpeg';
 
   // Get custom translations - handle nested paths
   const getTranslation = (key) => {

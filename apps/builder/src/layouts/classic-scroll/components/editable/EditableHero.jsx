@@ -12,7 +12,7 @@ function EditableHero({ config, ...props }) {
   const couple = config?.couple || {};
   const bride = couple.bride || {};
   const groom = couple.groom || {};
-  const heroImage = config?.hero?.mainImage || '/assets/photos/couple/1.jpeg';
+  const heroImage = config?.hero?.mainImage || '/assets/photos/couple1/couple/1.jpeg';
 
   // Create editable config by wrapping editable elements
   const editableConfig = {

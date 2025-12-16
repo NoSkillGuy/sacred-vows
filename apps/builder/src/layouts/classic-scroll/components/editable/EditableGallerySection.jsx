@@ -7,12 +7,12 @@ import EditableImage from '../shared/EditableImage';
 function EditableGallerySection({ translations, currentLang, config = {}, onUpdate }) {
   const gallery = config.gallery || {};
   const galleryImages = gallery.images || [
-    { src: '/assets/photos/couple/21.jpeg', alt: 'Couple photo 1' },
-    { src: '/assets/photos/family/22.jpeg', alt: 'Couple photo 2 (portrait)' },
-    { src: '/assets/photos/couple/23.jpeg', alt: 'Friends and candid moment' },
-    { src: '/assets/photos/couple/24.jpeg', alt: 'Traditional attire' },
-    { src: '/assets/photos/couple/25.jpeg', alt: 'Favourite memory together' },
-    { src: '/assets/photos/couple/26.jpeg', alt: 'Special capture' }
+    { src: '/assets/photos/couple1/couple/21.jpeg', alt: 'Couple photo 1' },
+    { src: '/assets/photos/couple1/family/22.jpeg', alt: 'Couple photo 2 (portrait)' },
+    { src: '/assets/photos/couple1/couple/23.jpeg', alt: 'Friends and candid moment' },
+    { src: '/assets/photos/couple1/couple/24.jpeg', alt: 'Traditional attire' },
+    { src: '/assets/photos/couple1/couple/25.jpeg', alt: 'Favourite memory together' },
+    { src: '/assets/photos/couple1/couple/26.jpeg', alt: 'Special capture' }
   ];
 
   // Get custom translations - handle nested paths
