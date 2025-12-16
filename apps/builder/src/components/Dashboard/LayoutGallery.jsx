@@ -102,10 +102,22 @@ function LayoutGallery() {
     
     try {
       setCreating(layout.id);
+      
+      // Initialize data with layout-specific defaults if available
+      let initialData = {};
+      if (layout.id === 'editorial-elegance') {
+        try {
+          const { editorialEleganceDefaults } = await import('../../layouts/editorial-elegance/defaults');
+          initialData = editorialEleganceDefaults;
+        } catch (error) {
+          console.warn('Failed to load editorial-elegance defaults for new invitation:', error);
+        }
+      }
+      
       const invitation = await createInvitation({
         layoutId: layout.id,
         title: 'My Wedding Invitation',
-        data: JSON.stringify({}),
+        data: JSON.stringify(initialData),
       });
       navigate(`/builder/${invitation.id}`);
     } catch (error) {

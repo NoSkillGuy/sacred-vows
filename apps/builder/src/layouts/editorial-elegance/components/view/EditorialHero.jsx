@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
+import { formatWeddingDate } from '../../utils/dateFormatter';
+import { useParallax } from '../../hooks/useScrollAnimations';
 
 /**
  * EditorialHero - Magazine cover style hero section
  * Supports image or muted video background
  */
 function EditorialHero({ translations, currentLang, config = {} }) {
+  const heroRef = useParallax();
   const couple = config.couple || {};
   const bride = couple.bride || {};
   const groom = couple.groom || {};
@@ -24,18 +27,8 @@ function EditorialHero({ translations, currentLang, config = {} }) {
   const videoUrl = hero.videoUrl || '';
   const videoPoster = hero.videoPoster || mainImage;
   
-  // Format date
-  const formatDate = (dateStr) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { 
-      day: 'numeric', 
-      month: 'long', 
-      year: 'numeric' 
-    }).toUpperCase();
-  };
-  
   return (
-    <section className="ee-hero" data-alignment={alignment}>
+    <section ref={heroRef} className="ee-hero" data-alignment={alignment}>
       {/* Background Media */}
       <div className="ee-hero-media">
         {mediaType === 'video' && videoUrl ? (
@@ -66,9 +59,11 @@ function EditorialHero({ translations, currentLang, config = {} }) {
             {brideName} & {groomName}
           </h1>
           <div className="ee-divider" />
-          <p className="ee-meta-text ee-hero-date">
-            {formatDate(weddingDate)}
-          </p>
+          {formatWeddingDate(weddingDate) && (
+            <p className="ee-meta-text ee-hero-date">
+              {formatWeddingDate(weddingDate)}
+            </p>
+          )}
           <p className="ee-meta-text ee-hero-location">
             {city}
           </p>

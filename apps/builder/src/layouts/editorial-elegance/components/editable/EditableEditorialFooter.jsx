@@ -21,7 +21,6 @@ function EditableEditorialFooter({ translations, currentLang, config = {}, onUpd
             onUpdate={onUpdate}
             path="couple.bride.name"
             tag="span"
-            inline={true}
           />
           {' & '}
           <EditableText
@@ -29,7 +28,6 @@ function EditableEditorialFooter({ translations, currentLang, config = {}, onUpd
             onUpdate={onUpdate}
             path="couple.groom.name"
             tag="span"
-            inline={true}
           />
         </h3>
         <p style={{ color: 'var(--ee-color-secondary)', fontSize: '14px' }}>

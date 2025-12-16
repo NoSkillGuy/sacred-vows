@@ -29,7 +29,6 @@ function EditableLocation({ translations, currentLang, config = {}, onUpdate }) 
               onUpdate={onUpdate}
               path="wedding.venue.address"
               tag="span"
-              inline={true}
             />
             <br />
             <EditableText
@@ -37,7 +36,6 @@ function EditableLocation({ translations, currentLang, config = {}, onUpdate }) 
               onUpdate={onUpdate}
               path="wedding.venue.city"
               tag="span"
-              inline={true}
             />
             {', '}
             <EditableText
@@ -45,7 +43,6 @@ function EditableLocation({ translations, currentLang, config = {}, onUpdate }) 
               onUpdate={onUpdate}
               path="wedding.venue.state"
               tag="span"
-              inline={true}
             />
           </p>
           {venue.mapsUrl && (

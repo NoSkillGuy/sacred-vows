@@ -6,7 +6,7 @@ function EditorialIntro({ translations, currentLang, config = {} }) {
   const editorialIntro = config.editorialIntro || {};
   const introText = editorialIntro.text || 
     'Two paths, one story.\nRooted in tradition, bound by love,\nwe invite you to celebrate the beginning of forever.';
-  const introImage = editorialIntro.image || '/assets/couple-portrait.jpg';
+  const introImage = editorialIntro.image || '/assets/photos/couple2/couple/2.jpeg';
   const alignment = editorialIntro.alignment || 'right'; // 'left' | 'right'
   
   return (

@@ -4,6 +4,7 @@
  */
 
 // View Components
+import EditorialHeader from './view/EditorialHeader';
 import EditorialHero from './view/EditorialHero';
 import EditorialIntro from './view/EditorialIntro';
 import EventCards from './view/EventCards';
@@ -12,6 +13,7 @@ import Location from './view/Location';
 import EditorialGallery from './view/EditorialGallery';
 import MinimalRSVP from './view/MinimalRSVP';
 import EditorialFooter from './view/EditorialFooter';
+import ScrollAnimationsInit from './view/ScrollAnimationsInit';
 
 // Editable Components
 import EditableEditorialHero from './editable/EditableEditorialHero';
@@ -54,6 +56,8 @@ export const editable = {
 };
 
 export const shared = {
+  Header: EditorialHeader,
+  ScrollAnimationsInit,
   EditableText,
   EditableImage,
 };

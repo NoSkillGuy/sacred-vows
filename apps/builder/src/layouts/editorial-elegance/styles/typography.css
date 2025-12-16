@@ -1,19 +1,21 @@
 /* Editorial Elegance Typography Scale */
 :root {
-  /* Typography Scale */
-  --ee-text-hero: clamp(48px, 8vw, 80px);
-  --ee-text-section-heading: clamp(32px, 5vw, 42px);
-  --ee-text-subheading: clamp(18px, 2.5vw, 24px);
+  /* Typography Scale - Enhanced for luxury feel */
+  --ee-text-hero: clamp(56px, 9vw, 96px);
+  --ee-text-section-heading: clamp(36px, 5.5vw, 48px);
+  --ee-text-subheading: clamp(20px, 2.8vw, 28px);
   --ee-text-body: 18px;
-  --ee-text-meta: 14px;
+  --ee-text-meta: 13px;
   
-  /* Letter Spacing */
-  --ee-spacing-meta: 0.1em; /* Uppercase dates/labels */
-  --ee-spacing-heading: -0.02em; /* Tight for serifs */
+  /* Letter Spacing - Refined for elegance */
+  --ee-spacing-meta: 0.12em; /* Uppercase dates/labels - slightly more generous */
+  --ee-spacing-heading: -0.03em; /* Tighter for serifs */
+  --ee-spacing-hero: -0.04em; /* Extra tight for hero names */
   
-  /* Line Height */
-  --ee-line-editorial: 1.6; /* Body text */
-  --ee-line-heading: 1.2; /* Headlines */
+  /* Line Height - Improved readability */
+  --ee-line-editorial: 1.65; /* Body text - more breathing room */
+  --ee-line-heading: 1.15; /* Headlines - tighter */
+  --ee-line-hero: 1.1; /* Hero names - very tight */
   
   /* Font Weights */
   --ee-weight-light: 300;
@@ -35,9 +37,10 @@
 .ee-hero-names {
   font-family: var(--font-heading, 'Playfair Display', serif);
   font-size: var(--ee-text-hero);
-  line-height: var(--ee-line-heading);
-  letter-spacing: var(--ee-spacing-heading);
+  line-height: var(--ee-line-hero);
+  letter-spacing: var(--ee-spacing-hero);
   font-weight: var(--ee-weight-regular);
+  font-feature-settings: "liga" 1, "kern" 1;
 }
 
 .ee-section-heading {
@@ -56,20 +59,30 @@
   letter-spacing: var(--ee-spacing-meta);
   font-weight: var(--ee-weight-medium);
   color: var(--ee-color-secondary);
+  font-feature-settings: "tnum" 1; /* Tabular numbers for dates */
 }
 
 /* Editorial intro paragraph */
 .ee-editorial-intro {
   font-family: var(--font-heading, 'Playfair Display', serif);
   font-size: var(--ee-text-subheading);
-  line-height: 1.7;
+  line-height: 1.75;
   font-weight: var(--ee-weight-light);
   font-style: italic;
+  white-space: pre-line; /* Preserve line breaks */
+  color: var(--ee-color-text);
 }
 
 /* Section header */
 .ee-section-header {
   text-align: center;
   margin-bottom: var(--ee-space-lg);
+}
+
+/* Enhanced text rendering */
+.editorial-elegance {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 

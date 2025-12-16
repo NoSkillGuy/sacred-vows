@@ -15,7 +15,7 @@ function MinimalRSVP({ translations, currentLang, config = {} }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     // TODO: Implement RSVP submission
-    console.log('RSVP submitted:', formData);
+    // RSVP submission will be handled by parent component or service
   };
   
   return (

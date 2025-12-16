@@ -64,7 +64,7 @@ export const editorialEleganceManifest = {
       icon: '👥',
       description: 'Bride, groom, and optional party members (2-4 photos)',
       required: false,
-      enabled: false,
+      enabled: true,
       order: 3,
       config: {
         showBios: false,
@@ -120,7 +120,9 @@ export const editorialEleganceManifest = {
   
   themes: {
     default: {
+      id: 'default',
       name: 'Editorial Classic',
+      isDefault: true,
       colors: {
         background: '#FAF9F7', // Ivory off-white
         text: '#1C1C1C', // Near black

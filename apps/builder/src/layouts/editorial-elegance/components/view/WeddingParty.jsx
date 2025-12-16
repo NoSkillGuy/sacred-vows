@@ -4,13 +4,12 @@
  */
 function WeddingParty({ translations, currentLang, config = {} }) {
   const weddingParty = config.weddingParty || {};
-  const bride = weddingParty.bride || config.couple?.bride;
-  const groom = weddingParty.groom || config.couple?.groom;
+  const couple = config.couple || {};
+  const bride = weddingParty.bride || couple.bride || { name: 'Bride', image: '/assets/photos/couple2/bride/1.jpeg' };
+  const groom = weddingParty.groom || couple.groom || { name: 'Groom', image: '/assets/photos/couple2/groom/1.jpeg' };
   const members = weddingParty.members || [];
   const showBios = weddingParty.showBios || false;
-  const filter = weddingParty.filter || 'none'; // 'none' | 'bw'
-  
-  if (!bride && !groom) return null;
+  const filter = weddingParty.filter || 'bw'; // 'none' | 'bw'
   
   const allMembers = [
     bride && { ...bride, title: 'THE BRIDE' },

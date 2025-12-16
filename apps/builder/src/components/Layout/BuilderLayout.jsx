@@ -30,8 +30,7 @@ function BuilderLayout() {
       setLoading(true);
       setError(null);
       const data = await getInvitation(invitationId);
-      setInvitation(data);
-      setCurrentInvitation(data);
+      await setCurrentInvitation(data);
       await loadLayoutManifest();
     } catch (err) {
       console.error('Failed to load invitation:', err);

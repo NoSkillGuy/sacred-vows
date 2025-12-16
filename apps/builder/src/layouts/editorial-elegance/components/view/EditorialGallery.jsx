@@ -8,9 +8,19 @@ function EditorialGallery({ translations, currentLang, config = {} }) {
   const layout = galleryConfig.layout || 'masonry'; // 'masonry' | 'single-column'
   const maxImages = galleryConfig.maxImages || 12;
   
-  const galleryImages = (gallery.images || []).slice(0, maxImages);
+  // Default gallery images from couple2
+  const defaultImages = [
+    { src: '/assets/photos/couple2/couple/1.jpeg', alt: 'Couple photo 1', category: 'couple' },
+    { src: '/assets/photos/couple2/couple/2.jpeg', alt: 'Couple photo 2', category: 'couple' },
+    { src: '/assets/photos/couple2/couple/3.jpeg', alt: 'Couple photo 3', category: 'couple' },
+    { src: '/assets/photos/couple2/couple/4.jpeg', alt: 'Couple photo 4', category: 'couple' },
+    { src: '/assets/photos/couple2/couple/5.jpeg', alt: 'Couple photo 5', category: 'couple' },
+    { src: '/assets/photos/couple2/couple/6.jpeg', alt: 'Couple photo 6', category: 'couple' },
+  ];
   
-  if (!galleryImages.length) return null;
+  const galleryImages = (gallery.images && gallery.images.length > 0 
+    ? gallery.images 
+    : defaultImages).slice(0, maxImages);
   
   return (
     <section className="ee-section ee-gallery-section">

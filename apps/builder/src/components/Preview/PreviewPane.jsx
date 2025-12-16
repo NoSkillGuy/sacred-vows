@@ -10,6 +10,9 @@ import './PreviewPane.css';
 function PreviewPane({ editMode = true, deviceMode = 'desktop' }) {
   const currentInvitation = useBuilderStore((state) => state.currentInvitation);
   const getEnabledSections = useBuilderStore((state) => state.getEnabledSections);
+  const loadLayoutManifest = useBuilderStore((state) => state.loadLayoutManifest);
+  const validateSectionsAgainstManifest = useBuilderStore((state) => state.validateSectionsAgainstManifest);
+  const currentLayoutManifest = useBuilderStore((state) => state.currentLayoutManifest);
   const { currentLang, translations, updateLanguage } = useLanguage();
   const [showRSVPModal, setShowRSVPModal] = useState(false);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
@@ -36,14 +39,59 @@ function PreviewPane({ editMode = true, deviceMode = 'desktop' }) {
   // Get the editable hook
   const { handleUpdate } = useEditable();
   
+  // Ensure layout manifest is loaded and sections are initialized
+  useEffect(() => {
+    const initializeSections = async () => {
+      if (!currentLayoutManifest || currentLayoutManifest.id !== layoutId) {
+        await loadLayoutManifest();
+      } else {
+        // Manifest is loaded, ensure sections are validated
+        const currentSections = currentInvitation.layoutConfig?.sections || [];
+        if (currentSections.length === 0 && currentLayoutManifest.sections) {
+          validateSectionsAgainstManifest(currentLayoutManifest);
+        }
+      }
+    };
+    
+    initializeSections();
+  }, [layoutId, currentLayoutManifest, loadLayoutManifest, validateSectionsAgainstManifest, currentInvitation.layoutConfig?.sections]);
+  
   useEffect(() => {
     setModeKey(prev => prev + 1);
   }, [editMode]);
 
   // Get enabled sections in order
   const enabledSections = useMemo(() => {
-    return getEnabledSections();
-  }, [currentInvitation.layoutConfig?.sections]);
+    let sections = getEnabledSections();
+    
+    // If no sections are enabled, try to get them from manifest
+    if (sections.length === 0) {
+      if (currentLayoutManifest?.sections) {
+        sections = currentLayoutManifest.sections
+          .filter(s => s.enabled !== false)
+          .map((s, index) => ({
+            id: s.id,
+            enabled: true,
+            order: s.order !== undefined ? s.order : index
+          }))
+          .sort((a, b) => a.order - b.order);
+      } else if (layout?.manifest?.sections) {
+        // Fallback to layout's manifest if currentLayoutManifest not set
+        sections = layout.manifest.sections
+          .filter(s => s.enabled !== false)
+          .map((s, index) => ({
+            id: s.id,
+            enabled: true,
+            order: s.order !== undefined ? s.order : index
+          }))
+          .sort((a, b) => a.order - b.order);
+      }
+      
+      // If we found sections from manifest, they will be validated by loadLayoutManifest
+    }
+    
+    return sections;
+  }, [currentInvitation.layoutConfig?.sections, currentLayoutManifest, layout, getEnabledSections, currentInvitation.layoutConfig, layoutId]);
 
   // Apply theme to CSS variables
   useEffect(() => {
@@ -91,11 +139,14 @@ function PreviewPane({ editMode = true, deviceMode = 'desktop' }) {
     setShowLanguageModal(false);
   };
 
+  // Ensure data is an object, not an array or string
+  const invitationData = parseInvitationData(currentInvitation.data, {});
+
   // Common props for editable sections
   const editableProps = {
     translations,
     currentLang,
-    config: currentInvitation.data,
+    config: invitationData,
     onUpdate: handleUpdate,
   };
 
@@ -103,7 +154,7 @@ function PreviewPane({ editMode = true, deviceMode = 'desktop' }) {
   const viewProps = {
     translations,
     currentLang,
-    config: currentInvitation.data,
+    config: invitationData,
   };
 
   // Device width classes
@@ -159,6 +210,7 @@ function PreviewPane({ editMode = true, deviceMode = 'desktop' }) {
   const Header = sharedComponents.Header || viewComponents.header;
   const Blessings = sharedComponents.Blessings || viewComponents.blessings;
   const ConfettiLayer = sharedComponents.ConfettiLayer || viewComponents.confetti;
+  const ScrollAnimationsInit = sharedComponents.ScrollAnimationsInit;
   const CelebrateButton = sharedComponents.CelebrateButton || viewComponents.celebrate;
   const LanguageModal = sharedComponents.LanguageModal;
   const GuestNameModal = sharedComponents.GuestNameModal;
@@ -199,7 +251,11 @@ function PreviewPane({ editMode = true, deviceMode = 'desktop' }) {
               />
             )}
             {Blessings && <Blessings />}
-            <main className="page-shell" key={editMode ? 'edit' : `view-${modeKey}`}>
+            {/* Initialize scroll animations for editorial-elegance layout */}
+            {ScrollAnimationsInit && layoutId === 'editorial-elegance' && (
+              <ScrollAnimationsInit />
+            )}
+            <main className={`page-shell ${layoutId === 'editorial-elegance' ? 'editorial-elegance' : ''}`} key={editMode ? 'edit' : `view-${modeKey}`}>
               {/* Dynamically render enabled sections in order */}
               {mainSections.map((section, index) => renderSection(section, index))}
               

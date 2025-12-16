@@ -8,6 +8,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  opacity: 0;
+  animation: fadeInHero 1s ease-out forwards;
+}
+
+@keyframes fadeInHero {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* Background Media */
@@ -22,13 +33,26 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.3s ease-out;
 }
 
-/* Subtle overlay - only if needed for text contrast */
+/* Subtle parallax effect on scroll */
+@media (prefers-reduced-motion: no-preference) {
+  .ee-hero-image {
+    will-change: transform;
+  }
+}
+
+/* Subtle overlay - sophisticated gradient for text contrast */
 .ee-hero-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.15); /* Very light, 10-15% max */
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.1) 0%,
+    rgba(0, 0, 0, 0.15) 50%,
+    rgba(0, 0, 0, 0.2) 100%
+  );
   z-index: 2;
 }
 
@@ -39,6 +63,18 @@
   text-align: center;
   color: #fff;
   padding: var(--ee-space-md);
+  animation: fadeInUp 1s ease-out 0.3s both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Alignment variations */
@@ -56,7 +92,10 @@
 /* Text styling */
 .ee-hero-names {
   margin: 0 0 var(--ee-space-sm);
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  text-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    0 4px 16px rgba(0, 0, 0, 0.2);
+  letter-spacing: -0.02em;
 }
 
 .ee-hero-date,
@@ -76,20 +115,31 @@
   align-items: center;
   gap: 8px;
   animation: scroll-bounce 2s ease-in-out infinite;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.ee-scroll-indicator:hover {
+  opacity: 1;
 }
 
 .ee-scroll-line {
   width: 1px;
   height: 48px;
   background: linear-gradient(to bottom, 
-    rgba(255, 255, 255, 0.8), 
-    rgba(255, 255, 255, 0.2)
+    rgba(255, 255, 255, 0.9), 
+    rgba(255, 255, 255, 0.1)
   );
+  border-radius: 1px;
 }
 
 @keyframes scroll-bounce {
-  0%, 100% { transform: translate(-50%, 0); }
-  50% { transform: translate(-50%, 8px); }
+  0%, 100% { 
+    transform: translate(-50%, 0);
+  }
+  50% { 
+    transform: translate(-50%, 10px);
+  }
 }
 
 /* Mobile responsive */

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import EditableText from '../shared/EditableText';
 import EditableImage from '../shared/EditableImage';
+import { formatWeddingDate } from '../../utils/dateFormatter';
 
 /**
  * EditableEditorialHero - WYSIWYG editable version of Editorial Hero
@@ -24,15 +25,6 @@ function EditableEditorialHero({ translations, currentLang, config = {}, onUpdat
   const mainImage = hero.mainImage || '/assets/hero-default.jpg';
   const videoUrl = hero.videoUrl || '';
   const videoPoster = hero.videoPoster || mainImage;
-  
-  const formatDate = (dateStr) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { 
-      day: 'numeric', 
-      month: 'long', 
-      year: 'numeric' 
-    }).toUpperCase();
-  };
   
   return (
     <section className="ee-hero" data-alignment={alignment}>
@@ -70,7 +62,6 @@ function EditableEditorialHero({ translations, currentLang, config = {}, onUpdat
               onUpdate={onUpdate}
               path="couple.bride.name"
               tag="span"
-              inline={true}
             />
             {' & '}
             <EditableText
@@ -78,20 +69,20 @@ function EditableEditorialHero({ translations, currentLang, config = {}, onUpdat
               onUpdate={onUpdate}
               path="couple.groom.name"
               tag="span"
-              inline={true}
             />
           </h1>
           <div className="ee-divider" />
-          <p className="ee-meta-text ee-hero-date">
-            {formatDate(weddingDate)}
-          </p>
+          {formatWeddingDate(weddingDate) && (
+            <p className="ee-meta-text ee-hero-date">
+              {formatWeddingDate(weddingDate)}
+            </p>
+          )}
           <p className="ee-meta-text ee-hero-location">
             <EditableText
               value={city}
               onUpdate={onUpdate}
               path="wedding.venue.city"
               tag="span"
-              inline={true}
             />
           </p>
         </div>

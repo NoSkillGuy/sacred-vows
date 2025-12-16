@@ -1,4 +1,5 @@
 import EditableText from '../shared/EditableText';
+import { formatEventDate } from '../../utils/dateFormatter';
 
 /**
  * EditableEventCards - WYSIWYG editable Event Cards
@@ -8,15 +9,6 @@ function EditableEventCards({ translations, currentLang, config = {}, onUpdate }
   const eventList = events.events || [];
   
   if (!eventList.length) return null;
-  
-  const formatDate = (dateStr) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { 
-      day: 'numeric', 
-      month: 'long', 
-      year: 'numeric' 
-    }).toUpperCase();
-  };
   
   return (
     <section className="ee-section ee-events-section">
@@ -36,9 +28,11 @@ function EditableEventCards({ translations, currentLang, config = {}, onUpdate }
                 className="ee-event-name"
                 tag="h3"
               />
-              <p className="ee-meta-text ee-event-date">
-                {formatDate(event.date)}
-              </p>
+              {formatEventDate(event.date) && (
+                <p className="ee-meta-text ee-event-date">
+                  {formatEventDate(event.date)}
+                </p>
+              )}
               <div className="ee-event-details">
                 <EditableText
                   value={event.venue || 'Venue TBD'}

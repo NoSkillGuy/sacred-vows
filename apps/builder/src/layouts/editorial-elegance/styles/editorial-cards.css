@@ -11,11 +11,28 @@
   border: 1px solid var(--ee-color-divider);
   padding: var(--ee-space-md);
   transition: all 0.3s ease;
+  background: var(--ee-color-bg);
+  position: relative;
+}
+
+.ee-event-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid transparent;
+  transition: border-color 0.3s ease;
+  pointer-events: none;
 }
 
 .ee-event-card:hover {
   border-color: var(--ee-color-accent);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.ee-event-card:hover::before {
+  border-color: var(--ee-color-accent);
+  opacity: 0.3;
 }
 
 .ee-event-name {
@@ -68,6 +85,11 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.ee-intro-image:hover {
+  transform: scale(1.05);
 }
 
 /* Location Layout */
@@ -189,6 +211,11 @@
   width: 100%;
   height: auto;
   display: block;
+  transition: transform 0.3s ease;
+}
+
+.ee-gallery-item:hover .ee-gallery-image {
+  transform: scale(1.02);
 }
 
 /* RSVP Form */
@@ -247,6 +274,75 @@
 .ee-submit-button:hover {
   background-color: var(--ee-color-text);
   color: var(--ee-color-bg);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.ee-submit-button:active {
+  transform: translateY(0);
+}
+
+/* RSVP form enhancements */
+.ee-rsvp-section {
+  background: var(--ee-color-bg);
+}
+
+.ee-form-field {
+  position: relative;
+}
+
+.ee-input:focus::placeholder,
+.ee-textarea:focus::placeholder {
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+/* Footer Styling */
+.ee-footer-section {
+  padding-top: var(--ee-space-xl);
+  padding-bottom: var(--ee-space-lg);
+}
+
+.ee-footer-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.ee-footer-container h3 {
+  font-family: var(--font-heading, 'Playfair Display', serif);
+  font-size: clamp(28px, 4vw, 36px);
+  font-weight: var(--ee-weight-regular);
+  letter-spacing: var(--ee-spacing-heading);
+  margin-bottom: var(--ee-space-sm);
+  color: var(--ee-color-text);
+}
+
+.ee-footer-container p {
+  line-height: 1.6;
+}
+
+/* Location Section Enhancements */
+.ee-location-section {
+  background: var(--ee-color-bg);
+}
+
+.ee-location-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.ee-map-link {
+  margin-top: var(--ee-space-md);
+  display: inline-block;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: all 0.2s ease;
+}
+
+.ee-map-link:hover {
+  color: var(--ee-color-accent);
 }
 
 /* Mobile stacking */

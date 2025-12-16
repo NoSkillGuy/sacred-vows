@@ -114,13 +114,24 @@ function generateBodyHTML(invitation, translations) {
   const weddingDate = wedding.dates?.[0] || 'Date TBD';
   const city = venue.city || 'City';
   
+  // Date formatting with error handling
   const formatDate = (dateStr) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { 
-      day: 'numeric', 
-      month: 'long', 
-      year: 'numeric' 
-    }).toUpperCase();
+    if (!dateStr || dateStr === 'Date TBD' || dateStr === '') {
+      return '';
+    }
+    try {
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) {
+        return '';
+      }
+      return date.toLocaleDateString('en-US', { 
+        day: 'numeric', 
+        month: 'long', 
+        year: 'numeric' 
+      }).toUpperCase();
+    } catch (error) {
+      return '';
+    }
   };
   
   let html = '';
@@ -136,7 +147,7 @@ function generateBodyHTML(invitation, translations) {
         <div class="ee-hero-text">
           <h1 class="ee-hero-names">${brideName} & ${groomName}</h1>
           <div class="ee-divider"></div>
-          <p class="ee-meta-text ee-hero-date">${formatDate(weddingDate)}</p>
+          ${formatDate(weddingDate) ? `<p class="ee-meta-text ee-hero-date">${formatDate(weddingDate)}</p>` : ''}
           <p class="ee-meta-text ee-hero-location">${city}</p>
         </div>
         <div class="ee-scroll-indicator">
@@ -175,7 +186,7 @@ function generateBodyHTML(invitation, translations) {
             <div class="ee-event-card">
               <div class="ee-event-card-inner">
                 <h3 class="ee-event-name">${event.label}</h3>
-                <p class="ee-meta-text ee-event-date">${formatDate(event.date)}</p>
+                ${formatDate(event.date) ? `<p class="ee-meta-text ee-event-date">${formatDate(event.date)}</p>` : ''}
                 <div class="ee-event-details">
                   <p class="ee-event-venue">${event.venue || 'Venue TBD'}</p>
                   <p class="ee-event-time">${event.time}</p>

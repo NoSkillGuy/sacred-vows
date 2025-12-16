@@ -6,7 +6,15 @@ function Location({ translations, currentLang, config = {} }) {
   const venue = wedding.venue || {};
   const mapStyle = config.location?.mapStyle || 'desaturated';
   
-  if (!venue.name) return null;
+  // Use default venue if none provided
+  const displayVenue = {
+    name: venue.name || 'Halcyon Hotel Residences',
+    address: venue.address || '',
+    city: venue.city || '',
+    state: venue.state || '',
+    mapsUrl: venue.mapsUrl || 'https://maps.app.goo.gl/s2JsPaRY3z6DbVkV6',
+    mapsEmbedUrl: venue.mapsEmbedUrl || ''
+  };
   
   return (
     <section className="ee-section ee-location-section">
@@ -14,15 +22,19 @@ function Location({ translations, currentLang, config = {} }) {
         {/* Venue Details */}
         <div className="ee-location-details">
           <p className="ee-meta-text">THE CEREMONY</p>
-          <h2 className="ee-section-heading">{venue.name}</h2>
+          <h2 className="ee-section-heading">{displayVenue.name}</h2>
           <div className="ee-divider" style={{ margin: 'var(--ee-space-sm) 0' }} />
-          <p className="ee-location-address">
-            {venue.address}<br />
-            {venue.city}, {venue.state}
-          </p>
-          {venue.mapsUrl && (
+          {(displayVenue.address || displayVenue.city) && (
+            <p className="ee-location-address">
+              {displayVenue.address && <>{displayVenue.address}<br /></>}
+              {displayVenue.city && displayVenue.state 
+                ? `${displayVenue.city}, ${displayVenue.state}`
+                : displayVenue.city || displayVenue.state}
+            </p>
+          )}
+          {displayVenue.mapsUrl && (
             <a 
-              href={venue.mapsUrl} 
+              href={displayVenue.mapsUrl} 
               target="_blank" 
               rel="noopener noreferrer"
               className="ee-link ee-map-link"
@@ -34,16 +46,16 @@ function Location({ translations, currentLang, config = {} }) {
         
         {/* Embedded Map */}
         <div className={`ee-location-map ee-map-${mapStyle}`}>
-          {venue.mapsEmbedUrl ? (
+          {displayVenue.mapsEmbedUrl ? (
             <iframe
-              src={venue.mapsEmbedUrl}
+              src={displayVenue.mapsEmbedUrl}
               width="100%"
               height="100%"
               style={{ border: 0 }}
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              title={`Map to ${venue.name}`}
+              title={`Map to ${displayVenue.name}`}
             />
           ) : (
             <div className="ee-map-placeholder">

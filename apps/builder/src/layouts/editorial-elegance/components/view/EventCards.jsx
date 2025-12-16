@@ -1,3 +1,5 @@
+import { formatEventDate } from '../../utils/dateFormatter';
+
 /**
  * EventCards - Horizontal card-based event schedule
  * Minimal design with thin borders, no icons
@@ -6,16 +8,15 @@ function EventCards({ translations, currentLang, config = {} }) {
   const events = config.events || {};
   const eventList = events.events || [];
   
-  if (!eventList.length) return null;
-  
-  const formatDate = (dateStr) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { 
-      day: 'numeric', 
-      month: 'long', 
-      year: 'numeric' 
-    }).toUpperCase();
+  // Show default event if no events provided
+  const defaultEvent = {
+    label: 'Wedding Ceremony',
+    date: config.wedding?.dates?.[0] || '2021-05-15',
+    time: '6:00 PM',
+    venue: config.wedding?.venue?.name || 'Venue TBD'
   };
+  
+  const displayEvents = eventList.length > 0 ? eventList : [defaultEvent];
   
   return (
     <section className="ee-section ee-events-section">
@@ -27,13 +28,15 @@ function EventCards({ translations, currentLang, config = {} }) {
       
       {/* Event Cards */}
       <div className="ee-event-cards">
-        {eventList.map((event, index) => (
+        {displayEvents.map((event, index) => (
           <div key={index} className="ee-event-card">
             <div className="ee-event-card-inner">
               <h3 className="ee-event-name">{event.label}</h3>
-              <p className="ee-meta-text ee-event-date">
-                {formatDate(event.date)}
-              </p>
+              {formatEventDate(event.date) && (
+                <p className="ee-meta-text ee-event-date">
+                  {formatEventDate(event.date)}
+                </p>
+              )}
               <div className="ee-event-details">
                 <p className="ee-event-venue">{event.venue || 'Venue TBD'}</p>
                 <p className="ee-event-time">{event.time}</p>

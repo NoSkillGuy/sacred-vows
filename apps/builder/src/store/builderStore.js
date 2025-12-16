@@ -3,6 +3,7 @@ import { defaultWeddingConfig, defaultLayoutConfig, SECTION_TYPES } from '../con
 import { updateInvitation } from '../services/invitationService';
 import { getLayoutManifest as getLayoutManifestFromAPI } from '../services/layoutService';
 import { getLayout, getLayoutManifest as getLayoutManifestFromRegistry, hasLayout } from '../layouts/registry';
+import { parseInvitationData, calculateSectionEnabled } from '../layouts/editorial-elegance/utils/dataHelpers';
 // Import layouts to ensure they're registered
 import '../layouts/classic-scroll';
 import '../layouts/editorial-elegance';
@@ -26,6 +27,15 @@ function loadFromStorage() {
       // Ensure layoutConfig exists for backward compatibility
       if (!parsed.layoutConfig) {
         parsed.layoutConfig = { ...defaultLayoutConfig };
+      }
+      
+      // Ensure data is an object, not an array or string
+      parsed.data = parseInvitationData(parsed.data, { ...defaultWeddingConfig });
+      
+      // If layout is editorial-elegance and data is minimal, merge defaults
+      if (parsed.layoutId === 'editorial-elegance' && Object.keys(parsed.data).length < 5) {
+        // Note: We can't do async import here, so we'll rely on setCurrentInvitation to merge
+        // But we can at least ensure it's an object
       }
       
       // Fallback for unsupported layouts
@@ -134,7 +144,7 @@ export const useBuilderStore = create((set, get) => {
         
         // Validate and sync sections against manifest
         const { validateSectionsAgainstManifest } = get();
-        validateSectionsAgainstManifest(manifest);
+        const validatedSections = validateSectionsAgainstManifest(manifest);
         
         // Get updated invitation after section validation
         const { currentInvitation: updatedInvitationAfterValidation } = get();
@@ -186,18 +196,39 @@ export const useBuilderStore = create((set, get) => {
      * Set current invitation (e.g., after fetching from API)
      * @param {Object} invitation - Invitation object from backend
      */
-    setCurrentInvitation: (invitation) => {
+    setCurrentInvitation: async (invitation) => {
       // Support migration from layoutConfig to layoutConfig
       const layoutConfig = invitation.layoutConfig || invitation.layoutConfig || {};
       const layoutId = invitation.layoutId || invitation.layoutId || 'classic-scroll';
+      
+      // Parse data if it's a string
+      let invitationData = parseInvitationData(invitation.data || {}, {});
+      
+      // Merge editorial-elegance defaults if needed (always merge for empty or minimal data)
+      if (layoutId === 'editorial-elegance') {
+        const dataKeys = Object.keys(invitationData).length;
+        const shouldMerge = dataKeys === 0 || dataKeys < 5 || !invitationData.couple || !invitationData.wedding;
+        
+        if (shouldMerge) {
+          try {
+            const { mergeWithDefaults } = await import('../layouts/editorial-elegance/defaults');
+            invitationData = mergeWithDefaults(invitationData);
+          } catch (error) {
+            console.warn('Failed to load editorial-elegance defaults in setCurrentInvitation:', error);
+          }
+        }
+      }
+      
       const invitationWithConfig = {
         ...invitation,
         layoutId,
+        data: invitationData,
         layoutConfig: {
           ...defaultLayoutConfig,
           ...layoutConfig,
         },
       };
+      
       set({ currentInvitation: invitationWithConfig });
       saveToStorage(invitationWithConfig);
     },
@@ -221,6 +252,7 @@ export const useBuilderStore = create((set, get) => {
      */
     validateSectionsAgainstManifest: (manifest) => {
       const { currentInvitation } = get();
+      
       if (!manifest || !manifest.sections || !Array.isArray(manifest.sections)) {
         // If no manifest or invalid manifest, return current sections (backward compatibility)
         return currentInvitation.layoutConfig?.sections || [];
@@ -249,7 +281,7 @@ export const useBuilderStore = create((set, get) => {
           // Add missing section with default enabled state from manifest
           return {
             id: manifestSection.id,
-            enabled: manifestSection.enabled !== false && manifestSection.defaultEnabled !== false,
+            enabled: calculateSectionEnabled(manifestSection),
             order: index,
           };
         }
@@ -290,9 +322,10 @@ export const useBuilderStore = create((set, get) => {
         sections = sections.filter(s => manifestSectionIds.has(s.id));
       }
       
-      return sections
-        .filter(s => s.enabled)
-        .sort((a, b) => a.order - b.order);
+      const enabledSections = sections.filter(s => s.enabled);
+      const result = enabledSections.sort((a, b) => a.order - b.order);
+      
+      return result;
     },
 
     /**
@@ -614,7 +647,7 @@ export const useBuilderStore = create((set, get) => {
       const { currentInvitation } = get();
       
       // Get default theme from new layout
-      const defaultTheme = newManifest?.themes?.find(t => t.isDefault) || newManifest?.themes?.[0];
+      const defaultTheme = newManifest?.themes?.default || newManifest?.themes?.find(t => t.isDefault) || newManifest?.themes?.[0];
       
       // Get default sections from new layout manifest
       // Use manifest.sections array directly, maintaining their order
@@ -622,7 +655,7 @@ export const useBuilderStore = create((set, get) => {
       if (newManifest?.sections && Array.isArray(newManifest.sections)) {
         defaultSections = newManifest.sections.map((sectionDef, index) => ({
           id: sectionDef.id,
-          enabled: sectionDef.enabled !== false && sectionDef.defaultEnabled !== false,
+          enabled: calculateSectionEnabled(sectionDef),
           order: sectionDef.order !== undefined ? sectionDef.order : index,
         }));
       } else if (newManifest?.defaultSectionOrder && Array.isArray(newManifest.defaultSectionOrder)) {
@@ -631,21 +664,36 @@ export const useBuilderStore = create((set, get) => {
           const sectionDef = newManifest?.sections?.find(s => s.id === id);
           return {
             id,
-            enabled: sectionDef?.defaultEnabled !== false,
+            enabled: sectionDef ? calculateSectionEnabled(sectionDef) : true,
             order: index,
           };
         });
       }
 
+      // Merge layout-specific default data if available
+      // Ensure data is an object, not an array, string, or undefined
+      const existingData = parseInvitationData(currentInvitation.data, {});
+      let mergedData = { ...existingData };
+      
+      // For editorial-elegance layout, merge defaults
+      if (newLayoutId === 'editorial-elegance') {
+        try {
+          const { mergeWithDefaults } = await import('../layouts/editorial-elegance/defaults');
+          mergedData = mergeWithDefaults(existingData);
+        } catch (error) {
+          console.warn('Failed to load editorial-elegance defaults:', error);
+        }
+      }
+
       const updatedInvitation = {
         ...currentInvitation,
         layoutId: newLayoutId,
-        // Preserve universal content data
+        // Merge default data with existing data
         data: {
-          ...currentInvitation.data,
+          ...mergedData,
           // Update theme in data for backward compatibility
           theme: defaultTheme ? {
-            preset: defaultTheme.id,
+            preset: defaultTheme.id || 'default',
             colors: { ...defaultTheme.colors },
             fonts: { ...defaultTheme.fonts },
           } : currentInvitation.data.theme,
@@ -655,7 +703,7 @@ export const useBuilderStore = create((set, get) => {
           sections: defaultSections,
           themes: newManifest?.themes || currentInvitation.layoutConfig?.themes,
           theme: defaultTheme ? {
-            preset: defaultTheme.id,
+            preset: defaultTheme.id || 'default',
             colors: { ...defaultTheme.colors },
             fonts: { ...defaultTheme.fonts },
           } : currentInvitation.layoutConfig?.theme,
@@ -754,7 +802,7 @@ export const useBuilderStore = create((set, get) => {
     /**
      * Set entire invitation
      */
-    setInvitation: (invitation) => {
+    setInvitation: async (invitation) => {
       // Ensure layoutConfig exists
       const layoutConfig = invitation.layoutConfig || {};
       let layoutId = invitation.layoutId || 'classic-scroll';
@@ -765,9 +813,31 @@ export const useBuilderStore = create((set, get) => {
         layoutId = 'classic-scroll';
       }
       
+      // Parse data if it's a string
+      let invitationData = invitation.data || {};
+      if (typeof invitationData === 'string') {
+        try {
+          invitationData = JSON.parse(invitationData);
+        } catch (e) {
+          console.warn('Failed to parse data as JSON in setInvitation:', e);
+          invitationData = {};
+        }
+      }
+      
+      // Merge editorial-elegance defaults if needed
+      if (layoutId === 'editorial-elegance') {
+        try {
+          const { mergeWithDefaults } = await import('../layouts/editorial-elegance/defaults');
+          invitationData = mergeWithDefaults(invitationData);
+        } catch (error) {
+          console.warn('Failed to load editorial-elegance defaults in setInvitation:', error);
+        }
+      }
+      
       const invitationWithConfig = {
         ...invitation,
         layoutId,
+        data: invitationData,
         layoutConfig: { ...defaultLayoutConfig, ...layoutConfig },
       };
       set({ currentInvitation: invitationWithConfig });
