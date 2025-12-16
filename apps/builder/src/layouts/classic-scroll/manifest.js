@@ -11,7 +11,7 @@ export const classicScrollManifest = {
   version: '1.0.0',
   
   metadata: {
-    description: 'Classic single-column vertical scroll layout with traditional wedding invitation structure. Features elegant typography, generous spacing, centered content, and a sequential narrative flow that guides guests through your celebration story. Ideal for traditional and formal weddings.',
+    description: 'Traditional single-column layout with elegant typography and centered content. Perfect for couples who appreciate classic design and formal celebrations.',
     previewImage: '/layouts/classic-scroll/preview.jpg',
     tags: ['elegant', 'classic', 'traditional', 'scroll', 'vertical'],
     author: 'Sacred Vows',
