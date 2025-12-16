@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Navigate, useLocation, useSearchParams } from 'react-router-dom';
-import { isAuthenticated, getCurrentUserFromAPI } from '../../services/authService';
+import { isAuthenticated, getCurrentUserFromAPI, refreshAccessToken } from '../../services/authService';
+import { setAccessToken } from '../../services/tokenStorage';
 
 // Handle OAuth callback token
 function handleOAuthToken(token) {
   if (token) {
-    localStorage.setItem('auth_token', token);
+    // Store access token in memory (not localStorage)
+    setAccessToken(token);
     // Clean the URL
     const url = new URL(window.location.href);
     url.searchParams.delete('token');
@@ -29,18 +31,27 @@ function ProtectedRoute({ children }) {
         handleOAuthToken(oauthToken);
       }
 
+      // If no access token, try to refresh using refresh token from cookie
       if (!isAuthenticated()) {
-        setIsValid(false);
-        setIsChecking(false);
-        return;
+        try {
+          // Attempt to refresh token (refresh token is in HttpOnly cookie)
+          await refreshAccessToken();
+          // If refresh succeeded, continue with auth check
+        } catch (refreshError) {
+          // Refresh failed, user needs to login
+          setIsValid(false);
+          setIsChecking(false);
+          return;
+        }
       }
 
+      // Verify token is still valid by fetching user
+      // getCurrentUserFromAPI uses apiClient which handles token refresh automatically
       try {
-        // Verify token is still valid by fetching user
         await getCurrentUserFromAPI();
         setIsValid(true);
       } catch {
-        // Token is invalid
+        // Token is invalid or refresh failed
         setIsValid(false);
       } finally {
         setIsChecking(false);

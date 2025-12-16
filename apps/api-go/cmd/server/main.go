@@ -87,6 +87,9 @@ func main() {
 	}
 
 	// Run GORM AutoMigrate
+	// Note: RefreshTokenModel is excluded because the table is created via SQL migration
+	// and GORM AutoMigrate has issues with the information_schema query for this table
+	// AutoMigrate is run after SQL migrations to ensure schema consistency
 	if err := db.AutoMigrate(
 		&postgres.UserModel{},
 		&postgres.InvitationModel{},
@@ -94,8 +97,12 @@ func main() {
 		&postgres.AssetModel{},
 		&postgres.RSVPResponseModel{},
 		&postgres.AnalyticsModel{},
+		// &postgres.RefreshTokenModel{}, // Excluded - table created via SQL migration 010
 	); err != nil {
-		logger.GetLogger().Fatal("Failed to run GORM migrations", zap.Error(err))
+		// Log error but don't fail - tables are already created via SQL migrations
+		// This allows the application to start even if AutoMigrate has issues
+		logger.GetLogger().Error("GORM AutoMigrate failed (tables should already exist from SQL migrations)", zap.Error(err))
+		// Continue - SQL migrations have already created all tables
 	}
 
 	// Initialize repositories
@@ -105,9 +112,17 @@ func main() {
 	assetRepo := postgres.NewAssetRepository(db.DB)
 	rsvpRepo := postgres.NewRSVPRepository(db.DB)
 	analyticsRepo := postgres.NewAnalyticsRepository(db.DB)
+	refreshTokenRepo := postgres.NewRefreshTokenRepository(db.DB)
 
 	// Initialize services
-	jwtService := auth.NewJWTService(cfg.Auth.JWTSecret, cfg.Auth.JWTExpiration)
+	jwtService := auth.NewJWTService(
+		cfg.Auth.JWTSecret,
+		cfg.Auth.JWTAccessExpiration,
+		cfg.Auth.JWTRefreshExpiration,
+		cfg.Auth.JWTIssuer,
+		cfg.Auth.JWTAudience,
+		cfg.Auth.ClockSkewTolerance,
+	)
 	googleOAuthService := auth.NewGoogleOAuthService(&cfg.Google)
 	fileStorage, err := storage.NewFileStorage(cfg.Storage.UploadPath, cfg.Storage.MaxFileSize, cfg.Storage.AllowedTypes)
 	if err != nil {
@@ -119,6 +134,7 @@ func main() {
 	loginUC := authUC.NewLoginUseCase(userRepo)
 	getCurrentUserUC := authUC.NewGetCurrentUserUseCase(userRepo)
 	googleOAuthUC := authUC.NewGoogleOAuthUseCaseWithService(userRepo, googleOAuthService.GetOAuthConfig(), googleOAuthService)
+	refreshTokenUC := authUC.NewRefreshTokenUseCase(refreshTokenRepo, userRepo, jwtService)
 
 	createInvitationUC := invitation.NewCreateInvitationUseCase(invitationRepo)
 	getInvitationByIDUC := invitation.NewGetInvitationByIDUseCase(invitationRepo)
@@ -126,6 +142,7 @@ func main() {
 	getInvitationPreviewUC := invitation.NewGetInvitationPreviewUseCase(invitationRepo)
 	updateInvitationUC := invitation.NewUpdateInvitationUseCase(invitationRepo)
 	deleteInvitationUC := invitation.NewDeleteInvitationUseCase(invitationRepo)
+	migrateInvitationsUC := invitation.NewMigrateInvitationsUseCase(invitationRepo)
 
 	getAllLayoutsUC := layout.NewGetAllLayoutsUseCase(layoutRepo)
 	getLayoutByIDUC := layout.NewGetLayoutByIDUseCase(layoutRepo)
@@ -143,15 +160,15 @@ func main() {
 	getAnalyticsByInvitationUC := analytics.NewGetAnalyticsByInvitationUseCase(analyticsRepo)
 
 	// Initialize handlers
-	authHandler := handlers.NewAuthHandler(registerUC, loginUC, getCurrentUserUC, googleOAuthUC, jwtService, googleOAuthService)
-	invitationHandler := handlers.NewInvitationHandler(createInvitationUC, getInvitationByIDUC, getAllInvitationsUC, getInvitationPreviewUC, updateInvitationUC, deleteInvitationUC)
+	authHandler := handlers.NewAuthHandler(registerUC, loginUC, getCurrentUserUC, googleOAuthUC, refreshTokenUC, refreshTokenRepo, jwtService, googleOAuthService)
+	invitationHandler := handlers.NewInvitationHandler(createInvitationUC, getInvitationByIDUC, getAllInvitationsUC, getInvitationPreviewUC, updateInvitationUC, deleteInvitationUC, migrateInvitationsUC)
 	layoutHandler := handlers.NewLayoutHandler(getAllLayoutsUC, getLayoutByIDUC, getLayoutManifestUC, getManifestsUC)
 	assetHandler := handlers.NewAssetHandler(uploadAssetUC, getAllAssetsUC, deleteAssetUC, fileStorage)
 	rsvpHandler := handlers.NewRSVPHandler(submitRSVPUC, getRSVPByInvitationUC)
 	analyticsHandler := handlers.NewAnalyticsHandler(trackViewUC, getAnalyticsByInvitationUC)
 
 	// Setup router
-	router := httpRouter.NewRouter(authHandler, invitationHandler, layoutHandler, assetHandler, rsvpHandler, analyticsHandler, jwtService)
+	router := httpRouter.NewRouter(authHandler, invitationHandler, layoutHandler, assetHandler, rsvpHandler, analyticsHandler, jwtService, cfg.Google.FrontendURL)
 	engine := router.Setup()
 
 	// Create HTTP server

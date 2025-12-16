@@ -105,6 +105,28 @@ Configured in `postgres.go`:
 - Domain Entities: `internal/domain/`
 - Migrations: `migrations/`
 
+## Invitation Storage
+
+All wedding invitations are stored in the PostgreSQL database in the `invitations` table. The storage has been verified and tested:
+
+- **Primary Storage**: PostgreSQL database (`invitations` table)
+- **Data Format**: JSONB column stores invitation configuration data
+- **Metadata**: Title and status are stored in `_meta` field within the JSON data
+- **Timestamps**: `created_at` and `updated_at` are automatically managed
+
+For detailed verification report, see [INVITATION_STORAGE_VERIFICATION.md](./INVITATION_STORAGE_VERIFICATION.md).
+
+### Invitation Repository
+
+The `InvitationRepository` provides full CRUD operations:
+- `Create()` - Saves invitation to database
+- `FindByID()` - Retrieves invitation by ID
+- `FindByUserID()` - Retrieves all invitations for a user
+- `Update()` - Updates invitation in database (preserves CreatedAt)
+- `Delete()` - Removes invitation from database
+
+All operations are tested. See `invitation_repository_test.go` for test coverage.
+
 ## Best Practices
 
 1. Always use context for database operations
@@ -113,3 +135,4 @@ Configured in `postgres.go`:
 4. Use transactions for multi-step operations
 5. Handle database errors appropriately
 6. Keep models separate from domain entities
+7. Preserve `CreatedAt` timestamp when updating entities

@@ -31,7 +31,11 @@ Main configuration structure with nested configs:
 
 **AuthConfig:**
 - `JWTSecret` - JWT signing secret (required)
-- `JWTExpiration` - Token expiration duration (default: 7 days)
+- `JWTAccessExpiration` - Access token expiration duration (default: 15 minutes)
+- `JWTRefreshExpiration` - Refresh token expiration duration (default: 30 days)
+- `JWTIssuer` - JWT issuer claim (default: "sacred-vows-api")
+- `JWTAudience` - JWT audience claim (default: "sacred-vows-client")
+- `ClockSkewTolerance` - Clock skew tolerance for token validation (default: 60 seconds)
 
 **StorageConfig:**
 - `UploadPath` - File upload directory (default: ./uploads)

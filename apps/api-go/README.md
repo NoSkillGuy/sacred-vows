@@ -289,6 +289,8 @@ Migrations are handled automatically by GORM AutoMigrate on startup. For manual 
 
 3. **Database**: Uses PostgreSQL with GORM. The schema is automatically migrated on startup using GORM AutoMigrate.
 
+4. **Invitation Storage**: All wedding invitations are stored in the PostgreSQL database in the `invitations` table. The storage has been verified and tested. See [INVITATION_STORAGE_VERIFICATION.md](./internal/infrastructure/database/postgres/INVITATION_STORAGE_VERIFICATION.md) for detailed verification report.
+
 ## License
 
 ISC

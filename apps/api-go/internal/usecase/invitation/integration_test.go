@@ -178,3 +178,6 @@ func (m *mockInvitationRepositoryWithFind) FindByUserID(ctx context.Context, use
 	return nil, nil
 }
 
+func (m *mockInvitationRepositoryWithFind) MigrateUserInvitations(ctx context.Context, fromUserID, toUserID string) (int, error) {
+	return 0, nil
+}

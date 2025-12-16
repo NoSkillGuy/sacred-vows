@@ -3,21 +3,7 @@
  * Handles API calls for invitation CRUD operations
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-
-// Get auth token from localStorage
-function getAuthToken() {
-  return localStorage.getItem('auth_token');
-}
-
-// Set auth headers
-function getHeaders() {
-  const token = getAuthToken();
-  return {
-    'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Bearer ${token}` }),
-  };
-}
+import { apiRequest } from './apiClient';
 
 /**
  * Get all invitations for current user
@@ -25,9 +11,8 @@ function getHeaders() {
  */
 export async function getInvitations() {
   try {
-    const response = await fetch(`${API_BASE_URL}/invitations`, {
+    const response = await apiRequest('/invitations', {
       method: 'GET',
-      headers: getHeaders(),
     });
 
     if (!response.ok) {
@@ -49,9 +34,8 @@ export async function getInvitations() {
  */
 export async function getInvitation(id) {
   try {
-    const response = await fetch(`${API_BASE_URL}/invitations/${id}`, {
+    const response = await apiRequest(`/invitations/${id}`, {
       method: 'GET',
-      headers: getHeaders(),
     });
 
     if (!response.ok) {
@@ -73,9 +57,8 @@ export async function getInvitation(id) {
  */
 export async function createInvitation(invitationData) {
   try {
-    const response = await fetch(`${API_BASE_URL}/invitations`, {
+    const response = await apiRequest('/invitations', {
       method: 'POST',
-      headers: getHeaders(),
       body: JSON.stringify(invitationData),
     });
 
@@ -99,9 +82,8 @@ export async function createInvitation(invitationData) {
  */
 export async function updateInvitation(id, updates) {
   try {
-    const response = await fetch(`${API_BASE_URL}/invitations/${id}`, {
+    const response = await apiRequest(`/invitations/${id}`, {
       method: 'PUT',
-      headers: getHeaders(),
       body: JSON.stringify(updates),
     });
 
@@ -124,9 +106,8 @@ export async function updateInvitation(id, updates) {
  */
 export async function deleteInvitation(id) {
   try {
-    const response = await fetch(`${API_BASE_URL}/invitations/${id}`, {
+    const response = await apiRequest(`/invitations/${id}`, {
       method: 'DELETE',
-      headers: getHeaders(),
     });
 
     if (!response.ok) {

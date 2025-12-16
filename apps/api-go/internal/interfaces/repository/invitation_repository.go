@@ -13,4 +13,5 @@ type InvitationRepository interface {
 	FindByUserID(ctx context.Context, userID string) ([]*domain.Invitation, error)
 	Update(ctx context.Context, invitation *domain.Invitation) error
 	Delete(ctx context.Context, id string) error
+	MigrateUserInvitations(ctx context.Context, fromUserID, toUserID string) (int, error)
 }

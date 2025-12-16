@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useBuilderStore, SECTION_TYPES } from '../../store/builderStore';
 import { useLanguage } from '../../hooks/useLanguage';
-import { getLayout, getViewComponents, getEditableComponents, getSharedComponents } from '../../layouts/registry';
+import { getLayout, getViewComponents, getEditableComponents, getSharedComponents, hasLayout } from '../../layouts/registry';
 // Import layouts to ensure they're registered
 import '../../layouts/classic-scroll';
 import '../../layouts/editorial-elegance';
@@ -19,7 +19,14 @@ function PreviewPane({ editMode = true, deviceMode = 'desktop' }) {
   const [modeKey, setModeKey] = useState(0);
   
   // Get layout-specific components from registry
-  const layoutId = currentInvitation.layoutId || 'classic-scroll';
+  let layoutId = currentInvitation.layoutId || 'classic-scroll';
+  
+  // Fallback for unsupported layouts (defensive check)
+  if (!hasLayout(layoutId)) {
+    console.warn(`Layout '${layoutId}' is not available. Falling back to 'classic-scroll'.`);
+    layoutId = 'classic-scroll';
+  }
+  
   const layout = getLayout(layoutId);
   const viewComponents = layout ? getViewComponents(layoutId) : {};
   const editableComponents = layout ? getEditableComponents(layoutId) : {};

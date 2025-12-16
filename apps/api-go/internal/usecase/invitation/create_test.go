@@ -36,6 +36,10 @@ func (m *mockInvitationRepository) Delete(ctx context.Context, id string) error 
 	return nil
 }
 
+func (m *mockInvitationRepository) MigrateUserInvitations(ctx context.Context, fromUserID, toUserID string) (int, error) {
+	return 0, nil
+}
+
 func TestCreateInvitationUseCase_Execute_DefaultStatusToDraft(t *testing.T) {
 	// Arrange
 	var savedInvitation *domain.Invitation

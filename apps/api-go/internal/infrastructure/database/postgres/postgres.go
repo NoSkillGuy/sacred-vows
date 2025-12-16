@@ -16,6 +16,7 @@ type DB struct {
 func New(cfg *config.DatabaseConfig) (*DB, error) {
 	db, err := gorm.Open(postgres.Open(cfg.URL), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
+		DisableForeignKeyConstraintWhenMigrating: true, // Disable FK constraints during migration
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)

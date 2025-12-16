@@ -3,15 +3,17 @@
  * Handles user authentication and token management
  */
 
+import { setAccessToken, getAccessToken, clearAccessToken, hasAccessToken } from './tokenStorage';
+import { apiRequest } from './apiClient';
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
-const AUTH_TOKEN_KEY = 'auth_token';
 const USER_KEY = 'user';
 
 /**
  * Register new user
  * @param {Object} userData - User registration data
- * @returns {Promise<Object>} User and token
+ * @returns {Promise<Object>} User and access token
  */
 export async function register(userData) {
   try {
@@ -21,6 +23,7 @@ export async function register(userData) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(userData),
+      credentials: 'include', // Include cookies for refresh token
     });
 
     if (!response.ok) {
@@ -30,9 +33,15 @@ export async function register(userData) {
 
     const data = await response.json();
     
-    // Store token and user
-    localStorage.setItem(AUTH_TOKEN_KEY, data.token);
-    localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+    // Store access token in memory (not localStorage)
+    if (data.accessToken) {
+      setAccessToken(data.accessToken);
+    }
+    
+    // Store user in localStorage (for display purposes)
+    if (data.user) {
+      localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+    }
 
     return data;
   } catch (error) {
@@ -45,7 +54,7 @@ export async function register(userData) {
  * Login user
  * @param {string} email - User email
  * @param {string} password - User password
- * @returns {Promise<Object>} User and token
+ * @returns {Promise<Object>} User and access token
  */
 export async function login(email, password) {
   try {
@@ -55,6 +64,7 @@ export async function login(email, password) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ email, password }),
+      credentials: 'include', // Include cookies for refresh token
     });
 
     if (!response.ok) {
@@ -64,9 +74,15 @@ export async function login(email, password) {
 
     const data = await response.json();
     
-    // Store token and user
-    localStorage.setItem(AUTH_TOKEN_KEY, data.token);
-    localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+    // Store access token in memory (not localStorage)
+    if (data.accessToken) {
+      setAccessToken(data.accessToken);
+    }
+    
+    // Store user in localStorage (for display purposes)
+    if (data.user) {
+      localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+    }
 
     return data;
   } catch (error) {
@@ -77,10 +93,27 @@ export async function login(email, password) {
 
 /**
  * Logout user
+ * Calls the logout endpoint to revoke refresh token, then clears local state
  */
-export function logout() {
-  localStorage.removeItem(AUTH_TOKEN_KEY);
-  localStorage.removeItem(USER_KEY);
+export async function logout() {
+  try {
+    // Call logout endpoint to revoke refresh token
+    // The refresh token is sent automatically via HttpOnly cookie
+    const token = getAccessToken();
+    if (token) {
+      await apiRequest(`${API_BASE_URL}/auth/logout`, {
+        method: 'POST',
+      });
+    }
+  } catch (error) {
+    // Even if API call fails, clear local state
+    console.error('Logout API error:', error);
+  } finally {
+    // Clear access token from memory
+    clearAccessToken();
+    // Clear user from localStorage
+    localStorage.removeItem(USER_KEY);
+  }
 }
 
 /**
@@ -99,11 +132,11 @@ export function getCurrentUser() {
 }
 
 /**
- * Get auth token
- * @returns {string|null} Auth token or null
+ * Get auth token (access token from memory)
+ * @returns {string|null} Access token or null
  */
 export function getAuthToken() {
-  return localStorage.getItem(AUTH_TOKEN_KEY);
+  return getAccessToken();
 }
 
 /**
@@ -111,25 +144,54 @@ export function getAuthToken() {
  * @returns {boolean} True if authenticated
  */
 export function isAuthenticated() {
-  return !!getAuthToken();
+  return hasAccessToken();
+}
+
+/**
+ * Refresh access token using refresh token from HttpOnly cookie
+ * @returns {Promise<string>} New access token
+ */
+export async function refreshAccessToken() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+      method: 'POST',
+      credentials: 'include', // Include cookies (refresh token)
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: 'Refresh failed' }));
+      throw new Error(error.error || 'Failed to refresh token');
+    }
+
+    const data = await response.json();
+    
+    if (!data.accessToken) {
+      throw new Error('No access token in refresh response');
+    }
+
+    // Store new access token in memory
+    setAccessToken(data.accessToken);
+
+    return data.accessToken;
+  } catch (error) {
+    // Clear token on refresh failure
+    clearAccessToken();
+    throw error;
+  }
 }
 
 /**
  * Get current user from API
+ * Uses apiClient which handles token refresh automatically
  * @returns {Promise<Object>} Current user
  */
 export async function getCurrentUserFromAPI() {
   try {
-    const token = getAuthToken();
-    if (!token) {
-      throw new Error('Not authenticated');
-    }
-
-    const response = await fetch(`${API_BASE_URL}/auth/me`, {
+    const response = await apiRequest(`${API_BASE_URL}/auth/me`, {
       method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
     });
 
     if (!response.ok) {
@@ -139,7 +201,9 @@ export async function getCurrentUserFromAPI() {
     const data = await response.json();
     
     // Update stored user
-    localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+    if (data.user) {
+      localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+    }
 
     return data.user;
   } catch (error) {

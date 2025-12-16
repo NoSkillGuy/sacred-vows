@@ -100,3 +100,17 @@ type AnalyticsModel struct {
 func (AnalyticsModel) TableName() string {
 	return "analytics"
 }
+
+// RefreshTokenModel represents the refresh_tokens table
+type RefreshTokenModel struct {
+	ID        string    `gorm:"primaryKey;type:text"`
+	UserID    string    `gorm:"type:text;not null;index"`
+	TokenHash string    `gorm:"type:text;not null;uniqueIndex"`
+	ExpiresAt time.Time `gorm:"not null;index"`
+	Revoked   bool      `gorm:"default:false;index"`
+	CreatedAt time.Time `gorm:"autoCreateTime"`
+}
+
+func (RefreshTokenModel) TableName() string {
+	return "refresh_tokens"
+}

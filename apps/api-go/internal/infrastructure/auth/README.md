@@ -17,8 +17,9 @@ Handles JSON Web Token generation and validation.
 - Secure token signing
 
 **Methods:**
-- `GenerateToken(userID, email)` - Creates JWT token
-- `ValidateToken(tokenString)` - Validates and extracts claims
+- `GenerateAccessToken(userID, email)` - Creates short-lived access token
+- `GenerateRefreshToken(userID, email)` - Creates long-lived refresh token
+- `ValidateAccessToken(tokenString)` - Validates and extracts claims from access token
 
 **Claims Structure:**
 ```go
@@ -31,7 +32,10 @@ type Claims struct {
 
 **Configuration:**
 - Secret key from environment
-- Expiration time (default: 7 days)
+- Access token expiration (default: 15 minutes)
+- Refresh token expiration (default: 30 days)
+- Issuer and audience claims
+- Clock skew tolerance (default: 60 seconds)
 
 ### Google OAuth Service (`google.go`)
 
@@ -78,10 +82,12 @@ Required environment variables:
 ## Security Considerations
 
 1. **JWT Secret**: Must be strong and kept secret
-2. **Token Expiration**: Configured to 7 days (adjustable)
-3. **HTTPS**: Required in production for OAuth
-4. **Token Storage**: Tokens should be stored securely client-side
-5. **ID Token Verification**: Always verify Google ID tokens
+2. **Access Token Expiration**: Short-lived (default: 15 minutes) for security
+3. **Refresh Token Expiration**: Long-lived (default: 30 days) for UX
+4. **Token Rotation**: Refresh tokens are rotated on each use
+5. **HTTPS**: Required in production for OAuth and secure cookies
+6. **Token Storage**: Access tokens in memory, refresh tokens in HttpOnly cookies
+7. **ID Token Verification**: Always verify Google ID tokens
 
 ## Related Files
 
@@ -93,9 +99,10 @@ Required environment variables:
 
 **JWT:**
 ```go
-jwtService := auth.NewJWTService(secret, expiration)
-token, err := jwtService.GenerateToken(userID, email)
-claims, err := jwtService.ValidateToken(tokenString)
+jwtService := auth.NewJWTService(secret, accessExpiration, refreshExpiration, issuer, audience, clockSkewTolerance)
+accessToken, err := jwtService.GenerateAccessToken(userID, email)
+tokenID, refreshToken, err := jwtService.GenerateRefreshToken(userID, email)
+claims, err := jwtService.ValidateAccessToken(tokenString)
 ```
 
 **Google OAuth:**

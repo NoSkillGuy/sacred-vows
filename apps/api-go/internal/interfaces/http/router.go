@@ -20,6 +20,7 @@ type Router struct {
 	rsvpHandler       *handlers.RSVPHandler
 	analyticsHandler  *handlers.AnalyticsHandler
 	jwtService        *auth.JWTService
+	frontendURL       string
 }
 
 func NewRouter(
@@ -30,6 +31,7 @@ func NewRouter(
 	rsvpHandler *handlers.RSVPHandler,
 	analyticsHandler *handlers.AnalyticsHandler,
 	jwtService *auth.JWTService,
+	frontendURL string,
 ) *Router {
 	return &Router{
 		authHandler:       authHandler,
@@ -39,6 +41,7 @@ func NewRouter(
 		rsvpHandler:       rsvpHandler,
 		analyticsHandler:  analyticsHandler,
 		jwtService:        jwtService,
+		frontendURL:       frontendURL,
 	}
 }
 
@@ -48,7 +51,7 @@ func (r *Router) Setup() *gin.Engine {
 
 	// Middleware
 	router.Use(gin.Recovery())
-	router.Use(middleware.CORS())
+	router.Use(middleware.CORS(r.frontendURL))
 	router.Use(middleware.ErrorHandler())
 	router.Use(logger.GinLogger())
 
@@ -68,6 +71,8 @@ func (r *Router) Setup() *gin.Engine {
 		{
 			auth.POST("/register", r.authHandler.Register)
 			auth.POST("/login", r.authHandler.Login)
+			auth.POST("/refresh", r.authHandler.RefreshToken)
+			auth.POST("/logout", middleware.AuthenticateToken(r.jwtService), r.authHandler.Logout)
 			auth.GET("/me", middleware.AuthenticateToken(r.jwtService), r.authHandler.GetCurrentUser)
 			auth.GET("/google", r.authHandler.GoogleOAuth)
 			auth.GET("/google/callback", r.authHandler.GoogleCallback)
@@ -83,6 +88,7 @@ func (r *Router) Setup() *gin.Engine {
 			invitations.POST("", middleware.OptionalAuth(r.jwtService), r.invitationHandler.Create)
 			invitations.PUT("/:id", middleware.OptionalAuth(r.jwtService), r.invitationHandler.Update)
 			invitations.DELETE("/:id", middleware.OptionalAuth(r.jwtService), r.invitationHandler.Delete)
+			invitations.POST("/migrate", middleware.AuthenticateToken(r.jwtService), r.invitationHandler.MigrateInvitations)
 		}
 
 		// Layout routes

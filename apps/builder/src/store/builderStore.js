@@ -25,19 +25,15 @@ function loadFromStorage() {
       const parsed = JSON.parse(stored);
       // Ensure layoutConfig exists for backward compatibility
       if (!parsed.layoutConfig) {
-        // Support old layoutConfig for migration
-        if (parsed.layoutConfig) {
-          parsed.layoutConfig = parsed.layoutConfig;
-          delete parsed.layoutConfig;
-        } else {
-          parsed.layoutConfig = { ...defaultLayoutConfig };
-        }
+        parsed.layoutConfig = { ...defaultLayoutConfig };
       }
-      // Migrate layoutId to layoutId
-      if (parsed.layoutId && !parsed.layoutId) {
-        parsed.layoutId = parsed.layoutId;
-        delete parsed.layoutId;
+      
+      // Fallback for unsupported layouts
+      if (parsed.layoutId && !hasLayout(parsed.layoutId)) {
+        console.warn(`Layout '${parsed.layoutId}' is not available. Falling back to 'classic-scroll'.`);
+        parsed.layoutId = 'classic-scroll';
       }
+      
       return parsed;
     }
   } catch (error) {
@@ -759,9 +755,16 @@ export const useBuilderStore = create((set, get) => {
      * Set entire invitation
      */
     setInvitation: (invitation) => {
-      // Ensure layoutConfig exists, support migration from layoutConfig
-      const layoutConfig = invitation.layoutConfig || invitation.layoutConfig || {};
-      const layoutId = invitation.layoutId || invitation.layoutId || 'classic-scroll';
+      // Ensure layoutConfig exists
+      const layoutConfig = invitation.layoutConfig || {};
+      let layoutId = invitation.layoutId || 'classic-scroll';
+      
+      // Fallback for unsupported layouts
+      if (!hasLayout(layoutId)) {
+        console.warn(`Layout '${layoutId}' is not available. Falling back to 'classic-scroll'.`);
+        layoutId = 'classic-scroll';
+      }
+      
       const invitationWithConfig = {
         ...invitation,
         layoutId,

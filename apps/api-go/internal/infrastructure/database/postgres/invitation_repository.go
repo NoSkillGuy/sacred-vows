@@ -65,6 +65,7 @@ func (r *invitationRepository) Update(ctx context.Context, invitation *domain.In
 		LayoutID:  invitation.LayoutID,
 		Data:      datatypes.JSON(invitation.Data),
 		UserID:    invitation.UserID,
+		CreatedAt: invitation.CreatedAt, // Preserve original CreatedAt
 		UpdatedAt: time.Now(),
 	}
 	return r.db.WithContext(ctx).Model(&InvitationModel{}).Where("id = ?", invitation.ID).Updates(model).Error
@@ -72,6 +73,18 @@ func (r *invitationRepository) Update(ctx context.Context, invitation *domain.In
 
 func (r *invitationRepository) Delete(ctx context.Context, id string) error {
 	return r.db.WithContext(ctx).Delete(&InvitationModel{}, "id = ?", id).Error
+}
+
+func (r *invitationRepository) MigrateUserInvitations(ctx context.Context, fromUserID, toUserID string) (int, error) {
+	result := r.db.WithContext(ctx).Model(&InvitationModel{}).
+		Where("user_id = ?", fromUserID).
+		Update("user_id", toUserID)
+	
+	if result.Error != nil {
+		return 0, result.Error
+	}
+	
+	return int(result.RowsAffected), nil
 }
 
 func toInvitationDomain(model *InvitationModel) (*domain.Invitation, error) {

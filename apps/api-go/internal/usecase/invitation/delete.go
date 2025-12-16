@@ -18,9 +18,12 @@ func NewDeleteInvitationUseCase(invitationRepo repository.InvitationRepository) 
 }
 
 func (uc *DeleteInvitationUseCase) Execute(ctx context.Context, id string) error {
-	_, err := uc.invitationRepo.FindByID(ctx, id)
+	invitation, err := uc.invitationRepo.FindByID(ctx, id)
 	if err != nil {
-		return errors.Wrap(errors.ErrNotFound.Code, "Invitation not found", err)
+		return errors.Wrap(errors.ErrInternalServerError.Code, "Failed to find invitation", err)
+	}
+	if invitation == nil {
+		return errors.Wrap(errors.ErrNotFound.Code, "Invitation not found", nil)
 	}
 
 	if err := uc.invitationRepo.Delete(ctx, id); err != nil {

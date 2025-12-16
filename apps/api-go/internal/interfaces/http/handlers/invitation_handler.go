@@ -8,6 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sacred-vows/api-go/internal/usecase/invitation"
 	"github.com/sacred-vows/api-go/pkg/errors"
+	"github.com/sacred-vows/api-go/pkg/logger"
+	"go.uber.org/zap"
 )
 
 // JSONData represents JSON data as a string for Swagger compatibility
@@ -62,6 +64,7 @@ type InvitationHandler struct {
 	getPreviewUC *invitation.GetInvitationPreviewUseCase
 	updateUC     *invitation.UpdateInvitationUseCase
 	deleteUC     *invitation.DeleteInvitationUseCase
+	migrateUC    *invitation.MigrateInvitationsUseCase
 }
 
 func NewInvitationHandler(
@@ -71,6 +74,7 @@ func NewInvitationHandler(
 	getPreviewUC *invitation.GetInvitationPreviewUseCase,
 	updateUC *invitation.UpdateInvitationUseCase,
 	deleteUC *invitation.DeleteInvitationUseCase,
+	migrateUC *invitation.MigrateInvitationsUseCase,
 ) *InvitationHandler {
 	return &InvitationHandler{
 		createUC:     createUC,
@@ -79,6 +83,7 @@ func NewInvitationHandler(
 		getPreviewUC: getPreviewUC,
 		updateUC:     updateUC,
 		deleteUC:     deleteUC,
+		migrateUC:    migrateUC,
 	}
 }
 
@@ -135,10 +140,30 @@ type MessageResponse struct {
 // @Failure      500  {object}  ErrorResponse        "Internal server error"
 // @Router       /invitations [get]
 func (h *InvitationHandler) GetAll(c *gin.Context) {
-	userID, _ := c.Get("userID")
-	if userID == nil {
+	authHeader := c.GetHeader("Authorization")
+	userID, exists := c.Get("userID")
+
+	// If Authorization header is present but userID is not set, token validation failed
+	// This means user tried to authenticate but token is invalid - return error
+	if authHeader != "" && (!exists || userID == nil) {
+		logger.GetLogger().Warn("GetAll invitations: Invalid token provided",
+			zap.String("authHeader", authHeader[:min(30, len(authHeader))]),
+		)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
+		return
+	}
+
+	// Only use anonymous if no Authorization header was provided
+	if !exists || userID == nil {
 		userID = "anonymous"
 	}
+
+	// Log for debugging
+	logger.GetLogger().Info("GetAll invitations",
+		zap.String("userID", userID.(string)),
+		zap.Bool("fromContext", exists),
+		zap.Bool("hasAuthHeader", authHeader != ""),
+	)
 
 	output, err := h.getAllUC.Execute(c.Request.Context(), userID.(string))
 	if err != nil {
@@ -238,10 +263,25 @@ func (h *InvitationHandler) Create(c *gin.Context) {
 		return
 	}
 
-	userID, _ := c.Get("userID")
-	if userID == nil {
+	authHeader := c.GetHeader("Authorization")
+	userID, exists := c.Get("userID")
+
+	// If Authorization header is present but userID is not set, token validation failed
+	if authHeader != "" && (!exists || userID == nil) {
+		logger.GetLogger().Warn("Create invitation: Invalid token provided")
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
+		return
+	}
+
+	// Only use anonymous if no Authorization header was provided
+	if !exists || userID == nil {
 		userID = "anonymous"
 	}
+
+	logger.GetLogger().Info("Create invitation",
+		zap.String("userID", userID.(string)),
+		zap.Bool("hasAuthHeader", authHeader != ""),
+	)
 
 	var titlePtr *string
 	if req.Title != "" {
@@ -290,6 +330,27 @@ func (h *InvitationHandler) Update(c *gin.Context) {
 		return
 	}
 
+	authHeader := c.GetHeader("Authorization")
+	userID, exists := c.Get("userID")
+
+	// If Authorization header is present but userID is not set, token validation failed
+	if authHeader != "" && (!exists || userID == nil) {
+		logger.GetLogger().Warn("Update invitation: Invalid token provided", zap.String("invitationID", id))
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
+		return
+	}
+
+	// Only use anonymous if no Authorization header was provided
+	if !exists || userID == nil {
+		userID = "anonymous"
+	}
+
+	logger.GetLogger().Info("Update invitation",
+		zap.String("invitationID", id),
+		zap.String("userID", userID.(string)),
+		zap.Bool("hasAuthHeader", authHeader != ""),
+	)
+
 	var dataPtr *json.RawMessage
 	if req.Data != nil {
 		raw := (*req.Data).ToRawMessage()
@@ -330,6 +391,28 @@ func (h *InvitationHandler) Update(c *gin.Context) {
 // @Router       /invitations/{id} [delete]
 func (h *InvitationHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
+
+	authHeader := c.GetHeader("Authorization")
+	userID, exists := c.Get("userID")
+
+	// If Authorization header is present but userID is not set, token validation failed
+	if authHeader != "" && (!exists || userID == nil) {
+		logger.GetLogger().Warn("Delete invitation: Invalid token provided", zap.String("invitationID", id))
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
+		return
+	}
+
+	logger.GetLogger().Info("Delete invitation",
+		zap.String("invitationID", id),
+		zap.String("userID", func() string {
+			if exists && userID != nil {
+				return userID.(string)
+			}
+			return "anonymous"
+		}()),
+		zap.Bool("hasAuthHeader", authHeader != ""),
+	)
+
 	if err := h.deleteUC.Execute(c.Request.Context(), id); err != nil {
 		appErr, ok := err.(*errors.AppError)
 		if ok {
@@ -341,4 +424,65 @@ func (h *InvitationHandler) Delete(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Invitation deleted"})
+}
+
+type MigrateInvitationsRequest struct {
+	FromUserID string `json:"fromUserID" binding:"required" example:"anonymous"`
+	ToUserID   string `json:"toUserID" binding:"required" example:"user123"`
+}
+
+type MigrateInvitationsResponse struct {
+	MigratedCount int `json:"migratedCount" example:"5"`
+}
+
+// MigrateInvitations migrates invitations from one user ID to another
+// @Summary      Migrate invitations
+// @Description  Migrate invitations from one user ID to another. Useful for migrating anonymous invitations to a user account.
+// @Tags         invitations
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request  body      MigrateInvitationsRequest  true  "Migration request"
+// @Success      200      {object}  MigrateInvitationsResponse  "Migration successful"
+// @Failure      400      {object}  ErrorResponse              "Invalid request"
+// @Failure      500      {object}  ErrorResponse              "Internal server error"
+// @Router       /invitations/migrate [post]
+func (h *InvitationHandler) MigrateInvitations(c *gin.Context) {
+	var req MigrateInvitationsRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		return
+	}
+
+	// Get authenticated user ID
+	userID, exists := c.Get("userID")
+	if !exists || userID == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+		return
+	}
+
+	// Ensure user can only migrate to their own account
+	if req.ToUserID != userID.(string) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Can only migrate invitations to your own account"})
+		return
+	}
+
+	output, err := h.migrateUC.Execute(c.Request.Context(), invitation.MigrateInvitationsInput{
+		FromUserID: req.FromUserID,
+		ToUserID:   req.ToUserID,
+	})
+
+	if err != nil {
+		appErr, ok := err.(*errors.AppError)
+		if ok {
+			c.JSON(appErr.Code, appErr.ToResponse())
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to migrate invitations"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"migratedCount": output.MigratedCount,
+	})
 }

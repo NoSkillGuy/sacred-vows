@@ -31,8 +31,12 @@ type DatabaseConfig struct {
 }
 
 type AuthConfig struct {
-	JWTSecret     string
-	JWTExpiration time.Duration
+	JWTSecret              string
+	JWTAccessExpiration    time.Duration // Short-lived access token (default: 15 minutes)
+	JWTRefreshExpiration   time.Duration // Long-lived refresh token (default: 30 days)
+	JWTIssuer              string        // JWT issuer claim (default: "sacred-vows-api")
+	JWTAudience            string        // JWT audience claim (default: "sacred-vows-client")
+	ClockSkewTolerance     time.Duration // Clock skew tolerance (default: 60 seconds)
 }
 
 type StorageConfig struct {
@@ -65,8 +69,12 @@ func Load() (*Config, error) {
 			ConnMaxLifetime: 5 * time.Minute,
 		},
 		Auth: AuthConfig{
-			JWTSecret:     getEnv("JWT_SECRET", "your-secret-key-change-in-production"),
-			JWTExpiration: 7 * 24 * time.Hour, // 7 days
+			JWTSecret:            getEnv("JWT_SECRET", "your-secret-key-change-in-production"),
+			JWTAccessExpiration:  parseDuration(getEnv("JWT_ACCESS_EXPIRATION", "15m"), 15*time.Minute),
+			JWTRefreshExpiration: parseDuration(getEnv("JWT_REFRESH_EXPIRATION", "30d"), 30*24*time.Hour),
+			JWTIssuer:            getEnv("JWT_ISSUER", "sacred-vows-api"),
+			JWTAudience:          getEnv("JWT_AUDIENCE", "sacred-vows-client"),
+			ClockSkewTolerance:   parseDuration(getEnv("JWT_CLOCK_SKEW", "60s"), 60*time.Second),
 		},
 		Storage: StorageConfig{
 			UploadPath:   getEnv("UPLOAD_PATH", "./uploads"),
@@ -111,4 +119,16 @@ func getEnvAsInt(key string, defaultValue int) int {
 		return value
 	}
 	return defaultValue
+}
+
+func parseDuration(value string, defaultValue time.Duration) time.Duration {
+	if value == "" {
+		return defaultValue
+	}
+	duration, err := time.ParseDuration(value)
+	if err != nil {
+		// If parsing fails, return default
+		return defaultValue
+	}
+	return duration
 }

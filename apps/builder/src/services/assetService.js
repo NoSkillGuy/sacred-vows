@@ -4,7 +4,7 @@
  * In production, this would integrate with Cloudinary, AWS S3, or similar
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+import { apiRequest } from './apiClient';
 
 /**
  * Upload an image file
@@ -19,13 +19,11 @@ export async function uploadImage(file) {
     const formData = new FormData();
     formData.append('image', file);
 
-    const response = await fetch(`${API_BASE_URL}/assets/upload`, {
+    // Use apiRequest which handles auth headers automatically
+    // apiClient will not set Content-Type for FormData
+    const response = await apiRequest('/assets/upload', {
       method: 'POST',
       body: formData,
-      // In production, include auth headers
-      // headers: {
-      //   'Authorization': `Bearer ${token}`
-      // }
     });
 
     if (!response.ok) {
@@ -48,11 +46,8 @@ export async function uploadImage(file) {
  */
 export async function deleteImage(imageUrl) {
   try {
-    const response = await fetch(`${API_BASE_URL}/assets/delete`, {
+    const response = await apiRequest('/assets/delete', {
       method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify({ url: imageUrl }),
     });
 
@@ -70,9 +65,8 @@ export async function deleteImage(imageUrl) {
  */
 export async function getAssets() {
   try {
-    const response = await fetch(`${API_BASE_URL}/assets`, {
+    const response = await apiRequest('/assets', {
       method: 'GET',
-      // In production, include auth headers
     });
 
     if (!response.ok) {

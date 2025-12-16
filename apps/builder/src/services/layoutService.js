@@ -3,21 +3,7 @@
  * Handles API calls for layout operations
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-
-// Get auth token from localStorage
-function getAuthToken() {
-  return localStorage.getItem('auth_token');
-}
-
-// Set auth headers
-function getHeaders() {
-  const token = getAuthToken();
-  return {
-    'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Bearer ${token}` }),
-  };
-}
+import { apiRequest } from './apiClient';
 
 /**
  * Get all layouts
@@ -28,9 +14,8 @@ function getHeaders() {
  */
 export async function getLayouts(options = {}) {
   try {
-    const response = await fetch(`${API_BASE_URL}/layouts/manifests`, {
+    const response = await apiRequest('/layouts/manifests', {
       method: 'GET',
-      headers: getHeaders(),
     });
 
     if (!response.ok) {
@@ -69,9 +54,8 @@ export async function getLayouts(options = {}) {
  */
 export async function getLayout(id) {
   try {
-    const response = await fetch(`${API_BASE_URL}/layouts/${id}`, {
+    const response = await apiRequest(`/layouts/${id}`, {
       method: 'GET',
-      headers: getHeaders(),
     });
 
     if (!response.ok) {
@@ -93,9 +77,8 @@ export async function getLayout(id) {
  */
 export async function getLayoutManifest(id) {
   try {
-    const response = await fetch(`${API_BASE_URL}/layouts/${id}/manifest`, {
+    const response = await apiRequest(`/layouts/${id}/manifest`, {
       method: 'GET',
-      headers: getHeaders(),
     });
 
     if (!response.ok) {
@@ -116,9 +99,8 @@ export async function getLayoutManifest(id) {
  */
 export async function getAllLayoutManifests() {
   try {
-    const response = await fetch(`${API_BASE_URL}/layouts/manifests`, {
+    const response = await apiRequest('/layouts/manifests', {
       method: 'GET',
-      headers: getHeaders(),
     });
 
     if (!response.ok) {

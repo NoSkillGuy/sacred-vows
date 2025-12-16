@@ -25,7 +25,7 @@ func AuthenticateToken(jwtService *auth.JWTService) gin.HandlerFunc {
 		}
 
 		token := parts[1]
-		claims, err := jwtService.ValidateToken(token)
+		claims, err := jwtService.ValidateAccessToken(token)
 		if err != nil {
 			c.JSON(http.StatusForbidden, gin.H{"error": "Invalid or expired token"})
 			c.Abort()
@@ -45,7 +45,7 @@ func OptionalAuth(jwtService *auth.JWTService) gin.HandlerFunc {
 			parts := strings.Split(authHeader, " ")
 			if len(parts) == 2 && parts[0] == "Bearer" {
 				token := parts[1]
-				claims, err := jwtService.ValidateToken(token)
+				claims, err := jwtService.ValidateAccessToken(token)
 				if err == nil {
 					c.Set("userID", claims.UserID)
 					c.Set("email", claims.Email)
