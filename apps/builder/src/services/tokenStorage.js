@@ -4,14 +4,24 @@
  * Access tokens are short-lived and should not persist across browser sessions
  */
 
+import { scheduleTokenRefresh, stopTokenRefresh } from './tokenRefreshScheduler';
+
 let accessToken = null;
 
 /**
- * Set access token in memory
+ * Set access token in memory and schedule proactive refresh
  * @param {string} token - Access token to store
  */
 export function setAccessToken(token) {
   accessToken = token;
+  
+  // Schedule proactive token refresh before expiration
+  if (token) {
+    scheduleTokenRefresh(token);
+  } else {
+    // If token is cleared (null), stop the scheduler
+    stopTokenRefresh();
+  }
 }
 
 /**
@@ -23,10 +33,11 @@ export function getAccessToken() {
 }
 
 /**
- * Clear access token from memory
+ * Clear access token from memory and stop refresh scheduler
  */
 export function clearAccessToken() {
   accessToken = null;
+  stopTokenRefresh();
 }
 
 /**
