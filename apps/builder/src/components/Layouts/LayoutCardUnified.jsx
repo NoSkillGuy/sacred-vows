@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import './LayoutCardUnified.css';
+import LayoutPreviewBackground from './LayoutPreviewBackground';
 
 function resolveTheme(layout) {
   if (layout.defaultTheme) return layout.defaultTheme;
@@ -89,42 +90,8 @@ function LayoutCardUnified({
       )}
 
       <div className="unified-preview-pane">
-        {/* Classic scroll layout preview (background) */}
-        <div className="unified-scroll-preview">
-            <div className="unified-scroll-section">
-              <div className="unified-scroll-line wide" />
-              <div className="unified-scroll-line" />
-              <div className="unified-scroll-line short" />
-            </div>
-            
-            <div className="unified-scroll-divider" />
-            
-            <div className="unified-scroll-section">
-              <div className="unified-scroll-line wide" />
-              <div className="unified-scroll-line" />
-            </div>
-            
-            <div className="unified-scroll-divider" />
-            
-            <div className="unified-scroll-section">
-              <div className="unified-scroll-line" />
-              <div className="unified-scroll-line short" />
-            </div>
-            
-            <div className="unified-scroll-divider" />
-            
-            <div className="unified-scroll-section">
-              <div className="unified-scroll-line wide" />
-              <div className="unified-scroll-line" />
-            </div>
-            
-            <div className="unified-scroll-divider" />
-            
-            <div className="unified-scroll-section">
-              <div className="unified-scroll-line" />
-              <div className="unified-scroll-line short" />
-            </div>
-          </div>
+        {/* Layout-specific preview background */}
+        <LayoutPreviewBackground layoutId={layout.id} />
           
         {/* Layout name and description (overlay) */}
         <div className="unified-preview-header">

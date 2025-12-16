@@ -178,6 +178,7 @@
   gap: 0.4rem;
   align-items: center;
   width: 100%;
+  flex-shrink: 0;
 }
 
 .unified-scroll-line {
@@ -202,8 +203,141 @@
   width: 60px;
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--rose-soft), transparent);
-  margin: 0.75rem 0;
+  margin: 0.4rem 0;
   opacity: 0.8;
+  flex-shrink: 0;
+}
+
+/* Editorial Elegance layout preview (background) */
+.unified-editorial-preview {
+  position: absolute;
+  inset: 0;
+  background: var(--white); /* Same as Classic Scroll */
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  opacity: 0.6; /* Same as Classic Scroll */
+  z-index: 0;
+}
+
+.unified-editorial-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(to right, rgba(200, 200, 200, 0.25) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(200, 200, 200, 0.25) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.unified-editorial-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  justify-content: flex-start;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  gap: 0.4rem;
+  min-height: 0;
+}
+
+/* Top hero box - Main editorial picture */
+.unified-editorial-hero-box {
+  width: 85%;
+  height: 100px;
+  background: rgba(0, 0, 0, 0.15); /* Same as Classic Scroll lines */
+  border-radius: 6px; /* Same as Classic Scroll lines */
+  flex-shrink: 0;
+}
+
+/* Typography section - Center headings (matching Classic Scroll structure) */
+.unified-editorial-typography {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 0.4rem;
+}
+
+.unified-editorial-line {
+  /* Same as Classic Scroll lines */
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+  height: 10px;
+}
+
+.unified-editorial-line.heading {
+  width: 70%;
+}
+
+.unified-editorial-line.heading.short {
+  width: 45%;
+}
+
+.unified-editorial-spacer {
+  height: 1.5rem;
+}
+
+.unified-editorial-spacer.large {
+  height: 2rem;
+}
+
+/* Images section - Left box and right text lines */
+.unified-editorial-images {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0 1rem;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.unified-editorial-image-box {
+  width: 120px;
+  height: 160px; /* Double the previous height */
+  background: rgba(0, 0, 0, 0.15); /* Same as Classic Scroll lines */
+  border-radius: 6px; /* Same as Classic Scroll lines */
+  flex-shrink: 0;
+}
+
+.unified-editorial-text-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  align-items: flex-start;
+  width: 42%;
+  justify-content: flex-start;
+  padding-top: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* Footer section - Editorial themed thin lines for remaining space */
+.unified-editorial-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 0.4rem;
+  margin-top: auto;
+  padding-top: 0.75rem;
+  padding-bottom: 0.5rem;
+  flex-shrink: 0;
+}
+
+.unified-editorial-thin-line {
+  width: 50px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.2), transparent);
+  opacity: 0.8;
+  border-radius: 1px;
+}
+
+.unified-editorial-thin-line.short {
+  width: 35px;
 }
 
 .unified-overlay {
@@ -421,6 +555,50 @@
   .unified-scroll-divider {
     width: 50px;
     margin: 0.5rem 0;
+  }
+  
+  .unified-editorial-preview {
+    padding: 1.25rem; /* Match Classic Scroll responsive padding */
+  }
+  
+  .unified-editorial-hero-box {
+    width: 90%;
+    height: 80px;
+  }
+  
+  .unified-editorial-spacer {
+    height: 1.25rem;
+  }
+  
+  .unified-editorial-spacer.large {
+    height: 1.5rem;
+  }
+  
+  .unified-editorial-images {
+    padding: 0 0.5rem;
+    gap: 0.75rem;
+  }
+  
+  .unified-editorial-image-box {
+    width: 45%;
+    height: 120px; /* Double the previous height for mobile */
+  }
+  
+  .unified-editorial-text-lines {
+    width: 45%;
+    gap: 0.3rem;
+  }
+  
+  .unified-editorial-line {
+    height: 8px; /* Match Classic Scroll responsive height */
+  }
+  
+  .unified-editorial-line.heading {
+    width: 70%;
+  }
+  
+  .unified-editorial-line.heading.short {
+    width: 50%;
   }
 }
 
