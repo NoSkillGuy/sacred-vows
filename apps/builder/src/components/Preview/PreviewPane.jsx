@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useBuilderStore, SECTION_TYPES } from '../../store/builderStore';
 import { useLanguage } from '../../hooks/useLanguage';
 import { getLayout, getViewComponents, getEditableComponents, getSharedComponents, hasLayout } from '../../layouts/registry';
+import { parseInvitationData } from '../../layouts/editorial-elegance/utils/dataHelpers';
 // Import layouts to ensure they're registered
 import '../../layouts/classic-scroll';
 import '../../layouts/editorial-elegance';
