@@ -34,24 +34,18 @@ function ProtectedRoute({ children }) {
       // If no access token, try to refresh using refresh token from cookie
       if (!isAuthenticated()) {
         try {
-          // Attempt to refresh token (refresh token is in HttpOnly cookie)
           await refreshAccessToken();
-          // If refresh succeeded, continue with auth check
         } catch (refreshError) {
-          // Refresh failed, user needs to login
           setIsValid(false);
           setIsChecking(false);
           return;
         }
       }
 
-      // Verify token is still valid by fetching user
-      // getCurrentUserFromAPI uses apiClient which handles token refresh automatically
       try {
         await getCurrentUserFromAPI();
         setIsValid(true);
-      } catch {
-        // Token is invalid or refresh failed
+      } catch (error) {
         setIsValid(false);
       } finally {
         setIsChecking(false);

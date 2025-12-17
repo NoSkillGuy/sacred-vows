@@ -45,15 +45,25 @@ func (r *refreshTokenRepository) Create(ctx context.Context, token *domain.Refre
 	return r.db.WithContext(ctx).Create(model).Error
 }
 
-func (r *refreshTokenRepository) FindByTokenHash(ctx context.Context, tokenHash string) (*domain.RefreshToken, error) {
-	var model RefreshTokenModel
-	if err := r.db.WithContext(ctx).Where("token_hash = ?", tokenHash).First(&model).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return nil, nil
-		}
+func (r *refreshTokenRepository) FindActiveByToken(ctx context.Context, token string) (*domain.RefreshToken, error) {
+	now := time.Now()
+
+	var models []RefreshTokenModel
+	if err := r.db.WithContext(ctx).
+		Where("revoked = ? AND expires_at > ?", false, now).
+		Order("created_at DESC").
+		Limit(2000).
+		Find(&models).Error; err != nil {
 		return nil, err
 	}
-	return toRefreshTokenDomain(&model), nil
+
+	for _, m := range models {
+		if CompareTokenHash(token, m.TokenHash) {
+			return toRefreshTokenDomain(&m), nil
+		}
+	}
+
+	return nil, nil
 }
 
 func (r *refreshTokenRepository) FindByID(ctx context.Context, id string) (*domain.RefreshToken, error) {
@@ -96,4 +106,5 @@ func toRefreshTokenDomain(model *RefreshTokenModel) *domain.RefreshToken {
 		CreatedAt: model.CreatedAt,
 	}
 }
+
 

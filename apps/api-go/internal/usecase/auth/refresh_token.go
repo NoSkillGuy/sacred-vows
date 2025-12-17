@@ -44,24 +44,12 @@ func (uc *RefreshTokenUseCase) Execute(ctx context.Context, input RefreshTokenIn
 		return nil, errors.New(errors.ErrBadRequest.Code, "Refresh token is required")
 	}
 
-	// Hash the provided token to look it up in the database
-	tokenHash, err := postgres.HashToken(input.RefreshToken)
-	if err != nil {
-		return nil, errors.Wrap(errors.ErrInternalServerError.Code, "Failed to hash refresh token", err)
-	}
-
-	// Find the refresh token in the database
-	storedToken, err := uc.refreshTokenRepo.FindByTokenHash(ctx, tokenHash)
+	storedToken, err := uc.refreshTokenRepo.FindActiveByToken(ctx, input.RefreshToken)
 	if err != nil {
 		return nil, errors.Wrap(errors.ErrInternalServerError.Code, "Failed to find refresh token", err)
 	}
 
 	if storedToken == nil {
-		return nil, errors.New(errors.ErrUnauthorized.Code, "Invalid refresh token")
-	}
-
-	// Verify the token hash matches (bcrypt comparison)
-	if !postgres.CompareTokenHash(input.RefreshToken, storedToken.TokenHash) {
 		return nil, errors.New(errors.ErrUnauthorized.Code, "Invalid refresh token")
 	}
 

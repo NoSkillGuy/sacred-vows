@@ -91,10 +91,10 @@ apps/builder/src/
 
 **Cookie Configuration:**
 - Name: `refresh_token`
-- Path: `/api/auth`
+- Path: `/` (so it is sent to all API endpoints)
 - HttpOnly: `true` (prevents XSS attacks)
-- Secure: `true` (HTTPS only)
-- SameSite: Not explicitly set (defaults to Lax)
+- Secure: `true` on HTTPS, `false` on HTTP (local development)
+- SameSite: `Lax`
 
 ## Authentication Flows
 
@@ -186,20 +186,18 @@ apps/builder/src/
 
 **Flow (Token Rotation):**
 1. Frontend sends refresh token from HttpOnly cookie
-2. Backend hashes the provided refresh token
-3. Looks up token hash in database
-4. Verifies token hash matches using bcrypt
-5. Checks token is not revoked
-6. Checks token is not expired
-7. Verifies user still exists
-8. **Token Rotation:**
+2. Backend finds the stored token by comparing the provided token against stored bcrypt hashes
+3. Checks token is not revoked
+4. Checks token is not expired
+5. Verifies user still exists
+6. **Token Rotation:**
    - Generates NEW refresh token
    - Hashes new refresh token
    - Stores new refresh token in database
    - Revokes old refresh token
-9. Generates new access token
-10. Sets new refresh token in HttpOnly cookie
-11. Returns new access token
+7. Generates new access token
+8. Sets new refresh token in HttpOnly cookie
+9. Returns new access token
 
 **Request:**
 - No body required
@@ -489,7 +487,7 @@ CREATE INDEX "idx_refresh_tokens_revoked" ON "refresh_tokens"("revoked");
 **Token Storage:**
 - Only token hash is stored (bcrypt)
 - Original token never stored in database
-- Token lookup requires hashing the provided token
+- Token lookup compares the provided token against stored bcrypt hashes (bcrypt hashes are non-deterministic, so equality lookup is not possible)
 
 ## Configuration
 

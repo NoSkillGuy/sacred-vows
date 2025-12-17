@@ -196,6 +196,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 func (h *AuthHandler) RefreshToken(c *gin.Context) {
 	// Read refresh token from HttpOnly cookie
 	refreshToken, err := c.Cookie("refresh_token")
+
 	if err != nil || refreshToken == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Refresh token not found"})
 		return
@@ -215,17 +216,29 @@ func (h *AuthHandler) RefreshToken(c *gin.Context) {
 		return
 	}
 
-	// Set new refresh token in HttpOnly Secure SameSite cookie
 	refreshExpiration := int(h.jwtService.GetRefreshExpiration().Seconds())
-	c.SetCookie(
-		"refresh_token",
-		output.RefreshToken,
-		refreshExpiration,
-		"/api/auth",
-		"",
-		true, // Secure (HTTPS only)
-		true, // HttpOnly (not accessible via JavaScript)
-	)
+
+	oldCookie1 := &http.Cookie{
+		Name:     "refresh_token",
+		Value:    "",
+		Path:     "/api/auth",
+		MaxAge:   -1,
+		HttpOnly: true,
+		Secure:   h.isSecureCookie(c),
+		SameSite: http.SameSiteLaxMode,
+	}
+	http.SetCookie(c.Writer, oldCookie1)
+
+	cookie := &http.Cookie{
+		Name:     "refresh_token",
+		Value:    output.RefreshToken,
+		Path:     "/",
+		MaxAge:   refreshExpiration,
+		HttpOnly: true,
+		Secure:   h.isSecureCookie(c),
+		SameSite: http.SameSiteLaxMode, // Lax works for same-site (localhost with different ports)
+	}
+	http.SetCookie(c.Writer, cookie)
 
 	c.JSON(http.StatusOK, gin.H{
 		"accessToken": output.AccessToken,
@@ -260,11 +273,11 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 	c.SetCookie(
 		"refresh_token",
 		"",
-		-1, // Expire immediately
-		"/api/auth",
+		-1,  // Expire immediately
+		"/", // Path "/" to match where cookie was set
 		"",
-		true, // Secure (HTTPS only)
-		true, // HttpOnly (not accessible via JavaScript)
+		h.isSecureCookie(c), // Secure (HTTPS only) - conditional based on request
+		true,                // HttpOnly (not accessible via JavaScript)
 	)
 
 	c.JSON(http.StatusOK, gin.H{
@@ -402,6 +415,18 @@ func (h *AuthHandler) GoogleVerify(c *gin.Context) {
 	})
 }
 
+func (h *AuthHandler) isSecureCookie(c *gin.Context) bool {
+	// Check if request is HTTPS
+	// Also check X-Forwarded-Proto header for proxies/load balancers
+	if c.GetHeader("X-Forwarded-Proto") == "https" {
+		return true
+	}
+	if c.Request.TLS != nil {
+		return true
+	}
+	return false
+}
+
 // setRefreshTokenCookie generates a refresh token, stores it in the database, and sets it in an HttpOnly cookie
 func (h *AuthHandler) setRefreshTokenCookie(c *gin.Context, userID, email string) error {
 	// Generate refresh token
@@ -428,17 +453,29 @@ func (h *AuthHandler) setRefreshTokenCookie(c *gin.Context, userID, email string
 		return err
 	}
 
-	// Set cookie
 	refreshExpiration := int(h.jwtService.GetRefreshExpiration().Seconds())
-	c.SetCookie(
-		"refresh_token",
-		refreshToken,
-		refreshExpiration,
-		"/api/auth",
-		"",
-		true, // Secure (HTTPS only)
-		true, // HttpOnly (not accessible via JavaScript)
-	)
+
+	oldCookie1 := &http.Cookie{
+		Name:     "refresh_token",
+		Value:    "",
+		Path:     "/api/auth",
+		MaxAge:   -1,
+		HttpOnly: true,
+		Secure:   h.isSecureCookie(c),
+		SameSite: http.SameSiteLaxMode,
+	}
+	http.SetCookie(c.Writer, oldCookie1)
+
+	cookie := &http.Cookie{
+		Name:     "refresh_token",
+		Value:    refreshToken,
+		Path:     "/",
+		MaxAge:   refreshExpiration,
+		HttpOnly: true,
+		Secure:   h.isSecureCookie(c),
+		SameSite: http.SameSiteLaxMode,
+	}
+	http.SetCookie(c.Writer, cookie)
 
 	return nil
 }
