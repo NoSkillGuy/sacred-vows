@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Toolbar from '../Toolbar/Toolbar';
+import BuilderSidebar from '../BuilderSidebar/BuilderSidebar';
 import PreviewPane from '../Preview/PreviewPane';
 import { getInvitation } from '../../services/invitationService';
 import { useBuilderStore } from '../../store/builderStore';
@@ -124,12 +124,11 @@ function BuilderLayout() {
 
   return (
     <div className="builder-layout">
-      <Toolbar
+      <BuilderSidebar
         editMode={editMode}
         onEditModeToggle={() => setEditMode(!editMode)}
         deviceMode={deviceMode}
         onDeviceModeChange={setDeviceMode}
-        invitation={invitation}
       />
       <div className="builder-main">
         <PreviewPane 
