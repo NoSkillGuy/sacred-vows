@@ -103,12 +103,14 @@ func (AnalyticsModel) TableName() string {
 
 // RefreshTokenModel represents the refresh_tokens table
 type RefreshTokenModel struct {
-	ID        string    `gorm:"primaryKey;type:text"`
-	UserID    string    `gorm:"type:text;not null;index"`
-	TokenHash string    `gorm:"type:text;not null;uniqueIndex"`
-	ExpiresAt time.Time `gorm:"not null;index"`
-	Revoked   bool      `gorm:"default:false;index"`
-	CreatedAt time.Time `gorm:"autoCreateTime"`
+	ID              string    `gorm:"primaryKey;type:text"`
+	UserID          string    `gorm:"type:text;not null;index"`
+	TokenHash       string    `gorm:"type:text;not null;uniqueIndex"`
+	TokenFingerprint []byte   `gorm:"type:bytea;not null;uniqueIndex"`
+	HMACKeyID       int16     `gorm:"type:smallint;not null;index"`
+	ExpiresAt       time.Time `gorm:"not null;index"`
+	Revoked         bool      `gorm:"default:false;index"`
+	CreatedAt       time.Time `gorm:"autoCreateTime"`
 }
 
 func (RefreshTokenModel) TableName() string {

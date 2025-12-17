@@ -1,6 +1,8 @@
 package config
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"os"
 	"strconv"
@@ -37,6 +39,16 @@ type AuthConfig struct {
 	JWTIssuer              string        // JWT issuer claim (default: "sacred-vows-api")
 	JWTAudience            string        // JWT audience claim (default: "sacred-vows-client")
 	ClockSkewTolerance     time.Duration // Clock skew tolerance (default: 60 seconds)
+	RefreshTokenHMACKeys        []RefreshTokenHMACKey
+	RefreshTokenHMACActiveKeyID int16
+}
+
+type RefreshTokenHMACKey struct {
+	ID     int16  `json:"id"`
+	KeyB64 string `json:"key_b64"`
+
+	// Decoded key bytes (not serialized)
+	Key []byte `json:"-"`
 }
 
 type StorageConfig struct {
@@ -75,6 +87,7 @@ func Load() (*Config, error) {
 			JWTIssuer:            getEnv("JWT_ISSUER", "sacred-vows-api"),
 			JWTAudience:          getEnv("JWT_AUDIENCE", "sacred-vows-client"),
 			ClockSkewTolerance:   parseDuration(getEnv("JWT_CLOCK_SKEW", "60s"), 60*time.Second),
+			RefreshTokenHMACActiveKeyID: int16(getEnvAsInt("REFRESH_TOKEN_HMAC_ACTIVE_KEY_ID", 1)),
 		},
 		Storage: StorageConfig{
 			UploadPath:   getEnv("UPLOAD_PATH", "./uploads"),
@@ -93,6 +106,10 @@ func Load() (*Config, error) {
 		return nil, fmt.Errorf("invalid configuration: %w", err)
 	}
 
+	if err := config.loadRefreshTokenHMACKeys(); err != nil {
+		return nil, fmt.Errorf("invalid configuration: %w", err)
+	}
+
 	return config, nil
 }
 
@@ -103,6 +120,43 @@ func (c *Config) validate() error {
 	if c.Auth.JWTSecret == "" || c.Auth.JWTSecret == "your-secret-key-change-in-production" {
 		return fmt.Errorf("JWT_SECRET must be set to a secure value")
 	}
+	return nil
+}
+
+func (c *Config) loadRefreshTokenHMACKeys() error {
+	raw := getEnv("REFRESH_TOKEN_HMAC_KEYS", "")
+	if raw == "" {
+		return fmt.Errorf("REFRESH_TOKEN_HMAC_KEYS is required")
+	}
+
+	var keys []RefreshTokenHMACKey
+	if err := json.Unmarshal([]byte(raw), &keys); err != nil {
+		return fmt.Errorf("REFRESH_TOKEN_HMAC_KEYS must be valid JSON: %w", err)
+	}
+	if len(keys) == 0 {
+		return fmt.Errorf("REFRESH_TOKEN_HMAC_KEYS must contain at least one key")
+	}
+
+	activeFound := false
+	for i := range keys {
+		b, err := base64.StdEncoding.DecodeString(keys[i].KeyB64)
+		if err != nil {
+			return fmt.Errorf("REFRESH_TOKEN_HMAC_KEYS[%d].key_b64 must be base64: %w", i, err)
+		}
+		if len(b) < 32 {
+			return fmt.Errorf("REFRESH_TOKEN_HMAC_KEYS[%d] decoded key must be >= 32 bytes", i)
+		}
+		keys[i].Key = b
+		if keys[i].ID == c.Auth.RefreshTokenHMACActiveKeyID {
+			activeFound = true
+		}
+	}
+
+	if !activeFound {
+		return fmt.Errorf("REFRESH_TOKEN_HMAC_ACTIVE_KEY_ID=%d not found in REFRESH_TOKEN_HMAC_KEYS", c.Auth.RefreshTokenHMACActiveKeyID)
+	}
+
+	c.Auth.RefreshTokenHMACKeys = keys
 	return nil
 }
 

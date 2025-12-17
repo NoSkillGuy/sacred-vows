@@ -134,7 +134,12 @@ func main() {
 	loginUC := authUC.NewLoginUseCase(userRepo)
 	getCurrentUserUC := authUC.NewGetCurrentUserUseCase(userRepo)
 	googleOAuthUC := authUC.NewGoogleOAuthUseCaseWithService(userRepo, googleOAuthService.GetOAuthConfig(), googleOAuthService)
-	refreshTokenUC := authUC.NewRefreshTokenUseCase(refreshTokenRepo, userRepo, jwtService)
+
+	hmacKeys := make([]auth.RefreshTokenHMACKey, 0, len(cfg.Auth.RefreshTokenHMACKeys))
+	for _, k := range cfg.Auth.RefreshTokenHMACKeys {
+		hmacKeys = append(hmacKeys, auth.RefreshTokenHMACKey{ID: k.ID, Key: k.Key})
+	}
+	refreshTokenUC := authUC.NewRefreshTokenUseCase(refreshTokenRepo, userRepo, jwtService, hmacKeys, cfg.Auth.RefreshTokenHMACActiveKeyID)
 
 	createInvitationUC := invitation.NewCreateInvitationUseCase(invitationRepo)
 	getInvitationByIDUC := invitation.NewGetInvitationByIDUseCase(invitationRepo)
@@ -160,7 +165,7 @@ func main() {
 	getAnalyticsByInvitationUC := analytics.NewGetAnalyticsByInvitationUseCase(analyticsRepo)
 
 	// Initialize handlers
-	authHandler := handlers.NewAuthHandler(registerUC, loginUC, getCurrentUserUC, googleOAuthUC, refreshTokenUC, refreshTokenRepo, jwtService, googleOAuthService)
+	authHandler := handlers.NewAuthHandler(registerUC, loginUC, getCurrentUserUC, googleOAuthUC, refreshTokenUC, refreshTokenRepo, jwtService, googleOAuthService, hmacKeys, cfg.Auth.RefreshTokenHMACActiveKeyID)
 	invitationHandler := handlers.NewInvitationHandler(createInvitationUC, getInvitationByIDUC, getAllInvitationsUC, getInvitationPreviewUC, updateInvitationUC, deleteInvitationUC, migrateInvitationsUC)
 	layoutHandler := handlers.NewLayoutHandler(getAllLayoutsUC, getLayoutByIDUC, getLayoutManifestUC, getManifestsUC)
 	assetHandler := handlers.NewAssetHandler(uploadAssetUC, getAllAssetsUC, deleteAssetUC, fileStorage)

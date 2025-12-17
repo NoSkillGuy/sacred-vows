@@ -35,35 +35,29 @@ func CompareTokenHash(token, hash string) bool {
 
 func (r *refreshTokenRepository) Create(ctx context.Context, token *domain.RefreshToken) error {
 	model := &RefreshTokenModel{
-		ID:        token.ID,
-		UserID:    token.UserID,
-		TokenHash: token.TokenHash,
-		ExpiresAt: token.ExpiresAt,
-		Revoked:   token.Revoked,
-		CreatedAt: token.CreatedAt,
+		ID:              token.ID,
+		UserID:          token.UserID,
+		TokenHash:       token.TokenHash,
+		TokenFingerprint: token.TokenFingerprint,
+		HMACKeyID:       token.HMACKeyID,
+		ExpiresAt:       token.ExpiresAt,
+		Revoked:         token.Revoked,
+		CreatedAt:       token.CreatedAt,
 	}
 	return r.db.WithContext(ctx).Create(model).Error
 }
 
-func (r *refreshTokenRepository) FindActiveByToken(ctx context.Context, token string) (*domain.RefreshToken, error) {
-	now := time.Now()
-
-	var models []RefreshTokenModel
+func (r *refreshTokenRepository) FindByTokenFingerprint(ctx context.Context, fingerprint []byte) (*domain.RefreshToken, error) {
+	var model RefreshTokenModel
 	if err := r.db.WithContext(ctx).
-		Where("revoked = ? AND expires_at > ?", false, now).
-		Order("created_at DESC").
-		Limit(2000).
-		Find(&models).Error; err != nil {
+		Where("token_fingerprint = ?", fingerprint).
+		First(&model).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
 		return nil, err
 	}
-
-	for _, m := range models {
-		if CompareTokenHash(token, m.TokenHash) {
-			return toRefreshTokenDomain(&m), nil
-		}
-	}
-
-	return nil, nil
+	return toRefreshTokenDomain(&model), nil
 }
 
 func (r *refreshTokenRepository) FindByID(ctx context.Context, id string) (*domain.RefreshToken, error) {
@@ -98,13 +92,13 @@ func (r *refreshTokenRepository) DeleteExpired(ctx context.Context) error {
 
 func toRefreshTokenDomain(model *RefreshTokenModel) *domain.RefreshToken {
 	return &domain.RefreshToken{
-		ID:        model.ID,
-		UserID:    model.UserID,
-		TokenHash: model.TokenHash,
-		ExpiresAt: model.ExpiresAt,
-		Revoked:   model.Revoked,
-		CreatedAt: model.CreatedAt,
+		ID:              model.ID,
+		UserID:          model.UserID,
+		TokenHash:       model.TokenHash,
+		TokenFingerprint: model.TokenFingerprint,
+		HMACKeyID:       model.HMACKeyID,
+		ExpiresAt:       model.ExpiresAt,
+		Revoked:         model.Revoked,
+		CreatedAt:       model.CreatedAt,
 	}
 }
-
-

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
@@ -22,6 +23,8 @@ type AuthHandler struct {
 	refreshTokenRepo repository.RefreshTokenRepository
 	jwtService       *authinfra.JWTService
 	googleOAuth      *authinfra.GoogleOAuthService
+	hmacKeys         []authinfra.RefreshTokenHMACKey
+	activeHMACKeyID  int16
 }
 
 func NewAuthHandler(
@@ -33,6 +36,8 @@ func NewAuthHandler(
 	refreshTokenRepo repository.RefreshTokenRepository,
 	jwtService *authinfra.JWTService,
 	googleOAuth *authinfra.GoogleOAuthService,
+	hmacKeys []authinfra.RefreshTokenHMACKey,
+	activeHMACKeyID int16,
 ) *AuthHandler {
 	return &AuthHandler{
 		registerUC:       registerUC,
@@ -43,6 +48,8 @@ func NewAuthHandler(
 		refreshTokenRepo: refreshTokenRepo,
 		jwtService:       jwtService,
 		googleOAuth:      googleOAuth,
+		hmacKeys:         hmacKeys,
+		activeHMACKeyID:  activeHMACKeyID,
 	}
 }
 
@@ -441,9 +448,19 @@ func (h *AuthHandler) setRefreshTokenCookie(c *gin.Context, userID, email string
 		return err
 	}
 
+	activeKey, ok := h.getActiveHMACKey()
+	if !ok {
+		return fmt.Errorf("refresh token hmac key not configured")
+	}
+	tokenBytes, err := authinfra.DecodeRefreshToken(refreshToken)
+	if err != nil {
+		return err
+	}
+	fingerprint := authinfra.ComputeRefreshTokenFingerprint(activeKey.Key, tokenBytes)
+
 	// Create refresh token entity
 	expiresAt := time.Now().Add(h.jwtService.GetRefreshExpiration())
-	refreshTokenEntity, err := domain.NewRefreshToken(tokenID, userID, tokenHash, expiresAt)
+	refreshTokenEntity, err := domain.NewRefreshToken(tokenID, userID, tokenHash, fingerprint, activeKey.ID, expiresAt)
 	if err != nil {
 		return err
 	}
@@ -478,6 +495,15 @@ func (h *AuthHandler) setRefreshTokenCookie(c *gin.Context, userID, email string
 	http.SetCookie(c.Writer, cookie)
 
 	return nil
+}
+
+func (h *AuthHandler) getActiveHMACKey() (authinfra.RefreshTokenHMACKey, bool) {
+	for _, k := range h.hmacKeys {
+		if k.ID == h.activeHMACKeyID {
+			return k, true
+		}
+	}
+	return authinfra.RefreshTokenHMACKey{}, false
 }
 
 type RefreshTokenResponse struct {

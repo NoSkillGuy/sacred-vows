@@ -15,17 +15,23 @@ type RefreshTokenUseCase struct {
 	refreshTokenRepo repository.RefreshTokenRepository
 	userRepo         repository.UserRepository
 	jwtService       *auth.JWTService
+	hmacKeys         []auth.RefreshTokenHMACKey
+	activeHMACKeyID  int16
 }
 
 func NewRefreshTokenUseCase(
 	refreshTokenRepo repository.RefreshTokenRepository,
 	userRepo repository.UserRepository,
 	jwtService *auth.JWTService,
+	hmacKeys []auth.RefreshTokenHMACKey,
+	activeHMACKeyID int16,
 ) *RefreshTokenUseCase {
 	return &RefreshTokenUseCase{
 		refreshTokenRepo: refreshTokenRepo,
 		userRepo:         userRepo,
 		jwtService:       jwtService,
+		hmacKeys:         hmacKeys,
+		activeHMACKeyID:  activeHMACKeyID,
 	}
 }
 
@@ -44,9 +50,26 @@ func (uc *RefreshTokenUseCase) Execute(ctx context.Context, input RefreshTokenIn
 		return nil, errors.New(errors.ErrBadRequest.Code, "Refresh token is required")
 	}
 
-	storedToken, err := uc.refreshTokenRepo.FindActiveByToken(ctx, input.RefreshToken)
+	tokenBytes, err := auth.DecodeRefreshToken(input.RefreshToken)
 	if err != nil {
-		return nil, errors.Wrap(errors.ErrInternalServerError.Code, "Failed to find refresh token", err)
+		return nil, errors.New(errors.ErrUnauthorized.Code, "Invalid refresh token")
+	}
+
+	var storedToken *domain.RefreshToken
+	for _, k := range uc.orderedHMACKeys() {
+		fp := auth.ComputeRefreshTokenFingerprint(k.Key, tokenBytes)
+		t, findErr := uc.refreshTokenRepo.FindByTokenFingerprint(ctx, fp)
+		if findErr != nil {
+			return nil, errors.Wrap(errors.ErrInternalServerError.Code, "Failed to find refresh token", findErr)
+		}
+		if t == nil {
+			continue
+		}
+		if !postgres.CompareTokenHash(input.RefreshToken, t.TokenHash) {
+			return nil, errors.New(errors.ErrUnauthorized.Code, "Invalid refresh token")
+		}
+		storedToken = t
+		break
 	}
 
 	if storedToken == nil {
@@ -85,12 +108,24 @@ func (uc *RefreshTokenUseCase) Execute(ctx context.Context, input RefreshTokenIn
 		return nil, errors.Wrap(errors.ErrInternalServerError.Code, "Failed to hash new refresh token", err)
 	}
 
+	activeKey, ok := uc.getActiveHMACKey()
+	if !ok {
+		return nil, errors.Wrap(errors.ErrInternalServerError.Code, "Refresh token HMAC key not configured", nil)
+	}
+	newTokenBytes, err := auth.DecodeRefreshToken(newRefreshToken)
+	if err != nil {
+		return nil, errors.Wrap(errors.ErrInternalServerError.Code, "Invalid refresh token encoding", err)
+	}
+	newFingerprint := auth.ComputeRefreshTokenFingerprint(activeKey.Key, newTokenBytes)
+
 	// Create new refresh token entity
 	expiresAt := time.Now().Add(uc.jwtService.GetRefreshExpiration())
 	newRefreshTokenEntity, err := domain.NewRefreshToken(
 		newTokenID,
 		user.ID,
 		newTokenHash,
+		newFingerprint,
+		activeKey.ID,
 		expiresAt,
 	)
 	if err != nil {
@@ -121,3 +156,28 @@ func (uc *RefreshTokenUseCase) Execute(ctx context.Context, input RefreshTokenIn
 	}, nil
 }
 
+func (uc *RefreshTokenUseCase) getActiveHMACKey() (auth.RefreshTokenHMACKey, bool) {
+	for _, k := range uc.hmacKeys {
+		if k.ID == uc.activeHMACKeyID {
+			return k, true
+		}
+	}
+	return auth.RefreshTokenHMACKey{}, false
+}
+
+func (uc *RefreshTokenUseCase) orderedHMACKeys() []auth.RefreshTokenHMACKey {
+	if len(uc.hmacKeys) <= 1 {
+		return uc.hmacKeys
+	}
+	out := make([]auth.RefreshTokenHMACKey, 0, len(uc.hmacKeys))
+	if active, ok := uc.getActiveHMACKey(); ok {
+		out = append(out, active)
+	}
+	for _, k := range uc.hmacKeys {
+		if k.ID == uc.activeHMACKeyID {
+			continue
+		}
+		out = append(out, k)
+	}
+	return out
+}

@@ -469,6 +469,8 @@ CREATE TABLE "refresh_tokens" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "user_id" TEXT NOT NULL,
     "token_hash" TEXT NOT NULL UNIQUE,
+    "token_fingerprint" BYTEA NOT NULL UNIQUE,
+    "hmac_key_id" SMALLINT NOT NULL,
     "expires_at" TIMESTAMP(3) NOT NULL,
     "revoked" BOOLEAN NOT NULL DEFAULT false,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -479,15 +481,18 @@ CREATE TABLE "refresh_tokens" (
 
 -- Indexes
 CREATE UNIQUE INDEX "refresh_tokens_token_hash_key" ON "refresh_tokens"("token_hash");
+CREATE UNIQUE INDEX "refresh_tokens_token_fingerprint_key" ON "refresh_tokens"("token_fingerprint");
 CREATE INDEX "idx_refresh_tokens_user_id" ON "refresh_tokens"("user_id");
 CREATE INDEX "idx_refresh_tokens_expires_at" ON "refresh_tokens"("expires_at");
 CREATE INDEX "idx_refresh_tokens_revoked" ON "refresh_tokens"("revoked");
+CREATE INDEX "idx_refresh_tokens_hmac_key_id" ON "refresh_tokens"("hmac_key_id");
 ```
 
 **Token Storage:**
-- Only token hash is stored (bcrypt)
+- token_hash (bcrypt) stored for verification
+- token_fingerprint (HMAC-SHA256) stored for indexed lookup
 - Original token never stored in database
-- Token lookup compares the provided token against stored bcrypt hashes (bcrypt hashes are non-deterministic, so equality lookup is not possible)
+- Token lookup uses token_fingerprint (deterministic), then verifies bcrypt hash
 
 ## Configuration
 
@@ -496,6 +501,8 @@ CREATE INDEX "idx_refresh_tokens_revoked" ON "refresh_tokens"("revoked");
 **Required:**
 - `JWT_SECRET` - Secret key for JWT signing (must be strong and unique)
 - `DATABASE_URL` - PostgreSQL connection string
+- `REFRESH_TOKEN_HMAC_KEYS` - JSON array of HMAC keys, e.g. `[{"id":1,"key_b64":"..."}]`
+- `REFRESH_TOKEN_HMAC_ACTIVE_KEY_ID` - Active HMAC key id to use for issuing new refresh tokens
 
 **Optional (with defaults):**
 - `JWT_ACCESS_EXPIRATION` - Access token lifetime (default: `15m`)
