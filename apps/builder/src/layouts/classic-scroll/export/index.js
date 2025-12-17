@@ -4,8 +4,8 @@
  * Export functionality for generating static HTML/CSS from classic-scroll layout
  */
 
-import { generateHTML } from './template';
-import { generateCSS } from './styles';
+import { generateHTML } from './template.js';
+import { generateCSS } from './styles.js';
 
 /**
  * Export the invitation as a complete static site

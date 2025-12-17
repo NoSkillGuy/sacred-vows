@@ -18,6 +18,7 @@ type Config struct {
 	Auth     AuthConfig
 	Storage  StorageConfig
 	Google   GoogleConfig
+	Publishing PublishingConfig
 }
 
 type ServerConfig struct {
@@ -65,6 +66,18 @@ type GoogleConfig struct {
 	FrontendURL  string
 }
 
+type PublishingConfig struct {
+	BaseDomain string
+	ArtifactStore string // filesystem|r2
+
+	// R2 (S3-compatible)
+	R2AccountID      string
+	R2AccessKeyID    string
+	R2SecretAccessKey string
+	R2Bucket         string
+	R2PublicBase     string
+}
+
 func Load() (*Config, error) {
 	// Load .env file if it exists.
 	// We try a few common locations to avoid surprises with working directory.
@@ -103,6 +116,15 @@ func Load() (*Config, error) {
 			ClientSecret: getEnv("GOOGLE_CLIENT_SECRET", ""),
 			RedirectURI:  getEnv("GOOGLE_REDIRECT_URI", "http://localhost:3000/api/auth/google/callback"),
 			FrontendURL:  getEnv("FRONTEND_URL", "http://localhost:5173"),
+		},
+		Publishing: PublishingConfig{
+			BaseDomain: getEnv("PUBLISHED_BASE_DOMAIN", ""),
+			ArtifactStore: getEnv("PUBLISH_ARTIFACT_STORE", "filesystem"),
+			R2AccountID: getEnv("R2_ACCOUNT_ID", ""),
+			R2AccessKeyID: getEnv("R2_ACCESS_KEY_ID", ""),
+			R2SecretAccessKey: getEnv("R2_SECRET_ACCESS_KEY", ""),
+			R2Bucket: getEnv("R2_BUCKET", ""),
+			R2PublicBase: getEnv("R2_PUBLIC_BASE", ""),
 		},
 	}
 

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import ThemeModal from '../Toolbar/ThemeModal';
 import GalleryModal from '../Toolbar/GalleryModal';
 import LayoutSwitcher from '../Toolbar/LayoutSwitcher';
-import ExportModal from '../Export/ExportModal';
+import PublishModal from '../Export/ExportModal';
 import SectionManager from '../SectionManager/SectionManager';
 import { useBuilderStore } from '../../store/builderStore';
 import SidebarSection from './SidebarSection';
@@ -178,7 +178,7 @@ function AutosaveStatus() {
 export default function BuilderSidebar({ editMode, onEditModeToggle, deviceMode, onDeviceModeChange }) {
   const [showThemeModal, setShowThemeModal] = useState(false);
   const [showGalleryModal, setShowGalleryModal] = useState(false);
-  const [showExportModal, setShowExportModal] = useState(false);
+  const [showPublishModal, setShowPublishModal] = useState(false);
   const [showSectionManager, setShowSectionManager] = useState(false);
   const [showLayoutSwitcher, setShowLayoutSwitcher] = useState(false);
 
@@ -407,7 +407,7 @@ export default function BuilderSidebar({ editMode, onEditModeToggle, deviceMode,
 
               {s.key === 'publish' && (
                 <div className="sidebar-actions">
-                  <button type="button" className="sidebar-btn primary" onClick={() => setShowExportModal(true)}>
+                  <button type="button" className="sidebar-btn primary" onClick={() => setShowPublishModal(true)}>
                     <span className="btn-icon" aria-hidden="true">
                       <RocketIcon />
                     </span>
@@ -472,7 +472,7 @@ export default function BuilderSidebar({ editMode, onEditModeToggle, deviceMode,
               <button type="button" className="rail-btn" onClick={() => setShowGalleryModal(true)} title="Gallery" aria-label="Gallery">
                 <GalleryIcon />
               </button>
-              <button type="button" className="rail-btn rail-primary" onClick={() => setShowExportModal(true)} title="Publish" aria-label="Publish">
+              <button type="button" className="rail-btn rail-primary" onClick={() => setShowPublishModal(true)} title="Publish" aria-label="Publish">
                 <RocketIcon />
               </button>
             </div>
@@ -618,7 +618,7 @@ export default function BuilderSidebar({ editMode, onEditModeToggle, deviceMode,
                         type="button"
                         className="sidebar-btn primary"
                         onClick={() => {
-                          setShowExportModal(true);
+                          setShowPublishModal(true);
                           setDrawerOpen(false);
                         }}
                       >
@@ -640,7 +640,7 @@ export default function BuilderSidebar({ editMode, onEditModeToggle, deviceMode,
       <SectionManager isOpen={showSectionManager} onClose={() => setShowSectionManager(false)} />
       <ThemeModal isOpen={showThemeModal} onClose={() => setShowThemeModal(false)} />
       <GalleryModal isOpen={showGalleryModal} onClose={() => setShowGalleryModal(false)} />
-      <ExportModal isOpen={showExportModal} onClose={() => setShowExportModal(false)} />
+      <PublishModal isOpen={showPublishModal} onClose={() => setShowPublishModal(false)} />
     </>
   );
 }

@@ -101,6 +101,23 @@ func (AnalyticsModel) TableName() string {
 	return "analytics"
 }
 
+// PublishedSiteModel represents the published_sites table
+type PublishedSiteModel struct {
+	ID             string     `gorm:"primaryKey;type:text"`
+	InvitationID   string     `gorm:"type:text;not null;index"`
+	OwnerUserID    string     `gorm:"type:text;not null;index"`
+	Subdomain      string     `gorm:"type:text;not null;uniqueIndex"`
+	Published      bool       `gorm:"not null;default:false"`
+	CurrentVersion int        `gorm:"not null;default:0"`
+	CreatedAt      time.Time  `gorm:"autoCreateTime"`
+	UpdatedAt      time.Time  `gorm:"autoUpdateTime"`
+	PublishedAt    *time.Time `gorm:""`
+}
+
+func (PublishedSiteModel) TableName() string {
+	return "published_sites"
+}
+
 // RefreshTokenModel represents the refresh_tokens table
 type RefreshTokenModel struct {
 	ID              string    `gorm:"primaryKey;type:text"`

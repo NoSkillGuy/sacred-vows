@@ -504,6 +504,15 @@ CREATE INDEX "idx_refresh_tokens_hmac_key_id" ON "refresh_tokens"("hmac_key_id")
 - `REFRESH_TOKEN_HMAC_KEYS` - JSON array of HMAC keys, e.g. `[{"id":1,"key_b64":"..."}]`
 - `REFRESH_TOKEN_HMAC_ACTIVE_KEY_ID` - Active HMAC key id to use for issuing new refresh tokens
 
+### Publishing Environment Variables
+
+See `docs/publishing.md` for full publishing configuration. Key variables:
+
+- `PUBLISHED_BASE_DOMAIN`
+- `PUBLISH_ARTIFACT_STORE` (`filesystem` or `r2`)
+- `SNAPSHOT_RENDERER_SCRIPT`
+- `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET` (when using R2)
+
 **Optional (with defaults):**
 - `JWT_ACCESS_EXPIRATION` - Access token lifetime (default: `15m`)
 - `JWT_REFRESH_EXPIRATION` - Refresh token lifetime (default: `30d`)

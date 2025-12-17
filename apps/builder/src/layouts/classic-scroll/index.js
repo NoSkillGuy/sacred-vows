@@ -5,12 +5,12 @@
  * This file registers the layout with the registry and exports all layout resources.
  */
 
-import { registerLayout } from '../registry';
-import classicScrollManifest from './manifest';
-import components from './components';
-import styles from './styles';
-import exportModule from './export';
-import hooks from './hooks';
+import { registerLayout } from '../registry.js';
+import classicScrollManifest from './manifest.js';
+import components from './components/index.js';
+import styles from './styles/index.js';
+import exportModule from './export/index.js';
+import hooks from './hooks/index.js';
 
 /**
  * Classic Scroll Layout Definition

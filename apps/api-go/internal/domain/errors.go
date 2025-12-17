@@ -12,6 +12,8 @@ var (
 	ErrInvalidAssetURL      = errors.New("invalid asset URL")
 	ErrInvalidFilename      = errors.New("invalid filename")
 	ErrInvalidInvitationID  = errors.New("invalid invitation ID")
+	ErrInvalidSubdomain     = errors.New("invalid subdomain")
+	ErrSubdomainTaken       = errors.New("subdomain already taken")
 	ErrInvalidName          = errors.New("invalid name")
 	ErrInvalidDate          = errors.New("invalid date")
 	ErrInvalidAnalyticsType = errors.New("invalid analytics type")

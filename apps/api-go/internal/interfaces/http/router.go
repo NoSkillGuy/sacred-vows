@@ -17,6 +17,9 @@ type Router struct {
 	assetHandler      *handlers.AssetHandler
 	rsvpHandler       *handlers.RSVPHandler
 	analyticsHandler  *handlers.AnalyticsHandler
+	publishHandler    *handlers.PublishHandler
+	resolveHandler    *handlers.PublishedSiteResolveHandler
+	resolveAPIHandler *handlers.PublishedResolveAPIHandler
 	jwtService        *auth.JWTService
 	frontendURL       string
 }
@@ -28,6 +31,9 @@ func NewRouter(
 	assetHandler *handlers.AssetHandler,
 	rsvpHandler *handlers.RSVPHandler,
 	analyticsHandler *handlers.AnalyticsHandler,
+	publishHandler *handlers.PublishHandler,
+	resolveHandler *handlers.PublishedSiteResolveHandler,
+	resolveAPIHandler *handlers.PublishedResolveAPIHandler,
 	jwtService *auth.JWTService,
 	frontendURL string,
 ) *Router {
@@ -38,6 +44,9 @@ func NewRouter(
 		assetHandler:      assetHandler,
 		rsvpHandler:       rsvpHandler,
 		analyticsHandler:  analyticsHandler,
+		publishHandler:    publishHandler,
+		resolveHandler:    resolveHandler,
+		resolveAPIHandler: resolveAPIHandler,
 		jwtService:        jwtService,
 		frontendURL:       frontendURL,
 	}
@@ -114,13 +123,34 @@ func (r *Router) Setup() *gin.Engine {
 			analytics.POST("/view", r.analyticsHandler.TrackView)
 			analytics.GET("/:invitationId", r.analyticsHandler.GetByInvitation)
 		}
+
+		// Publish routes
+		publish := api.Group("/publish")
+		{
+			publish.POST("/validate", middleware.RateLimit(20, 2), r.publishHandler.ValidateSubdomain)
+			publish.POST("", middleware.RateLimit(10, 1), middleware.AuthenticateToken(r.jwtService), r.publishHandler.Publish)
+		}
+
+		// Published resolve endpoint for edge (no auth)
+		published := api.Group("/published")
+		{
+			published.GET("/resolve", r.resolveAPIHandler.Resolve)
+		}
 	}
 
 	// Swagger documentation
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
+	// Serve published artifacts (dev/local implementation)
+	router.Static("/published", "./published")
+
 	// 404 handler
 	router.NoRoute(func(c *gin.Context) {
+		// Attempt to resolve published sites by Host header, otherwise return default 404.
+		if r.resolveHandler != nil {
+			r.resolveHandler.Handle(c)
+			return
+		}
 		c.JSON(404, gin.H{"error": "Route not found"})
 	})
 

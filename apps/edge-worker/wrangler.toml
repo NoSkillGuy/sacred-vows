@@ -1,0 +1,15 @@
+name = "sacred-vows-published-sites"
+main = "src/index.ts"
+compatibility_date = "2025-12-17"
+
+[vars]
+PUBLISHED_BASE_DOMAIN = ""
+API_ORIGIN = ""
+RESOLVE_CACHE_TTL_SECONDS = "30"
+
+# Bind your R2 bucket:
+# [[r2_buckets]]
+# binding = "R2_BUCKET"
+# bucket_name = "your-bucket"
+
+

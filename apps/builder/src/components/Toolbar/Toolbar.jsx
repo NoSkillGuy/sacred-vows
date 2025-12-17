@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import ThemeModal from './ThemeModal';
 import GalleryModal from './GalleryModal';
 import LayoutSwitcher from './LayoutSwitcher';
-import ExportModal from '../Export/ExportModal';
+import PublishModal from '../Export/ExportModal';
 import SectionManager from '../SectionManager/SectionManager';
 import { useBuilderStore } from '../../store/builderStore';
 import './Toolbar.css';
@@ -107,7 +107,7 @@ const BackIcon = () => (
 function Toolbar({ editMode, onEditModeToggle, deviceMode, onDeviceModeChange }) {
   const [showThemeModal, setShowThemeModal] = useState(false);
   const [showGalleryModal, setShowGalleryModal] = useState(false);
-  const [showExportModal, setShowExportModal] = useState(false);
+  const [showPublishModal, setShowPublishModal] = useState(false);
   const [showSectionManager, setShowSectionManager] = useState(false);
   const [showLayoutSwitcher, setShowLayoutSwitcher] = useState(false);
 
@@ -223,7 +223,7 @@ function Toolbar({ editMode, onEditModeToggle, deviceMode, onDeviceModeChange })
 
           <button
             className="toolbar-btn publish-btn"
-            onClick={() => setShowExportModal(true)}
+            onClick={() => setShowPublishModal(true)}
             title="Publish your invitation"
           >
             <span className="btn-icon">
@@ -250,9 +250,9 @@ function Toolbar({ editMode, onEditModeToggle, deviceMode, onDeviceModeChange })
         isOpen={showGalleryModal} 
         onClose={() => setShowGalleryModal(false)} 
       />
-      <ExportModal 
-        isOpen={showExportModal} 
-        onClose={() => setShowExportModal(false)} 
+      <PublishModal 
+        isOpen={showPublishModal} 
+        onClose={() => setShowPublishModal(false)} 
       />
     </>
   );

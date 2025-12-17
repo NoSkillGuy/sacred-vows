@@ -3,12 +3,12 @@
  * Registers the layout with the central layout registry
  */
 
-import { registerLayout } from '../registry';
-import { editorialEleganceManifest } from './manifest';
-import * as components from './components';
-import * as styles from './styles';
-import * as hooks from './hooks';
-import * as exportModule from './export';
+import { registerLayout } from '../registry.js';
+import { editorialEleganceManifest } from './manifest.js';
+import * as components from './components/index.js';
+import * as styles from './styles/index.js';
+import * as hooks from './hooks/index.js';
+import * as exportModule from './export/index.js';
 
 // Register editorial-elegance layout
 registerLayout({

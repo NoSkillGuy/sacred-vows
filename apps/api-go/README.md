@@ -72,7 +72,7 @@ apps/api-go/
 
 3. **Configure environment variables**:
    ```bash
-   cp .env.example .env
+   cp env.example .env
    # Edit .env with your configuration
    ```
 
@@ -90,7 +90,7 @@ apps/api-go/
 
 ## Environment Variables
 
-See `.env.example` for all required environment variables:
+See `env.example` for all required environment variables:
 
 - `DATABASE_URL` - PostgreSQL connection string
 - `JWT_SECRET` - Secret key for JWT token signing

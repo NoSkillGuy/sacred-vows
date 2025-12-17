@@ -32,6 +32,9 @@ logs/
 # Builder build output
 apps/builder/dist/
 
+# Published site artifacts (local filesystem artifact store)
+apps/api-go/published/sites/
+
 # OS generated files
 Icon?
 # But allow PWA icons

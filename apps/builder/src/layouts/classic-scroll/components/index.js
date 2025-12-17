@@ -8,37 +8,37 @@
  */
 
 // Import view components
-import Header from './view/Header';
-import Hero from './view/Hero';
-import Couple from './view/Couple';
-import FathersLetter from './view/FathersLetter';
-import Gallery from './view/Gallery';
-import Events from './view/Events';
-import Venue from './view/Venue';
-import RSVP from './view/RSVP';
-import Footer from './view/Footer';
-import Blessings from './view/Blessings';
-import ConfettiLayer from './view/ConfettiLayer';
-import CelebrateButton from './view/CelebrateButton';
+import Header from './view/Header.jsx';
+import Hero from './view/Hero.jsx';
+import Couple from './view/Couple.jsx';
+import FathersLetter from './view/FathersLetter.jsx';
+import Gallery from './view/Gallery.jsx';
+import Events from './view/Events.jsx';
+import Venue from './view/Venue.jsx';
+import RSVP from './view/RSVP.jsx';
+import Footer from './view/Footer.jsx';
+import Blessings from './view/Blessings.jsx';
+import ConfettiLayer from './view/ConfettiLayer.jsx';
+import CelebrateButton from './view/CelebrateButton.jsx';
 
 // Import editable components
-import EditableHero from './editable/EditableHero';
-import EditableHeroSection from './editable/EditableHeroSection';
-import EditableCoupleSection from './editable/EditableCoupleSection';
-import EditableFathersLetterSection from './editable/EditableFathersLetterSection';
-import EditableGallerySection from './editable/EditableGallerySection';
-import EditableEventsSection from './editable/EditableEventsSection';
-import EditableVenueSection from './editable/EditableVenueSection';
-import EditableRSVPSection from './editable/EditableRSVPSection';
-import EditableFooter from './editable/EditableFooter';
+import EditableHero from './editable/EditableHero.jsx';
+import EditableHeroSection from './editable/EditableHeroSection.jsx';
+import EditableCoupleSection from './editable/EditableCoupleSection.jsx';
+import EditableFathersLetterSection from './editable/EditableFathersLetterSection.jsx';
+import EditableGallerySection from './editable/EditableGallerySection.jsx';
+import EditableEventsSection from './editable/EditableEventsSection.jsx';
+import EditableVenueSection from './editable/EditableVenueSection.jsx';
+import EditableRSVPSection from './editable/EditableRSVPSection.jsx';
+import EditableFooter from './editable/EditableFooter.jsx';
 
 // Import shared components
-import EditableText from './shared/EditableText';
-import EditableImage from './shared/EditableImage';
-import EditableWrapper from './shared/EditableWrapper';
-import RSVPModal from './shared/RSVPModal';
-import LanguageModal from './shared/LanguageModal';
-import GuestNameModal from './shared/GuestNameModal';
+import EditableText from './shared/EditableText.jsx';
+import EditableImage from './shared/EditableImage.jsx';
+import EditableWrapper from './shared/EditableWrapper.jsx';
+import RSVPModal from './shared/RSVPModal.jsx';
+import LanguageModal from './shared/LanguageModal.jsx';
+import GuestNameModal from './shared/GuestNameModal.jsx';
 
 // View components mapped by section ID
 export const viewComponents = {

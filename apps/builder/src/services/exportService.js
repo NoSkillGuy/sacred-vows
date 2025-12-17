@@ -107,7 +107,7 @@ export async function exportInvitationAsZip(invitationData, translations) {
   const jpeg1x1 = '/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxISEhISEhIVFRUVFRUVFRUVFRUVFRUWFxUVFRUYHSggGBolGxUVITEhJSkrLi4uFx8zODMsNygtLisBCgoKDg0OGhAQGi0lICUtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLf/AABEIAKgBLAMBIgACEQEDEQH/xAAbAAEAAgMBAQAAAAAAAAAAAAAABQYBAwQCB//EADwQAAEDAgQDBgQEBQQCAwAAAAEAAhEDIQQSMUEFUWFxBhMicYGRoQcjQrHB0fAHFSNSYuEzgpKiFf/EABoBAQADAQEBAAAAAAAAAAAAAAABAgMEBQb/xAAuEQACAgECBAMIAwEBAAAAAAAAAQIRAxIhMUETIlFhBRQycaGxwTNScpHB0f/aAAwDAQACEQMRAD8A9xREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQf/2Q==';
   
   // Generate HTML
-  const html = generateInvitationHTML(invitationData, translations);
+  const html = await generateInvitationHTML(invitationData, translations);
   zip.file('index.html', html);
   zip.file('manifest.json', manifest);
   zip.file('assets/photos/icons/icon-192.png', png1x1, { base64: true });

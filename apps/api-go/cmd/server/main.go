@@ -33,6 +33,7 @@ import (
 	"github.com/sacred-vows/api-go/internal/infrastructure/auth"
 	"github.com/sacred-vows/api-go/internal/infrastructure/config"
 	"github.com/sacred-vows/api-go/internal/infrastructure/database/postgres"
+	publishinfra "github.com/sacred-vows/api-go/internal/infrastructure/publish"
 	"github.com/sacred-vows/api-go/internal/infrastructure/storage"
 	httpRouter "github.com/sacred-vows/api-go/internal/interfaces/http"
 	"github.com/sacred-vows/api-go/internal/interfaces/http/handlers"
@@ -41,6 +42,7 @@ import (
 	authUC "github.com/sacred-vows/api-go/internal/usecase/auth"
 	"github.com/sacred-vows/api-go/internal/usecase/invitation"
 	"github.com/sacred-vows/api-go/internal/usecase/layout"
+	publishUC "github.com/sacred-vows/api-go/internal/usecase/publish"
 	"github.com/sacred-vows/api-go/internal/usecase/rsvp"
 	"github.com/sacred-vows/api-go/pkg/logger"
 	"go.uber.org/zap"
@@ -77,7 +79,8 @@ func main() {
 		if _, err := os.Stat("/app/migrations"); err == nil {
 			migrationsDir = "/app/migrations"
 		} else {
-			migrationsDir = "../../migrations"
+			// When running locally from apps/api-go, migrations live at ./migrations
+			migrationsDir = "./migrations"
 		}
 	}
 	if err := db.RunMigrations(ctx, migrationsDir); err != nil {
@@ -97,6 +100,7 @@ func main() {
 		&postgres.AssetModel{},
 		&postgres.RSVPResponseModel{},
 		&postgres.AnalyticsModel{},
+		&postgres.PublishedSiteModel{},
 		// &postgres.RefreshTokenModel{}, // Excluded - table created via SQL migration 010
 	); err != nil {
 		// Log error but don't fail - tables are already created via SQL migrations
@@ -113,6 +117,7 @@ func main() {
 	rsvpRepo := postgres.NewRSVPRepository(db.DB)
 	analyticsRepo := postgres.NewAnalyticsRepository(db.DB)
 	refreshTokenRepo := postgres.NewRefreshTokenRepository(db.DB)
+	publishedSiteRepo := postgres.NewPublishedSiteRepository(db.DB)
 
 	// Initialize services
 	jwtService := auth.NewJWTService(
@@ -164,6 +169,45 @@ func main() {
 	trackViewUC := analytics.NewTrackViewUseCase(analyticsRepo)
 	getAnalyticsByInvitationUC := analytics.NewGetAnalyticsByInvitationUseCase(analyticsRepo)
 
+	// Publish use cases (wiring generator/storage happens later; defaults to noop)
+	validateSubdomainUC := publishUC.NewValidateSubdomainUseCase(publishedSiteRepo)
+	var snapshotGen publishUC.SnapshotGenerator
+	var artifactStore publishUC.ArtifactStorage
+
+	snapshotGenConcrete, err := publishinfra.NewNodeSnapshotGenerator(invitationRepo)
+	if err != nil {
+		logger.GetLogger().Warn("Publish snapshot generator not configured; publishing will fail", zap.Error(err))
+		snapshotGen = &publishinfra.NoopSnapshotGenerator{}
+	} else {
+		snapshotGen = snapshotGenConcrete
+	}
+
+	switch cfg.Publishing.ArtifactStore {
+	case "r2":
+		r2Store, err := publishinfra.NewR2ArtifactStorage(ctx, publishinfra.R2Config{
+			AccountID:       cfg.Publishing.R2AccountID,
+			AccessKeyID:     cfg.Publishing.R2AccessKeyID,
+			SecretAccessKey: cfg.Publishing.R2SecretAccessKey,
+			Bucket:          cfg.Publishing.R2Bucket,
+			PublicBase:      cfg.Publishing.R2PublicBase,
+		})
+		if err != nil {
+			logger.GetLogger().Warn("R2 artifact storage not configured; publishing will fail", zap.Error(err))
+			artifactStore = &publishinfra.NoopArtifactStorage{}
+		} else {
+			artifactStore = r2Store
+		}
+	default:
+		artifactStoreConcrete, err := publishinfra.NewFilesystemArtifactStorage()
+		if err != nil {
+			logger.GetLogger().Warn("Filesystem artifact storage not configured; publishing will fail", zap.Error(err))
+			artifactStore = &publishinfra.NoopArtifactStorage{}
+		} else {
+			artifactStore = artifactStoreConcrete
+		}
+	}
+	publishInvitationUC := publishUC.NewPublishInvitationUseCase(invitationRepo, publishedSiteRepo, snapshotGen, artifactStore)
+
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(registerUC, loginUC, getCurrentUserUC, googleOAuthUC, refreshTokenUC, refreshTokenRepo, jwtService, googleOAuthService, hmacKeys, cfg.Auth.RefreshTokenHMACActiveKeyID)
 	invitationHandler := handlers.NewInvitationHandler(createInvitationUC, getInvitationByIDUC, getAllInvitationsUC, getInvitationPreviewUC, updateInvitationUC, deleteInvitationUC, migrateInvitationsUC)
@@ -171,9 +215,12 @@ func main() {
 	assetHandler := handlers.NewAssetHandler(uploadAssetUC, getAllAssetsUC, deleteAssetUC, fileStorage)
 	rsvpHandler := handlers.NewRSVPHandler(submitRSVPUC, getRSVPByInvitationUC)
 	analyticsHandler := handlers.NewAnalyticsHandler(trackViewUC, getAnalyticsByInvitationUC)
+	publishHandler := handlers.NewPublishHandler(validateSubdomainUC, publishInvitationUC, cfg.Publishing.BaseDomain, cfg.Server.Port)
+	resolveHandler := handlers.NewPublishedSiteResolveHandler(publishedSiteRepo, cfg.Publishing.BaseDomain)
+	resolveAPIHandler := handlers.NewPublishedResolveAPIHandler(publishedSiteRepo, cfg.Publishing.BaseDomain)
 
 	// Setup router
-	router := httpRouter.NewRouter(authHandler, invitationHandler, layoutHandler, assetHandler, rsvpHandler, analyticsHandler, jwtService, cfg.Google.FrontendURL)
+	router := httpRouter.NewRouter(authHandler, invitationHandler, layoutHandler, assetHandler, rsvpHandler, analyticsHandler, publishHandler, resolveHandler, resolveAPIHandler, jwtService, cfg.Google.FrontendURL)
 	engine := router.Setup()
 
 	// Create HTTP server
