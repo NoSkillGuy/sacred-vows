@@ -29,6 +29,9 @@ yarn-error.log*
 logs/
 *.log
 
+# Builder build output
+apps/builder/dist/
+
 # OS generated files
 Icon?
 # But allow PWA icons
