@@ -35,14 +35,14 @@ func CompareTokenHash(token, hash string) bool {
 
 func (r *refreshTokenRepository) Create(ctx context.Context, token *domain.RefreshToken) error {
 	model := &RefreshTokenModel{
-		ID:              token.ID,
-		UserID:          token.UserID,
-		TokenHash:       token.TokenHash,
+		ID:               token.ID,
+		UserID:           token.UserID,
+		TokenHash:        token.TokenHash,
 		TokenFingerprint: token.TokenFingerprint,
-		HMACKeyID:       token.HMACKeyID,
-		ExpiresAt:       token.ExpiresAt,
-		Revoked:         token.Revoked,
-		CreatedAt:       token.CreatedAt,
+		HMACKeyID:        token.HMACKeyID,
+		ExpiresAt:        token.ExpiresAt,
+		Revoked:          token.Revoked,
+		CreatedAt:        token.CreatedAt,
 	}
 	return r.db.WithContext(ctx).Create(model).Error
 }
@@ -92,13 +92,13 @@ func (r *refreshTokenRepository) DeleteExpired(ctx context.Context) error {
 
 func toRefreshTokenDomain(model *RefreshTokenModel) *domain.RefreshToken {
 	return &domain.RefreshToken{
-		ID:              model.ID,
-		UserID:          model.UserID,
-		TokenHash:       model.TokenHash,
+		ID:               model.ID,
+		UserID:           model.UserID,
+		TokenHash:        model.TokenHash,
 		TokenFingerprint: model.TokenFingerprint,
-		HMACKeyID:       model.HMACKeyID,
-		ExpiresAt:       model.ExpiresAt,
-		Revoked:         model.Revoked,
-		CreatedAt:       model.CreatedAt,
+		HMACKeyID:        model.HMACKeyID,
+		ExpiresAt:        model.ExpiresAt,
+		Revoked:          model.Revoked,
+		CreatedAt:        model.CreatedAt,
 	}
 }

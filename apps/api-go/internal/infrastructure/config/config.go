@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strconv"
 	"time"
 
@@ -33,12 +34,12 @@ type DatabaseConfig struct {
 }
 
 type AuthConfig struct {
-	JWTSecret              string
-	JWTAccessExpiration    time.Duration // Short-lived access token (default: 15 minutes)
-	JWTRefreshExpiration   time.Duration // Long-lived refresh token (default: 30 days)
-	JWTIssuer              string        // JWT issuer claim (default: "sacred-vows-api")
-	JWTAudience            string        // JWT audience claim (default: "sacred-vows-client")
-	ClockSkewTolerance     time.Duration // Clock skew tolerance (default: 60 seconds)
+	JWTSecret                   string
+	JWTAccessExpiration         time.Duration // Short-lived access token (default: 15 minutes)
+	JWTRefreshExpiration        time.Duration // Long-lived refresh token (default: 30 days)
+	JWTIssuer                   string        // JWT issuer claim (default: "sacred-vows-api")
+	JWTAudience                 string        // JWT audience claim (default: "sacred-vows-client")
+	ClockSkewTolerance          time.Duration // Clock skew tolerance (default: 60 seconds)
 	RefreshTokenHMACKeys        []RefreshTokenHMACKey
 	RefreshTokenHMACActiveKeyID int16
 }
@@ -65,8 +66,11 @@ type GoogleConfig struct {
 }
 
 func Load() (*Config, error) {
-	// Load .env file if it exists (don't fail if it doesn't)
-	_ = godotenv.Load()
+	// Load .env file if it exists.
+	// We try a few common locations to avoid surprises with working directory.
+	if err := loadDotEnv(); err != nil {
+		return nil, err
+	}
 
 	config := &Config{
 		Server: ServerConfig{
@@ -76,17 +80,17 @@ func Load() (*Config, error) {
 		},
 		Database: DatabaseConfig{
 			URL:             getEnv("DATABASE_URL", ""),
-			MaxOpenConns:   25,
-			MaxIdleConns:   5,
+			MaxOpenConns:    25,
+			MaxIdleConns:    5,
 			ConnMaxLifetime: 5 * time.Minute,
 		},
 		Auth: AuthConfig{
-			JWTSecret:            getEnv("JWT_SECRET", "your-secret-key-change-in-production"),
-			JWTAccessExpiration:  parseDuration(getEnv("JWT_ACCESS_EXPIRATION", "15m"), 15*time.Minute),
-			JWTRefreshExpiration: parseDuration(getEnv("JWT_REFRESH_EXPIRATION", "30d"), 30*24*time.Hour),
-			JWTIssuer:            getEnv("JWT_ISSUER", "sacred-vows-api"),
-			JWTAudience:          getEnv("JWT_AUDIENCE", "sacred-vows-client"),
-			ClockSkewTolerance:   parseDuration(getEnv("JWT_CLOCK_SKEW", "60s"), 60*time.Second),
+			JWTSecret:                   getEnv("JWT_SECRET", "your-secret-key-change-in-production"),
+			JWTAccessExpiration:         parseDuration(getEnv("JWT_ACCESS_EXPIRATION", "15m"), 15*time.Minute),
+			JWTRefreshExpiration:        parseDuration(getEnv("JWT_REFRESH_EXPIRATION", "30d"), 30*24*time.Hour),
+			JWTIssuer:                   getEnv("JWT_ISSUER", "sacred-vows-api"),
+			JWTAudience:                 getEnv("JWT_AUDIENCE", "sacred-vows-client"),
+			ClockSkewTolerance:          parseDuration(getEnv("JWT_CLOCK_SKEW", "60s"), 60*time.Second),
 			RefreshTokenHMACActiveKeyID: int16(getEnvAsInt("REFRESH_TOKEN_HMAC_ACTIVE_KEY_ID", 1)),
 		},
 		Storage: StorageConfig{
@@ -111,6 +115,36 @@ func Load() (*Config, error) {
 	}
 
 	return config, nil
+}
+
+func loadDotEnv() error {
+	// 1) If caller provided explicit path via ENV_FILE, use it.
+	if envFile := os.Getenv("ENV_FILE"); envFile != "" {
+		if err := godotenv.Overload(envFile); err != nil {
+			return fmt.Errorf("failed to load ENV_FILE=%s: %w", envFile, err)
+		}
+		return nil
+	}
+
+	// 2) Try common paths relative to current working directory.
+	candidates := []string{
+		".env",
+		filepath.Join(".", ".env"),
+		filepath.Join("..", ".env"),
+	}
+
+	for _, p := range candidates {
+		if _, err := os.Stat(p); err == nil {
+			// Overload so local .env wins over any inherited env vars.
+			if err := godotenv.Overload(p); err != nil {
+				return fmt.Errorf("failed to load %s: %w", p, err)
+			}
+			return nil
+		}
+	}
+
+	// If no .env present, that's OK (env may come from the process environment).
+	return nil
 }
 
 func (c *Config) validate() error {
