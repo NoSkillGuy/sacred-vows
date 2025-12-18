@@ -6,6 +6,7 @@ This directory contains Terraform configuration for deploying the Sacred Vows AP
 
 The Terraform configuration provisions:
 
+**GCP Resources:**
 - **Cloud Run Service**: Serverless container hosting for the `api-go` service
 - **Firestore Database**: Native mode NoSQL database
 - **Cloud Storage Bucket**: For uploaded assets (images, etc.)
@@ -14,36 +15,51 @@ The Terraform configuration provisions:
 - **Secret Manager**: Secure storage for JWT secrets and HMAC keys
 - **Domain Mapping**: Custom domain configuration for `api.sacredvows.io`
 
+**Cloudflare Resources:**
+- **Cloudflare Pages**: Deployment of the builder app
+- **DNS Records**: CNAME records for API endpoints with Cloudflare proxy
+- **Workers**: (Optional) Edge worker for published sites (managed separately)
+
 ## Structure
 
 ```
 infra/terraform/
 ├── modules/
-│   └── gcp-resources/    # Reusable module for GCP resources
-│       ├── main.tf        # Resource definitions
-│       ├── variables.tf   # Module variables
-│       └── outputs.tf     # Module outputs
-├── dev/                   # Dev environment
-│   ├── main.tf            # Dev module instantiation
-│   ├── variables.tf       # Dev-specific variables
-│   ├── terraform.tfvars   # Dev configuration (not in git)
+│   ├── gcp-resources/         # Reusable module for GCP resources
+│   │   ├── main.tf            # Resource definitions
+│   │   ├── variables.tf       # Module variables
+│   │   └── outputs.tf         # Module outputs
+│   └── cloudflare-resources/  # Reusable module for Cloudflare resources
+│       ├── main.tf            # Resource definitions
+│       ├── variables.tf       # Module variables
+│       ├── outputs.tf         # Module outputs
+│       └── README.md          # Cloudflare module documentation
+├── dev/                       # Dev environment
+│   ├── main.tf                # Dev module instantiation
+│   ├── variables.tf           # Dev-specific variables
+│   ├── terraform.tfvars       # Dev configuration (not in git)
 │   └── terraform.tfvars.example  # Example dev config
-├── prod/                  # Prod environment
-│   ├── main.tf            # Prod module instantiation
-│   ├── variables.tf       # Prod-specific variables
-│   ├── terraform.tfvars   # Prod configuration (not in git)
+├── prod/                      # Prod environment
+│   ├── main.tf                # Prod module instantiation
+│   ├── variables.tf           # Prod-specific variables
+│   ├── terraform.tfvars       # Prod configuration (not in git)
 │   └── terraform.tfvars.example  # Example prod config
-├── main.tf                # Root provider configuration
-├── variables.tf           # Root variables
-├── outputs.tf             # Root outputs
-├── README.md              # This file
-└── DEPLOYMENT.md          # Detailed deployment guide
+├── main.tf                    # Root provider configuration
+├── variables.tf               # Root variables
+├── outputs.tf                 # Root outputs
+├── README.md                  # This file
+└── DEPLOYMENT.md              # Detailed deployment guide
 ```
 
 ## Prerequisites
 
 1. **GCP Project**: Create a GCP project (e.g., `sacred-vows`)
-2. **Enable APIs**: Enable required GCP APIs:
+2. **Cloudflare Account**: Create a Cloudflare account and add your domain
+3. **Cloudflare API Token**: Create an API token with Zone:Edit and Pages:Edit permissions
+   ```bash
+   export CLOUDFLARE_API_TOKEN="your-api-token-here"
+   ```
+4. **Enable APIs**: Enable required GCP APIs:
    ```bash
    gcloud services enable \
      cloudbuild.googleapis.com \
@@ -87,6 +103,8 @@ Edit `terraform.tfvars` with your configuration:
 - `project_id`: Your GCP project ID (e.g., `sacred-vows`)
 - `api_domain`: API domain (e.g., `api.dev.sacredvows.io` for dev)
 - `google_client_id` / `google_client_secret`: Google OAuth credentials
+- `cloudflare_account_id`: Your Cloudflare Account ID (from dashboard)
+- `cloudflare_api_cname_target`: CNAME target from Google Cloud Run domain mapping
 
 ### 2. Configure Terraform Backend
 

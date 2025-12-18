@@ -1,15 +1,19 @@
-name = "sacred-vows-published-sites"
+name = "dev-published-sites"  # Must match Terraform name: ${environment}-published-sites
 main = "src/index.ts"
-compatibility_date = "2025-12-17"
+compatibility_date = "2024-12-01"  # Match Terraform compatibility_date
 
 [vars]
-PUBLISHED_BASE_DOMAIN = "sacredvows.io"
-API_ORIGIN = "https://api.sacredvows.io"  # Cloud Run API endpoint
+PUBLISHED_BASE_DOMAIN = "dev.sacredvows.io"
+API_ORIGIN = "https://api.dev.sacredvows.io/api"
 RESOLVE_CACHE_TTL_SECONDS = "30"
 
-# Bind your R2 bucket:
-# [[r2_buckets]]
-# binding = "R2_BUCKET"
-# bucket_name = "your-bucket"
+# R2 bucket binding (must match Terraform)
+[[r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "sacred-vows-published-dev"
+
+# Routes configuration - tells Wrangler where to deploy the worker
+# Note: Routes are managed separately via wrangler triggers or Cloudflare Dashboard
+# For now, deploy without routes and configure them via Terraform or Dashboard
 
 

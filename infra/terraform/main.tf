@@ -4,7 +4,19 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 7.0"
+      version = "~> 7.14"
+    }
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      version = "~> 4.40"
+    }
+    null = {
+      source  = "hashicorp/null"
+      version = "~> 3.2"
+    }
+    local = {
+      source  = "hashicorp/local"
+      version = "~> 2.5"
     }
   }
 
@@ -18,5 +30,11 @@ terraform {
 provider "google" {
   project = var.project_id
   region  = var.region
+}
+
+provider "cloudflare" {
+  # API token from environment variable CLOUDFLARE_API_TOKEN
+  # Or use email and API key (not recommended for production)
+  # api_token = var.cloudflare_api_token
 }
 

@@ -16,3 +16,24 @@ module "gcp_resources" {
   google_client_secret = var.google_client_secret
 }
 
+module "cloudflare_resources" {
+  source = "../modules/cloudflare-resources"
+
+  cloudflare_account_id = var.cloudflare_account_id
+  zone_name             = var.cloudflare_zone_name
+  environment           = var.environment
+  api_url               = "https://${var.api_domain}/api"
+  api_subdomain         = var.cloudflare_api_subdomain
+  api_cname_target      = var.cloudflare_api_cname_target
+  builder_domain        = var.builder_domain
+  production_branch     = var.cloudflare_production_branch
+  published_base_domain  = var.published_base_domain
+  node_version          = var.cloudflare_node_version
+  r2_bucket_name        = var.cloudflare_r2_bucket_name
+  r2_bucket_location    = var.cloudflare_r2_bucket_location
+  enable_worker_route   = var.cloudflare_enable_worker_route
+  resolve_cache_ttl_seconds = var.cloudflare_resolve_cache_ttl_seconds
+
+  depends_on = [module.gcp_resources]
+}
+

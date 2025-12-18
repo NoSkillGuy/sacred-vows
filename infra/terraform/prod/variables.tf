@@ -74,3 +74,63 @@ variable "google_client_secret" {
   sensitive   = true
 }
 
+# Cloudflare Configuration
+variable "cloudflare_account_id" {
+  description = "Cloudflare Account ID"
+  type        = string
+  sensitive   = true
+}
+
+variable "cloudflare_zone_name" {
+  description = "Cloudflare zone name (domain)"
+  type        = string
+  default     = "sacredvows.io"
+}
+
+variable "cloudflare_api_subdomain" {
+  description = "API subdomain for DNS record (e.g., 'api' for prod environment)"
+  type        = string
+  default     = "api"
+}
+
+variable "cloudflare_api_cname_target" {
+  description = "CNAME target for API (from Google Cloud Run domain mapping, e.g., ghs.googlehosted.com). Get this from: gcloud run domain-mappings describe <api_domain> --region <region>"
+  type        = string
+}
+
+variable "cloudflare_production_branch" {
+  description = "Production branch name for Cloudflare Pages"
+  type        = string
+  default     = "main"
+}
+
+variable "cloudflare_node_version" {
+  description = "Node.js version for Cloudflare Pages build"
+  type        = string
+  default     = "18"
+}
+
+variable "cloudflare_r2_bucket_name" {
+  description = "R2 bucket name for published sites (optional, leave empty to disable)"
+  type        = string
+  default     = ""
+}
+
+variable "cloudflare_r2_bucket_location" {
+  description = "R2 bucket location. Options: APAC (Asia Pacific), WEUR (Western Europe), WNAM (Western North America), ENAM (Eastern North America). Default: APAC for asia-northeast1"
+  type        = string
+  default     = "APAC"
+}
+
+variable "cloudflare_enable_worker_route" {
+  description = "Enable worker route for published sites (wildcard subdomain routing)"
+  type        = bool
+  default     = true
+}
+
+variable "cloudflare_resolve_cache_ttl_seconds" {
+  description = "Cache TTL for worker resolve operations"
+  type        = string
+  default     = "30"
+}
+

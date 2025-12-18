@@ -15,3 +15,22 @@ timeout_seconds = 300
 google_client_id     = "your-google-client-id"
 google_client_secret = "your-google-client-secret"
 
+# Cloudflare Configuration
+# Get your Account ID from: https://dash.cloudflare.com -> Select domain -> Right sidebar
+cloudflare_account_id = "your-cloudflare-account-id"
+cloudflare_zone_name  = "sacredvows.io"
+cloudflare_api_subdomain = "api.dev"  # DNS record name for API
+
+# Get this from Google Cloud Run domain mapping:
+# gcloud run domain-mappings describe api.dev.sacredvows.io --region asia-south1 --project=sacred-vows
+# Look for the "target" field (usually ghs.googlehosted.com or similar)
+cloudflare_api_cname_target = "ghs.googlehosted.com"
+
+# Optional Cloudflare settings
+cloudflare_production_branch = "main"
+cloudflare_node_version = "18"
+cloudflare_r2_bucket_name = "sacred-vows-published-dev"  # R2 bucket for published sites (required for worker)
+cloudflare_r2_bucket_location = "APAC"  # Asia Pacific (matches asia-northeast1 region)
+cloudflare_enable_worker_route = true
+cloudflare_resolve_cache_ttl_seconds = "30"
+
