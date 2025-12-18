@@ -1,0 +1,77 @@
+.image-deletion-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  background: var(--blush-light, #fff8f7);
+  border: 1px solid var(--rose-soft, #f5d0d3);
+  border-radius: var(--radius-md, 8px);
+  margin-top: 0.75rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--text-medium, #4a4a4a);
+}
+
+.image-deletion-notice .notice-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+  opacity: 0.8;
+}
+
+.image-deletion-notice .notice-content {
+  flex: 1;
+}
+
+.image-deletion-notice .notice-text {
+  margin: 0;
+  color: var(--text-medium, #4a4a4a);
+}
+
+.image-deletion-notice .notice-text strong {
+  color: var(--text-dark, #2d2d2d);
+  font-weight: 600;
+}
+
+/* Compact variant for smaller spaces */
+.image-deletion-notice.compact {
+  padding: 0.625rem 0.875rem;
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.image-deletion-notice.compact .notice-icon {
+  font-size: 0.875rem;
+}
+
+/* Inline variant for tooltips or overlays */
+.image-deletion-notice.inline {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  margin: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border-color: rgba(245, 208, 211, 0.8);
+}
+
+.image-deletion-notice.inline .notice-text {
+  color: var(--text-dark, #2d2d2d);
+}
+
+.image-deletion-notice.inline .notice-text strong {
+  color: var(--text-dark, #2d2d2d);
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .image-deletion-notice {
+    padding: 0.75rem 0.875rem;
+    font-size: 0.75rem;
+  }
+  
+  .image-deletion-notice .notice-icon {
+    font-size: 0.875rem;
+  }
+}
+

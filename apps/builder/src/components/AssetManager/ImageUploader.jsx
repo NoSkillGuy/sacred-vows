@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import './ImageUploader.css';
+import ImageDeletionNotice from './ImageDeletionNotice';
 
 function ImageUploader({ onUpload, onUploadComplete }) {
   const [uploading, setUploading] = useState(false);
@@ -94,6 +95,7 @@ function ImageUploader({ onUpload, onUploadComplete }) {
               </button>
             </p>
             <p className="upload-hint">Supports JPG, PNG, WebP (Max 10MB)</p>
+            <ImageDeletionNotice />
           </>
         )}
       </div>

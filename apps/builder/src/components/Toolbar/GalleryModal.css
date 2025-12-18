@@ -248,6 +248,7 @@
 .category-filter {
   display: flex;
   gap: 0.5rem;
+  margin-top: 1.25rem;
   margin-bottom: 1.25rem;
   flex-wrap: wrap;
 }
@@ -417,6 +418,14 @@
   justify-content: space-between;
   align-items: center;
   background: var(--blush-light);
+  gap: 1rem;
+}
+
+.footer-info-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
 }
 
 .footer-info {

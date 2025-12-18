@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useBuilderStore } from '../../store/builderStore';
 import './GalleryModal.css';
+import ImageDeletionNotice from '../AssetManager/ImageDeletionNotice';
 
 const defaultImages = [
   { category: 'couple', images: [
@@ -170,6 +171,7 @@ function GalleryModal({ isOpen, onClose }) {
             </div>
           ) : (
             <div className="gallery-add">
+              <ImageDeletionNotice variant="compact" />
               <div className="category-filter">
                 {['couple', 'bride', 'groom', 'family'].map((cat) => (
                   <button
@@ -213,9 +215,14 @@ function GalleryModal({ isOpen, onClose }) {
         </div>
 
         <div className="gallery-modal-footer">
-          <span className="footer-info">
-            {galleryImages.length} image{galleryImages.length !== 1 ? 's' : ''} in gallery
-          </span>
+          <div className="footer-info-section">
+            <span className="footer-info">
+              {galleryImages.length} image{galleryImages.length !== 1 ? 's' : ''} in gallery
+            </span>
+            {galleryImages.length > 0 && (
+              <ImageDeletionNotice variant="compact" />
+            )}
+          </div>
           <button className="btn btn-primary" onClick={onClose}>
             Done
           </button>
