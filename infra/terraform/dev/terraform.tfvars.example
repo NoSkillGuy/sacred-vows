@@ -1,0 +1,17 @@
+project_id = "sacred-vows"
+region     = "asia-south1"  # Mumbai, India
+environment = "dev"
+
+api_domain           = "api.dev.sacredvows.io"  # Or use api.sacredvows.io for prod
+builder_domain       = "dev.sacredvows.io"
+published_base_domain = "dev.sacredvows.io"
+
+min_instances = 0
+max_instances = 5
+cpu          = "200m"  # 200 millicores (0.2 CPU) - cost optimized for dev
+memory       = "256Mi"  # Reduced memory for cost optimization
+timeout_seconds = 300
+
+google_client_id     = "your-google-client-id"
+google_client_secret = "your-google-client-secret"
+

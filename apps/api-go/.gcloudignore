@@ -1,0 +1,5 @@
+# Don't exclude source files
+!cmd/**
+!internal/**
+!pkg/**
+!migrations/**

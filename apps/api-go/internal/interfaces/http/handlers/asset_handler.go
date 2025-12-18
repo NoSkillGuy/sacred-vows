@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"path/filepath"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sacred-vows/api-go/internal/infrastructure/storage"
@@ -15,20 +16,23 @@ type AssetHandler struct {
 	uploadUC    *asset.UploadAssetUseCase
 	getAllUC    *asset.GetAllAssetsUseCase
 	deleteUC    *asset.DeleteAssetUseCase
-	fileStorage *storage.FileStorage
+	fileStorage storage.Storage
+	gcsStorage  storage.SignedURLStorage // Optional, for signed URL generation
 }
 
 func NewAssetHandler(
 	uploadUC *asset.UploadAssetUseCase,
 	getAllUC *asset.GetAllAssetsUseCase,
 	deleteUC *asset.DeleteAssetUseCase,
-	fileStorage *storage.FileStorage,
+	fileStorage storage.Storage,
+	gcsStorage storage.SignedURLStorage, // Optional, can be nil
 ) *AssetHandler {
 	return &AssetHandler{
 		uploadUC:    uploadUC,
 		getAllUC:    getAllUC,
 		deleteUC:    deleteUC,
 		fileStorage: fileStorage,
+		gcsStorage:  gcsStorage,
 	}
 }
 
@@ -192,4 +196,65 @@ func (h *AssetHandler) Delete(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Asset deleted"})
+}
+
+type GenerateSignedURLRequest struct {
+	Filename  string `json:"filename" binding:"required" example:"abc123.jpg"`
+	MimeType  string `json:"mimeType" binding:"required" example:"image/jpeg"`
+	Size      int64  `json:"size" binding:"required" example:"1024000"`
+}
+
+type GenerateSignedURLResponse struct {
+	SignedURL string `json:"signedUrl" example:"https://storage.googleapis.com/..."`
+	ObjectKey string `json:"objectKey" example:"abc123.jpg"`
+	ExpiresIn int    `json:"expiresIn" example:"3600"`
+}
+
+// GenerateSignedURL generates a signed URL for direct upload to GCS
+// @Summary      Generate signed URL for upload
+// @Description  Generate a signed URL that allows direct upload to GCS. The client should use this URL to PUT the file directly to GCS.
+// @Tags         assets
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request  body      GenerateSignedURLRequest  true  "Upload request"
+// @Success      200      {object}  GenerateSignedURLResponse  "Signed URL generated"
+// @Failure      400      {object}  ErrorResponse             "Invalid request"
+// @Failure      500      {object}  ErrorResponse             "Internal server error"
+// @Router       /assets/upload-url [post]
+func (h *AssetHandler) GenerateSignedURL(c *gin.Context) {
+	if h.gcsStorage == nil {
+		c.JSON(http.StatusNotImplemented, gin.H{"error": "Signed URL generation not available"})
+		return
+	}
+
+	var req GenerateSignedURLRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		return
+	}
+
+	// Validate file
+	if err := h.fileStorage.ValidateFile(req.MimeType, req.Size); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Generate unique filename
+	ext := filepath.Ext(req.Filename)
+	uniqueFilename := ksuid.New().String() + ext
+
+	// Generate signed URL (valid for 1 hour)
+	expiresIn := 1 * time.Hour
+	signedURL, err := h.gcsStorage.GenerateSignedURL(c.Request.Context(), uniqueFilename, "PUT", expiresIn)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate signed URL"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"signedUrl": signedURL,
+		"objectKey": uniqueFilename,
+		"expiresIn": int(expiresIn.Seconds()),
+	})
 }

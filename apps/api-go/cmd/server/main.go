@@ -32,11 +32,13 @@ import (
 	_ "github.com/sacred-vows/api-go/docs" // Swagger documentation
 	"github.com/sacred-vows/api-go/internal/infrastructure/auth"
 	"github.com/sacred-vows/api-go/internal/infrastructure/config"
+	"github.com/sacred-vows/api-go/internal/infrastructure/database/firestore"
 	"github.com/sacred-vows/api-go/internal/infrastructure/database/postgres"
 	publishinfra "github.com/sacred-vows/api-go/internal/infrastructure/publish"
 	"github.com/sacred-vows/api-go/internal/infrastructure/storage"
 	httpRouter "github.com/sacred-vows/api-go/internal/interfaces/http"
 	"github.com/sacred-vows/api-go/internal/interfaces/http/handlers"
+	"github.com/sacred-vows/api-go/internal/interfaces/repository"
 	"github.com/sacred-vows/api-go/internal/usecase/analytics"
 	"github.com/sacred-vows/api-go/internal/usecase/asset"
 	authUC "github.com/sacred-vows/api-go/internal/usecase/auth"
@@ -63,61 +65,94 @@ func main() {
 		logger.GetLogger().Fatal("Failed to load configuration", zap.Error(err))
 	}
 
-	// Initialize database
-	db, err := postgres.New(&cfg.Database)
-	if err != nil {
-		logger.GetLogger().Fatal("Failed to connect to database", zap.Error(err))
-	}
-	defer db.Close()
-
-	// Run SQL migrations
+	// Initialize database based on configuration
 	ctx := context.Background()
-	// Migrations folder path - in Docker it's /app/migrations, locally it's ../../migrations
-	migrationsDir := os.Getenv("MIGRATIONS_DIR")
-	if migrationsDir == "" {
-		// Try Docker path first, then local path
-		if _, err := os.Stat("/app/migrations"); err == nil {
-			migrationsDir = "/app/migrations"
-		} else {
-			// When running locally from apps/api-go, migrations live at ./migrations
-			migrationsDir = "./migrations"
+	var userRepo repository.UserRepository
+	var invitationRepo repository.InvitationRepository
+	var layoutRepo repository.LayoutRepository
+	var assetRepo repository.AssetRepository
+	var rsvpRepo repository.RSVPRepository
+	var analyticsRepo repository.AnalyticsRepository
+	var refreshTokenRepo repository.RefreshTokenRepository
+	var publishedSiteRepo repository.PublishedSiteRepository
+
+	if cfg.Database.Type == "firestore" {
+		// Initialize Firestore
+		firestoreClient, err := firestore.NewFromEnv(ctx)
+		if err != nil {
+			logger.GetLogger().Fatal("Failed to connect to Firestore", zap.Error(err))
 		}
-	}
-	if err := db.RunMigrations(ctx, migrationsDir); err != nil {
-		logger.GetLogger().Error("Failed to run SQL migrations", zap.Error(err))
-		// Continue anyway - GORM AutoMigrate will handle schema changes
-		// But data migrations (like loading layouts) may fail
-	}
+		defer firestoreClient.Close()
 
-	// Run GORM AutoMigrate
-	// Note: RefreshTokenModel is excluded because the table is created via SQL migration
-	// and GORM AutoMigrate has issues with the information_schema query for this table
-	// AutoMigrate is run after SQL migrations to ensure schema consistency
-	if err := db.AutoMigrate(
-		&postgres.UserModel{},
-		&postgres.InvitationModel{},
-		&postgres.LayoutModel{},
-		&postgres.AssetModel{},
-		&postgres.RSVPResponseModel{},
-		&postgres.AnalyticsModel{},
-		&postgres.PublishedSiteModel{},
-		// &postgres.RefreshTokenModel{}, // Excluded - table created via SQL migration 010
-	); err != nil {
-		// Log error but don't fail - tables are already created via SQL migrations
-		// This allows the application to start even if AutoMigrate has issues
-		logger.GetLogger().Error("GORM AutoMigrate failed (tables should already exist from SQL migrations)", zap.Error(err))
-		// Continue - SQL migrations have already created all tables
-	}
+		logger.GetLogger().Info("Using Firestore database", zap.String("project_id", cfg.Database.ProjectID), zap.String("database_id", cfg.Database.DatabaseID))
 
-	// Initialize repositories
-	userRepo := postgres.NewUserRepository(db.DB)
-	invitationRepo := postgres.NewInvitationRepository(db.DB)
-	layoutRepo := postgres.NewLayoutRepository(db.DB)
-	assetRepo := postgres.NewAssetRepository(db.DB)
-	rsvpRepo := postgres.NewRSVPRepository(db.DB)
-	analyticsRepo := postgres.NewAnalyticsRepository(db.DB)
-	refreshTokenRepo := postgres.NewRefreshTokenRepository(db.DB)
-	publishedSiteRepo := postgres.NewPublishedSiteRepository(db.DB)
+		// Initialize Firestore repositories
+		userRepo = firestore.NewUserRepository(firestoreClient)
+		invitationRepo = firestore.NewInvitationRepository(firestoreClient)
+		layoutRepo = firestore.NewLayoutRepository(firestoreClient)
+		assetRepo = firestore.NewAssetRepository(firestoreClient)
+		rsvpRepo = firestore.NewRSVPRepository(firestoreClient)
+		analyticsRepo = firestore.NewAnalyticsRepository(firestoreClient)
+		refreshTokenRepo = firestore.NewRefreshTokenRepository(firestoreClient)
+		publishedSiteRepo = firestore.NewPublishedSiteRepository(firestoreClient)
+	} else {
+		// Initialize Postgres
+		db, err := postgres.New(&cfg.Database)
+		if err != nil {
+			logger.GetLogger().Fatal("Failed to connect to database", zap.Error(err))
+		}
+		defer db.Close()
+
+		// Run SQL migrations
+		// Migrations folder path - in Docker it's /app/migrations, locally it's ../../migrations
+		migrationsDir := os.Getenv("MIGRATIONS_DIR")
+		if migrationsDir == "" {
+			// Try Docker path first, then local path
+			if _, err := os.Stat("/app/migrations"); err == nil {
+				migrationsDir = "/app/migrations"
+			} else {
+				// When running locally from apps/api-go, migrations live at ./migrations
+				migrationsDir = "./migrations"
+			}
+		}
+		if err := db.RunMigrations(ctx, migrationsDir); err != nil {
+			logger.GetLogger().Error("Failed to run SQL migrations", zap.Error(err))
+			// Continue anyway - GORM AutoMigrate will handle schema changes
+			// But data migrations (like loading layouts) may fail
+		}
+
+		// Run GORM AutoMigrate
+		// Note: RefreshTokenModel is excluded because the table is created via SQL migration
+		// and GORM AutoMigrate has issues with the information_schema query for this table
+		// AutoMigrate is run after SQL migrations to ensure schema consistency
+		if err := db.AutoMigrate(
+			&postgres.UserModel{},
+			&postgres.InvitationModel{},
+			&postgres.LayoutModel{},
+			&postgres.AssetModel{},
+			&postgres.RSVPResponseModel{},
+			&postgres.AnalyticsModel{},
+			&postgres.PublishedSiteModel{},
+			// &postgres.RefreshTokenModel{}, // Excluded - table created via SQL migration 010
+		); err != nil {
+			// Log error but don't fail - tables are already created via SQL migrations
+			// This allows the application to start even if AutoMigrate has issues
+			logger.GetLogger().Error("GORM AutoMigrate failed (tables should already exist from SQL migrations)", zap.Error(err))
+			// Continue - SQL migrations have already created all tables
+		}
+
+		logger.GetLogger().Info("Using PostgreSQL database")
+
+		// Initialize Postgres repositories
+		userRepo = postgres.NewUserRepository(db.DB)
+		invitationRepo = postgres.NewInvitationRepository(db.DB)
+		layoutRepo = postgres.NewLayoutRepository(db.DB)
+		assetRepo = postgres.NewAssetRepository(db.DB)
+		rsvpRepo = postgres.NewRSVPRepository(db.DB)
+		analyticsRepo = postgres.NewAnalyticsRepository(db.DB)
+		refreshTokenRepo = postgres.NewRefreshTokenRepository(db.DB)
+		publishedSiteRepo = postgres.NewPublishedSiteRepository(db.DB)
+	}
 
 	// Initialize services
 	jwtService := auth.NewJWTService(
@@ -129,9 +164,27 @@ func main() {
 		cfg.Auth.ClockSkewTolerance,
 	)
 	googleOAuthService := auth.NewGoogleOAuthService(&cfg.Google)
-	fileStorage, err := storage.NewFileStorage(cfg.Storage.UploadPath, cfg.Storage.MaxFileSize, cfg.Storage.AllowedTypes)
-	if err != nil {
-		logger.GetLogger().Fatal("Failed to initialize file storage", zap.Error(err))
+
+	// Initialize storage (GCS if bucket is configured, otherwise filesystem)
+	var fileStorage storage.Storage
+	var gcsStorage storage.SignedURLStorage
+	gcsBucket := os.Getenv("GCS_ASSETS_BUCKET")
+	publicAssetsBaseURL := os.Getenv("PUBLIC_ASSETS_BASE_URL")
+	if gcsBucket != "" {
+		gcsStorageImpl, err := storage.NewGCSStorage(ctx, gcsBucket, publicAssetsBaseURL, cfg.Storage.MaxFileSize, cfg.Storage.AllowedTypes)
+		if err != nil {
+			logger.GetLogger().Fatal("Failed to initialize GCS storage", zap.Error(err))
+		}
+		fileStorage = gcsStorageImpl
+		gcsStorage = gcsStorageImpl
+		logger.GetLogger().Info("Using GCS storage", zap.String("bucket", gcsBucket))
+	} else {
+		fsStorage, err := storage.NewFileStorage(cfg.Storage.UploadPath, cfg.Storage.MaxFileSize, cfg.Storage.AllowedTypes)
+		if err != nil {
+			logger.GetLogger().Fatal("Failed to initialize file storage", zap.Error(err))
+		}
+		fileStorage = fsStorage
+		logger.GetLogger().Info("Using filesystem storage", zap.String("path", cfg.Storage.UploadPath))
 	}
 
 	// Initialize use cases
@@ -212,7 +265,7 @@ func main() {
 	authHandler := handlers.NewAuthHandler(registerUC, loginUC, getCurrentUserUC, googleOAuthUC, refreshTokenUC, refreshTokenRepo, jwtService, googleOAuthService, hmacKeys, cfg.Auth.RefreshTokenHMACActiveKeyID)
 	invitationHandler := handlers.NewInvitationHandler(createInvitationUC, getInvitationByIDUC, getAllInvitationsUC, getInvitationPreviewUC, updateInvitationUC, deleteInvitationUC, migrateInvitationsUC)
 	layoutHandler := handlers.NewLayoutHandler(getAllLayoutsUC, getLayoutByIDUC, getLayoutManifestUC, getManifestsUC)
-	assetHandler := handlers.NewAssetHandler(uploadAssetUC, getAllAssetsUC, deleteAssetUC, fileStorage)
+	assetHandler := handlers.NewAssetHandler(uploadAssetUC, getAllAssetsUC, deleteAssetUC, fileStorage, gcsStorage)
 	rsvpHandler := handlers.NewRSVPHandler(submitRSVPUC, getRSVPByInvitationUC)
 	analyticsHandler := handlers.NewAnalyticsHandler(trackViewUC, getAnalyticsByInvitationUC)
 	publishHandler := handlers.NewPublishHandler(validateSubdomainUC, publishInvitationUC, cfg.Publishing.BaseDomain, cfg.Server.Port)

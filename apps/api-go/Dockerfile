@@ -2,7 +2,7 @@
 # Stage 1: Build Stage
 # ==============================================================================
 # This stage compiles the Go application into a static binary
-FROM golang:1.23-alpine AS builder
+FROM golang:1.24-alpine AS builder
 
 WORKDIR /app
 
@@ -25,7 +25,8 @@ COPY . .
 
 # Generate Swagger documentation
 # This ensures docs are always up-to-date in the Docker image
-RUN swag init -g cmd/server/main.go -o docs
+# Use || true to continue if swag fails (docs may already exist)
+RUN swag init -g cmd/server/main.go -o docs || true
 
 # Build the application as a static binary
 # CGO_ENABLED=0 creates a statically linked binary that doesn't require C libraries

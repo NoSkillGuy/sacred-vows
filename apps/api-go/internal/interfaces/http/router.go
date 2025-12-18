@@ -106,6 +106,7 @@ func (r *Router) Setup() *gin.Engine {
 		assets := api.Group("/assets")
 		{
 			assets.POST("/upload", middleware.OptionalAuth(r.jwtService), r.assetHandler.Upload)
+			assets.POST("/upload-url", middleware.OptionalAuth(r.jwtService), r.assetHandler.GenerateSignedURL)
 			assets.GET("", middleware.OptionalAuth(r.jwtService), r.assetHandler.GetAll)
 			assets.DELETE("/delete", middleware.OptionalAuth(r.jwtService), r.assetHandler.Delete)
 		}

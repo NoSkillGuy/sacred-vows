@@ -5,8 +5,8 @@ This Worker serves published invitations directly from R2, routing by `Host` hea
 ## Bindings
 
 - `R2_BUCKET`: R2 bucket binding
-- `PUBLISHED_BASE_DOMAIN`: base domain used for subdomain extraction (e.g. `sacredvows.app`)
-- `API_ORIGIN`: API base URL (e.g. `https://api.sacredvows.app`)
+- `PUBLISHED_BASE_DOMAIN`: base domain used for subdomain extraction (e.g. `sacredvows.io`)
+- `API_ORIGIN`: API base URL - should point to Cloud Run API (e.g. `https://api.sacredvows.io`)
 
 Optional:
 - `RESOLVE_CACHE_TTL_SECONDS` (default 30)
