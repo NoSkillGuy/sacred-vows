@@ -139,6 +139,9 @@ Configure the following secrets in your GitHub repository:
    - `Service Account User` (to use service accounts)
    - `Artifact Registry Writer` (to push images)
    - `Cloud Build Editor` (to build images)
+   - `Service Usage Admin` (to use Cloud Build service - required for `gcloud builds submit`)
+   - `Storage Admin` (to access Cloud Build storage buckets)
+   - `Viewer` (to view build logs and status - optional but recommended)
 4. Create JSON key:
    - Click on service account → Keys → Add Key → Create new key → JSON
    - Download the JSON file
@@ -163,18 +166,33 @@ Configure the following secrets in your GitHub repository:
 #### 3. `CLOUDFLARE_API_TOKEN`
 **Description**: Cloudflare API token for deploying Workers
 
+**Token Name**: `github-actions-workers-deploy` (or similar descriptive name)
+
 **Steps to create**:
 1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com/profile/api-tokens)
 2. Click "Create Token"
-3. Use "Edit Cloudflare Workers" template or create custom token with:
+3. **Token Name**: Enter `github-actions-workers-deploy` (or similar descriptive name)
+4. Use "Edit Cloudflare Workers" template or create custom token with:
+   - **Resources**: Select `Account` (for Workers permissions)
    - **Permissions**: 
-     - Account: `Cloudflare Workers:Edit`
-     - Zone: `Zone:Read` (for your zone)
+     - Select `Workers Scripts` → `Edit` (required for deploying Workers)
+     - Optionally: `Workers R2 Storage` → `Read` (if worker needs R2 access)
    - **Account Resources**: Include your account
-   - **Zone Resources**: Include `sacredvows.io`
-4. Copy token and paste as secret value
+   - **Additional Permissions** (add another permission group):
+     - **Resources**: Select `User`
+     - **Permissions**: 
+       - Select `User Details` → `Read` (required for Wrangler authentication)
+   - **Zone Resources**: Include `sacredvows.io` (if needed for zone-level permissions)
+5. Copy token and paste as secret value
 
-**Note**: Token should start with a long alphanumeric string
+**Note**: 
+- Token should start with a long alphanumeric string
+- **Required permissions**:
+  - `Workers Scripts` → `Edit` (required for deploying Workers)
+  - `User Details` → `Read` (required for Wrangler authentication - must be added as a separate permission group with User resource)
+- **Optional permissions**:
+  - `Workers R2 Storage` → `Read` (if worker needs R2 access)
+- **Important**: Make sure to add `User Details` → `Read` as a separate permission group by clicking "Add more" and selecting `User` as the resource type
 
 ### Verify Secrets
 
@@ -314,10 +332,22 @@ npx wrangler tail
 
 **Error**: `gcloud builds submit` fails
 
+**Common Error**: `The user is forbidden from accessing the bucket [PROJECT_ID_cloudbuild]`
+
 **Solutions**:
+- **Add missing IAM roles to service account**:
+  - `Service Usage Admin` (required for `serviceusage.services.use` permission)
+  - `Storage Admin` (to access Cloud Build storage buckets)
+  - These roles are in addition to the roles listed in the setup section
 - Check Cloud Build API is enabled: `gcloud services enable cloudbuild.googleapis.com`
 - Verify Artifact Registry repository exists: `gcloud artifacts repositories list`
 - Check Dockerfile syntax and build context
+- Verify service account has all required roles by checking IAM bindings:
+  ```bash
+  gcloud projects get-iam-policy sacred-vows \
+    --flatten="bindings[].members" \
+    --filter="bindings.members:serviceAccount:github-actions-deploy@sacred-vows.iam.gserviceaccount.com"
+  ```
 
 #### 3. GitHub Actions: Cloud Run Update Failed
 
