@@ -27,7 +27,7 @@ steps:
 
 # Substitutions
 substitutions:
-  _IMAGE_NAME: 'asia-northeast1-docker.pkg.dev/${PROJECT_ID}/api-dev/api-go'
+  _IMAGE_NAME: 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go'
 
 # Options for faster builds
 options:
