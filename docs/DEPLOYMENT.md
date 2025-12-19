@@ -287,9 +287,17 @@ npm ci
 # Set Cloudflare API token
 export CLOUDFLARE_API_TOKEN="your-token-here"
 
+# Verify account_id is set in wrangler.toml (helps avoid authentication issues)
+# The account_id can be found in Cloudflare dashboard or in error messages
+
 # Deploy worker
 npx wrangler deploy
 ```
+
+**Note**: Ensure `account_id` is configured in `apps/edge-worker/wrangler.toml`. This helps avoid authentication errors and bypasses the User Details permission requirement. The account ID can be found:
+- In the Cloudflare dashboard (right sidebar when viewing Workers)
+- In error messages when deploying without `account_id` set
+- In Terraform configuration: `infra/terraform/dev/terraform.tfvars` (as `cloudflare_account_id`)
 
 ### Verify Manual Deployments
 
@@ -362,10 +370,16 @@ npx wrangler tail
 
 **Error**: `wrangler deploy` fails with authentication error
 
+**Common Error**: `Authentication error [code: 10000]` when accessing `/memberships`
+
 **Solutions**:
 - Verify `CLOUDFLARE_API_TOKEN` secret is set correctly
-- Check token has `Workers:Edit` permission
+- Check token has required permissions:
+  - `Workers Scripts` → `Edit` (required for deploying Workers)
+  - `User Details` → `Read` (required for Wrangler authentication - must be added as a separate permission group with User resource)
+- Ensure `account_id` is set in `apps/edge-worker/wrangler.toml` (helps bypass User Details permission requirement)
 - Ensure token hasn't expired
+- If using API token, verify it matches the token configured in Cloudflare dashboard
 
 #### 5. Worker Deployment: Wrong Worker Name
 
@@ -407,6 +421,7 @@ npx wrangler tail
 
 5. **Review Configuration**:
    - Check `wrangler.toml` matches dev environment requirements
+   - Verify `account_id` is set in `wrangler.toml` (found in Cloudflare dashboard or error output)
    - Verify Dockerfile builds successfully locally
    - Ensure all environment variables are set correctly
 

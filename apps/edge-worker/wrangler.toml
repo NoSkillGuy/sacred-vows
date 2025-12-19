@@ -1,6 +1,7 @@
 name = "dev-published-sites"  # Must match Terraform name: ${environment}-published-sites
 main = "src/index.ts"
 compatibility_date = "2024-12-01"  # Match Terraform compatibility_date
+account_id = "7aa0cce061cd1cf948e79d3353b9b532"  # Cloudflare Account ID (bypasses User Details permission requirement)
 
 [vars]
 PUBLISHED_BASE_DOMAIN = "dev.sacredvows.io"

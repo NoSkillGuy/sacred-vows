@@ -45,17 +45,21 @@ jobs:
           echo "Build submitted with ID: $BUILD_ID"
           echo "Waiting for build to complete..."
           
-          # Wait for build to complete (this doesn't require log streaming)
-          gcloud builds wait "$BUILD_ID" \
-            --region=asia-northeast1 \
-            --project=${{ secrets.GCP_PROJECT_ID }} \
-            --quiet || true
-          
-          # Check build status
-          BUILD_STATUS=$(gcloud builds describe "$BUILD_ID" \
-            --region=asia-northeast1 \
-            --project=${{ secrets.GCP_PROJECT_ID }} \
-            --format="value(status)")
+          # Poll build status until it's no longer WORKING
+          while true; do
+            BUILD_STATUS=$(gcloud builds describe "$BUILD_ID" \
+              --region=asia-northeast1 \
+              --project=${{ secrets.GCP_PROJECT_ID }} \
+              --format="value(status)")
+            
+            echo "Current build status: $BUILD_STATUS"
+            
+            if [ "$BUILD_STATUS" != "WORKING" ] && [ "$BUILD_STATUS" != "QUEUED" ]; then
+              break
+            fi
+            
+            sleep 10
+          done
           
           if [ "$BUILD_STATUS" != "SUCCESS" ]; then
             echo "Build failed with status: $BUILD_STATUS"
