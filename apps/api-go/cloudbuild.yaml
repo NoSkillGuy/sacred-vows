@@ -1,31 +1,29 @@
 steps:
-  # Build the Docker image with BuildKit and caching enabled
+  # Pull the latest image to use as cache (fails gracefully if image doesn't exist)
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - 'docker pull ${_IMAGE_NAME}:latest || exit 0'
+    id: 'pull-cache'
+
+  # Build the Docker image with layer caching enabled
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
-      - '--build-arg'
-      - 'BUILDKIT_INLINE_CACHE=1'
-      - '--cache-from'
-      - '${_IMAGE_NAME}:latest'
-      - '--tag'
+      - '-t'
       - '${_IMAGE_NAME}:${SHORT_SHA}'
-      - '--tag'
+      - '-t'
+      - '${_IMAGE_NAME}:latest'
+      - '--cache-from'
       - '${_IMAGE_NAME}:latest'
       - '-f'
       - 'Dockerfile'
       - '.'
     env:
       - 'DOCKER_BUILDKIT=1'
-      - 'COMPOSE_DOCKER_CLI_BUILD=1'
     id: 'build'
-
-  # Push the image to Artifact Registry
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - 'push'
-      - '--all-tags'
-      - '${_IMAGE_NAME}'
-    id: 'push'
+    waitFor: ['pull-cache']
 
 # Substitutions
 substitutions:
@@ -33,11 +31,11 @@ substitutions:
 
 # Options for faster builds
 options:
-  machineType: 'E2_HIGHCPU_8'  # Use high-CPU machine for faster builds
+  # Use high-CPU machine for faster builds (uncomment if you have permission)
+  # machineType: 'E2_HIGHCPU_8'
   logging: CLOUD_LOGGING_ONLY
   env:
     - 'DOCKER_BUILDKIT=1'
-    - 'COMPOSE_DOCKER_CLI_BUILD=1'
 
 # Timeout (optional, adjust as needed)
 timeout: '1200s'  # 20 minutes
