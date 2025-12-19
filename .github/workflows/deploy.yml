@@ -4,63 +4,84 @@ on:
   push:
     branches:
       - main
-      - master
 
 jobs:
-  deploy-builder:
-    name: Deploy Builder App
+  deploy-api-go:
+    name: Deploy API (Go) to Cloud Run
     runs-on: ubuntu-latest
+    environment:
+      name: dev
     steps:
-      - uses: actions/checkout@v3
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-      
-      - name: Install dependencies
-        working-directory: ./apps/builder
-        run: npm ci
-      
-      - name: Build
-        working-directory: ./apps/builder
-        run: npm run build
-      
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v20
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: ./apps/builder
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  deploy-api:
-    name: Deploy API
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker asia-northeast1-docker.pkg.dev --quiet
+
+      - name: Build and push Docker image
+        working-directory: ./apps/api-go
+        run: |
+          IMAGE_TAG="asia-northeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/api-dev/api-go:latest"
+          gcloud builds submit \
+            --tag "$IMAGE_TAG" \
+            --project ${{ secrets.GCP_PROJECT_ID }} \
+            --region asia-northeast1
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run services update api-go-dev \
+            --image asia-northeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/api-dev/api-go:latest \
+            --region asia-northeast1 \
+            --project ${{ secrets.GCP_PROJECT_ID }} \
+            --quiet
+
+      - name: Verify deployment
+        run: |
+          echo "Deployment completed. Service URL:"
+          gcloud run services describe api-go-dev \
+            --region asia-northeast1 \
+            --project ${{ secrets.GCP_PROJECT_ID }} \
+            --format 'value(status.url)'
+
+  deploy-edge-worker:
+    name: Deploy Edge Worker to Cloudflare
     runs-on: ubuntu-latest
+    environment:
+      name: dev
     steps:
-      - uses: actions/checkout@v3
-      
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
-      
+
       - name: Install dependencies
-        working-directory: ./apps/api
+        working-directory: ./apps/edge-worker
         run: npm ci
-      
-      - name: Generate Prisma Client
-        working-directory: ./apps/api
-        run: npx prisma generate
-      
-      - name: Run Prisma migrations
-        working-directory: ./apps/api
-        run: npx prisma migrate deploy
+
+      - name: Deploy to Cloudflare Workers
+        working-directory: ./apps/edge-worker
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      
-      - name: Deploy to Railway
-        uses: bervProject/railway-deploy@main
-        with:
-          railway_token: ${{ secrets.RAILWAY_TOKEN }}
-          service: api
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          npx wrangler deploy
+
+      - name: Verify deployment
+        working-directory: ./apps/edge-worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          echo "Worker deployment completed. Worker name: dev-published-sites"
