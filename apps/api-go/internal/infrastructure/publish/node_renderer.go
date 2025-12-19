@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
 	"os/exec"
 
 	"github.com/sacred-vows/api-go/internal/interfaces/repository"
@@ -20,19 +19,17 @@ type NodeSnapshotGenerator struct {
 	scriptPath     string
 }
 
-func NewNodeSnapshotGenerator(invitationRepo repository.InvitationRepository) (*NodeSnapshotGenerator, error) {
-	script := os.Getenv("SNAPSHOT_RENDERER_SCRIPT")
-	if script == "" {
-		return nil, errors.New("SNAPSHOT_RENDERER_SCRIPT is required (path to renderPublishedHTML.js)")
+func NewNodeSnapshotGenerator(invitationRepo repository.InvitationRepository, scriptPath string, nodeBinary string) (*NodeSnapshotGenerator, error) {
+	if scriptPath == "" {
+		return nil, errors.New("snapshot renderer script path is required (path to renderPublishedHTML.js)")
 	}
-	node := os.Getenv("SNAPSHOT_RENDERER_NODE")
-	if node == "" {
-		node = "node"
+	if nodeBinary == "" {
+		nodeBinary = "node"
 	}
 	return &NodeSnapshotGenerator{
 		invitationRepo: invitationRepo,
-		nodeBinary:     node,
-		scriptPath:     script,
+		nodeBinary:     nodeBinary,
+		scriptPath:     scriptPath,
 	}, nil
 }
 

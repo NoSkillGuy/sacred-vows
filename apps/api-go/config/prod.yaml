@@ -29,7 +29,7 @@ publishing:
   r2_bucket: "sacred-vows-published-prod"  # R2 bucket name
   r2_public_base: ""  # Empty when using Workers (worker serves content)
   version_retention_count: 3
-  snapshot_renderer_script: ""  # Set via env var if needed
+  snapshot_renderer_script: "/app/builder/template-engine/src/renderPublishedHTML.js"
   snapshot_renderer_node: "node"
   published_artifacts_dir: "./published"
   published_artifacts_public_base: ""

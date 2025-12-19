@@ -8,6 +8,7 @@ steps:
     id: 'pull-cache'
 
   # Build the Docker image with layer caching enabled
+  # Build context is repo root (..) to access both apps/api-go and apps/builder
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
@@ -18,8 +19,8 @@ steps:
       - '--cache-from'
       - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:latest'
       - '-f'
-      - 'Dockerfile'
-      - '.'
+      - 'apps/api-go/Dockerfile'
+      - '..'
     env:
       - 'DOCKER_BUILDKIT=1'
     id: 'build'

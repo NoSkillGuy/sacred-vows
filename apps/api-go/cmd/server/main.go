@@ -192,7 +192,11 @@ func main() {
 	var snapshotGen publishUC.SnapshotGenerator
 	var artifactStore publishUC.ArtifactStorage
 
-	snapshotGenConcrete, err := publishinfra.NewNodeSnapshotGenerator(invitationRepo)
+	snapshotGenConcrete, err := publishinfra.NewNodeSnapshotGenerator(
+		invitationRepo,
+		cfg.Publishing.SnapshotRendererScript,
+		cfg.Publishing.SnapshotRendererNode,
+	)
 	if err != nil {
 		logger.GetLogger().Warn("Publish snapshot generator not configured; publishing will fail", zap.Error(err))
 		snapshotGen = &publishinfra.NoopSnapshotGenerator{}

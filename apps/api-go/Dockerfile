@@ -17,15 +17,16 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 
 # Copy go mod files first for better layer caching
 # This allows Docker to cache the dependency download layer separately
-COPY go.mod go.sum ./
+# Build context is repo root, so paths are relative to that
+COPY apps/api-go/go.mod apps/api-go/go.sum ./
 
 # Download Go module dependencies with BuildKit cache mount
 # This dramatically speeds up builds by caching downloaded modules
 RUN --mount=type=cache,target=/go/pkg/mod \
     go mod download
 
-# Copy source code
-COPY . .
+# Copy source code (from apps/api-go directory)
+COPY apps/api-go/ .
 
 # Generate Swagger documentation
 # This ensures docs are always up-to-date in the Docker image
@@ -48,7 +49,8 @@ FROM alpine:latest
 # Install runtime dependencies
 # ca-certificates: Required for HTTPS/TLS connections
 # tzdata: Required for timezone data
-RUN apk --no-cache add ca-certificates tzdata
+# nodejs and npm: Required for snapshot renderer script
+RUN apk --no-cache add ca-certificates tzdata nodejs npm
 
 # Create a non-root user for security
 RUN addgroup -g 1000 appuser && \
@@ -66,6 +68,17 @@ COPY --from=builder /app/docs /app/docs
 # Copy config files (YAML configs for different environments)
 COPY --from=builder /app/config /app/config
 
+# Copy builder template engine files needed for snapshot generation
+# Build context is repo root, so we can access apps/builder
+COPY apps/builder/src/template-engine /app/builder/template-engine
+
+# Install Node.js dependencies for the template engine
+WORKDIR /app/builder/template-engine
+RUN npm install --production
+
+# Return to app directory
+WORKDIR /app
+
 # Create directories that will be mounted as volumes
 # These will be mounted to /app/uploads and /app/layouts
 RUN mkdir -p /app/uploads /app/layouts
@@ -73,7 +86,7 @@ RUN mkdir -p /app/uploads /app/layouts
 # Ensure the binary is executable
 RUN chmod +x /app/server
 
-# Change ownership to non-root user
+# Change ownership to non-root user (including builder template engine)
 RUN chown -R appuser:appuser /app
 
 # Switch to non-root user

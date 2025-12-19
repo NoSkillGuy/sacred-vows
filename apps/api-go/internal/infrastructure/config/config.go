@@ -81,6 +81,10 @@ type PublishingConfig struct {
 
 	// Version retention: number of versions to keep (default: 3)
 	VersionRetentionCount int
+
+	// Snapshot renderer
+	SnapshotRendererScript string
+	SnapshotRendererNode   string
 }
 
 // EmailVendorConfig represents configuration for a single email vendor
@@ -202,14 +206,16 @@ func Load() (*Config, error) {
 			FrontendURL:  getEnv("FRONTEND_URL", getYAMLString(yamlConfig, "google.frontend_url", "http://localhost:5173")),
 		},
 		Publishing: PublishingConfig{
-			BaseDomain:            getEnv("PUBLISHED_BASE_DOMAIN", getYAMLString(yamlConfig, "publishing.base_domain", "")),
-			ArtifactStore:         getEnv("PUBLISH_ARTIFACT_STORE", getYAMLString(yamlConfig, "publishing.artifact_store", "filesystem")),
-			R2AccountID:           getEnv("R2_ACCOUNT_ID", getYAMLString(yamlConfig, "publishing.r2_account_id", "")),
-			R2AccessKeyID:         getEnv("R2_ACCESS_KEY_ID", ""),     // Always from env (sensitive)
-			R2SecretAccessKey:     getEnv("R2_SECRET_ACCESS_KEY", ""), // Always from env (sensitive)
-			R2Bucket:              getEnv("R2_BUCKET", getYAMLString(yamlConfig, "publishing.r2_bucket", "")),
-			R2PublicBase:          getEnv("R2_PUBLIC_BASE", getYAMLString(yamlConfig, "publishing.r2_public_base", "")),
-			VersionRetentionCount: getEnvAsInt("PUBLISH_VERSION_RETENTION_COUNT", getYAMLInt(yamlConfig, "publishing.version_retention_count", 3)),
+			BaseDomain:             getEnv("PUBLISHED_BASE_DOMAIN", getYAMLString(yamlConfig, "publishing.base_domain", "")),
+			ArtifactStore:          getEnv("PUBLISH_ARTIFACT_STORE", getYAMLString(yamlConfig, "publishing.artifact_store", "filesystem")),
+			R2AccountID:            getEnv("R2_ACCOUNT_ID", getYAMLString(yamlConfig, "publishing.r2_account_id", "")),
+			R2AccessKeyID:          getEnv("R2_ACCESS_KEY_ID", ""),     // Always from env (sensitive)
+			R2SecretAccessKey:      getEnv("R2_SECRET_ACCESS_KEY", ""), // Always from env (sensitive)
+			R2Bucket:               getEnv("R2_BUCKET", getYAMLString(yamlConfig, "publishing.r2_bucket", "")),
+			R2PublicBase:           getEnv("R2_PUBLIC_BASE", getYAMLString(yamlConfig, "publishing.r2_public_base", "")),
+			VersionRetentionCount:  getEnvAsInt("PUBLISH_VERSION_RETENTION_COUNT", getYAMLInt(yamlConfig, "publishing.version_retention_count", 3)),
+			SnapshotRendererScript: getEnv("SNAPSHOT_RENDERER_SCRIPT", getYAMLString(yamlConfig, "publishing.snapshot_renderer_script", "")),
+			SnapshotRendererNode:   getEnv("SNAPSHOT_RENDERER_NODE", getYAMLString(yamlConfig, "publishing.snapshot_renderer_node", "node")),
 		},
 		Email: loadEmailConfig(yamlConfig),
 	}
@@ -471,6 +477,14 @@ func getYAMLString(cfg *ConfigFile, path string, defaultValue string) string {
 		case "r2_public_base":
 			if cfg.Publishing.R2PublicBase != "" {
 				return cfg.Publishing.R2PublicBase
+			}
+		case "snapshot_renderer_script":
+			if cfg.Publishing.SnapshotRendererScript != "" {
+				return cfg.Publishing.SnapshotRendererScript
+			}
+		case "snapshot_renderer_node":
+			if cfg.Publishing.SnapshotRendererNode != "" {
+				return cfg.Publishing.SnapshotRendererNode
 			}
 		}
 	case "email":
