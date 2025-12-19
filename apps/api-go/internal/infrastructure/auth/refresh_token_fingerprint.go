@@ -4,6 +4,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
@@ -51,4 +52,11 @@ func CompareTokenHash(token, hash string) bool {
 	return err == nil
 }
 
+// HashTokenForStorage creates a deterministic SHA-256 hash of the token for storage and lookup
+// This is different from password hashing (bcrypt) because we need to be able to look up tokens
+// Used for password reset tokens where we need deterministic hashing for database lookups
+func HashTokenForStorage(token string) string {
+	hash := sha256.Sum256([]byte(token))
+	return hex.EncodeToString(hash[:])
+}
 

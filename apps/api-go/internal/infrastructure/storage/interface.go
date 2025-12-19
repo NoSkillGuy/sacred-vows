@@ -19,3 +19,5 @@ type SignedURLStorage interface {
 	GenerateSignedURL(ctx context.Context, objectName string, method string, expiresIn time.Duration) (string, error)
 }
 
+
+

@@ -212,3 +212,60 @@ export async function getCurrentUserFromAPI() {
   }
 }
 
+/**
+ * Request password reset
+ * @param {string} email - User email
+ * @returns {Promise<Object>} Success response
+ */
+export async function requestPasswordReset(email) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to send password reset email');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Password reset request error:', error);
+    throw error;
+  }
+}
+
+/**
+ * Reset password with token
+ * @param {string} token - Reset token from email
+ * @param {string} password - New password
+ * @returns {Promise<Object>} Success response
+ */
+export async function resetPassword(token, password) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token, password }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to reset password');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Password reset error:', error);
+    throw error;
+  }
+}
+

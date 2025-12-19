@@ -3,6 +3,8 @@ import BuilderLayout from './components/Layout/BuilderLayout';
 import LandingPage from './components/Landing/LandingPage';
 import LoginPage from './components/Auth/LoginPage';
 import SignupPage from './components/Auth/SignupPage';
+import ForgotPasswordPage from './components/Auth/ForgotPasswordPage';
+import ResetPasswordPage from './components/Auth/ResetPasswordPage';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 import SmartRedirect from './components/Auth/SmartRedirect';
 import Dashboard from './components/Dashboard/Dashboard';
@@ -36,6 +38,8 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         
         {/* Static Pages - Layouts */}
         <Route path="/layouts-gallery" element={<LayoutsGalleryPage />} />

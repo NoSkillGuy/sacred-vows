@@ -79,6 +79,8 @@ func (r *Router) Setup() *gin.Engine {
 			auth.GET("/google", r.authHandler.GoogleOAuth)
 			auth.GET("/google/callback", r.authHandler.GoogleCallback)
 			auth.POST("/google/verify", r.authHandler.GoogleVerify)
+			auth.POST("/forgot-password", r.authHandler.ForgotPassword)
+			auth.POST("/reset-password", r.authHandler.ResetPassword)
 		}
 
 		// Invitation routes

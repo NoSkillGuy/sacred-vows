@@ -86,3 +86,5 @@ func (r *rsvpRepository) docToRSVP(doc *firestore.DocumentSnapshot) *domain.RSVP
 	return rsvp
 }
 
+
+

@@ -217,6 +217,7 @@ func validateMigrationSequence(applied map[int]bool, migrations []Migration) err
 func getAllMigrations() []Migration {
 	return []Migration{
 		{Version: 1, Name: "load_layouts", Up: migration001LoadLayouts}, // Seeds classic-scroll and editorial-elegance layouts
+		{Version: 2, Name: "create_password_reset_tokens", Up: migration002CreatePasswordResetTokens}, // Creates password_reset_tokens collection structure
 	}
 }
 
@@ -763,6 +764,42 @@ func migration001LoadLayouts(ctx context.Context, client *Client) error {
 	_, err = client.Collection("layouts").Doc(editorialEleganceID).Set(ctx, editorialEleganceData)
 	if err != nil {
 		return fmt.Errorf("failed to create editorial-elegance layout: %w", err)
+	}
+
+	return nil
+}
+
+// Migration 002: Create Password Reset Tokens Collection
+// Firestore creates collections automatically, but this migration documents the collection structure
+// and ensures the collection exists. Indexes should be created in Firebase Console:
+// - Single-field index on "token_hash" for lookups
+// - Single-field index on "expires_at" for cleanup queries
+func migration002CreatePasswordResetTokens(ctx context.Context, client *Client) error {
+	// Firestore creates collections automatically when first document is written
+	// This migration just ensures the collection structure is documented
+	// The collection will be created when the first password reset token is stored
+	
+	// Create a placeholder document to ensure collection exists, then delete it
+	placeholderID := "_schema_placeholder"
+	placeholderData := map[string]interface{}{
+		"id":         placeholderID,
+		"user_id":    "_schema",
+		"token_hash": "_schema",
+		"expires_at": time.Now().Add(24 * time.Hour),
+		"used":       false,
+		"created_at": time.Now(),
+		"_note":      "This is a schema placeholder. Collection structure: id (string), user_id (string), token_hash (string), expires_at (timestamp), used (boolean), created_at (timestamp). Indexes needed: token_hash (single-field), expires_at (single-field).",
+	}
+
+	_, err := client.Collection("password_reset_tokens").Doc(placeholderID).Set(ctx, placeholderData)
+	if err != nil {
+		return fmt.Errorf("failed to create password_reset_tokens collection: %w", err)
+	}
+
+	// Delete the placeholder
+	_, err = client.Collection("password_reset_tokens").Doc(placeholderID).Delete(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to delete schema placeholder: %w", err)
 	}
 
 	return nil
