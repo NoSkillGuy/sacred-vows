@@ -1,18 +1,3 @@
-output "pages_project_name" {
-  description = "Cloudflare Pages project name"
-  value       = cloudflare_pages_project.builder.name
-}
-
-output "pages_project_url" {
-  description = "Cloudflare Pages project URL"
-  value       = try(cloudflare_pages_project.builder.domains[0], "")
-}
-
-output "pages_domain" {
-  description = "Cloudflare Pages custom domain"
-  value       = cloudflare_pages_domain.builder.domain
-}
-
 output "api_dns_record_id" {
   description = "API DNS record ID"
   value       = cloudflare_record.api.id

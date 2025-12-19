@@ -98,18 +98,6 @@ variable "cloudflare_api_cname_target" {
   type        = string
 }
 
-variable "cloudflare_production_branch" {
-  description = "Production branch name for Cloudflare Pages"
-  type        = string
-  default     = "main"
-}
-
-variable "cloudflare_node_version" {
-  description = "Node.js version for Cloudflare Pages build"
-  type        = string
-  default     = "18"
-}
-
 variable "cloudflare_r2_bucket_name" {
   description = "R2 bucket name for published sites (optional, leave empty to disable)"
   type        = string

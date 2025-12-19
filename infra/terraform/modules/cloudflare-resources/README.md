@@ -2,17 +2,13 @@
 
 This Terraform module manages Cloudflare resources for the Sacred Vows application, including:
 
-- **Cloudflare Pages**: Deployment of the builder app
 - **DNS Records**: CNAME records for API endpoints
+- **R2 Buckets**: Storage for published sites
 - **Workers**: (Optional) Edge worker for published sites (managed separately via wrangler)
 
-## Resources Created
+**Note:** Cloudflare Pages for the builder app is managed manually via the Cloudflare UI, not through Terraform.
 
-### Cloudflare Pages Project
-- Creates a Pages project for the builder app
-- Configures build settings (build command, output directory)
-- Sets up environment variables for preview and production deployments
-- Configures custom domain
+## Resources Created
 
 ### DNS Records
 - Creates CNAME record for API endpoint pointing to Google Cloud Run
@@ -27,8 +23,8 @@ This Terraform module manages Cloudflare resources for the Sacred Vows applicati
 1. **Cloudflare Account**: You need a Cloudflare account with your domain added
 2. **Cloudflare API Token**: Create an API token with appropriate permissions:
    - Zone:Edit
-   - Account:Cloudflare Pages:Edit
    - Account:Workers:Edit (if using workers)
+   - Account:Cloudflare R2:Edit (if using R2 buckets)
    
    Set it as an environment variable:
    ```bash
@@ -63,37 +59,22 @@ cloudflare_api_cname_target = "ghs.googlehosted.com"
 | `cloudflare_account_id` | Cloudflare Account ID | Required |
 | `zone_name` | Cloudflare zone name (domain) | `"sacredvows.io"` |
 | `environment` | Environment name (dev, prod) | Required |
-| `api_url` | Full API URL with /api suffix | Required |
 | `api_subdomain` | API subdomain for DNS | Required |
 | `api_cname_target` | CNAME target from Cloud Run | Required |
-| `builder_domain` | Builder app domain | Required |
-| `production_branch` | Production branch for Pages | `"main"` |
-| `node_version` | Node.js version for build | `"18"` |
+| `published_base_domain` | Published sites base domain | `"sacredvows.io"` |
 | `r2_bucket_name` | R2 bucket name (optional) | `""` |
+| `r2_bucket_location` | R2 bucket location | `"APAC"` |
 | `enable_worker_route` | Enable worker route | `true` |
+| `resolve_cache_ttl_seconds` | Cache TTL for worker resolve | `"30"` |
 
 ## Outputs
 
-- `pages_project_name`: Cloudflare Pages project name
-- `pages_project_url`: Pages project URL
-- `pages_domain`: Custom domain for Pages
 - `api_dns_record_id`: API DNS record ID
 - `api_dns_record_name`: API DNS record name
 - `zone_id`: Cloudflare zone ID
-
-## Cloudflare Pages Setup
-
-After applying Terraform, you still need to:
-
-1. **Connect GitHub Repository**:
-   - Go to Cloudflare Dashboard → Pages → Your project
-   - Click "Connect to Git"
-   - Authorize GitHub and select your repository
-   - The build settings are already configured via Terraform
-
-2. **Verify Deployment**:
-   - Pages will automatically deploy on push to the production branch
-   - Check the deployment status in the Cloudflare dashboard
+- `r2_bucket_name`: R2 bucket name (if created)
+- `worker_script_name`: Worker script name
+- `worker_route_pattern`: Worker route pattern (if enabled)
 
 ## Worker Deployment
 
@@ -119,11 +100,6 @@ The module automatically creates DNS records with Cloudflare proxy enabled. This
 
 ## Troubleshooting
 
-### Pages Build Fails
-- Check build logs in Cloudflare Pages dashboard
-- Verify `build_command` and `destination_dir` are correct
-- Ensure environment variables are set correctly
-
 ### DNS Not Resolving
 - Wait for DNS propagation (can take up to 48 hours)
 - Verify the CNAME target is correct
@@ -136,7 +112,7 @@ The module automatically creates DNS records with Cloudflare proxy enabled. This
 
 ## Related Documentation
 
-- [Cloudflare Pages Documentation](https://developers.cloudflare.com/pages/)
 - [Cloudflare DNS Documentation](https://developers.cloudflare.com/dns/)
 - [Cloudflare Workers Documentation](https://developers.cloudflare.com/workers/)
+- [Cloudflare R2 Documentation](https://developers.cloudflare.com/r2/)
 

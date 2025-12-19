@@ -5,10 +5,11 @@ This guide explains how to use Terraform to manage Cloudflare resources for the 
 ## What Was Added
 
 Terraform now manages:
-- ✅ **Cloudflare Pages** - Builder app deployment
 - ✅ **DNS Records** - CNAME records for API endpoints
 - ✅ **R2 Buckets** - Storage for published sites
 - ✅ **Workers** - Edge worker for published sites (automatically built and deployed)
+
+**Note:** Cloudflare Pages for the builder app is managed manually via the Cloudflare UI, not through Terraform.
 
 ## Quick Start
 
@@ -24,7 +25,6 @@ Terraform now manages:
 2. Click "Create Token"
 3. Use "Edit zone DNS" template or create custom token with:
    - Zone:Edit
-   - Account:Cloudflare Pages:Edit
    - Account:Workers:Edit
    - Account:Cloudflare R2:Edit
 4. Copy the token
@@ -69,6 +69,7 @@ cloudflare_api_cname_target = "ghs.googlehosted.com"  # From step 2
 cloudflare_r2_bucket_name = "sacred-vows-published-dev"
 cloudflare_r2_bucket_location = "APAC"  # Asia Pacific (matches asia-northeast1)
 cloudflare_enable_worker_route = true
+cloudflare_resolve_cache_ttl_seconds = "30"
 ```
 
 **For prod (`infra/terraform/prod/terraform.tfvars`):**
@@ -85,6 +86,7 @@ cloudflare_api_cname_target = "ghs.googlehosted.com"  # From step 2
 cloudflare_r2_bucket_name = "sacred-vows-published-prod"
 cloudflare_r2_bucket_location = "APAC"  # Asia Pacific (matches asia-northeast1)
 cloudflare_enable_worker_route = true
+cloudflare_resolve_cache_ttl_seconds = "30"
 ```
 
 ### 4. Initialize and Apply
@@ -105,13 +107,6 @@ terraform apply
 
 ## What Gets Created
 
-### Cloudflare Pages
-- Project: `dev-builder` or `prod-builder`
-- Build configuration: `cd apps/builder && npm ci && npm run build`
-- Output directory: `apps/builder/dist`
-- Environment variables: `VITE_API_URL` set automatically
-- Custom domain: `dev.sacredvows.io` or `sacredvows.io`
-
 ### DNS Records
 - CNAME record: `api.dev` or `api` → Cloud Run domain mapping
 - Proxy enabled (orange cloud) for DDoS protection and CDN
@@ -129,23 +124,7 @@ terraform apply
 
 ## Next Steps After Terraform Apply
 
-### 1. Connect GitHub Repository to Pages
-
-Terraform creates the Pages project, but you need to connect it to GitHub:
-
-1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com)
-2. Navigate to Workers & Pages → Your project (`dev-builder` or `prod-builder`)
-3. Click "Connect to Git"
-4. Authorize GitHub and select your repository
-5. The build settings are already configured via Terraform
-
-### 2. Verify Deployment
-
-- Pages will automatically deploy on push to the production branch
-- Check deployment status in Cloudflare dashboard
-- Visit your custom domain to verify it's working
-
-### 3. Worker and R2 Bucket
+### 1. Worker and R2 Bucket
 
 The worker and R2 bucket are automatically created by Terraform:
 
@@ -162,33 +141,34 @@ The worker and R2 bucket are automatically created by Terraform:
 
 ## Troubleshooting
 
-### Pages Build Fails
-- Check build logs in Cloudflare Pages dashboard
-- Verify the build command works locally: `cd apps/builder && npm ci && npm run build`
-- Ensure environment variables are set correctly
+For detailed troubleshooting information, see the [Cloudflare Pages Troubleshooting Guide](../../docs/cloudflare-pages-troubleshooting.md).
 
-### DNS Not Resolving
+### Quick Troubleshooting
+
+**DNS Not Resolving**
 - Wait for DNS propagation (can take up to 48 hours)
 - Verify CNAME target is correct: `dig api.dev.sacredvows.io`
 - Check that proxy is enabled (orange cloud in Cloudflare dashboard)
 
-### API Not Accessible
+**API Not Accessible (ERR_CONNECTION_CLOSED)**
 - Verify Cloud Run domain mapping exists
 - Check DNS record in Cloudflare dashboard
 - Ensure Cloudflare proxy is enabled
+- **Common Issue:** SSL/TLS mode set to "Flexible" - must be "Full" - see troubleshooting guide
+- **Common Issue:** Authenticated Origin Pulls enabled - must be OFF - see troubleshooting guide
 
-### Worker Build Fails
+**Worker Build Fails**
 - Ensure Node.js and npm are installed
 - Check that `apps/edge-worker/package.json` has `esbuild` as a dependency
 - Run `cd apps/edge-worker && npm install` manually if needed
 - Verify the build script in `package.json` is correct
 
-### R2 Bucket Issues
+**R2 Bucket Issues**
 - Verify bucket name is unique (not already exists)
 - Check R2 location is valid: `APAC`, `WEUR`, `WNAM`, or `ENAM`
 - Ensure API token has `Account:Cloudflare R2:Edit` permission
 
-### Terraform Errors
+**Terraform Errors**
 
 **"Provider cloudflare not found"**
 ```bash
@@ -207,7 +187,6 @@ terraform init  # Download the provider
 
 - `infra/terraform/main.tf` - Added Cloudflare and null providers
 - `infra/terraform/modules/cloudflare-resources/` - New module with:
-  - Cloudflare Pages project
   - DNS records
   - R2 bucket
   - Worker script (with automatic build)
@@ -225,13 +204,14 @@ terraform init  # Download the provider
 
 ✅ **Infrastructure as Code** - Version control for Cloudflare config
 ✅ **Consistency** - Same config across dev/prod
-✅ **Automation** - No manual DNS/Pages/Worker/R2 configuration
+✅ **Automation** - No manual DNS/Worker/R2 configuration
 ✅ **State Management** - Terraform tracks all changes
 ✅ **Automatic Worker Build** - TypeScript worker is automatically compiled and deployed
 ✅ **Regional Optimization** - R2 bucket location matches your GCP region (APAC for asia-northeast1)
 
 ## Related Documentation
 
+- [Cloudflare Pages Troubleshooting Guide](../../docs/cloudflare-pages-troubleshooting.md) - **Comprehensive guide for all issues encountered**
 - [Cloudflare Module README](./modules/cloudflare-resources/README.md)
 - [Main Terraform README](./README.md)
 - [Cloudflare Setup Guide](../../docs/cloudflare-setup.md)

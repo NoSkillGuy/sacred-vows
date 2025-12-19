@@ -27,8 +27,6 @@ cloudflare_api_subdomain = "api.dev"  # DNS record name for API
 cloudflare_api_cname_target = "ghs.googlehosted.com"
 
 # Optional Cloudflare settings
-cloudflare_production_branch = "main"
-cloudflare_node_version = "18"
 cloudflare_r2_bucket_name = "sacred-vows-published-dev"  # R2 bucket for published sites (required for worker)
 cloudflare_r2_bucket_location = "APAC"  # Asia Pacific (matches asia-northeast1 region)
 cloudflare_enable_worker_route = true

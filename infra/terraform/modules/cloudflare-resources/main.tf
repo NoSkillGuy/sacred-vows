@@ -12,42 +12,6 @@ data "cloudflare_zone" "main" {
   name = var.zone_name  # e.g., "sacredvows.io"
 }
 
-# Cloudflare Pages Project for Builder App
-resource "cloudflare_pages_project" "builder" {
-  account_id        = var.cloudflare_account_id
-  name              = "${var.environment}-builder"
-  production_branch = var.production_branch
-
-  build_config {
-    build_command   = "cd apps/builder && npm ci && npm run build"
-    destination_dir = "apps/builder/dist"
-    root_dir        = "/"
-    web_analytics_tag = var.web_analytics_tag != "" ? var.web_analytics_tag : null
-  }
-
-  deployment_configs {
-    preview {
-      environment_variables = {
-        VITE_API_URL = var.api_url
-        NODE_VERSION = var.node_version
-      }
-    }
-    production {
-      environment_variables = {
-        VITE_API_URL = var.api_url
-        NODE_VERSION = var.node_version
-      }
-    }
-  }
-}
-
-# Custom Domain for Builder App
-resource "cloudflare_pages_domain" "builder" {
-  account_id   = var.cloudflare_account_id
-  project_name = cloudflare_pages_project.builder.name
-  domain       = var.builder_domain  # e.g., "dev.sacredvows.io" or "sacredvows.io"
-}
-
 # DNS Records for API (CNAME to Cloud Run)
 resource "cloudflare_record" "api" {
   zone_id        = data.cloudflare_zone.main.id

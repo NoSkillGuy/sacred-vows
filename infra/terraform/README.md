@@ -16,9 +16,11 @@ The Terraform configuration provisions:
 - **Domain Mapping**: Custom domain configuration for `api.sacredvows.io`
 
 **Cloudflare Resources:**
-- **Cloudflare Pages**: Deployment of the builder app
 - **DNS Records**: CNAME records for API endpoints with Cloudflare proxy
+- **R2 Buckets**: Storage for published sites
 - **Workers**: (Optional) Edge worker for published sites (managed separately)
+
+**Note:** Cloudflare Pages for the builder app is managed manually via the Cloudflare UI, not through Terraform.
 
 ## Structure
 
@@ -55,7 +57,7 @@ infra/terraform/
 
 1. **GCP Project**: Create a GCP project (e.g., `sacred-vows`)
 2. **Cloudflare Account**: Create a Cloudflare account and add your domain
-3. **Cloudflare API Token**: Create an API token with Zone:Edit and Pages:Edit permissions
+3. **Cloudflare API Token**: Create an API token with Zone:Edit, Workers:Edit, and R2:Edit permissions
    ```bash
    export CLOUDFLARE_API_TOKEN="your-api-token-here"
    ```
