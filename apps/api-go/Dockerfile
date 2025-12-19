@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.4
 # ==============================================================================
 # Stage 1: Build Stage
 # ==============================================================================
@@ -6,19 +7,22 @@ FROM golang:1.24-alpine AS builder
 
 WORKDIR /app
 
-# Install build dependencies
+# Install build dependencies in a single layer
 RUN apk add --no-cache git
 
 # Install swag CLI for Swagger documentation generation
-RUN go install github.com/swaggo/swag/cmd/swag@latest
+# Cache this layer separately as it rarely changes
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    go install github.com/swaggo/swag/cmd/swag@latest
 
 # Copy go mod files first for better layer caching
 # This allows Docker to cache the dependency download layer separately
 COPY go.mod go.sum ./
 
-# Download Go module dependencies
-# This layer will be cached unless go.mod or go.sum changes
-RUN go mod download
+# Download Go module dependencies with BuildKit cache mount
+# This dramatically speeds up builds by caching downloaded modules
+RUN --mount=type=cache,target=/go/pkg/mod \
+    go mod download
 
 # Copy source code
 COPY . .
@@ -28,10 +32,12 @@ COPY . .
 # Use || true to continue if swag fails (docs may already exist)
 RUN swag init -g cmd/server/main.go -o docs || true
 
-# Build the application as a static binary
+# Build the application as a static binary with BuildKit cache mount
 # CGO_ENABLED=0 creates a statically linked binary that doesn't require C libraries
-# This makes the binary portable and suitable for minimal runtime images
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o bin/server ./cmd/server
+# Using cache mounts for both module cache and build cache significantly speeds up builds
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o bin/server ./cmd/server
 
 # ==============================================================================
 # Stage 2: Runtime Stage

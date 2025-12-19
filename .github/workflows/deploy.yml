@@ -34,9 +34,10 @@ jobs:
         run: |
           IMAGE_TAG="asia-northeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/api-dev/api-go:latest"
           
-          # Submit build asynchronously to avoid log streaming permission issues
+          # Submit build using cloudbuild.yaml for optimized caching
+          # This uses BuildKit cache mounts and Docker layer caching for faster builds
           BUILD_ID=$(gcloud builds submit \
-            --tag "$IMAGE_TAG" \
+            --config=cloudbuild.yaml \
             --project ${{ secrets.GCP_PROJECT_ID }} \
             --region asia-northeast1 \
             --async \
