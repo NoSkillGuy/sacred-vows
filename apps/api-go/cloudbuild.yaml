@@ -4,7 +4,7 @@ steps:
     entrypoint: 'bash'
     args:
       - '-c'
-      - 'docker pull ${_IMAGE_NAME}:latest || exit 0'
+      - 'docker pull asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:latest || exit 0'
     id: 'pull-cache'
 
   # Build the Docker image with layer caching enabled
@@ -12,11 +12,11 @@ steps:
     args:
       - 'build'
       - '-t'
-      - '${_IMAGE_NAME}:${SHORT_SHA}'
+      - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:${SHORT_SHA}'
       - '-t'
-      - '${_IMAGE_NAME}:latest'
+      - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:latest'
       - '--cache-from'
-      - '${_IMAGE_NAME}:latest'
+      - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:latest'
       - '-f'
       - 'Dockerfile'
       - '.'
@@ -24,10 +24,6 @@ steps:
       - 'DOCKER_BUILDKIT=1'
     id: 'build'
     waitFor: ['pull-cache']
-
-# Substitutions
-substitutions:
-  _IMAGE_NAME: 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go'
 
 # Options for faster builds
 options:
@@ -42,6 +38,6 @@ timeout: '1200s'  # 20 minutes
 
 # Images to be pushed to the registry
 images:
-  - '${_IMAGE_NAME}:${SHORT_SHA}'
-  - '${_IMAGE_NAME}:latest'
+  - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:${SHORT_SHA}'
+  - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:latest'
 
