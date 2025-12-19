@@ -131,4 +131,3 @@ func (s *GCSStorage) ValidateFile(mimeType string, size int64) error {
 func (s *GCSStorage) Close() error {
 	return s.client.Close()
 }
-
