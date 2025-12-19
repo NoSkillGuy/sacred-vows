@@ -12,7 +12,7 @@ steps:
     args:
       - 'build'
       - '-t'
-      - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:${SHORT_SHA}'
+      - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:${_TAG}'
       - '-t'
       - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:latest'
       - '--cache-from'
@@ -36,8 +36,15 @@ options:
 # Timeout (optional, adjust as needed)
 timeout: '1200s'  # 20 minutes
 
+# Substitutions
+# _TAG should be provided from GitHub Actions (commit SHA)
+# If not provided, it will default to 'latest' (but GitHub Actions always provides it)
+substitutions:
+  _TAG: 'latest'
+
 # Images to be pushed to the registry
+# Use BUILD_ID as fallback if SHORT_SHA is not available
 images:
-  - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:${SHORT_SHA}'
+  - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:${_TAG}'
   - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:latest'
 
