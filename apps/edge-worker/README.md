@@ -139,7 +139,8 @@ Artifacts are stored with version prefixes to enable:
 - **Immutable deployments**: Each publish creates a new version directory
 - **Safe republishing**: New versions don't overwrite old files
 - **Long-term caching**: Versioned assets can be cached indefinitely since they never change
-- **Rollback capability**: Previous versions remain accessible
+- **Rollback capability**: Previous versions remain accessible (within retention window)
+- **Automatic cleanup**: Only the last N versions are kept (configurable via `PUBLISH_VERSION_RETENTION_COUNT`, default: 3)
 
 ```mermaid
 graph TD

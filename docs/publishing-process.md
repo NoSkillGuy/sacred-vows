@@ -169,6 +169,29 @@ The Worker sets caching headers:
 
 Because the artifact path includes the version, old cached assets never “accidentally” become stale.
 
+## Version Retention and Rollback
+
+### Automatic Version Cleanup
+
+After each successful publish, the system automatically cleans up old versions:
+- **Retention Policy**: Only the last N versions are kept (configurable via `PUBLISH_VERSION_RETENTION_COUNT`, default: 3)
+- **Automatic Deletion**: Versions older than the retention window are automatically deleted
+- **Background Process**: Cleanup runs in the background and doesn't block the publish response
+- **Error Handling**: If cleanup fails, it's logged but doesn't affect the publish operation
+
+### Rollback Functionality
+
+Users can rollback to any available previous version:
+- **Available Versions**: Only versions within the retention window are available for rollback
+- **Instant Rollback**: Rollback updates the `current_version` pointer immediately (no new version created)
+- **UI Access**: Rollback is available in the builder UI's publish modal
+- **Authentication**: Rollback requires authentication and ownership validation
+
+### API Endpoints
+
+- `GET /api/published/versions?subdomain={subdomain}` - List available versions for a site
+- `POST /api/published/rollback` - Rollback to a specific version (requires auth)
+
 ## Operational notes
 
 ### Required env vars (production)
@@ -179,6 +202,7 @@ API:
 - `PUBLISH_ARTIFACT_STORE=r2`
 - `SNAPSHOT_RENDERER_SCRIPT`
 - `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`
+- `PUBLISH_VERSION_RETENTION_COUNT` (optional, default: 3)
 
 Worker:
 

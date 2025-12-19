@@ -136,6 +136,8 @@ func (r *Router) Setup() *gin.Engine {
 		published := api.Group("/published")
 		{
 			published.GET("/resolve", r.resolveAPIHandler.Resolve)
+			published.GET("/versions", middleware.AuthenticateToken(r.jwtService), r.publishHandler.ListVersions)
+			published.POST("/rollback", middleware.AuthenticateToken(r.jwtService), r.publishHandler.Rollback)
 		}
 	}
 

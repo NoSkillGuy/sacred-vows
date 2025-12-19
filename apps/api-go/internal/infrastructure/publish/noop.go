@@ -23,4 +23,12 @@ func (s *NoopArtifactStorage) PublicURL(key string) string {
 	return ""
 }
 
+func (s *NoopArtifactStorage) ListVersions(ctx context.Context, subdomain string) ([]int, error) {
+	return nil, errors.New("artifact storage not configured")
+}
+
+func (s *NoopArtifactStorage) DeleteVersion(ctx context.Context, subdomain string, version int) error {
+	return errors.New("artifact storage not configured")
+}
+
 

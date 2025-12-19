@@ -7,14 +7,17 @@ import (
 
 	"github.com/sacred-vows/api-go/internal/domain"
 	"github.com/sacred-vows/api-go/internal/interfaces/repository"
+	"github.com/sacred-vows/api-go/pkg/logger"
 	"github.com/segmentio/ksuid"
+	"go.uber.org/zap"
 )
 
 type PublishInvitationUseCase struct {
-	invitationRepo repository.InvitationRepository
-	publishedRepo  repository.PublishedSiteRepository
-	snapshotGen    SnapshotGenerator
-	artifactStore  ArtifactStorage
+	invitationRepo      repository.InvitationRepository
+	publishedRepo       repository.PublishedSiteRepository
+	snapshotGen         SnapshotGenerator
+	artifactStore       ArtifactStorage
+	versionRetentionCount int
 }
 
 func NewPublishInvitationUseCase(
@@ -22,12 +25,14 @@ func NewPublishInvitationUseCase(
 	publishedRepo repository.PublishedSiteRepository,
 	snapshotGen SnapshotGenerator,
 	artifactStore ArtifactStorage,
+	versionRetentionCount int,
 ) *PublishInvitationUseCase {
 	return &PublishInvitationUseCase{
-		invitationRepo: invitationRepo,
-		publishedRepo:  publishedRepo,
-		snapshotGen:    snapshotGen,
-		artifactStore:  artifactStore,
+		invitationRepo:       invitationRepo,
+		publishedRepo:        publishedRepo,
+		snapshotGen:           snapshotGen,
+		artifactStore:         artifactStore,
+		versionRetentionCount: versionRetentionCount,
 	}
 }
 
@@ -145,8 +150,51 @@ func (uc *PublishInvitationUseCase) Execute(ctx context.Context, invitationID, o
 		return "", 0, "", err
 	}
 
+	// Cleanup old versions in background (don't block response)
+	go uc.cleanupOldVersions(context.Background(), subdomain, version)
+
 	indexURL = uc.artifactStore.PublicURL(indexKey)
 	return subdomain, version, indexURL, nil
+}
+
+// cleanupOldVersions deletes versions older than the retention count.
+// This runs in a background goroutine and errors are logged but don't affect the publish operation.
+func (uc *PublishInvitationUseCase) cleanupOldVersions(ctx context.Context, subdomain string, currentVersion int) {
+	if uc.versionRetentionCount < 1 {
+		return // Retention disabled or invalid
+	}
+
+	versions, err := uc.artifactStore.ListVersions(ctx, subdomain)
+	if err != nil {
+		logger.GetLogger().Warn("Failed to list versions for cleanup",
+			zap.String("subdomain", subdomain),
+			zap.Error(err),
+		)
+		return
+	}
+
+	// Keep only the last N versions (already sorted descending)
+	if len(versions) <= uc.versionRetentionCount {
+		return // No cleanup needed
+	}
+
+	// Delete versions beyond the retention window
+	versionsToDelete := versions[uc.versionRetentionCount:]
+	for _, version := range versionsToDelete {
+		if err := uc.artifactStore.DeleteVersion(ctx, subdomain, version); err != nil {
+			logger.GetLogger().Warn("Failed to delete old version",
+				zap.String("subdomain", subdomain),
+				zap.Int("version", version),
+				zap.Error(err),
+			)
+			// Continue with other versions
+		} else {
+			logger.GetLogger().Info("Deleted old version",
+				zap.String("subdomain", subdomain),
+				zap.Int("version", version),
+			)
+		}
+	}
 }
 
 

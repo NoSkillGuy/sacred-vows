@@ -74,6 +74,9 @@ type PublishingConfig struct {
 	R2SecretAccessKey string
 	R2Bucket          string
 	R2PublicBase      string
+
+	// Version retention: number of versions to keep (default: 3)
+	VersionRetentionCount int
 }
 
 func Load() (*Config, error) {
@@ -114,13 +117,14 @@ func Load() (*Config, error) {
 			FrontendURL:  getEnv("FRONTEND_URL", "http://localhost:5173"),
 		},
 		Publishing: PublishingConfig{
-			BaseDomain:        getEnv("PUBLISHED_BASE_DOMAIN", ""),
-			ArtifactStore:     getEnv("PUBLISH_ARTIFACT_STORE", "filesystem"),
-			R2AccountID:       getEnv("R2_ACCOUNT_ID", ""),
-			R2AccessKeyID:     getEnv("R2_ACCESS_KEY_ID", ""),
-			R2SecretAccessKey: getEnv("R2_SECRET_ACCESS_KEY", ""),
-			R2Bucket:          getEnv("R2_BUCKET", ""),
-			R2PublicBase:      getEnv("R2_PUBLIC_BASE", ""),
+			BaseDomain:           getEnv("PUBLISHED_BASE_DOMAIN", ""),
+			ArtifactStore:         getEnv("PUBLISH_ARTIFACT_STORE", "filesystem"),
+			R2AccountID:          getEnv("R2_ACCOUNT_ID", ""),
+			R2AccessKeyID:         getEnv("R2_ACCESS_KEY_ID", ""),
+			R2SecretAccessKey:     getEnv("R2_SECRET_ACCESS_KEY", ""),
+			R2Bucket:              getEnv("R2_BUCKET", ""),
+			R2PublicBase:          getEnv("R2_PUBLIC_BASE", ""),
+			VersionRetentionCount: getEnvAsInt("PUBLISH_VERSION_RETENTION_COUNT", 3),
 		},
 	}
 
@@ -171,6 +175,9 @@ func (c *Config) validate() error {
 	}
 	if c.Auth.JWTSecret == "" || c.Auth.JWTSecret == "your-secret-key-change-in-production" {
 		return fmt.Errorf("JWT_SECRET must be set to a secure value")
+	}
+	if c.Publishing.VersionRetentionCount < 1 {
+		return fmt.Errorf("PUBLISH_VERSION_RETENTION_COUNT must be >= 1")
 	}
 	return nil
 }

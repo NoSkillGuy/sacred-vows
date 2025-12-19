@@ -28,6 +28,10 @@ type ArtifactStorage interface {
 	Put(ctx context.Context, key string, contentType string, cacheControl string, body []byte) error
 	// PublicURL returns a publicly reachable URL for key.
 	PublicURL(key string) string
+	// ListVersions returns all version numbers for a given subdomain
+	ListVersions(ctx context.Context, subdomain string) ([]int, error)
+	// DeleteVersion deletes all artifacts for a specific version of a subdomain
+	DeleteVersion(ctx context.Context, subdomain string, version int) error
 }
 
 

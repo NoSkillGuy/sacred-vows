@@ -205,7 +205,9 @@ func main() {
 			artifactStore = artifactStoreConcrete
 		}
 	}
-	publishInvitationUC := publishUC.NewPublishInvitationUseCase(invitationRepo, publishedSiteRepo, snapshotGen, artifactStore)
+	publishInvitationUC := publishUC.NewPublishInvitationUseCase(invitationRepo, publishedSiteRepo, snapshotGen, artifactStore, cfg.Publishing.VersionRetentionCount)
+	listVersionsUC := publishUC.NewListPublishedVersionsUseCase(publishedSiteRepo, artifactStore)
+	rollbackUC := publishUC.NewRollbackPublishedSiteUseCase(publishedSiteRepo, artifactStore)
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(registerUC, loginUC, getCurrentUserUC, googleOAuthUC, refreshTokenUC, refreshTokenRepo, jwtService, googleOAuthService, hmacKeys, cfg.Auth.RefreshTokenHMACActiveKeyID)
@@ -214,7 +216,7 @@ func main() {
 	assetHandler := handlers.NewAssetHandler(uploadAssetUC, getAllAssetsUC, deleteAssetUC, fileStorage, gcsStorage)
 	rsvpHandler := handlers.NewRSVPHandler(submitRSVPUC, getRSVPByInvitationUC)
 	analyticsHandler := handlers.NewAnalyticsHandler(trackViewUC, getAnalyticsByInvitationUC)
-	publishHandler := handlers.NewPublishHandler(validateSubdomainUC, publishInvitationUC, cfg.Publishing.BaseDomain, cfg.Server.Port)
+	publishHandler := handlers.NewPublishHandler(validateSubdomainUC, publishInvitationUC, listVersionsUC, rollbackUC, cfg.Publishing.BaseDomain, cfg.Server.Port)
 	resolveHandler := handlers.NewPublishedSiteResolveHandler(publishedSiteRepo, cfg.Publishing.BaseDomain)
 	resolveAPIHandler := handlers.NewPublishedResolveAPIHandler(publishedSiteRepo, cfg.Publishing.BaseDomain)
 

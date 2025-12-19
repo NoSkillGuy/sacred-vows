@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useBuilderStore } from '../../store/builderStore';
 import { exportInvitationAsJSON } from '../../services/exportService';
-import { publishInvitation, validateSubdomain } from '../../services/publishService';
+import { publishInvitation, validateSubdomain, listVersions, rollbackToVersion } from '../../services/publishService';
 import './ExportModal.css';
 
 function PublishModal({ isOpen, onClose }) {
@@ -14,6 +14,10 @@ function PublishModal({ isOpen, onClose }) {
   const [reason, setReason] = useState('');
   const [publishedUrl, setPublishedUrl] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [versions, setVersions] = useState([]);
+  const [loadingVersions, setLoadingVersions] = useState(false);
+  const [rollingBack, setRollingBack] = useState(false);
+  const [rollbackTarget, setRollbackTarget] = useState(null);
   const validateReqIdRef = useRef(0);
 
   const invitationId = currentInvitation?.id;
@@ -27,7 +31,34 @@ function PublishModal({ isOpen, onClose }) {
     setAvailable(null);
     setNormalized('');
     setErrorMsg('');
+    setVersions([]);
+    setRollbackTarget(null);
   }, [isOpen]);
+
+  // Fetch versions when subdomain is available and site is published
+  useEffect(() => {
+    if (!isOpen) return;
+    if (exportFormat !== 'publish') return;
+    if (!normalized || !available) {
+      setVersions([]);
+      return;
+    }
+
+    const fetchVersions = async () => {
+      setLoadingVersions(true);
+      try {
+        const res = await listVersions(normalized);
+        setVersions(res.versions || []);
+      } catch (e) {
+        // Silently fail - versions might not exist yet
+        setVersions([]);
+      } finally {
+        setLoadingVersions(false);
+      }
+    };
+
+    fetchVersions();
+  }, [isOpen, exportFormat, normalized, available]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -73,11 +104,41 @@ function PublishModal({ isOpen, onClose }) {
       const res = await publishInvitation(invitationId, subdomain);
       setPublishedUrl(res.url || '');
       if (!res.url) throw new Error('Publish succeeded but no URL was returned.');
+      
+      // Refresh versions after publish
+      if (normalized) {
+        try {
+          const versionsRes = await listVersions(normalized);
+          setVersions(versionsRes.versions || []);
+        } catch (e) {
+          // Ignore version fetch errors
+        }
+      }
     } catch (error) {
       console.error('Publish error:', error);
       setErrorMsg(error?.message || 'Failed to publish. Please try again.');
     } finally {
       setPublishing(false);
+    }
+  };
+
+  const handleRollback = async (version) => {
+    if (!normalized) return;
+    
+    setRollingBack(true);
+    setErrorMsg('');
+    try {
+      await rollbackToVersion(normalized, version);
+      // Refresh versions after rollback
+      const versionsRes = await listVersions(normalized);
+      setVersions(versionsRes.versions || []);
+      setRollbackTarget(null);
+      setErrorMsg('');
+    } catch (error) {
+      console.error('Rollback error:', error);
+      setErrorMsg(error?.message || 'Failed to rollback. Please try again.');
+    } finally {
+      setRollingBack(false);
     }
   };
 
@@ -149,6 +210,58 @@ function PublishModal({ isOpen, onClose }) {
                     </div>
                   </div>
                 ) : null}
+
+                {versions.length > 0 && (
+                  <div style={{ marginTop: 16 }}>
+                    <p><strong>Version History</strong></p>
+                    <div className="version-list">
+                      {versions.map((v) => (
+                        <div key={v.version} className="version-item">
+                          <span className="version-number">Version {v.version}</span>
+                          {v.isCurrent && (
+                            <span className="version-badge current">Current</span>
+                          )}
+                          {!v.isCurrent && (
+                            <button
+                              className="btn btn-secondary btn-sm"
+                              onClick={() => setRollbackTarget(v.version)}
+                              disabled={rollingBack}
+                            >
+                              Rollback
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {rollbackTarget !== null && (
+                  <div className="rollback-confirmation" style={{ marginTop: 16, padding: 12, backgroundColor: '#fff3cd', borderRadius: 4 }}>
+                    <p style={{ margin: '0 0 8px 0', fontWeight: 'bold' }}>
+                      Rollback to Version {rollbackTarget}?
+                    </p>
+                    <p style={{ margin: '0 0 8px 0', fontSize: 13 }}>
+                      This will make Version {rollbackTarget} the active version. The current version will remain available for rollback.
+                    </p>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button
+                        className="btn btn-primary btn-sm"
+                        onClick={() => handleRollback(rollbackTarget)}
+                        disabled={rollingBack}
+                      >
+                        {rollingBack ? 'Rolling back...' : 'Confirm Rollback'}
+                      </button>
+                      <button
+                        className="btn btn-secondary btn-sm"
+                        onClick={() => setRollbackTarget(null)}
+                        disabled={rollingBack}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
               </>
             ) : (
               <>

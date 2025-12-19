@@ -10,19 +10,30 @@ import (
 )
 
 type PublishHandler struct {
-	validateUC *publish.ValidateSubdomainUseCase
-	publishUC  *publish.PublishInvitationUseCase
-	baseDomain string
-	serverPort string
+	validateUC    *publish.ValidateSubdomainUseCase
+	publishUC     *publish.PublishInvitationUseCase
+	listVersionsUC *publish.ListPublishedVersionsUseCase
+	rollbackUC    *publish.RollbackPublishedSiteUseCase
+	baseDomain    string
+	serverPort    string
 }
 
 func NewPublishHandler(
 	validateUC *publish.ValidateSubdomainUseCase,
 	publishUC *publish.PublishInvitationUseCase,
+	listVersionsUC *publish.ListPublishedVersionsUseCase,
+	rollbackUC *publish.RollbackPublishedSiteUseCase,
 	baseDomain string,
 	serverPort string,
 ) *PublishHandler {
-	return &PublishHandler{validateUC: validateUC, publishUC: publishUC, baseDomain: baseDomain, serverPort: serverPort}
+	return &PublishHandler{
+		validateUC:    validateUC,
+		publishUC:     publishUC,
+		listVersionsUC: listVersionsUC,
+		rollbackUC:    rollbackUC,
+		baseDomain:    baseDomain,
+		serverPort:    serverPort,
+	}
 }
 
 type validateSubdomainRequest struct {
@@ -140,5 +151,108 @@ func (h *PublishHandler) Publish(c *gin.Context) {
 		URL:       url,
 		Subdomain: subdomain,
 		Version:   version,
+	})
+}
+
+type listVersionsResponse struct {
+	Versions []publish.VersionInfo `json:"versions"`
+}
+
+// ListVersions godoc
+// @Summary List available versions for a published site
+// @Tags publish
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param subdomain query string true "Subdomain"
+// @Success 200 {object} listVersionsResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
+// @Router /published/versions [get]
+func (h *PublishHandler) ListVersions(c *gin.Context) {
+	subdomain := c.Query("subdomain")
+	if subdomain == "" {
+		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "subdomain is required"})
+		return
+	}
+
+	userIDAny, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, ErrorResponse{Error: "authentication required"})
+		return
+	}
+	userID, _ := userIDAny.(string)
+
+	versions, err := h.listVersionsUC.Execute(c.Request.Context(), subdomain, userID)
+	if err != nil {
+		logger.GetLogger().Warn("list versions failed",
+			zap.String("userId", userID),
+			zap.String("subdomain", subdomain),
+			zap.Error(err),
+		)
+		c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, listVersionsResponse{
+		Versions: versions,
+	})
+}
+
+type rollbackRequest struct {
+	Subdomain string `json:"subdomain"`
+	Version   int    `json:"version"`
+}
+
+type rollbackResponse struct {
+	Message string `json:"message"`
+}
+
+// Rollback godoc
+// @Summary Rollback a published site to a previous version
+// @Tags publish
+// @Accept json
+// @Produce json
+// @Security BearerAuth
+// @Param request body rollbackRequest true "Rollback request"
+// @Success 200 {object} rollbackResponse
+// @Failure 400 {object} ErrorResponse
+// @Failure 401 {object} ErrorResponse
+// @Failure 403 {object} ErrorResponse
+// @Router /published/rollback [post]
+func (h *PublishHandler) Rollback(c *gin.Context) {
+	var req rollbackRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, ErrorResponse{Error: "invalid request"})
+		return
+	}
+
+	userIDAny, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, ErrorResponse{Error: "authentication required"})
+		return
+	}
+	userID, _ := userIDAny.(string)
+
+	if err := h.rollbackUC.Execute(c.Request.Context(), req.Subdomain, req.Version, userID); err != nil {
+		logger.GetLogger().Warn("rollback failed",
+			zap.String("userId", userID),
+			zap.String("subdomain", req.Subdomain),
+			zap.Int("version", req.Version),
+			zap.Error(err),
+		)
+		c.JSON(http.StatusBadRequest, ErrorResponse{Error: err.Error()})
+		return
+	}
+
+	logger.GetLogger().Info("rollback succeeded",
+		zap.String("userId", userID),
+		zap.String("subdomain", req.Subdomain),
+		zap.Int("version", req.Version),
+	)
+
+	c.JSON(http.StatusOK, rollbackResponse{
+		Message: "Rollback successful",
 	})
 }

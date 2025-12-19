@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
+	"sort"
+	"strconv"
 )
 
 // FilesystemArtifactStorage stores published artifacts on local disk.
@@ -47,6 +50,66 @@ func (s *FilesystemArtifactStorage) PublicURL(key string) string {
 		return "/published/" + key
 	}
 	return fmt.Sprintf("%s/published/%s", s.publicBase, key)
+}
+
+// ListVersions lists all version numbers for a given subdomain.
+// It scans the filesystem for directories matching "sites/{subdomain}/v{version}/" and extracts version numbers.
+func (s *FilesystemArtifactStorage) ListVersions(ctx context.Context, subdomain string) ([]int, error) {
+	subdomainPath := filepath.Join(s.rootDir, "sites", subdomain)
+	versionMap := make(map[int]bool)
+
+	// Check if subdomain directory exists
+	if _, err := os.Stat(subdomainPath); os.IsNotExist(err) {
+		return []int{}, nil // No versions found
+	}
+
+	// Read directory entries
+	entries, err := os.ReadDir(subdomainPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read subdomain directory: %w", err)
+	}
+
+	// Regex to extract version number from directory name like "v123"
+	versionRegex := regexp.MustCompile(`^v(\d+)$`)
+
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+		matches := versionRegex.FindStringSubmatch(entry.Name())
+		if len(matches) >= 2 {
+			if version, err := strconv.Atoi(matches[1]); err == nil {
+				versionMap[version] = true
+			}
+		}
+	}
+
+	// Convert map to sorted slice
+	versions := make([]int, 0, len(versionMap))
+	for v := range versionMap {
+		versions = append(versions, v)
+	}
+	sort.Sort(sort.Reverse(sort.IntSlice(versions))) // Sort descending
+
+	return versions, nil
+}
+
+// DeleteVersion deletes all artifacts for a specific version of a subdomain.
+// It removes the entire version directory "sites/{subdomain}/v{version}/".
+func (s *FilesystemArtifactStorage) DeleteVersion(ctx context.Context, subdomain string, version int) error {
+	versionPath := filepath.Join(s.rootDir, "sites", subdomain, fmt.Sprintf("v%d", version))
+
+	// Check if version directory exists
+	if _, err := os.Stat(versionPath); os.IsNotExist(err) {
+		return nil // Nothing to delete
+	}
+
+	// Remove the entire version directory and all its contents
+	if err := os.RemoveAll(versionPath); err != nil {
+		return fmt.Errorf("failed to delete version directory: %w", err)
+	}
+
+	return nil
 }
 
 
