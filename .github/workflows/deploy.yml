@@ -30,7 +30,6 @@ jobs:
           gcloud auth configure-docker asia-northeast1-docker.pkg.dev --quiet
 
       - name: Build and push Docker image
-        working-directory: ./apps/api-go
         run: |
           IMAGE_TAG="asia-northeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/api-dev/api-go:latest"
           
@@ -39,8 +38,9 @@ jobs:
           
           # Submit build using cloudbuild.yaml for optimized caching
           # This uses BuildKit cache mounts and Docker layer caching for faster builds
+          # Run from repo root so build context includes both apps/api-go and apps/builder
           BUILD_ID=$(gcloud builds submit \
-            --config=cloudbuild.yaml \
+            --config=apps/api-go/cloudbuild.yaml \
             --project ${{ secrets.GCP_PROJECT_ID }} \
             --region asia-northeast1 \
             --substitutions=_TAG=$SHORT_SHA \
