@@ -14,16 +14,18 @@ import (
 )
 
 type AuthHandler struct {
-	registerUC       *authuc.RegisterUseCase
-	loginUC          *authuc.LoginUseCase
-	getCurrentUserUC *authuc.GetCurrentUserUseCase
-	googleOAuthUC    *authuc.GoogleOAuthUseCase
-	refreshTokenUC   *authuc.RefreshTokenUseCase
-	refreshTokenRepo repository.RefreshTokenRepository
-	jwtService       *authinfra.JWTService
-	googleOAuth      *authinfra.GoogleOAuthService
-	hmacKeys         []authinfra.RefreshTokenHMACKey
-	activeHMACKeyID  int16
+	registerUC            *authuc.RegisterUseCase
+	loginUC               *authuc.LoginUseCase
+	getCurrentUserUC      *authuc.GetCurrentUserUseCase
+	googleOAuthUC         *authuc.GoogleOAuthUseCase
+	refreshTokenUC        *authuc.RefreshTokenUseCase
+	requestPasswordResetUC *authuc.RequestPasswordResetUseCase
+	resetPasswordUC       *authuc.ResetPasswordUseCase
+	refreshTokenRepo      repository.RefreshTokenRepository
+	jwtService            *authinfra.JWTService
+	googleOAuth           *authinfra.GoogleOAuthService
+	hmacKeys              []authinfra.RefreshTokenHMACKey
+	activeHMACKeyID       int16
 }
 
 func NewAuthHandler(
@@ -32,6 +34,8 @@ func NewAuthHandler(
 	getCurrentUserUC *authuc.GetCurrentUserUseCase,
 	googleOAuthUC *authuc.GoogleOAuthUseCase,
 	refreshTokenUC *authuc.RefreshTokenUseCase,
+	requestPasswordResetUC *authuc.RequestPasswordResetUseCase,
+	resetPasswordUC *authuc.ResetPasswordUseCase,
 	refreshTokenRepo repository.RefreshTokenRepository,
 	jwtService *authinfra.JWTService,
 	googleOAuth *authinfra.GoogleOAuthService,
@@ -39,16 +43,18 @@ func NewAuthHandler(
 	activeHMACKeyID int16,
 ) *AuthHandler {
 	return &AuthHandler{
-		registerUC:       registerUC,
-		loginUC:          loginUC,
-		getCurrentUserUC: getCurrentUserUC,
-		googleOAuthUC:    googleOAuthUC,
-		refreshTokenUC:   refreshTokenUC,
-		refreshTokenRepo: refreshTokenRepo,
-		jwtService:       jwtService,
-		googleOAuth:      googleOAuth,
-		hmacKeys:         hmacKeys,
-		activeHMACKeyID:  activeHMACKeyID,
+		registerUC:            registerUC,
+		loginUC:               loginUC,
+		getCurrentUserUC:      getCurrentUserUC,
+		googleOAuthUC:         googleOAuthUC,
+		refreshTokenUC:        refreshTokenUC,
+		requestPasswordResetUC: requestPasswordResetUC,
+		resetPasswordUC:       resetPasswordUC,
+		refreshTokenRepo:      refreshTokenRepo,
+		jwtService:            jwtService,
+		googleOAuth:           googleOAuth,
+		hmacKeys:              hmacKeys,
+		activeHMACKeyID:        activeHMACKeyID,
 	}
 }
 
@@ -507,4 +513,101 @@ func (h *AuthHandler) getActiveHMACKey() (authinfra.RefreshTokenHMACKey, bool) {
 
 type RefreshTokenResponse struct {
 	AccessToken string `json:"accessToken" example:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."`
+}
+
+type ForgotPasswordRequest struct {
+	Email string `json:"email" binding:"required" example:"user@example.com"`
+}
+
+type ResetPasswordRequest struct {
+	Token    string `json:"token" binding:"required" example:"abc123..."`
+	Password string `json:"password" binding:"required" example:"newSecurePassword123"`
+}
+
+
+// ForgotPassword handles password reset requests
+// @Summary      Request password reset
+// @Description  Sends a password reset email to the user if an account with that email exists. Always returns success for security reasons.
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        request  body      ForgotPasswordRequest  true  "Password reset request"
+// @Success      200      {object}  MessageResponse         "If an account with that email exists, a password reset link has been sent"
+// @Failure      400      {object}  ErrorResponse           "Invalid request"
+// @Failure      500      {object}  ErrorResponse           "Internal server error"
+// @Router       /auth/forgot-password [post]
+func (h *AuthHandler) ForgotPassword(c *gin.Context) {
+	if h.requestPasswordResetUC == nil {
+		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "Email service is not configured. Password reset is currently unavailable."})
+		return
+	}
+
+	var req ForgotPasswordRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email is required"})
+		return
+	}
+
+	_, err := h.requestPasswordResetUC.Execute(c.Request.Context(), authuc.RequestPasswordResetInput{
+		Email: req.Email,
+	})
+
+	if err != nil {
+		appErr, ok := err.(*errors.AppError)
+		if ok {
+			c.JSON(appErr.Code, appErr.ToResponse())
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to process password reset request"})
+		return
+	}
+
+	// Always return success message (security best practice - don't reveal if email exists)
+	c.JSON(http.StatusOK, gin.H{
+		"message": "If an account with that email exists, we've sent a password reset link.",
+	})
+}
+
+// ResetPassword handles password reset with token
+// @Summary      Reset password
+// @Description  Resets the user's password using a valid reset token from the email link.
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Param        request  body      ResetPasswordRequest  true  "Password reset with token"
+// @Success      200      {object}  MessageResponse        "Password reset successfully"
+// @Failure      400      {object}  ErrorResponse         "Invalid request"
+// @Failure      401      {object}  ErrorResponse         "Invalid or expired reset token"
+// @Failure      500      {object}  ErrorResponse         "Internal server error"
+// @Router       /auth/reset-password [post]
+func (h *AuthHandler) ResetPassword(c *gin.Context) {
+	if h.resetPasswordUC == nil {
+		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "Password reset service is not configured. Please contact support."})
+		return
+	}
+
+	var req ResetPasswordRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Token and password are required"})
+		return
+	}
+
+	_, err := h.resetPasswordUC.Execute(c.Request.Context(), authuc.ResetPasswordInput{
+		Token:    req.Token,
+		Password: req.Password,
+	})
+
+	if err != nil {
+		appErr, ok := err.(*errors.AppError)
+		if ok {
+			c.JSON(appErr.Code, appErr.ToResponse())
+			return
+		}
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Failed to reset password"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Password reset successfully",
+	})
 }

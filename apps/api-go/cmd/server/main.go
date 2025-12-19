@@ -33,6 +33,7 @@ import (
 	"github.com/sacred-vows/api-go/internal/infrastructure/auth"
 	"github.com/sacred-vows/api-go/internal/infrastructure/config"
 	"github.com/sacred-vows/api-go/internal/infrastructure/database/firestore"
+	"github.com/sacred-vows/api-go/internal/infrastructure/email"
 	publishinfra "github.com/sacred-vows/api-go/internal/infrastructure/publish"
 	"github.com/sacred-vows/api-go/internal/infrastructure/storage"
 	httpRouter "github.com/sacred-vows/api-go/internal/interfaces/http"
@@ -89,7 +90,9 @@ func main() {
 	var rsvpRepo repository.RSVPRepository
 	var analyticsRepo repository.AnalyticsRepository
 	var refreshTokenRepo repository.RefreshTokenRepository
+	var passwordResetRepo repository.PasswordResetRepository
 	var publishedSiteRepo repository.PublishedSiteRepository
+	var emailUsageRepo repository.EmailUsageRepository
 
 	userRepo = firestore.NewUserRepository(firestoreClient)
 	invitationRepo = firestore.NewInvitationRepository(firestoreClient)
@@ -98,7 +101,9 @@ func main() {
 	rsvpRepo = firestore.NewRSVPRepository(firestoreClient)
 	analyticsRepo = firestore.NewAnalyticsRepository(firestoreClient)
 	refreshTokenRepo = firestore.NewRefreshTokenRepository(firestoreClient)
+	passwordResetRepo = firestore.NewPasswordResetRepository(firestoreClient)
 	publishedSiteRepo = firestore.NewPublishedSiteRepository(firestoreClient)
+	emailUsageRepo = firestore.NewEmailUsageRepository(firestoreClient)
 
 	// Initialize services
 	jwtService := auth.NewJWTService(
@@ -110,6 +115,13 @@ func main() {
 		cfg.Auth.ClockSkewTolerance,
 	)
 	googleOAuthService := auth.NewGoogleOAuthService(&cfg.Google)
+
+	// Initialize email service
+	emailService, err := email.NewEmailService(cfg.Email, emailUsageRepo)
+	if err != nil {
+		logger.GetLogger().Warn("Email service not configured; password reset will fail", zap.Error(err))
+		// Continue anyway - email service is optional for other features
+	}
 
 	// Initialize storage (GCS if bucket is configured, otherwise filesystem)
 	var fileStorage storage.Storage
@@ -144,6 +156,14 @@ func main() {
 		hmacKeys = append(hmacKeys, auth.RefreshTokenHMACKey{ID: k.ID, Key: k.Key})
 	}
 	refreshTokenUC := authUC.NewRefreshTokenUseCase(refreshTokenRepo, userRepo, jwtService, hmacKeys, cfg.Auth.RefreshTokenHMACActiveKeyID)
+
+	// Password reset use cases (only if email service is configured)
+	var requestPasswordResetUC *authUC.RequestPasswordResetUseCase
+	var resetPasswordUC *authUC.ResetPasswordUseCase
+	if emailService != nil {
+		requestPasswordResetUC = authUC.NewRequestPasswordResetUseCase(userRepo, passwordResetRepo, emailService, cfg.Google.FrontendURL)
+		resetPasswordUC = authUC.NewResetPasswordUseCase(passwordResetRepo, userRepo)
+	}
 
 	createInvitationUC := invitation.NewCreateInvitationUseCase(invitationRepo)
 	getInvitationByIDUC := invitation.NewGetInvitationByIDUseCase(invitationRepo)
@@ -210,7 +230,7 @@ func main() {
 	rollbackUC := publishUC.NewRollbackPublishedSiteUseCase(publishedSiteRepo, artifactStore)
 
 	// Initialize handlers
-	authHandler := handlers.NewAuthHandler(registerUC, loginUC, getCurrentUserUC, googleOAuthUC, refreshTokenUC, refreshTokenRepo, jwtService, googleOAuthService, hmacKeys, cfg.Auth.RefreshTokenHMACActiveKeyID)
+	authHandler := handlers.NewAuthHandler(registerUC, loginUC, getCurrentUserUC, googleOAuthUC, refreshTokenUC, requestPasswordResetUC, resetPasswordUC, refreshTokenRepo, jwtService, googleOAuthService, hmacKeys, cfg.Auth.RefreshTokenHMACActiveKeyID)
 	invitationHandler := handlers.NewInvitationHandler(createInvitationUC, getInvitationByIDUC, getAllInvitationsUC, getInvitationPreviewUC, updateInvitationUC, deleteInvitationUC, migrateInvitationsUC)
 	layoutHandler := handlers.NewLayoutHandler(getAllLayoutsUC, getLayoutByIDUC, getLayoutManifestUC, getManifestsUC)
 	assetHandler := handlers.NewAssetHandler(uploadAssetUC, getAllAssetsUC, deleteAssetUC, fileStorage, gcsStorage)

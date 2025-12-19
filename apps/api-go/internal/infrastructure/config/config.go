@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -19,6 +20,7 @@ type Config struct {
 	Storage    StorageConfig
 	Google     GoogleConfig
 	Publishing PublishingConfig
+	Email      EmailConfig
 }
 
 type ServerConfig struct {
@@ -79,6 +81,25 @@ type PublishingConfig struct {
 	VersionRetentionCount int
 }
 
+// EmailVendorConfig represents configuration for a single email vendor
+type EmailVendorConfig struct {
+	Provider     string // "mailjet" | "mailgun"
+	APIKey       string
+	SecretKey    string // For Mailjet (not used for Mailgun)
+	Domain       string // For Mailgun (domain to send from)
+	DailyLimit   int    // e.g., 100 for Mailgun free, 200 for Mailjet free
+	MonthlyLimit int    // e.g., 10000 for Mailgun paid, 15000 for Mailjet paid
+	Enabled      bool
+	FromAddress  string
+	FromName     string
+}
+
+type EmailConfig struct {
+	Vendors     []EmailVendorConfig
+	FromAddress string // Default from address (used if vendor doesn't specify)
+	FromName    string // Default from name (used if vendor doesn't specify)
+}
+
 func Load() (*Config, error) {
 	// Load .env file if it exists.
 	// We try a few common locations to avoid surprises with working directory.
@@ -126,6 +147,7 @@ func Load() (*Config, error) {
 			R2PublicBase:          getEnv("R2_PUBLIC_BASE", ""),
 			VersionRetentionCount: getEnvAsInt("PUBLISH_VERSION_RETENTION_COUNT", 3),
 		},
+		Email: loadEmailConfig(),
 	}
 
 	if err := config.validate(); err != nil {
@@ -244,4 +266,93 @@ func parseDuration(value string, defaultValue time.Duration) time.Duration {
 		return defaultValue
 	}
 	return duration
+}
+
+// loadEmailConfig loads email configuration in multi-vendor format
+func loadEmailConfig() EmailConfig {
+	cfg := EmailConfig{
+		FromAddress: getEnv("EMAIL_FROM_ADDRESS", ""),
+		FromName:    getEnv("EMAIL_FROM_NAME", "Sacred Vows"),
+	}
+
+	// Check if multi-vendor JSON config is provided
+	vendorsJSON := getEnv("EMAIL_VENDORS_JSON", "")
+	if vendorsJSON != "" {
+		var vendors []EmailVendorConfig
+		if err := json.Unmarshal([]byte(vendorsJSON), &vendors); err == nil {
+			// Set default from address/name for vendors that don't have them
+			for i := range vendors {
+				if vendors[i].FromAddress == "" {
+					vendors[i].FromAddress = cfg.FromAddress
+				}
+				if vendors[i].FromName == "" {
+					vendors[i].FromName = cfg.FromName
+				}
+			}
+			cfg.Vendors = vendors
+			return cfg
+		}
+	}
+
+	// Check if vendor list is provided (comma-separated)
+	vendorList := getEnv("EMAIL_VENDORS", "")
+	if vendorList != "" {
+		// Parse comma-separated vendor list
+		vendors := []EmailVendorConfig{}
+		
+		// Check for Mailjet
+		if contains(vendorList, "mailjet") {
+			mailjetKey := getEnv("MAILJET_API_KEY", "")
+			mailjetSecret := getEnv("MAILJET_SECRET_KEY", "")
+			if mailjetKey != "" && mailjetSecret != "" {
+				vendors = append(vendors, EmailVendorConfig{
+					Provider:     "mailjet",
+					APIKey:       mailjetKey,
+					SecretKey:    mailjetSecret,
+					DailyLimit:   getEnvAsInt("MAILJET_DAILY_LIMIT", 200),
+					MonthlyLimit: getEnvAsInt("MAILJET_MONTHLY_LIMIT", 6000),
+					Enabled:      true,
+					FromAddress:  cfg.FromAddress,
+					FromName:     cfg.FromName,
+				})
+			}
+		}
+		
+		// Check for Mailgun
+		if contains(vendorList, "mailgun") {
+			mailgunKey := getEnv("MAILGUN_API_KEY", "")
+			mailgunDomain := getEnv("MAILGUN_DOMAIN", "")
+			if mailgunKey != "" && mailgunDomain != "" {
+				vendors = append(vendors, EmailVendorConfig{
+					Provider:     "mailgun",
+					APIKey:       mailgunKey,
+					Domain:       mailgunDomain,
+					DailyLimit:   getEnvAsInt("MAILGUN_DAILY_LIMIT", 100),
+					MonthlyLimit: getEnvAsInt("MAILGUN_MONTHLY_LIMIT", 3000),
+					Enabled:      true,
+					FromAddress:  cfg.FromAddress,
+					FromName:     cfg.FromName,
+				})
+			}
+		}
+		
+		if len(vendors) > 0 {
+			cfg.Vendors = vendors
+			return cfg
+		}
+	}
+
+	// If no vendors configured, return empty config (will be handled by factory)
+	return cfg
+}
+
+// contains checks if a comma-separated string contains a value
+func contains(list, value string) bool {
+	items := strings.Split(list, ",")
+	for _, item := range items {
+		if strings.TrimSpace(item) == value {
+			return true
+		}
+	}
+	return false
 }
