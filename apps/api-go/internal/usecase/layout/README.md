@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Handles layout operations including loading layouts from the database, filtering, and manifest management. Layouts are stored in the PostgreSQL database with both manifest and config as JSONB columns.
+Handles layout operations including loading layouts from the database, filtering, and manifest management. Layouts are stored in Firestore with both manifest and config as string fields (JSON stored as strings).
 
 ## Use Cases
 
@@ -72,7 +72,7 @@ Gets manifests for all layouts.
 
 ## Manifest Normalization
 
-Layouts are loaded from the database where manifest and config are stored as JSONB columns. The normalization process (in `normalize.go`):
+Layouts are loaded from Firestore where manifest and config are stored as string fields (JSON stored as strings). The normalization process (in `normalize.go`):
 
 - Parses manifest JSON from database
 - Sets default theme if none specified
@@ -90,22 +90,23 @@ The `ToLayoutSummaryDTO` function converts `domain.Layout` to `LayoutSummaryDTO`
 
 ## Database Schema
 
-Layouts are stored in the `layouts` table (renamed from `layouts` in migration 006) with:
-- `id`: Layout identifier (primary key)
+Layouts are stored in the `layouts` Firestore collection with:
+- `id`: Layout identifier (document ID)
 - `name`: Layout name
 - `description`: Layout description
-- `previewImage`: Preview image URL
+- `preview_image`: Preview image URL
 - `tags`: Array of tags
 - `version`: Layout version
-- `config`: Layout config as JSONB (render defaults)
-- `manifest`: Layout manifest as JSONB (catalog metadata)
-- `isActive`: Whether layout is active
+- `config`: Layout config as string (JSON stored as string, render defaults)
+- `manifest`: Layout manifest as string (JSON stored as string, catalog metadata)
+- `is_active`: Whether layout is active
 
 ## Related Files
 
 - Handler: `internal/interfaces/http/handlers/layout_handler.go`
-- Repository: `internal/infrastructure/database/postgres/layout_repository.go`
+- Repository: `internal/infrastructure/database/firestore/layout_repository.go`
 - Domain: `internal/domain/layout.go`
 - Normalization: `internal/usecase/layout/normalize.go`
+
 
 

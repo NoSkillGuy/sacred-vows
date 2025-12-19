@@ -47,7 +47,7 @@ Layout data operations for database-stored layouts:
 - `Update(ctx, layout)` - Update layout
 - `Delete(ctx, id)` - Delete layout
 
-**Note:** Layouts are stored in the database with both `manifest` and `config` as JSONB columns. Layouts are loaded via SQL migration `003_load_layouts.up.sql` which contains all layout data embedded in the migration file.
+**Note:** Layouts are stored in Firestore with both `manifest` and `config` as string fields (JSON stored as strings). Layouts are loaded via Firestore migration `003_load_templates` which contains all layout data embedded in the migration code.
 
 ### AssetRepository (`asset_repository.go`)
 
@@ -108,13 +108,13 @@ All methods accept `context.Context` for:
 ## Implementations
 
 Repository interfaces are implemented in:
-- `internal/infrastructure/database/postgres/` - PostgreSQL/GORM implementations
+- `internal/infrastructure/database/firestore/` - Firestore implementations
 
 ## Related Files
 
 - Domain Entities: `internal/domain/`
 - Use Cases: `internal/usecase/` (depend on these interfaces)
-- Implementations: `internal/infrastructure/database/postgres/`
+- Implementations: `internal/infrastructure/database/firestore/`
 
 ## Best Practices
 

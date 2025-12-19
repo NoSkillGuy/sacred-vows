@@ -1,20 +1,4 @@
 services:
-  postgres:
-    image: postgres:15
-    environment:
-      POSTGRES_USER: wedding_builder
-      POSTGRES_PASSWORD: wedding_builder_password
-      POSTGRES_DB: wedding_builder
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U wedding_builder"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   api-go:
     build:
       context: ./apps/api-go
@@ -22,7 +6,9 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: postgresql://wedding_builder:wedding_builder_password@postgres:5432/wedding_builder
+      GCP_PROJECT_ID: ${GCP_PROJECT_ID:-test-project}
+      FIRESTORE_DATABASE: ${FIRESTORE_DATABASE:-(default)}
+      FIRESTORE_EMULATOR_HOST: ${FIRESTORE_EMULATOR_HOST:-firestore-emulator:8080}
       JWT_SECRET: ${JWT_SECRET:-dev-secret-key-min-32-chars-long-for-security}
       PORT: 3000
       LAYOUTS_DIR: /app/layouts
@@ -32,7 +18,7 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
       GOOGLE_REDIRECT_URI: http://localhost:3000/api/auth/google/callback
     depends_on:
-      postgres:
+      firestore-emulator:
         condition: service_healthy
     volumes:
       - ./apps/builder/layouts:/app/layouts
@@ -43,7 +29,17 @@ services:
       timeout: 10s
       retries: 3
 
+  firestore-emulator:
+    image: gcr.io/google.com/cloudsdktool/google-cloud-cli:emulators
+    command: gcloud beta emulators firestore start --host-port=0.0.0.0:8080
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
-  postgres_data:
   api_go_uploads:
 

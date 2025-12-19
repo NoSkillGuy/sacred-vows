@@ -54,9 +54,6 @@ WORKDIR /app
 # Copy the compiled binary from the builder stage
 COPY --from=builder /app/bin/server /app/server
 
-# Copy migration files from the builder stage
-COPY --from=builder /app/migrations /app/migrations
-
 # Copy generated Swagger documentation from the builder stage
 COPY --from=builder /app/docs /app/docs
 

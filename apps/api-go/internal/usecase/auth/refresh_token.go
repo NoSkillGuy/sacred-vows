@@ -6,7 +6,6 @@ import (
 
 	"github.com/sacred-vows/api-go/internal/domain"
 	"github.com/sacred-vows/api-go/internal/infrastructure/auth"
-	"github.com/sacred-vows/api-go/internal/infrastructure/database/postgres"
 	"github.com/sacred-vows/api-go/internal/interfaces/repository"
 	"github.com/sacred-vows/api-go/pkg/errors"
 )
@@ -65,7 +64,7 @@ func (uc *RefreshTokenUseCase) Execute(ctx context.Context, input RefreshTokenIn
 		if t == nil {
 			continue
 		}
-		if !postgres.CompareTokenHash(input.RefreshToken, t.TokenHash) {
+		if !auth.CompareTokenHash(input.RefreshToken, t.TokenHash) {
 			return nil, errors.New(errors.ErrUnauthorized.Code, "Invalid refresh token")
 		}
 		storedToken = t
@@ -103,7 +102,7 @@ func (uc *RefreshTokenUseCase) Execute(ctx context.Context, input RefreshTokenIn
 	}
 
 	// Hash the new refresh token
-	newTokenHash, err := postgres.HashToken(newRefreshToken)
+	newTokenHash, err := auth.HashToken(newRefreshToken)
 	if err != nil {
 		return nil, errors.Wrap(errors.ErrInternalServerError.Code, "Failed to hash new refresh token", err)
 	}

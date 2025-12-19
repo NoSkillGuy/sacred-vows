@@ -25,7 +25,7 @@ The infrastructure layer contains implementations of external frameworks and ser
 ```
 infrastructure/
 ├── database/
-│   └── postgres/      # PostgreSQL/GORM implementation
+│   └── firestore/     # Firestore implementation
 ├── auth/              # Authentication services
 ├── config/            # Configuration management
 └── storage/           # File storage
@@ -33,13 +33,12 @@ infrastructure/
 
 ## Components
 
-### Database (`database/postgres/`)
+### Database (`database/firestore/`)
 
-PostgreSQL database implementation using GORM:
-- Database connection management
+Firestore database implementation:
+- Firestore client connection management
 - Repository implementations
-- GORM models
-- Migration support
+- Migration support (Go-based migrations)
 
 ### Authentication (`auth/`)
 
@@ -64,8 +63,8 @@ File storage implementation:
 ## Dependencies
 
 This layer can depend on:
-- External frameworks (Gin, GORM, JWT libraries)
-- Database drivers
+- External frameworks (Gin, Firestore, JWT libraries)
+- Database clients
 - OAuth libraries
 - File system operations
 - Environment variable loaders

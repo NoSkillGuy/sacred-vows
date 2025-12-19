@@ -9,7 +9,6 @@ import (
 
 	"github.com/sacred-vows/api-go/internal/domain"
 	authinfra "github.com/sacred-vows/api-go/internal/infrastructure/auth"
-	"github.com/sacred-vows/api-go/internal/infrastructure/database/postgres"
 	"github.com/sacred-vows/api-go/pkg/errors"
 )
 
@@ -71,7 +70,7 @@ func TestRefreshTokenUseCase_LookupTriesOlderKeys(t *testing.T) {
 	}
 
 	oldFP := authinfra.ComputeRefreshTokenFingerprint(keys[1].Key, tokenBytes)
-	hash, err := postgres.HashToken(tokenStr)
+	hash, err := authinfra.HashToken(tokenStr)
 	if err != nil {
 		t.Fatalf("hash err: %v", err)
 	}

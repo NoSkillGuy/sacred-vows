@@ -28,12 +28,6 @@ type ServerConfig struct {
 }
 
 type DatabaseConfig struct {
-	Type            string // "postgres" or "firestore"
-	URL             string // For Postgres
-	MaxOpenConns    int
-	MaxIdleConns    int
-	ConnMaxLifetime time.Duration
-	// For Firestore
 	ProjectID  string
 	DatabaseID string
 }
@@ -96,13 +90,8 @@ func Load() (*Config, error) {
 			WriteTimeout: 15 * time.Second,
 		},
 		Database: DatabaseConfig{
-			Type:            getEnv("DATABASE_TYPE", "postgres"), // postgres or firestore
-			URL:             getEnv("DATABASE_URL", ""),
-			MaxOpenConns:    25,
-			MaxIdleConns:    5,
-			ConnMaxLifetime: 5 * time.Minute,
-			ProjectID:       getEnv("GCP_PROJECT_ID", ""),
-			DatabaseID:      getEnv("FIRESTORE_DATABASE", "(default)"),
+			ProjectID:  getEnv("GCP_PROJECT_ID", ""),
+			DatabaseID: getEnv("FIRESTORE_DATABASE", "(default)"),
 		},
 		Auth: AuthConfig{
 			JWTSecret:                   getEnv("JWT_SECRET", "your-secret-key-change-in-production"),
@@ -177,16 +166,8 @@ func loadDotEnv() error {
 }
 
 func (c *Config) validate() error {
-	if c.Database.Type == "postgres" {
-		if c.Database.URL == "" {
-			return fmt.Errorf("DATABASE_URL is required when DATABASE_TYPE=postgres")
-		}
-	} else if c.Database.Type == "firestore" {
-		if c.Database.ProjectID == "" {
-			return fmt.Errorf("GCP_PROJECT_ID is required when DATABASE_TYPE=firestore")
-		}
-	} else {
-		return fmt.Errorf("DATABASE_TYPE must be either 'postgres' or 'firestore'")
+	if c.Database.ProjectID == "" {
+		return fmt.Errorf("GCP_PROJECT_ID is required")
 	}
 	if c.Auth.JWTSecret == "" || c.Auth.JWTSecret == "your-secret-key-change-in-production" {
 		return fmt.Errorf("JWT_SECRET must be set to a secure value")

@@ -24,10 +24,8 @@ Main configuration structure with nested configs:
 - `WriteTimeout` - Response write timeout
 
 **DatabaseConfig:**
-- `URL` - PostgreSQL connection string (required)
-- `MaxOpenConns` - Maximum open connections
-- `MaxIdleConns` - Maximum idle connections
-- `ConnMaxLifetime` - Connection max lifetime
+- `ProjectID` - Google Cloud Project ID (required)
+- `DatabaseID` - Firestore database name (default: "(default)")
 
 **AuthConfig:**
 - `JWTSecret` - JWT signing secret (required)
@@ -67,13 +65,15 @@ if err != nil {
 ## Validation
 
 Validates:
-- `DATABASE_URL` must be set
+- `GCP_PROJECT_ID` must be set
 - `JWT_SECRET` must be set and not default value
 
 ## Environment Variables
 
 See `.env.example` for all available variables:
-- `DATABASE_URL` (required)
+- `GCP_PROJECT_ID` (required)
+- `FIRESTORE_DATABASE` (optional, default: "(default)")
+- `FIRESTORE_EMULATOR_HOST` (optional, for local development)
 - `JWT_SECRET` (required)
 - `PORT` (optional, default: 3000)
 - `GOOGLE_CLIENT_ID` (optional)

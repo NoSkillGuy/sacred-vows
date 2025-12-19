@@ -51,13 +51,13 @@ apps/api-go/
 - Analytics tracking
   - Track invitation views
   - Retrieve analytics by invitation
-- PostgreSQL database with GORM
+- Firestore database
 - File storage with validation
 
 ## Prerequisites
 
 - Go 1.21 or higher
-- PostgreSQL 15 or higher
+- Google Cloud SDK (for Firestore emulator, optional for local development)
 - Make (optional, for using Makefile commands)
 
 ## Setup
@@ -77,22 +77,44 @@ apps/api-go/
    ```
 
 4. **Set up the database**:
+
+   **Using Firestore Emulator (recommended for local development)**
    ```bash
-   # Using docker-compose (recommended)
-   docker-compose up -d postgres
+   # Start Firestore emulator
+   gcloud beta emulators firestore start --host-port=localhost:8080
    
-   # Or use your own PostgreSQL instance
-   # Update DATABASE_URL in .env
+   # Or use docker-compose which includes the emulator
+   docker-compose up -d firestore-emulator
+   
+   # Set environment variables in .env:
+   # GCP_PROJECT_ID=test-project
+   # FIRESTORE_DATABASE=(default)
+   # FIRESTORE_EMULATOR_HOST=localhost:8080
+   ```
+
+   **Or connect to real Firestore instance**
+   ```bash
+   # Authenticate with GCP
+   gcloud auth application-default login
+   
+   # Set environment variables in .env:
+   # GCP_PROJECT_ID=your-project-id
+   # FIRESTORE_DATABASE=(default)
    ```
 
 5. **Run migrations**:
-   The application will automatically run migrations on startup using GORM AutoMigrate.
+   The application will automatically run Firestore migrations on startup (see Database Migrations section)
 
 ## Environment Variables
 
 See `env.example` for all required environment variables:
 
-- `DATABASE_URL` - PostgreSQL connection string
+**Database Configuration:**
+- `GCP_PROJECT_ID` - Google Cloud Project ID (required)
+- `FIRESTORE_DATABASE` - Firestore database name (default: `(default)`)
+- `FIRESTORE_EMULATOR_HOST` - Firestore emulator host (e.g., `localhost:8080`) for local development
+
+**Application:**
 - `JWT_SECRET` - Secret key for JWT token signing
 - `PORT` - Server port (default: 3000)
 - `GOOGLE_CLIENT_ID` - Google OAuth client ID
@@ -251,7 +273,7 @@ When adding new endpoints or modifying existing ones:
 1. Define domain entities in `internal/domain/`
 2. Create repository interfaces in `internal/interfaces/repository/`
 3. Implement use cases in `internal/usecase/`
-4. Implement repositories in `internal/infrastructure/database/postgres/`
+4. Implement repositories in `internal/infrastructure/database/firestore/`
 5. Create HTTP handlers in `internal/interfaces/http/handlers/`
 6. Register routes in `internal/interfaces/http/router.go`
 
@@ -267,12 +289,62 @@ go test ./...
 
 ### Database Migrations
 
-Migrations are handled automatically by GORM AutoMigrate on startup. For manual migrations, see `migrations/README.md`.
+Firestore migrations run automatically on startup:
+- All 12 migrations are executed sequentially
+- Migrations are tracked in the `schema_migrations` collection
+- Migrations are idempotent (safe to run multiple times)
+
+**Verifying Firestore Migrations Locally:**
+
+1. **Start Firestore Emulator:**
+   ```bash
+   gcloud beta emulators firestore start --host-port=localhost:8080
+   ```
+
+2. **Configure Environment:**
+   ```bash
+   # In apps/api-go/.env
+   GCP_PROJECT_ID=test-project
+   FIRESTORE_DATABASE=(default)
+   FIRESTORE_EMULATOR_HOST=localhost:8080
+   ```
+
+3. **Run the Application:**
+   ```bash
+   go run cmd/server/main.go
+   ```
+
+4. **Check Migration Logs:**
+   Look for log messages indicating migrations:
+   - `"Running migration"` - Shows which migration is executing
+   - `"Migration already applied"` - Shows migrations that were skipped
+   - `"Migration completed"` - Confirms successful migration
+
+5. **Verify in Firestore:**
+   - Check that `schema_migrations` collection exists with 12 documents (versions 1-12)
+   - Verify collections were created: `users`, `invitations`, `layouts`, `assets`, `rsvp_responses`, `analytics`, `refresh_tokens`, `published_sites`
+   - Check `layouts` collection contains `classic-scroll` and `editorial-elegance` documents
+
+**Using Real Firestore (instead of emulator):**
+```bash
+# Authenticate with GCP
+gcloud auth application-default login
+
+# Set environment variables
+export GCP_PROJECT_ID=your-project-id
+export FIRESTORE_DATABASE=(default)
+```
+
+**Migration Behavior:**
+- Migrations run sequentially and validate version order
+- If a migration fails, the application logs an error but continues startup
+- Running migrations multiple times is safe (idempotent)
+- Migration status is persisted in Firestore `schema_migrations` collection
 
 ## Dependencies
 
 - **Gin** - HTTP web framework
-- **GORM** - ORM for database operations
+- **Firestore** - Google Cloud Firestore database
 - **JWT** - JSON Web Token authentication
 - **OAuth2** - Google OAuth integration
 - **Zap** - Structured logging
@@ -287,9 +359,9 @@ Migrations are handled automatically by GORM AutoMigrate on startup. For manual 
 
 2. **Google OAuth Verify**: Fully implemented using `google.golang.org/api/idtoken` for proper ID token verification.
 
-3. **Database**: Uses PostgreSQL with GORM. The schema is automatically migrated on startup using GORM AutoMigrate.
+3. **Database**: Uses Firestore with Go-based migrations. Migrations run automatically on startup and are tracked in the `schema_migrations` collection.
 
-4. **Invitation Storage**: All wedding invitations are stored in the PostgreSQL database in the `invitations` table. The storage has been verified and tested. See [INVITATION_STORAGE_VERIFICATION.md](./internal/infrastructure/database/postgres/INVITATION_STORAGE_VERIFICATION.md) for detailed verification report.
+4. **Invitation Storage**: All wedding invitations are stored in Firestore in the `invitations` collection.
 
 ## License
 

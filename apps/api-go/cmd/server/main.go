@@ -33,7 +33,6 @@ import (
 	"github.com/sacred-vows/api-go/internal/infrastructure/auth"
 	"github.com/sacred-vows/api-go/internal/infrastructure/config"
 	"github.com/sacred-vows/api-go/internal/infrastructure/database/firestore"
-	"github.com/sacred-vows/api-go/internal/infrastructure/database/postgres"
 	publishinfra "github.com/sacred-vows/api-go/internal/infrastructure/publish"
 	"github.com/sacred-vows/api-go/internal/infrastructure/storage"
 	httpRouter "github.com/sacred-vows/api-go/internal/interfaces/http"
@@ -65,8 +64,24 @@ func main() {
 		logger.GetLogger().Fatal("Failed to load configuration", zap.Error(err))
 	}
 
-	// Initialize database based on configuration
+	// Initialize Firestore database
 	ctx := context.Background()
+	firestoreClient, err := firestore.NewFromEnv(ctx)
+	if err != nil {
+		logger.GetLogger().Fatal("Failed to connect to Firestore", zap.Error(err))
+	}
+	defer firestoreClient.Close()
+
+	logger.GetLogger().Info("Using Firestore database", zap.String("project_id", cfg.Database.ProjectID), zap.String("database_id", cfg.Database.DatabaseID))
+
+	// Run Firestore migrations
+	if err := firestoreClient.RunMigrations(ctx); err != nil {
+		logger.GetLogger().Error("Failed to run Firestore migrations", zap.Error(err))
+		// Continue anyway - migrations may have partially succeeded
+		// But data migrations (like loading layouts) may fail
+	}
+
+	// Initialize Firestore repositories
 	var userRepo repository.UserRepository
 	var invitationRepo repository.InvitationRepository
 	var layoutRepo repository.LayoutRepository
@@ -76,83 +91,14 @@ func main() {
 	var refreshTokenRepo repository.RefreshTokenRepository
 	var publishedSiteRepo repository.PublishedSiteRepository
 
-	if cfg.Database.Type == "firestore" {
-		// Initialize Firestore
-		firestoreClient, err := firestore.NewFromEnv(ctx)
-		if err != nil {
-			logger.GetLogger().Fatal("Failed to connect to Firestore", zap.Error(err))
-		}
-		defer firestoreClient.Close()
-
-		logger.GetLogger().Info("Using Firestore database", zap.String("project_id", cfg.Database.ProjectID), zap.String("database_id", cfg.Database.DatabaseID))
-
-		// Initialize Firestore repositories
-		userRepo = firestore.NewUserRepository(firestoreClient)
-		invitationRepo = firestore.NewInvitationRepository(firestoreClient)
-		layoutRepo = firestore.NewLayoutRepository(firestoreClient)
-		assetRepo = firestore.NewAssetRepository(firestoreClient)
-		rsvpRepo = firestore.NewRSVPRepository(firestoreClient)
-		analyticsRepo = firestore.NewAnalyticsRepository(firestoreClient)
-		refreshTokenRepo = firestore.NewRefreshTokenRepository(firestoreClient)
-		publishedSiteRepo = firestore.NewPublishedSiteRepository(firestoreClient)
-	} else {
-		// Initialize Postgres
-		db, err := postgres.New(&cfg.Database)
-		if err != nil {
-			logger.GetLogger().Fatal("Failed to connect to database", zap.Error(err))
-		}
-		defer db.Close()
-
-		// Run SQL migrations
-		// Migrations folder path - in Docker it's /app/migrations, locally it's ../../migrations
-		migrationsDir := os.Getenv("MIGRATIONS_DIR")
-		if migrationsDir == "" {
-			// Try Docker path first, then local path
-			if _, err := os.Stat("/app/migrations"); err == nil {
-				migrationsDir = "/app/migrations"
-			} else {
-				// When running locally from apps/api-go, migrations live at ./migrations
-				migrationsDir = "./migrations"
-			}
-		}
-		if err := db.RunMigrations(ctx, migrationsDir); err != nil {
-			logger.GetLogger().Error("Failed to run SQL migrations", zap.Error(err))
-			// Continue anyway - GORM AutoMigrate will handle schema changes
-			// But data migrations (like loading layouts) may fail
-		}
-
-		// Run GORM AutoMigrate
-		// Note: RefreshTokenModel is excluded because the table is created via SQL migration
-		// and GORM AutoMigrate has issues with the information_schema query for this table
-		// AutoMigrate is run after SQL migrations to ensure schema consistency
-		if err := db.AutoMigrate(
-			&postgres.UserModel{},
-			&postgres.InvitationModel{},
-			&postgres.LayoutModel{},
-			&postgres.AssetModel{},
-			&postgres.RSVPResponseModel{},
-			&postgres.AnalyticsModel{},
-			&postgres.PublishedSiteModel{},
-			// &postgres.RefreshTokenModel{}, // Excluded - table created via SQL migration 010
-		); err != nil {
-			// Log error but don't fail - tables are already created via SQL migrations
-			// This allows the application to start even if AutoMigrate has issues
-			logger.GetLogger().Error("GORM AutoMigrate failed (tables should already exist from SQL migrations)", zap.Error(err))
-			// Continue - SQL migrations have already created all tables
-		}
-
-		logger.GetLogger().Info("Using PostgreSQL database")
-
-		// Initialize Postgres repositories
-		userRepo = postgres.NewUserRepository(db.DB)
-		invitationRepo = postgres.NewInvitationRepository(db.DB)
-		layoutRepo = postgres.NewLayoutRepository(db.DB)
-		assetRepo = postgres.NewAssetRepository(db.DB)
-		rsvpRepo = postgres.NewRSVPRepository(db.DB)
-		analyticsRepo = postgres.NewAnalyticsRepository(db.DB)
-		refreshTokenRepo = postgres.NewRefreshTokenRepository(db.DB)
-		publishedSiteRepo = postgres.NewPublishedSiteRepository(db.DB)
-	}
+	userRepo = firestore.NewUserRepository(firestoreClient)
+	invitationRepo = firestore.NewInvitationRepository(firestoreClient)
+	layoutRepo = firestore.NewLayoutRepository(firestoreClient)
+	assetRepo = firestore.NewAssetRepository(firestoreClient)
+	rsvpRepo = firestore.NewRSVPRepository(firestoreClient)
+	analyticsRepo = firestore.NewAnalyticsRepository(firestoreClient)
+	refreshTokenRepo = firestore.NewRefreshTokenRepository(firestoreClient)
+	publishedSiteRepo = firestore.NewPublishedSiteRepository(firestoreClient)
 
 	// Initialize services
 	jwtService := auth.NewJWTService(

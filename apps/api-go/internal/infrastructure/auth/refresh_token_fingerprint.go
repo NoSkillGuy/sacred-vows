@@ -5,6 +5,8 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"fmt"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type RefreshTokenHMACKey struct {
@@ -32,6 +34,21 @@ func ComputeRefreshTokenFingerprint(key []byte, tokenBytes []byte) []byte {
 	mac := hmac.New(sha256.New, key)
 	_, _ = mac.Write(tokenBytes)
 	return mac.Sum(nil)
+}
+
+// HashToken hashes a refresh token using bcrypt for secure storage
+func HashToken(token string) (string, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(token), bcrypt.DefaultCost)
+	if err != nil {
+		return "", fmt.Errorf("failed to hash token: %w", err)
+	}
+	return string(hash), nil
+}
+
+// CompareTokenHash compares a plain token with a hashed token
+func CompareTokenHash(token, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(token))
+	return err == nil
 }
 
 

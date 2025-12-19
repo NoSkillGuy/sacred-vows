@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sacred-vows/api-go/internal/domain"
 	authinfra "github.com/sacred-vows/api-go/internal/infrastructure/auth"
-	"github.com/sacred-vows/api-go/internal/infrastructure/database/postgres"
 	"github.com/sacred-vows/api-go/internal/interfaces/repository"
 	authuc "github.com/sacred-vows/api-go/internal/usecase/auth"
 	"github.com/sacred-vows/api-go/pkg/errors"
@@ -443,7 +442,7 @@ func (h *AuthHandler) setRefreshTokenCookie(c *gin.Context, userID, email string
 	}
 
 	// Hash the refresh token
-	tokenHash, err := postgres.HashToken(refreshToken)
+	tokenHash, err := authinfra.HashToken(refreshToken)
 	if err != nil {
 		return err
 	}
