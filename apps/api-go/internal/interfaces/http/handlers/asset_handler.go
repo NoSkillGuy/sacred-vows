@@ -130,8 +130,22 @@ func (h *AssetHandler) Upload(c *gin.Context) {
 		return
 	}
 
+	// Generate signed URL for GCS assets if using GCS storage
+	assetURL := output.URL
+	if h.gcsStorage != nil {
+		// For GCS, the stored URL is the filename (object key)
+		// Generate a signed URL for reading the asset
+		filename := output.Asset.Filename
+		signedURL, err := h.gcsStorage.GenerateSignedURL(c.Request.Context(), filename, "GET", 1*time.Hour)
+		if err == nil {
+			assetURL = signedURL
+			// Update the asset DTO with the signed URL
+			output.Asset.URL = signedURL
+		}
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"url":   output.URL,
+		"url":   assetURL,
 		"asset": output.Asset,
 	})
 }
@@ -163,6 +177,19 @@ func (h *AssetHandler) GetAll(c *gin.Context) {
 		return
 	}
 
+	// Generate signed URLs for GCS assets if using GCS storage
+	if h.gcsStorage != nil {
+		for i := range output.Assets {
+			// For GCS, the stored URL contains the filename
+			// Extract filename from URL (format: /uploads/{filename} or just {filename})
+			filename := output.Assets[i].Filename
+			signedURL, err := h.gcsStorage.GenerateSignedURL(c.Request.Context(), filename, "GET", 1*time.Hour)
+			if err == nil {
+				output.Assets[i].URL = signedURL
+			}
+		}
+	}
+
 	c.JSON(http.StatusOK, gin.H{"assets": output.Assets})
 }
 
@@ -185,13 +212,24 @@ func (h *AssetHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	if err := h.deleteUC.Execute(c.Request.Context(), req.URL); err != nil {
+	// Find asset to get filename for storage deletion
+	asset, err := h.deleteUC.Execute(c.Request.Context(), req.URL)
+	if err != nil {
 		appErr, ok := err.(*errors.AppError)
 		if ok {
 			c.JSON(appErr.Code, appErr.ToResponse())
 			return
 		}
 		c.JSON(http.StatusNotFound, gin.H{"error": "Asset not found"})
+		return
+	}
+
+	// Delete from storage using the filename
+	// Extract filename from URL (format: /uploads/{filename} or just {filename})
+	filename := asset.Filename
+	if err := h.fileStorage.DeleteFile(filename); err != nil {
+		// Log error but don't fail - asset is already deleted from DB
+		c.JSON(http.StatusOK, gin.H{"message": "Asset deleted", "warning": "Storage deletion may have failed"})
 		return
 	}
 

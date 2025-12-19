@@ -225,15 +225,15 @@ cpu          = "200m"  # 200 millicores (0.2 CPU) - cost optimized for dev
 memory       = "256Mi"  # Reduced memory for cost optimization
 timeout_seconds = 300
 
-google_client_id     = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
-google_client_secret = "YOUR_GOOGLE_CLIENT_SECRET"
+# Note: Google OAuth credentials are now in Secret Manager
+# Create secrets: google-client-id-dev and google-client-secret-dev
 ```
 
-**Important**: Never commit `terraform.tfvars` to git (it contains secrets).
+**Important**: Never commit `terraform.tfvars` to git. All sensitive values are now in Secret Manager.
 
 ### Step 2: Create Dev Secrets
 
-Create secrets in Secret Manager for dev environment:
+Create all secrets in Secret Manager for dev environment:
 
 ```bash
 # JWT Secret (minimum 32 characters)
@@ -257,6 +257,55 @@ echo -n "1" | \
     --data-file=- \
     --project=sacred-vows \
     --replication-policy="automatic"
+
+# Google OAuth Client ID
+echo -n "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com" | \
+  gcloud secrets create google-client-id-dev \
+    --data-file=- \
+    --project=sacred-vows \
+    --replication-policy="automatic"
+
+# Google OAuth Client Secret
+echo -n "YOUR_GOOGLE_CLIENT_SECRET" | \
+  gcloud secrets create google-client-secret-dev \
+    --data-file=- \
+    --project=sacred-vows \
+    --replication-policy="automatic"
+
+# Mailjet API Key
+echo -n "YOUR_MAILJET_API_KEY" | \
+  gcloud secrets create mailjet-api-key-dev \
+    --data-file=- \
+    --project=sacred-vows \
+    --replication-policy="automatic"
+
+# Mailjet Secret Key
+echo -n "YOUR_MAILJET_SECRET_KEY" | \
+  gcloud secrets create mailjet-secret-key-dev \
+    --data-file=- \
+    --project=sacred-vows \
+    --replication-policy="automatic"
+
+# Mailgun API Key
+echo -n "YOUR_MAILGUN_API_KEY" | \
+  gcloud secrets create mailgun-api-key-dev \
+    --data-file=- \
+    --project=sacred-vows \
+    --replication-policy="automatic"
+
+# R2 Access Key ID
+echo -n "YOUR_R2_ACCESS_KEY_ID" | \
+  gcloud secrets create r2-access-key-id-dev \
+    --data-file=- \
+    --project=sacred-vows \
+    --replication-policy="automatic"
+
+# R2 Secret Access Key
+echo -n "YOUR_R2_SECRET_ACCESS_KEY" | \
+  gcloud secrets create r2-secret-access-key-dev \
+    --data-file=- \
+    --project=sacred-vows \
+    --replication-policy="automatic"
 ```
 
 Verify secrets were created:
@@ -264,6 +313,18 @@ Verify secrets were created:
 ```bash
 gcloud secrets list --project=sacred-vows | grep dev
 ```
+
+You should see all 10 secrets:
+- `jwt-secret-dev`
+- `refresh-token-hmac-keys-dev`
+- `refresh-token-hmac-active-key-id-dev`
+- `google-client-id-dev`
+- `google-client-secret-dev`
+- `mailjet-api-key-dev`
+- `mailjet-secret-key-dev`
+- `mailgun-api-key-dev`
+- `r2-access-key-id-dev`
+- `r2-secret-access-key-dev`
 
 ### Step 3: Initialize Terraform
 
@@ -474,11 +535,9 @@ cpu          = "200m"  # 200 millicores (0.2 CPU) - cost optimized
 memory       = "256Mi"  # Reduced memory for cost optimization
 timeout_seconds = 300
 
-google_client_id     = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
-google_client_secret = "YOUR_GOOGLE_CLIENT_SECRET"
+# Note: Google OAuth credentials are now in Secret Manager
+# Create secrets: google-client-id-prod and google-client-secret-prod
 ```
-
-**Note**: Use the same Google OAuth credentials or create separate ones for prod.
 
 ### Step 2: Create Prod Secrets
 
@@ -503,6 +562,61 @@ echo -n "1" | \
     --data-file=- \
     --project=sacred-vows \
     --replication-policy="automatic"
+
+# Google OAuth Client ID
+echo -n "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com" | \
+  gcloud secrets create google-client-id-prod \
+    --data-file=- \
+    --project=sacred-vows \
+    --replication-policy="automatic"
+
+# Google OAuth Client Secret
+echo -n "YOUR_GOOGLE_CLIENT_SECRET" | \
+  gcloud secrets create google-client-secret-prod \
+    --data-file=- \
+    --project=sacred-vows \
+    --replication-policy="automatic"
+
+# Mailjet API Key
+echo -n "YOUR_MAILJET_API_KEY" | \
+  gcloud secrets create mailjet-api-key-prod \
+    --data-file=- \
+    --project=sacred-vows \
+    --replication-policy="automatic"
+
+# Mailjet Secret Key
+echo -n "YOUR_MAILJET_SECRET_KEY" | \
+  gcloud secrets create mailjet-secret-key-prod \
+    --data-file=- \
+    --project=sacred-vows \
+    --replication-policy="automatic"
+
+# Mailgun API Key
+echo -n "YOUR_MAILGUN_API_KEY" | \
+  gcloud secrets create mailgun-api-key-prod \
+    --data-file=- \
+    --project=sacred-vows \
+    --replication-policy="automatic"
+
+# R2 Access Key ID
+echo -n "YOUR_R2_ACCESS_KEY_ID" | \
+  gcloud secrets create r2-access-key-id-prod \
+    --data-file=- \
+    --project=sacred-vows \
+    --replication-policy="automatic"
+
+# R2 Secret Access Key
+echo -n "YOUR_R2_SECRET_ACCESS_KEY" | \
+  gcloud secrets create r2-secret-access-key-prod \
+    --data-file=- \
+    --project=sacred-vows \
+    --replication-policy="automatic"
+```
+
+Verify secrets were created:
+
+```bash
+gcloud secrets list --project=sacred-vows | grep prod
 ```
 
 ### Step 3: Initialize Terraform

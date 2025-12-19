@@ -63,6 +63,9 @@ COPY --from=builder /app/bin/server /app/server
 # Copy generated Swagger documentation from the builder stage
 COPY --from=builder /app/docs /app/docs
 
+# Copy config files (YAML configs for different environments)
+COPY --from=builder /app/config /app/config
+
 # Create directories that will be mounted as volumes
 # These will be mounted to /app/uploads and /app/layouts
 RUN mkdir -p /app/uploads /app/layouts

@@ -105,24 +105,42 @@ apps/api-go/
 5. **Run migrations**:
    The application will automatically run Firestore migrations on startup (see Database Migrations section)
 
-## Environment Variables
+## Configuration
 
-See `env.example` for all required environment variables:
+Configuration is managed through a combination of **YAML config files** (for non-sensitive settings) and **environment variables** (for sensitive data).
 
-**Database Configuration:**
+### Configuration Files
+
+Non-sensitive configuration is stored in environment-specific YAML files:
+- `config/local.yaml` - Local development defaults
+- `config/dev.yaml` - Dev environment
+- `config/prod.yaml` - Production environment
+
+The environment is determined by the `APP_ENV` environment variable (defaults to `local`).
+
+### Environment Variables
+
+See `env.example` for all required **sensitive** environment variables. Non-sensitive settings should be configured in the YAML files.
+
+**Required Sensitive Variables:**
+- `APP_ENV` - Environment name: `local`, `dev`, or `prod` (defaults to `local`)
 - `GCP_PROJECT_ID` - Google Cloud Project ID (required)
+- `JWT_SECRET` - Secret key for JWT token signing (required)
+- `REFRESH_TOKEN_HMAC_KEYS` - JSON array of HMAC keys for refresh tokens (required)
+- `REFRESH_TOKEN_HMAC_ACTIVE_KEY_ID` - Active HMAC key ID (required)
+
+**Optional Sensitive Variables:**
 - `FIRESTORE_DATABASE` - Firestore database name (default: `(default)`)
 - `FIRESTORE_EMULATOR_HOST` - Firestore emulator host (e.g., `localhost:8080`) for local development
-
-**Application:**
-- `JWT_SECRET` - Secret key for JWT token signing
-- `PORT` - Server port (default: 3000)
 - `GOOGLE_CLIENT_ID` - Google OAuth client ID
 - `GOOGLE_CLIENT_SECRET` - Google OAuth client secret
-- `GOOGLE_REDIRECT_URI` - Google OAuth redirect URI
-- `FRONTEND_URL` - Frontend application URL
-- `UPLOAD_PATH` - Path for file uploads (default: ./uploads)
-- `LAYOUTS_DIR` - Path to layouts directory
+- `MAILJET_API_KEY` - Mailjet API key
+- `MAILJET_SECRET_KEY` - Mailjet secret key
+- `MAILGUN_API_KEY` - Mailgun API key
+- `R2_ACCESS_KEY_ID` - R2 access key ID
+- `R2_SECRET_ACCESS_KEY` - R2 secret access key
+
+**Note:** Non-sensitive settings like `PORT`, `FRONTEND_URL`, `EMAIL_VENDORS`, email limits, etc. are configured in the YAML files. Environment variables can override YAML values if needed.
 
 ## Running the Application
 

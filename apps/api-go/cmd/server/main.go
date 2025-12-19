@@ -126,16 +126,15 @@ func main() {
 	// Initialize storage (GCS if bucket is configured, otherwise filesystem)
 	var fileStorage storage.Storage
 	var gcsStorage storage.SignedURLStorage
-	gcsBucket := os.Getenv("GCS_ASSETS_BUCKET")
-	publicAssetsBaseURL := os.Getenv("PUBLIC_ASSETS_BASE_URL")
-	if gcsBucket != "" {
-		gcsStorageImpl, err := storage.NewGCSStorage(ctx, gcsBucket, publicAssetsBaseURL, cfg.Storage.MaxFileSize, cfg.Storage.AllowedTypes)
+	if cfg.Storage.GCSBucket != "" {
+		// GCS bucket is private - assets accessed via signed URLs, not public URLs
+		gcsStorageImpl, err := storage.NewGCSStorage(ctx, cfg.Storage.GCSBucket, "", cfg.Storage.MaxFileSize, cfg.Storage.AllowedTypes)
 		if err != nil {
 			logger.GetLogger().Fatal("Failed to initialize GCS storage", zap.Error(err))
 		}
 		fileStorage = gcsStorageImpl
 		gcsStorage = gcsStorageImpl
-		logger.GetLogger().Info("Using GCS storage", zap.String("bucket", gcsBucket))
+		logger.GetLogger().Info("Using GCS storage", zap.String("bucket", cfg.Storage.GCSBucket))
 	} else {
 		fsStorage, err := storage.NewFileStorage(cfg.Storage.UploadPath, cfg.Storage.MaxFileSize, cfg.Storage.AllowedTypes)
 		if err != nil {

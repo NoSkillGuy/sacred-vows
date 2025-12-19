@@ -248,6 +248,68 @@ After successful deployment:
 
 ---
 
+## Configuration Management
+
+The api-go service uses a hybrid configuration approach:
+
+### YAML Config Files (Non-Sensitive)
+
+Non-sensitive configuration is stored in environment-specific YAML files:
+- `apps/api-go/config/local.yaml` - Local development
+- `apps/api-go/config/dev.yaml` - Dev environment
+- `apps/api-go/config/prod.yaml` - Production environment
+
+These files contain:
+- Server settings (port, timeouts)
+- Email configuration (vendors, limits, from address/name)
+- Publishing settings (domains, artifact store type)
+- JWT settings (expiration, issuer, audience - not secrets)
+- Storage paths and public URLs
+
+### Environment Variables (Sensitive)
+
+Sensitive configuration comes from:
+- **Local Development**: `.env` file (copy from `env.example`)
+- **Deployed Environments**: 
+  - Secret Manager (for secrets like JWT_SECRET, API keys)
+  - Terraform (for infrastructure-derived values like GCP_PROJECT_ID)
+  - GitHub Actions (loads YAML and sets non-sensitive env vars in Cloud Run)
+
+### How It Works
+
+1. **Docker Image Build**:
+   - YAML config files are copied into the Docker image during build
+   - All environment configs (local.yaml, dev.yaml, prod.yaml) are included
+
+2. **Terraform Deployment**:
+   - Sets `APP_ENV` environment variable (e.g., "dev" or "prod")
+   - Sets infrastructure-derived values (GCP_PROJECT_ID, FIRESTORE_DATABASE, etc.)
+   - Sets sensitive values from Secret Manager (JWT_SECRET, API keys, etc.)
+
+3. **Application Startup**:
+   - Reads `APP_ENV` from environment variable
+   - Loads corresponding YAML config file from `/app/config/{APP_ENV}.yaml`
+   - Merges YAML values with environment variables (env vars take precedence for overrides)
+   - Validates required configuration
+
+**Key Point**: The application reads YAML files directly from the container - no need to convert YAML to environment variables in GitHub Actions!
+
+### Updating Configuration
+
+**Non-Sensitive Settings**:
+- Edit the appropriate YAML file (`config/dev.yaml` for dev, etc.)
+- Commit and push to `main` branch
+- GitHub Actions will automatically build new Docker image with updated config
+- New config is available immediately on next deployment
+
+**Sensitive Settings**:
+- Update secrets in Secret Manager (for deployed environments)
+- Update `.env` file (for local development)
+- Secrets are managed separately from code
+- No need to rebuild Docker image for secret changes (they come from env vars)
+
+---
+
 ## Manual Deployment
 
 If you need to deploy manually (e.g., for testing or troubleshooting):

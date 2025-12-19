@@ -12,8 +12,7 @@ module "gcp_resources" {
   cpu                 = var.cpu
   memory              = var.memory
   timeout_seconds     = var.timeout_seconds
-  google_client_id    = var.google_client_id
-  google_client_secret = var.google_client_secret
+  # Note: Google OAuth credentials are now in Secret Manager
 }
 
 module "cloudflare_resources" {

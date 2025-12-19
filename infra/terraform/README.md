@@ -104,9 +104,10 @@ cp terraform.tfvars.example terraform.tfvars
 Edit `terraform.tfvars` with your configuration:
 - `project_id`: Your GCP project ID (e.g., `sacred-vows`)
 - `api_domain`: API domain (e.g., `api.dev.sacredvows.io` for dev)
-- `google_client_id` / `google_client_secret`: Google OAuth credentials
 - `cloudflare_account_id`: Your Cloudflare Account ID (from dashboard)
 - `cloudflare_api_cname_target`: CNAME target from Google Cloud Run domain mapping
+
+**Note**: All sensitive values (Google OAuth, Email API keys, R2 credentials) are now stored in Secret Manager. See "Create Secrets" section below.
 
 ### 2. Configure Terraform Backend
 
@@ -167,7 +168,37 @@ echo -n '[{"id":1,"key_b64":"base64-encoded-32-byte-or-more-key"}]' | \
 # Active HMAC Key ID
 echo -n "1" | \
   gcloud secrets create refresh-token-hmac-active-key-id-dev --data-file=- --project=sacred-vows
+
+# Google OAuth Client ID
+echo -n "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com" | \
+  gcloud secrets create google-client-id-dev --data-file=- --project=sacred-vows
+
+# Google OAuth Client Secret
+echo -n "YOUR_GOOGLE_CLIENT_SECRET" | \
+  gcloud secrets create google-client-secret-dev --data-file=- --project=sacred-vows
+
+# Mailjet API Key
+echo -n "YOUR_MAILJET_API_KEY" | \
+  gcloud secrets create mailjet-api-key-dev --data-file=- --project=sacred-vows
+
+# Mailjet Secret Key
+echo -n "YOUR_MAILJET_SECRET_KEY" | \
+  gcloud secrets create mailjet-secret-key-dev --data-file=- --project=sacred-vows
+
+# Mailgun API Key
+echo -n "YOUR_MAILGUN_API_KEY" | \
+  gcloud secrets create mailgun-api-key-dev --data-file=- --project=sacred-vows
+
+# R2 Access Key ID
+echo -n "YOUR_R2_ACCESS_KEY_ID" | \
+  gcloud secrets create r2-access-key-id-dev --data-file=- --project=sacred-vows
+
+# R2 Secret Access Key
+echo -n "YOUR_R2_SECRET_ACCESS_KEY" | \
+  gcloud secrets create r2-secret-access-key-dev --data-file=- --project=sacred-vows
 ```
+
+**All 10 secrets are required** for the application to function properly.
 
 Repeat for `prod` environment (replace `-dev` with `-prod`).
 
@@ -327,20 +358,30 @@ terraform output
 
 Terraform automatically sets these environment variables in Cloud Run:
 
+**Infrastructure variables:**
 - `GCP_PROJECT_ID`: GCP project ID
 - `FIRESTORE_DATABASE`: Firestore database name
-- `GCS_ASSETS_BUCKET`: GCS bucket for assets
-- `PUBLIC_ASSETS_BASE_URL`: Public URL base for assets
-- `PUBLISHED_BASE_DOMAIN`: Base domain for published sites
-- `FRONTEND_URL`: Frontend URL (builder)
-- `JWT_SECRET`: From Secret Manager
-- `REFRESH_TOKEN_HMAC_KEYS`: From Secret Manager
-- `REFRESH_TOKEN_HMAC_ACTIVE_KEY_ID`: From Secret Manager
+- `APP_ENV`: Environment name (dev/prod) - determines which YAML config to load
+
+**From Secret Manager (all sensitive values):**
+- `JWT_SECRET`: JWT signing secret
+- `REFRESH_TOKEN_HMAC_KEYS`: HMAC keys for refresh tokens
+- `REFRESH_TOKEN_HMAC_ACTIVE_KEY_ID`: Active HMAC key ID
 - `GOOGLE_CLIENT_ID`: Google OAuth client ID
 - `GOOGLE_CLIENT_SECRET`: Google OAuth client secret
-- `GOOGLE_REDIRECT_URI`: OAuth redirect URI
-- `PORT`: Server port (8080)
-- `PUBLISH_ARTIFACT_STORE`: "r2" (for published artifacts)
+- `MAILJET_API_KEY`: Mailjet API key
+- `MAILJET_SECRET_KEY`: Mailjet secret key
+- `MAILGUN_API_KEY`: Mailgun API key
+- `R2_ACCESS_KEY_ID`: Cloudflare R2 access key
+- `R2_SECRET_ACCESS_KEY`: Cloudflare R2 secret key
+
+**From YAML config files (non-sensitive):**
+- `GOOGLE_REDIRECT_URI`: OAuth redirect URI (from config/{env}.yaml)
+- `FRONTEND_URL`: Frontend URL (from config/{env}.yaml)
+- `PUBLISHED_BASE_DOMAIN`: Base domain for published sites (from config/{env}.yaml)
+- `PUBLISH_ARTIFACT_STORE`: Artifact store type (from config/{env}.yaml)
+- `GCS_ASSETS_BUCKET`: GCS bucket name (from config/{env}.yaml)
+- And other non-sensitive application settings
 
 ## Database Configuration
 

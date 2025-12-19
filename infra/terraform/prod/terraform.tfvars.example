@@ -12,8 +12,8 @@ cpu          = "200m"  # 200 millicores (0.2 CPU) - cost optimized
 memory       = "256Mi"  # Reduced memory for cost optimization
 timeout_seconds = 300
 
-google_client_id     = "your-google-client-id"
-google_client_secret = "your-google-client-secret"
+# Note: Google OAuth credentials are now in Secret Manager
+# Create secrets: google-client-id-prod and google-client-secret-prod
 
 # Cloudflare Configuration
 # Get your Account ID from: https://dash.cloudflare.com -> Select domain -> Right sidebar

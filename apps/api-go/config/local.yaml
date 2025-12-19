@@ -1,0 +1,47 @@
+# Local development configuration
+# Non-sensitive settings only - sensitive values come from .env file
+
+server:
+  port: "3000"
+  read_timeout: "15s"
+  write_timeout: "15s"
+
+auth:
+  jwt_access_expiration: "15m"
+  jwt_refresh_expiration: "30d"
+  jwt_issuer: "sacred-vows-api"
+  jwt_audience: "sacred-vows-client"
+  jwt_clock_skew: "60s"
+
+storage:
+  upload_path: "./uploads"
+  max_file_size: 10485760  # 10MB
+
+google:
+  redirect_uri: "http://localhost:3000/api/auth/google/callback"
+  frontend_url: "http://localhost:5173"
+
+publishing:
+  base_domain: "localhost"
+  artifact_store: "filesystem"
+  r2_account_id: ""  # Not used in local
+  r2_bucket: ""  # Not used in local
+  r2_public_base: ""  # Not used in local
+  version_retention_count: 3
+  snapshot_renderer_script: ""  # Set via env var if needed
+  snapshot_renderer_node: "node"
+  published_artifacts_dir: "./published"
+  published_artifacts_public_base: "http://localhost:3000"
+
+email:
+  vendors: "mailgun"
+  from_address: "noreply@localhost"
+  from_name: "Sacred Vows"
+  mailjet:
+    daily_limit: 200
+    monthly_limit: 6000
+  mailgun:
+    domain: ""
+    daily_limit: 100
+    monthly_limit: 3000
+

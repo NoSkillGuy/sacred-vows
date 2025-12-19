@@ -62,17 +62,8 @@ variable "timeout_seconds" {
   default     = 300
 }
 
-variable "google_client_id" {
-  description = "Google OAuth Client ID"
-  type        = string
-  sensitive   = true
-}
-
-variable "google_client_secret" {
-  description = "Google OAuth Client Secret"
-  type        = string
-  sensitive   = true
-}
+# Note: Google OAuth credentials are now stored in Secret Manager
+# Create secrets: google-client-id-{env} and google-client-secret-{env}
 
 # Cloudflare Configuration
 variable "cloudflare_account_id" {

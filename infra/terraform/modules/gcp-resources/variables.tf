@@ -53,15 +53,8 @@ variable "timeout_seconds" {
   type        = number
 }
 
-variable "google_client_id" {
-  description = "Google OAuth Client ID"
-  type        = string
-  sensitive   = true
-}
-
-variable "google_client_secret" {
-  description = "Google OAuth Client Secret"
-  type        = string
-  sensitive   = true
-}
+# Note: Google OAuth credentials are now stored in Secret Manager
+# Remove these variables from terraform.tfvars and create secrets instead:
+# - google-client-id-{env}
+# - google-client-secret-{env}
 
