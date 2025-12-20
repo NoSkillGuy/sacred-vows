@@ -70,6 +70,7 @@ type GoogleConfig struct {
 
 type PublishingConfig struct {
 	BaseDomain    string
+	SubdomainSuffix string // Optional suffix for subdomain in URL (e.g., "-dev" for dev environment)
 	ArtifactStore string // filesystem|r2
 
 	// R2 (S3-compatible)
@@ -131,6 +132,7 @@ type ConfigFile struct {
 	} `yaml:"google"`
 	Publishing struct {
 		BaseDomain                   string `yaml:"base_domain"`
+		SubdomainSuffix              string `yaml:"subdomain_suffix"`
 		ArtifactStore                string `yaml:"artifact_store"`
 		R2AccountID                  string `yaml:"r2_account_id"`
 		R2Bucket                     string `yaml:"r2_bucket"`
@@ -207,6 +209,7 @@ func Load() (*Config, error) {
 		},
 		Publishing: PublishingConfig{
 			BaseDomain:             getEnv("PUBLISHED_BASE_DOMAIN", getYAMLString(yamlConfig, "publishing.base_domain", "")),
+			SubdomainSuffix:        getEnv("PUBLISHED_SUBDOMAIN_SUFFIX", getYAMLString(yamlConfig, "publishing.subdomain_suffix", "")),
 			ArtifactStore:          getEnv("PUBLISH_ARTIFACT_STORE", getYAMLString(yamlConfig, "publishing.artifact_store", "filesystem")),
 			R2AccountID:            getEnv("R2_ACCOUNT_ID", getYAMLString(yamlConfig, "publishing.r2_account_id", "")),
 			R2AccessKeyID:          getEnv("R2_ACCESS_KEY_ID", ""),     // Always from env (sensitive)

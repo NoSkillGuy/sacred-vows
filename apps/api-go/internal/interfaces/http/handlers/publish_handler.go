@@ -15,6 +15,7 @@ type PublishHandler struct {
 	listVersionsUC *publish.ListPublishedVersionsUseCase
 	rollbackUC    *publish.RollbackPublishedSiteUseCase
 	baseDomain    string
+	subdomainSuffix string // Optional suffix (e.g., "-dev") to append to subdomain in URL
 	serverPort    string
 }
 
@@ -24,6 +25,7 @@ func NewPublishHandler(
 	listVersionsUC *publish.ListPublishedVersionsUseCase,
 	rollbackUC *publish.RollbackPublishedSiteUseCase,
 	baseDomain string,
+	subdomainSuffix string,
 	serverPort string,
 ) *PublishHandler {
 	return &PublishHandler{
@@ -32,6 +34,7 @@ func NewPublishHandler(
 		listVersionsUC: listVersionsUC,
 		rollbackUC:    rollbackUC,
 		baseDomain:    baseDomain,
+		subdomainSuffix: subdomainSuffix,
 		serverPort:    serverPort,
 	}
 }
@@ -133,17 +136,23 @@ func (h *PublishHandler) Publish(c *gin.Context) {
 
 	url := ""
 	if h.baseDomain != "" {
+		// Apply subdomain suffix if configured (e.g., "-dev" for dev environment)
+		urlSubdomain := subdomain
+		if h.subdomainSuffix != "" {
+			urlSubdomain = subdomain + h.subdomainSuffix
+		}
+		
 		// Local dev convenience: *.localhost resolves to 127.0.0.1 but defaults to port 80 in browsers.
 		// Our API commonly runs on :3000, so include the port and use http for localhost.
 		if h.baseDomain == "localhost" {
 			port := h.serverPort
 			if port != "" && port != "80" {
-				url = "http://" + subdomain + "." + h.baseDomain + ":" + port
+				url = "http://" + urlSubdomain + "." + h.baseDomain + ":" + port
 			} else {
-				url = "http://" + subdomain + "." + h.baseDomain
+				url = "http://" + urlSubdomain + "." + h.baseDomain
 			}
 		} else {
-			url = "https://" + subdomain + "." + h.baseDomain
+			url = "https://" + urlSubdomain + "." + h.baseDomain
 		}
 	}
 

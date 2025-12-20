@@ -40,7 +40,16 @@ resource "cloudflare_workers_route" "published_sites" {
   count = var.enable_worker_route && var.r2_bucket_name != "" ? 1 : 0
 
   zone_id     = data.cloudflare_zone.main.id
-  pattern     = "*.${var.published_base_domain}/*"
+  # For dev: use *-dev.sacredvows.io pattern (single-level subdomain, covered by Universal SSL)
+  # For prod: use *.sacredvows.io pattern
+  pattern     = var.environment == "dev" ? "*-dev.${var.zone_name}/*" : "*.${var.published_base_domain}/*"
   script_name = "${var.environment}-published-sites"  # Worker name deployed via Wrangler
 }
+
+# Note: For Cloudflare Workers with custom routes, DNS resolution is handled automatically
+# by Cloudflare when the route is configured. No explicit DNS record is needed.
+# However, if DNS isn't resolving, verify:
+# 1. The route pattern matches: *.dev.sacredvows.io/*
+# 2. The Worker is deployed and active
+# 3. The domain zone is active in Cloudflare
 

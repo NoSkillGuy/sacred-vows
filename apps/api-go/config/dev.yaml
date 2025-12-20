@@ -23,7 +23,8 @@ google:
   frontend_url: "https://dev.sacredvows.io"
 
 publishing:
-  base_domain: "dev.sacredvows.io"
+  base_domain: "sacredvows.io"  # For dev, subdomains use *-dev.sacredvows.io pattern
+  subdomain_suffix: "-dev"  # Suffix to append to subdomain in URL (dev only)
   artifact_store: "r2"
   r2_account_id: "7aa0cce061cd1cf948e79d3353b9b532"  # Cloudflare Account ID
   r2_bucket: "sacred-vows-published-dev"  # R2 bucket name

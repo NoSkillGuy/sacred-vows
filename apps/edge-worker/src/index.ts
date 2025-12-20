@@ -21,7 +21,14 @@ function getSubdomain(host: string, baseDomain: string): string | null {
   const cleanHost = stripPort(host).toLowerCase();
   const suffix = `.${baseDomain.toLowerCase()}`;
   if (!cleanHost.endsWith(suffix)) return null;
-  const sub = cleanHost.slice(0, cleanHost.length - suffix.length);
+  let sub = cleanHost.slice(0, cleanHost.length - suffix.length);
+  
+  // For dev environment: strip "-dev" suffix from subdomain
+  // e.g., "john4-dev.sacredvows.io" -> "john4"
+  if (sub.endsWith('-dev')) {
+    sub = sub.slice(0, sub.length - 4);
+  }
+  
   return sub || null;
 }
 

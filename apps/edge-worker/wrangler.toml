@@ -4,7 +4,9 @@ compatibility_date = "2024-12-01"  # Match Terraform compatibility_date
 account_id = "7aa0cce061cd1cf948e79d3353b9b532"  # Cloudflare Account ID (bypasses User Details permission requirement)
 
 [vars]
-PUBLISHED_BASE_DOMAIN = "dev.sacredvows.io"
+# For dev: base domain is sacredvows.io, subdomains use *-dev.sacredvows.io pattern
+# Worker will strip "-dev" suffix when extracting subdomain
+PUBLISHED_BASE_DOMAIN = "sacredvows.io"
 API_ORIGIN = "https://api.dev.sacredvows.io/api"
 RESOLVE_CACHE_TTL_SECONDS = "30"
 
