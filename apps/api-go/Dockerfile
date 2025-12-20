@@ -76,6 +76,10 @@ COPY apps/builder/src/template-engine /app/builder/template-engine
 # The renderer script imports from ../../layouts/ relative to template-engine/src/
 COPY apps/builder/src/layouts /app/builder/layouts
 
+# Copy public directory (needed by bundleLocalAssets function)
+# The bundleLocalAssets function reads from ../../../public relative to template-engine/src/
+COPY apps/builder/public /app/builder/public
+
 # Install Node.js dependencies for the template engine
 WORKDIR /app/builder/template-engine
 RUN npm install --production
