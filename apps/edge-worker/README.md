@@ -222,7 +222,8 @@ compatibility_date = "2024-12-01"
 account_id = "your-cloudflare-account-id"
 
 [vars]
-PUBLISHED_BASE_DOMAIN = "dev.sacredvows.io"
+# For dev: base domain is sacredvows.io, Worker handles -dev suffix stripping
+PUBLISHED_BASE_DOMAIN = "sacredvows.io"
 API_ORIGIN = "https://api.dev.sacredvows.io/api"
 RESOLVE_CACHE_TTL_SECONDS = "30"
 
