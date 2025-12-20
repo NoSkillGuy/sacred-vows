@@ -7,7 +7,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 	"os/exec"
+	"path/filepath"
 
 	"github.com/sacred-vows/api-go/internal/interfaces/repository"
 	"github.com/sacred-vows/api-go/internal/usecase/publish"
@@ -23,14 +25,71 @@ func NewNodeSnapshotGenerator(invitationRepo repository.InvitationRepository, sc
 	if scriptPath == "" {
 		return nil, errors.New("snapshot renderer script path is required (path to renderPublishedHTML.js)")
 	}
+
+	// Resolve the script path (handle relative paths for local dev convenience)
+	resolvedPath, err := resolveScriptPath(scriptPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to resolve script path: %w", err)
+	}
+
+	// Verify the file exists
+	if _, err := os.Stat(resolvedPath); os.IsNotExist(err) {
+		return nil, fmt.Errorf("snapshot renderer script not found at: %s", resolvedPath)
+	}
+
 	if nodeBinary == "" {
 		nodeBinary = "node"
 	}
 	return &NodeSnapshotGenerator{
 		invitationRepo: invitationRepo,
 		nodeBinary:     nodeBinary,
-		scriptPath:     scriptPath,
+		scriptPath:     resolvedPath,
 	}, nil
+}
+
+// resolveScriptPath resolves the script path:
+// - Absolute paths are used as-is
+// - Relative paths are resolved relative to workspace root (for local dev convenience)
+func resolveScriptPath(scriptPath string) (string, error) {
+	// If it's already an absolute path, use it as-is
+	if filepath.IsAbs(scriptPath) {
+		return scriptPath, nil
+	}
+
+	// For relative paths, resolve relative to workspace root (local dev only)
+	cwd, err := os.Getwd()
+	if err != nil {
+		return "", fmt.Errorf("failed to get current working directory: %w", err)
+	}
+
+	workspaceRoot := findWorkspaceRoot(cwd)
+	if workspaceRoot == "" {
+		return "", errors.New("relative paths require workspace root (looking for apps/builder directory); use absolute path in Docker")
+	}
+
+	resolved := filepath.Join(workspaceRoot, scriptPath)
+	return filepath.Abs(resolved)
+}
+
+// findWorkspaceRoot finds the workspace root by looking for the apps/builder directory
+func findWorkspaceRoot(startPath string) string {
+	current := startPath
+	for {
+		// Check if apps/builder exists at this level
+		builderPath := filepath.Join(current, "apps", "builder")
+		if info, err := os.Stat(builderPath); err == nil && info.IsDir() {
+			return current
+		}
+
+		// Go up one level
+		parent := filepath.Dir(current)
+		if parent == current {
+			// Reached filesystem root
+			break
+		}
+		current = parent
+	}
+	return ""
 }
 
 func (g *NodeSnapshotGenerator) GenerateBundle(ctx context.Context, invitationID string) (*publish.SnapshotBundle, error) {
