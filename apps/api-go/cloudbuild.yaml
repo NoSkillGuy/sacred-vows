@@ -4,10 +4,12 @@ steps:
     entrypoint: 'bash'
     args:
       - '-c'
-      - 'docker pull asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:latest || exit 0'
+      - |
+        docker pull asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:latest || exit 0
+        docker pull asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:cache || exit 0
     id: 'pull-cache'
 
-  # Build the Docker image with layer caching enabled
+  # Build the Docker image with BuildKit inline cache and layer caching
   # Build context is repo root (.) to access both apps/api-go and apps/builder
   # Dockerfile path is relative to build context (repo root)
   - name: 'gcr.io/cloud-builders/docker'
@@ -18,7 +20,13 @@ steps:
       - '-t'
       - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:latest'
       - '--cache-from'
-      - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:latest'
+      - 'type=registry,ref=asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:cache'
+      - '--cache-from'
+      - 'type=registry,ref=asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:latest'
+      - '--build-arg'
+      - 'BUILDKIT_INLINE_CACHE=1'
+      - '--cache-to'
+      - 'type=registry,ref=asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:cache,mode=max'
       - '-f'
       - 'apps/api-go/Dockerfile'
       - '.'
@@ -27,13 +35,36 @@ steps:
     id: 'build'
     waitFor: ['pull-cache']
 
-# Options for faster builds
+  # Push cache image for next build
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:cache'
+    id: 'push-cache'
+    waitFor: ['build']
+
+# Options optimized for FREE TIER usage
 options:
-  # Use high-CPU machine for faster builds (uncomment if you have permission)
-  # machineType: 'E2_HIGHCPU_8'
+  # Machine type: E2_MEDIUM (qualifies for free tier)
+  # 
+  # FREE TIER: 2,500 build-minutes per month on E2_MEDIUM/e2-standard-2 machine type
+  # - This allows ~500 builds/month (assuming 5min per build)
+  # - With caching optimizations, subsequent builds are 1-3min, allowing ~800-2,500 builds/month
+  # 
+  # Cost analysis (if exceeding free tier):
+  # - E2_MEDIUM: 5min × $0.003 = $0.015 per build (FREE within 2,500 min/month)
+  # - E2_HIGHCPU_8: 2min × $0.0156 = $0.031 per build (NOT eligible for free tier, always paid)
+  # 
+  # To use E2_HIGHCPU_8 for faster builds (NOT free tier), override via --machine-type flag
+  # Recommendation: 
+  # - ALWAYS use E2_MEDIUM (default) to maximize free tier usage
+  # - With caching optimizations, builds will be 1-3min, well within free tier limits
+  machineType: 'E2_MEDIUM'  # FREE TIER eligible - 2,500 build-minutes/month free
   logging: CLOUD_LOGGING_ONLY
   env:
     - 'DOCKER_BUILDKIT=1'
+  # Disk size: 100GB for caching (doesn't affect free tier eligibility)
+  diskSizeGb: 100
 
 # Timeout (optional, adjust as needed)
 timeout: '1200s'  # 20 minutes

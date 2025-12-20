@@ -8,7 +8,9 @@ FROM golang:1.24-alpine AS builder
 WORKDIR /app
 
 # Install build dependencies in a single layer
-RUN apk add --no-cache git
+# Cache apk packages for faster rebuilds
+RUN --mount=type=cache,target=/var/cache/apk \
+    apk add --no-cache git
 
 # Install swag CLI for Swagger documentation generation
 # Cache this layer separately as it rarely changes
@@ -50,7 +52,9 @@ FROM alpine:latest
 # ca-certificates: Required for HTTPS/TLS connections
 # tzdata: Required for timezone data
 # nodejs and npm: Required for snapshot renderer script
-RUN apk --no-cache add ca-certificates tzdata nodejs npm
+# Cache apk packages for faster rebuilds
+RUN --mount=type=cache,target=/var/cache/apk \
+    apk --no-cache add ca-certificates tzdata nodejs npm
 
 # Create a non-root user for security
 RUN addgroup -g 1000 appuser && \
@@ -81,8 +85,10 @@ COPY apps/builder/src/layouts /app/builder/layouts
 COPY apps/builder/public /app/builder/public
 
 # Install Node.js dependencies for the template engine
+# Use BuildKit cache mount to cache node_modules for faster rebuilds
 WORKDIR /app/builder/template-engine
-RUN npm install --production
+RUN --mount=type=cache,target=/root/.npm \
+    npm install --production
 
 # Return to app directory
 WORKDIR /app
