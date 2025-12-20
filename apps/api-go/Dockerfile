@@ -72,6 +72,10 @@ COPY --from=builder /app/config /app/config
 # Build context is repo root, so we can access apps/builder
 COPY apps/builder/src/template-engine /app/builder/template-engine
 
+# Copy layouts directory (needed by renderPublishedHTML.js)
+# The renderer script imports from ../../layouts/ relative to template-engine/src/
+COPY apps/builder/src/layouts /app/builder/layouts
+
 # Install Node.js dependencies for the template engine
 WORKDIR /app/builder/template-engine
 RUN npm install --production
