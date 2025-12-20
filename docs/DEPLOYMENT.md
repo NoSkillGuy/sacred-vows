@@ -164,7 +164,7 @@ Configure the following secrets in your GitHub repository:
 **Value**: `sacred-vows`
 
 #### 3. `CLOUDFLARE_API_TOKEN`
-**Description**: Cloudflare API token for deploying Workers
+**Description**: Cloudflare API token for deploying Workers and purging DNS cache
 
 **Token Name**: `github-actions-workers-deploy` (or similar descriptive name)
 
@@ -182,7 +182,11 @@ Configure the following secrets in your GitHub repository:
      - **Resources**: Select `User`
      - **Permissions**: 
        - Select `User Details` → `Read` (required for Wrangler authentication)
-   - **Zone Resources**: Include `sacredvows.io` (if needed for zone-level permissions)
+   - **Zone Permissions** (add another permission group):
+     - **Resources**: Select `Zone` → Include `sacredvows.io`
+     - **Permissions**: 
+       - Select `Zone` → `Read` (required to get zone ID)
+       - Select `Cache Purge` → `Edit` (required to purge DNS cache after deployments)
 5. Copy token and paste as secret value
 
 **Note**: 
@@ -190,9 +194,13 @@ Configure the following secrets in your GitHub repository:
 - **Required permissions**:
   - `Workers Scripts` → `Edit` (required for deploying Workers)
   - `User Details` → `Read` (required for Wrangler authentication - must be added as a separate permission group with User resource)
+  - `Zone` → `Read` (required to get zone ID for cache purge)
+  - `Cache Purge` → `Edit` (required to purge DNS cache after Cloud Run deployments)
 - **Optional permissions**:
   - `Workers R2 Storage` → `Read` (if worker needs R2 access)
-- **Important**: Make sure to add `User Details` → `Read` as a separate permission group by clicking "Add more" and selecting `User` as the resource type
+- **Important**: 
+  - Make sure to add `User Details` → `Read` as a separate permission group by clicking "Add more" and selecting `User` as the resource type
+  - Make sure to add `Cache Purge` → `Edit` as a separate permission group with `Zone` resource scoped to `sacredvows.io`
 
 ### Verify Secrets
 
@@ -478,7 +486,11 @@ Cloudflare's proxy caches DNS resolutions. When Cloud Run IPs change after deplo
 The workflow automatically purges Cloudflare's DNS cache after each deployment. If this fails:
 
 1. **Check GitHub Actions logs** for the "Purge Cloudflare DNS Cache" step
-2. **Verify `CLOUDFLARE_API_TOKEN`** has `Zone:Cache Purge` permission
+2. **If you see authentication error** (`"code":10000,"message":"Authentication error"`):
+   - Your `CLOUDFLARE_API_TOKEN` is missing `Zone:Cache Purge` permission
+   - Go to [Cloudflare API Tokens](https://dash.cloudflare.com/profile/api-tokens)
+   - Edit your token and add: **Zone** → **Cache Purge** → **Edit**
+   - Update the token in GitHub Secrets
 3. **Manual fix**: Toggle DNS proxy in Cloudflare Dashboard (disable then re-enable)
 
 **For detailed troubleshooting**, see `docs/cloudflare-pages-troubleshooting.md` → "Issue: Domain Stops Working After Deployment"

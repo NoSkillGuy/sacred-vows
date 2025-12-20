@@ -374,6 +374,46 @@ After deployment, check GitHub Actions logs for:
 
 If you see warnings, check that the API token has the correct permissions.
 
+**Troubleshooting Authentication Errors:**
+
+If you see this error in GitHub Actions logs:
+```
+⚠️ Warning: Cache purge may have failed
+Response: {"success":false,"errors":[{"code":10000,"message":"Authentication error"}]}
+```
+
+This means your `CLOUDFLARE_API_TOKEN` doesn't have the required permissions. Fix it by:
+
+1. **Go to Cloudflare Dashboard**:
+   - Navigate to [API Tokens](https://dash.cloudflare.com/profile/api-tokens)
+   - Find your existing token or create a new one
+
+2. **Update Token Permissions**:
+   - Click "Edit" on your token
+   - Add the following permission:
+     - **Zone** → **Cache Purge** → **Edit**
+   - Make sure it's scoped to your zone: `sacredvows.io`
+   - Save the token
+
+3. **Alternative: Create New Token**:
+   - Click "Create Token"
+   - Use "Edit zone DNS" template as a base
+   - Add additional permissions:
+     - **Zone** → **Cache Purge** → **Edit**
+     - **Zone** → **Zone** → **Read** (if not already included)
+   - Set zone resources to: `sacredvows.io`
+   - Copy the new token
+
+4. **Update GitHub Secret**:
+   - Go to your GitHub repository → Settings → Secrets and variables → Actions
+   - Update `CLOUDFLARE_API_TOKEN` with the new token value
+   - The next deployment will use the updated token
+
+**Required Permissions Checklist:**
+- ✅ Zone:Cache Purge:Edit (required for cache purge)
+- ✅ Zone:Zone:Read (required to get zone ID)
+- ✅ Zone:DNS:Edit (if you also manage DNS via API)
+
 ---
 
 ## Quick Reference: Correct Configurations
