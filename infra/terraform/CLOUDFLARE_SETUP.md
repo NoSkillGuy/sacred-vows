@@ -119,7 +119,9 @@ terraform apply
 ### Workers
 - Worker script: `dev-published-sites` or `prod-published-sites`
 - Automatically built from TypeScript source using esbuild
-- Routes: `*.dev.sacredvows.io/*` or `*.sacredvows.io/*` for published sites
+- Routes: `*-dev.sacredvows.io/*` (dev) or `*.sacredvows.io/*` (prod) for published sites
+  - **Dev**: Uses single-level subdomain pattern (`*-dev`) to avoid multi-level SSL certificate issues
+  - **Prod**: Uses standard wildcard pattern (`*`)
 - Binds to R2 bucket for artifact storage
 
 ## Next Steps After Terraform Apply

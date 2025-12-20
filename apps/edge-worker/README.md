@@ -196,7 +196,8 @@ Configure these in `wrangler.toml` or via Cloudflare Dashboard:
 
 - **`PUBLISHED_BASE_DOMAIN`** (string)
   - Base domain used for subdomain extraction
-  - Example: `sacredvows.io` or `dev.sacredvows.io`
+  - **Production**: `sacredvows.io` (results in `*.sacredvows.io` URLs)
+  - **Dev**: `sacredvows.io` (Worker automatically handles `-dev` suffix stripping)
   - The worker will extract subdomains from hosts matching `*.${PUBLISHED_BASE_DOMAIN}`
 
 - **`API_ORIGIN`** (string)
@@ -306,7 +307,9 @@ For the worker to serve requests, configure DNS:
 
 1. **Wildcard DNS record**:
    - Create a DNS record: `*.<PUBLISHED_BASE_DOMAIN>` → Cloudflare Worker (proxied)
-   - Example: `*.dev.sacredvows.io` → `dev-published-sites` (Worker)
+   - **Dev**: `*-dev.sacredvows.io/*` → `dev-published-sites` (Worker)
+   - **Prod**: `*.sacredvows.io/*` → `prod-published-sites` (Worker)
+   - **Note**: Dev uses single-level subdomain pattern to avoid multi-level SSL certificate issues
 
 2. **TLS/SSL**:
    - Cloudflare automatically provides TLS certificates for proxied records

@@ -8,14 +8,19 @@ Sacred Vows supports publishing invitations to subdomains **without deploying a 
 - Public traffic is served by a **Cloudflare Worker** directly from **Cloudflare R2**
 - Publishing generates versioned artifacts under `sites/<subdomain>/v<version>/...` and advances a `current_version` pointer
 
-## Required DNS / TLS (production)
+## Required DNS / TLS
 
 To make `https://<subdomain>.<PUBLISHED_BASE_DOMAIN>` work:
 
 1. Configure **wildcard DNS**:
-   - `*.<PUBLISHED_BASE_DOMAIN>` → points to your Cloudflare Worker (proxied)
+   - **Production**: `*.<PUBLISHED_BASE_DOMAIN>` → points to your Cloudflare Worker (proxied)
+   - **Dev**: `*-dev.<BASE_DOMAIN>` → points to your Cloudflare Worker (proxied)
+     - Example: `*-dev.sacredvows.io` for dev environment
+     - Uses single-level subdomain pattern to avoid multi-level SSL certificate issues
 2. Configure **TLS**:
-   - Cloudflare will handle TLS for `*.<PUBLISHED_BASE_DOMAIN>` when proxied
+   - Cloudflare will handle TLS automatically when proxied
+   - **Dev**: Uses Universal SSL (free) with single-level subdomain pattern
+   - **Production**: Uses Universal SSL (free) with standard wildcard pattern
 
 ## Backend environment variables
 
@@ -27,7 +32,12 @@ This repo does not commit `.env` files. For convenience, copy one of these files
 
 ### Required for subdomain URL generation
 
-- `PUBLISHED_BASE_DOMAIN`: base domain for published sites (example: `sacredvows.app`)
+- `PUBLISHED_BASE_DOMAIN`: base domain for published sites
+  - **Production**: `sacredvows.io` (results in `*.sacredvows.io` URLs)
+  - **Dev**: `sacredvows.io` with `subdomain_suffix: "-dev"` (results in `*-dev.sacredvows.io` URLs)
+- `PUBLISHED_SUBDOMAIN_SUFFIX` (optional): suffix to append to subdomain in URL
+  - **Dev**: `-dev` (configured in `config/dev.yaml`)
+  - **Production**: empty (not needed)
 
 ### Required to render snapshots
 
@@ -64,7 +74,8 @@ Select the artifact store:
 - `POST /api/publish`
   - auth required (Bearer access token)
   - body: `{ "invitationId": "...", "subdomain": "john-wedding" }`
-  - returns: `{ "url": "https://john-wedding.<PUBLISHED_BASE_DOMAIN>", "subdomain": "john-wedding", "version": 1 }`
+  - returns: `{ "url": "https://john-wedding[-dev].<PUBLISHED_BASE_DOMAIN>", "subdomain": "john-wedding", "version": 1 }`
+  - **Note**: URL includes `-dev` suffix in dev environment (e.g., `https://john-wedding-dev.sacredvows.io`)
 
 ### Edge resolve endpoint (for the Worker)
 

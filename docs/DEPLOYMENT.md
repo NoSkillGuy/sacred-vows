@@ -40,7 +40,7 @@ flowchart TD
     GHA --> WorkerJob[deploy-edge-worker Job]
     
     APIJob --> CloudRun[Google Cloud Run<br/>api-go-dev<br/>api.dev.sacredvows.io]
-    WorkerJob --> CFWorkers[Cloudflare Workers<br/>dev-published-sites<br/>*.dev.sacredvows.io]
+    WorkerJob --> CFWorkers[Cloudflare Workers<br/>dev-published-sites<br/>*-dev.sacredvows.io]
     
     CFPages --> CFPagesApp[Cloudflare Pages<br/>builder app<br/>dev.sacredvows.io]
     
@@ -251,7 +251,7 @@ Location: `.github/workflows/deploy.yml`
 
 After successful deployment:
 - **api-go**: Available at `https://api.dev.sacredvows.io`
-- **edge-worker**: Active and routing requests for `*.dev.sacredvows.io`
+- **edge-worker**: Active and routing requests for `*-dev.sacredvows.io` (dev uses single-level subdomain pattern for SSL compatibility)
 - **builder**: Automatically deployed by Cloudflare Pages
 
 ---

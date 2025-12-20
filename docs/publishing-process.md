@@ -132,13 +132,15 @@ The API returns:
 
 When a guest visits:
 
-- `https://john-wedding.<PUBLISHED_BASE_DOMAIN>/`
+- **Production**: `https://john-wedding.<PUBLISHED_BASE_DOMAIN>/` (e.g., `https://john-wedding.sacredvows.io/`)
+- **Dev**: `https://john-wedding-dev.<BASE_DOMAIN>/` (e.g., `https://john-wedding-dev.sacredvows.io/`)
 
 ### 1) Cloudflare Worker extracts the subdomain
 
 The Worker reads the `Host` header and extracts:
 
-- `subdomain = john-wedding`
+- **Production**: `subdomain = john-wedding` (from `john-wedding.sacredvows.io`)
+- **Dev**: `subdomain = john-wedding` (from `john-wedding-dev.sacredvows.io`, Worker automatically strips `-dev` suffix)
 
 ### 2) Worker resolves the current version
 
@@ -194,21 +196,28 @@ Users can rollback to any available previous version:
 
 ## Operational notes
 
-### Required env vars (production)
+### Required env vars
 
-API:
-
-- `PUBLISHED_BASE_DOMAIN`
+**API (Production):**
+- `PUBLISHED_BASE_DOMAIN` (e.g., `sacredvows.io`)
 - `PUBLISH_ARTIFACT_STORE=r2`
 - `SNAPSHOT_RENDERER_SCRIPT`
 - `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`
 - `PUBLISH_VERSION_RETENTION_COUNT` (optional, default: 3)
 
-Worker:
+**API (Dev):**
+- `PUBLISHED_BASE_DOMAIN=sacredvows.io` (configured in `config/dev.yaml`)
+- `PUBLISHED_SUBDOMAIN_SUFFIX=-dev` (configured in `config/dev.yaml` as `subdomain_suffix`)
+- `PUBLISH_ARTIFACT_STORE=r2`
+- `SNAPSHOT_RENDERER_SCRIPT`
+- `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`
 
-- `PUBLISHED_BASE_DOMAIN`
+**Worker:**
+- `PUBLISHED_BASE_DOMAIN` (e.g., `sacredvows.io` - Worker automatically handles `-dev` suffix stripping)
 - `API_ORIGIN`
 - `R2_BUCKET` binding
+
+**Note**: Dev environment uses `*-dev.sacredvows.io` pattern to avoid multi-level subdomain SSL certificate issues. The Worker automatically strips the `-dev` suffix when extracting the subdomain for lookup.
 
 ### Rate limiting
 
