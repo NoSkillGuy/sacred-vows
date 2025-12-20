@@ -313,6 +313,69 @@ Domain mapping exists but shows error conditions.
 
 ---
 
+### Issue: Domain Stops Working After Deployment
+
+**Problem:**
+`api.dev.sacredvows.io` (or other custom domain) stops working after deploying via GitHub Actions. The domain was working before, but after a Cloud Run deployment, requests fail or timeout.
+
+**Symptoms:**
+- Domain worked before deployment
+- After `gcloud run services update`, domain becomes unreachable
+- DNS resolves correctly (`dig api.dev.sacredvows.io` shows Cloudflare IPs)
+- Toggling Cloudflare DNS proxy off and on temporarily fixes it
+
+**Root Cause:**
+When Cloud Run services are updated, the underlying IP addresses behind the domain mapping can change. Cloudflare's proxy caches DNS resolutions, so it continues using the old cached IP addresses even though they're no longer valid. This causes requests to fail.
+
+**Solution:**
+The GitHub Actions workflow automatically purges Cloudflare's DNS cache after each Cloud Run deployment. This forces Cloudflare to re-resolve DNS and pick up the new IP addresses.
+
+**How It Works:**
+1. After `gcloud run services update` completes, the workflow calls Cloudflare's cache purge API
+2. This clears all cached DNS resolutions for the zone
+3. Cloudflare then re-resolves DNS and gets the updated IP addresses from Google's domain mapping
+
+**Manual Fix (if needed):**
+If you need to manually fix this issue:
+
+1. **Option 1: Toggle DNS Proxy** (Quick fix)
+   - Go to Cloudflare Dashboard → DNS
+   - Find the `api.dev` CNAME record
+   - Click the orange cloud to disable proxy (gray cloud)
+   - Wait 30 seconds
+   - Click again to re-enable proxy (orange cloud)
+   - This forces Cloudflare to re-resolve DNS
+
+2. **Option 2: Purge Cache via API** (Permanent fix)
+   ```bash
+   # Get zone ID
+   ZONE_ID=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=sacredvows.io" \
+     -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+     -H "Content-Type: application/json" | jq -r '.result[0].id')
+   
+   # Purge cache
+   curl -X POST "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/purge_cache" \
+     -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+     -H "Content-Type: application/json" \
+     -d '{"purge_everything":true}'
+   ```
+
+**Prevention:**
+The automated cache purge in the GitHub Actions workflow prevents this issue. Ensure:
+- `CLOUDFLARE_API_TOKEN` secret is set in GitHub
+- Token has `Zone:Cache Purge` permission
+- The "Purge Cloudflare DNS Cache" step runs after each Cloud Run deployment
+
+**Verification:**
+After deployment, check GitHub Actions logs for:
+```
+✅ Successfully purged Cloudflare cache
+```
+
+If you see warnings, check that the API token has the correct permissions.
+
+---
+
 ## Quick Reference: Correct Configurations
 
 ### Cloudflare Pages Build Settings

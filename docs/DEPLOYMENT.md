@@ -461,6 +461,28 @@ npx wrangler tail
 - Check bucket name in `wrangler.toml` matches actual bucket name
 - Ensure bucket is in the same account as the worker
 
+#### 7. Domain Stops Working After Deployment
+
+**Error**: `api.dev.sacredvows.io` becomes unreachable after Cloud Run deployment
+
+**Symptoms**:
+- Domain worked before deployment
+- After deployment, requests fail or timeout
+- DNS resolves correctly but connections fail
+- Toggling Cloudflare DNS proxy temporarily fixes it
+
+**Root Cause**:
+Cloudflare's proxy caches DNS resolutions. When Cloud Run IPs change after deployment, Cloudflare continues using old cached IPs.
+
+**Solution**:
+The workflow automatically purges Cloudflare's DNS cache after each deployment. If this fails:
+
+1. **Check GitHub Actions logs** for the "Purge Cloudflare DNS Cache" step
+2. **Verify `CLOUDFLARE_API_TOKEN`** has `Zone:Cache Purge` permission
+3. **Manual fix**: Toggle DNS proxy in Cloudflare Dashboard (disable then re-enable)
+
+**For detailed troubleshooting**, see `docs/cloudflare-pages-troubleshooting.md` → "Issue: Domain Stops Working After Deployment"
+
 ### Debugging Steps
 
 1. **Check GitHub Actions Logs**:
