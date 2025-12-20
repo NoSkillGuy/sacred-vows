@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"net/http"
+	"os"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sacred-vows/api-go/internal/usecase/publish"
@@ -10,13 +12,13 @@ import (
 )
 
 type PublishHandler struct {
-	validateUC    *publish.ValidateSubdomainUseCase
-	publishUC     *publish.PublishInvitationUseCase
-	listVersionsUC *publish.ListPublishedVersionsUseCase
-	rollbackUC    *publish.RollbackPublishedSiteUseCase
-	baseDomain    string
+	validateUC      *publish.ValidateSubdomainUseCase
+	publishUC       *publish.PublishInvitationUseCase
+	listVersionsUC  *publish.ListPublishedVersionsUseCase
+	rollbackUC      *publish.RollbackPublishedSiteUseCase
+	baseDomain      string
 	subdomainSuffix string // Optional suffix (e.g., "-dev") to append to subdomain in URL
-	serverPort    string
+	serverPort      string
 }
 
 func NewPublishHandler(
@@ -29,13 +31,13 @@ func NewPublishHandler(
 	serverPort string,
 ) *PublishHandler {
 	return &PublishHandler{
-		validateUC:    validateUC,
-		publishUC:     publishUC,
-		listVersionsUC: listVersionsUC,
-		rollbackUC:    rollbackUC,
-		baseDomain:    baseDomain,
+		validateUC:      validateUC,
+		publishUC:       publishUC,
+		listVersionsUC:  listVersionsUC,
+		rollbackUC:      rollbackUC,
+		baseDomain:      baseDomain,
 		subdomainSuffix: subdomainSuffix,
-		serverPort:    serverPort,
+		serverPort:      serverPort,
 	}
 }
 
@@ -138,10 +140,38 @@ func (h *PublishHandler) Publish(c *gin.Context) {
 	if h.baseDomain != "" {
 		// Apply subdomain suffix if configured (e.g., "-dev" for dev environment)
 		urlSubdomain := subdomain
-		if h.subdomainSuffix != "" {
-			urlSubdomain = subdomain + h.subdomainSuffix
+		suffix := h.subdomainSuffix
+
+		// Fallback: if baseDomain is "sacredvows.io" and suffix is empty,
+		// detect dev environment from request host (safety net in case config loading fails)
+		if suffix == "" && h.baseDomain == "sacredvows.io" {
+			// Check request host - strip port if present
+			host := c.Request.Host
+			if i := strings.Index(host, ":"); i >= 0 {
+				host = host[:i]
+			}
+			if host != "" && strings.Contains(host, "dev.sacredvows.io") {
+				suffix = "-dev"
+				logger.GetLogger().Warn("using fallback: detected dev environment from request host (config may not be loaded correctly)",
+					zap.String("host", host),
+					zap.String("subdomain", subdomain),
+					zap.String("appEnv", os.Getenv("APP_ENV")),
+					zap.String("configuredSuffix", h.subdomainSuffix),
+				)
+			} else {
+				logger.GetLogger().Warn("subdomain suffix is empty for sacredvows.io domain",
+					zap.String("host", host),
+					zap.String("appEnv", os.Getenv("APP_ENV")),
+					zap.String("subdomain", subdomain),
+					zap.String("configuredSuffix", h.subdomainSuffix),
+				)
+			}
 		}
-		
+
+		if suffix != "" {
+			urlSubdomain = subdomain + suffix
+		}
+
 		// Local dev convenience: *.localhost resolves to 127.0.0.1 but defaults to port 80 in browsers.
 		// Our API commonly runs on :3000, so include the port and use http for localhost.
 		if h.baseDomain == "localhost" {

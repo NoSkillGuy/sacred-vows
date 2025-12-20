@@ -78,6 +78,7 @@ jobs:
         run: |
           gcloud run services update api-go-dev \
             --image asia-northeast1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/api-dev/api-go:latest \
+            --update-env-vars APP_ENV=dev \
             --region asia-northeast1 \
             --project ${{ secrets.GCP_PROJECT_ID }} \
             --quiet
