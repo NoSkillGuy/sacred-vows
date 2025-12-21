@@ -330,8 +330,78 @@ cloudflare_public_assets_r2_bucket_name = "sacred-vows-public-assets-dev"
 2. **Configure Public Access**:
    - Enable public access for the bucket
    - Set up CORS rules if needed
-3. **Upload Assets**: Run migration script
-4. **Verify CDN**: Ensure assets are accessible via CDN URL
+3. **Configure R2 Custom Domain** (see section below)
+4. **Upload Assets**: Run migration script
+5. **Verify CDN**: Ensure assets are accessible via CDN URL
+
+### R2 Custom Domain Configuration
+
+To serve assets via a custom domain (e.g., `pub-dev.sacredvows.io`), you need to configure the R2 custom domain in Cloudflare Dashboard.
+
+#### Step 1: Configure Custom Domain in Cloudflare Dashboard
+
+1. Go to **Cloudflare Dashboard** → **R2** → Select your public assets bucket
+   - Dev: `sacred-vows-public-assets-dev`
+   - Prod: `sacred-vows-public-assets-prod`
+
+2. Navigate to **Settings** → **Custom Domain**
+
+3. Click **Add Custom Domain** and enter:
+   - **Dev**: `pub-dev.sacredvows.io`
+   - **Prod**: `pub.sacredvows.io`
+
+4. Cloudflare will automatically:
+   - Create the DNS record (CNAME)
+   - Provision SSL certificate
+   - Configure routing
+
+#### Step 2: Update Terraform Configuration
+
+After configuring the custom domain, Cloudflare will provide a CNAME target (usually `{domain}.cdn.cloudflare.net`).
+
+Add the CNAME target to your `terraform.tfvars`:
+
+```hcl
+# For dev
+cloudflare_public_assets_r2_bucket_name = "sacred-vows-public-assets-dev"
+cloudflare_public_assets_cdn_target = "pub-dev.sacredvows.io.cdn.cloudflare.net"  # Get from dashboard
+
+# For prod
+cloudflare_public_assets_r2_bucket_name = "sacred-vows-public-assets-prod"
+cloudflare_public_assets_cdn_target = "pub.sacredvows.io.cdn.cloudflare.net"  # Get from dashboard
+```
+
+#### Step 3: Apply Terraform
+
+```bash
+cd infra/terraform/dev  # or prod
+terraform plan
+terraform apply
+```
+
+This will create/manage the DNS record via Terraform for consistency.
+
+#### Step 4: Verify DNS Resolution
+
+Verify that the DNS record is properly configured:
+
+```bash
+# Check DNS resolution (should return Cloudflare IPs)
+dig pub-dev.sacredvows.io
+
+# Check CNAME record specifically
+dig +short pub-dev.sacredvows.io CNAME
+
+# For production
+dig pub.sacredvows.io
+dig +short pub.sacredvows.io CNAME
+```
+
+When properly configured, you should see:
+- **A records**: Cloudflare IP addresses (e.g., `104.21.x.x`, `172.67.x.x`) when proxied
+- **CNAME record**: Points to `{domain}.cdn.cloudflare.net` (the underlying R2 custom domain target)
+
+**Note**: DNS propagation and SSL certificate provisioning may take 5-10 minutes after configuration.
 
 ## Migration Process
 
@@ -368,7 +438,7 @@ cloudflare_public_assets_r2_bucket_name = "sacred-vows-public-assets-dev"
 3. **Verify Upload**:
    - Check R2 bucket in Cloudflare Dashboard
    - Verify manifest.json exists
-   - Test CDN URL access
+   - Test CDN URL access (see verification steps below)
 
 ### Step 3: Configure Application
 
@@ -389,18 +459,50 @@ cloudflare_public_assets_r2_bucket_name = "sacred-vows-public-assets-dev"
    npm run build
    ```
 
-### Step 4: Verify
+### Step 4: Verify CDN Setup
+
+#### Verify DNS and SSL
+
+1. **Check DNS Resolution**:
+   ```bash
+   # Should return Cloudflare IP addresses
+   dig pub-dev.sacredvows.io
+   
+   # Check CNAME record
+   dig +short pub-dev.sacredvows.io CNAME
+   ```
+
+2. **Test HTTPS Access**:
+   ```bash
+   # Test with HEAD request (dev)
+   curl -I https://pub-dev.sacredvows.io/defaults/couple1/bride/1.jpeg
+   
+   # Test with HEAD request (prod)
+   curl -I https://pub.sacredvows.io/defaults/couple1/bride/1.jpeg
+   
+   # Test with verbose output to see full response
+   curl -v https://pub-dev.sacredvows.io/defaults/couple1/bride/1.jpeg 2>&1 | head -20
+   ```
+
+   Expected results:
+   - **HTTP 200**: Asset is accessible ✅
+   - **HTTP 404**: Asset doesn't exist in R2 bucket (check the object key path)
+   - **Connection timeout/DNS error**: DNS not propagated or SSL still provisioning (wait 5-10 minutes)
+
+#### Verify Application Integration
 
 1. **Test Builder Preview**:
    - Open builder app
    - Select a layout
-   - Verify images load from CDN (check Network tab)
+   - Verify images load from CDN (check Network tab in DevTools)
+   - Look for requests to `pub-dev.sacredvows.io` or `pub.sacredvows.io`
    - Verify offline access works (disable network, reload)
 
 2. **Test Published Site**:
    - Publish an invitation
    - Verify default assets are served from CDN
    - Check that user-uploaded assets still work
+   - Inspect network requests to confirm CDN URLs are used
 
 ## Usage
 
@@ -439,16 +541,45 @@ cloudflare_public_assets_r2_bucket_name = "sacred-vows-public-assets-dev"
    ```bash
    echo $VITE_PUBLIC_ASSETS_CDN_URL
    ```
-   Should be set in `.env` file
+   Should be set in `.env` file and match the configured R2 custom domain.
 
 2. **Verify R2 Bucket**:
    - Check bucket exists in Cloudflare Dashboard
    - Verify public access is enabled
    - Check assets are uploaded (manifest.json exists)
+   - Verify asset paths match the expected structure: `defaults/{category}/{subcategory}/{filename}`
 
-3. **Check CDN URL**:
-   - Test CDN URL directly in browser
-   - Verify CORS headers if loading from different domain
+3. **Check DNS Resolution**:
+   ```bash
+   # Verify DNS is resolving
+   dig pub-dev.sacredvows.io
+   
+   # Should return Cloudflare IP addresses (104.21.x.x, 172.67.x.x)
+   # If not resolving, check DNS record in Cloudflare Dashboard
+   ```
+
+4. **Check SSL Certificate**:
+   - If DNS resolves but HTTPS fails, SSL certificate may still be provisioning
+   - Wait 5-10 minutes after configuring R2 custom domain
+   - Check SSL/TLS status in Cloudflare Dashboard → SSL/TLS → Overview
+
+5. **Test CDN URL Directly**:
+   ```bash
+   # Test if asset is accessible
+   curl -I https://pub-dev.sacredvows.io/defaults/couple1/bride/1.jpeg
+   
+   # Check response headers
+   curl -v https://pub-dev.sacredvows.io/defaults/couple1/bride/1.jpeg 2>&1 | grep -i "http\|content-type"
+   ```
+
+6. **Verify R2 Custom Domain Configuration**:
+   - Go to Cloudflare Dashboard → R2 → Your Bucket → Settings → Custom Domain
+   - Ensure custom domain is configured and active
+   - Check that DNS record exists (should be created automatically)
+
+7. **Check CORS Headers** (if loading from different domain):
+   - Verify CORS is configured in R2 bucket settings
+   - Check browser console for CORS errors
 
 ### Fallback to Local Assets
 
@@ -456,6 +587,26 @@ If CDN is not configured, the system automatically falls back to local assets:
 - `getDefaultAssetUrl()` returns local paths
 - Assets load from `/assets/` directory
 - No errors, graceful degradation
+
+### DNS and SSL Issues
+
+1. **DNS Not Resolving**:
+   - Wait for DNS propagation (usually 5-15 minutes, can take up to 48 hours globally)
+   - Verify CNAME target is correct in `terraform.tfvars`
+   - Check that proxy is enabled (orange cloud) in Cloudflare Dashboard
+   - Verify DNS record exists: `dig pub-dev.sacredvows.io` or check Cloudflare Dashboard → DNS → Records
+
+2. **SSL Certificate Not Provisioned**:
+   - Wait 5-10 minutes after configuring R2 custom domain
+   - Check SSL/TLS status in Cloudflare Dashboard
+   - Verify custom domain is active in R2 bucket settings
+   - If still failing after 15 minutes, check Cloudflare Dashboard for errors
+
+3. **R2 Custom Domain Not Working**:
+   - **DNS resolves but HTTPS fails**: SSL certificate may still be provisioning (wait 5-10 minutes)
+   - **404 errors**: Verify the asset exists in R2 bucket at the correct path (e.g., `defaults/couple1/bride/1.jpeg`)
+   - **Connection timeout**: Check that the R2 custom domain is fully configured in Cloudflare Dashboard → R2 → Bucket → Settings → Custom Domain
+   - **Verify DNS**: Use `dig pub-dev.sacredvows.io` to confirm it resolves to Cloudflare IPs
 
 ### Cache Issues
 
@@ -471,6 +622,10 @@ If CDN is not configured, the system automatically falls back to local assets:
 3. **Check Cache Headers**:
    - Verify R2 objects have correct `CacheControl` headers
    - Check Service Worker cache strategy
+   - Test with curl to see actual cache headers:
+     ```bash
+     curl -I https://pub-dev.sacredvows.io/defaults/couple1/bride/1.jpeg | grep -i cache
+     ```
 
 ## Future Enhancements
 
@@ -484,6 +639,7 @@ If CDN is not configured, the system automatically falls back to local assets:
 
 - [Publishing Process](./publishing.md): How published sites handle assets
 - [Cloudflare Setup](./cloudflare-setup.md): Cloudflare infrastructure setup
+- [Cloudflare Resources README](../infra/terraform/modules/cloudflare-resources/README.md): Detailed R2 custom domain setup and DNS verification
 - [Deployment Guide](./DEPLOYMENT.md): Deployment procedures
 
 ## Summary

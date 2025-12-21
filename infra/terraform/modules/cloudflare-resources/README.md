@@ -165,14 +165,47 @@ This will create/manage the DNS record via Terraform for consistency.
 
 ### Step 5: Verify Setup
 
-Test that assets are accessible:
+#### Check DNS Resolution
+
+Verify that the DNS record is properly configured:
 
 ```bash
-# Should return 200 OK
-curl -I https://pub-dev.sacredvows.io/defaults/couple2/groom/1.jpeg
+# Check DNS resolution (should return Cloudflare IPs)
+dig pub-dev.sacredvows.io
+
+# Check CNAME record specifically
+dig +short pub-dev.sacredvows.io CNAME
+
+# For production
+dig pub.sacredvows.io
+dig +short pub.sacredvows.io CNAME
 ```
 
-**Note**: DNS propagation and SSL certificate provisioning may take 5-10 minutes.
+When properly configured, you should see:
+- **A records**: Cloudflare IP addresses (e.g., `104.21.x.x`, `172.67.x.x`) when proxied
+- **CNAME record**: Points to `{domain}.cdn.cloudflare.net` (the underlying R2 custom domain target)
+
+#### Test Asset Access
+
+Test that assets are accessible via HTTPS:
+
+```bash
+# Test with HEAD request (dev)
+curl -I https://pub-dev.sacredvows.io/defaults/couple1/bride/1.jpeg
+
+# Test with HEAD request (prod)
+curl -I https://pub.sacredvows.io/defaults/couple1/bride/1.jpeg
+
+# Test with full request to see response
+curl -v https://pub-dev.sacredvows.io/defaults/couple1/bride/1.jpeg 2>&1 | head -20
+```
+
+Expected results:
+- **HTTP 200**: Asset is accessible ✅
+- **HTTP 404**: Asset doesn't exist in R2 bucket (check the object key path)
+- **Connection timeout/DNS error**: DNS not propagated or SSL still provisioning
+
+**Note**: DNS propagation and SSL certificate provisioning may take 5-10 minutes after configuration. If DNS resolves but HTTPS doesn't work, wait a few more minutes for SSL certificate provisioning.
 
 ## Troubleshooting
 
@@ -200,9 +233,16 @@ skip_worker_route_if_exists = true
 Note: This skips creation but Terraform won't manage the existing route.
 
 ### DNS Not Resolving
-- Wait for DNS propagation (can take up to 48 hours)
-- Verify the CNAME target is correct
-- Check that proxy is enabled (orange cloud)
+- Wait for DNS propagation (can take up to 48 hours, but usually 5-15 minutes for Cloudflare)
+- Verify the CNAME target is correct in `terraform.tfvars`
+- Check that proxy is enabled (orange cloud) in Cloudflare Dashboard
+- Verify the DNS record exists: `dig pub-dev.sacredvows.io` or check Cloudflare Dashboard → DNS → Records
+
+### R2 Custom Domain Not Working
+- **DNS resolves but HTTPS fails**: SSL certificate may still be provisioning (wait 5-10 minutes)
+- **404 errors**: Verify the asset exists in R2 bucket at the correct path (e.g., `defaults/couple1/bride/1.jpeg`)
+- **Connection timeout**: Check that the R2 custom domain is fully configured in Cloudflare Dashboard → R2 → Bucket → Settings → Custom Domain
+- **Verify DNS**: Use `dig pub-dev.sacredvows.io` to confirm it resolves to Cloudflare IPs
 
 ### API Not Accessible
 - Verify Cloud Run domain mapping exists
