@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { getDefaultAssetUrl } from '../../../../services/defaultAssetService';
 
 /**
  * EditorialHeader - Minimal floating music control
@@ -9,7 +10,7 @@ function EditorialHeader({ translations, currentLang, config = {} }) {
   const audioRef = useRef(null);
   
   const music = config.music || {};
-  const musicFile = music.file || '/assets/music/1.mp3';
+  const musicFile = music.file || getDefaultAssetUrl('music', null, '1.mp3');
   const musicVolume = typeof music.volume === 'number' ? music.volume : 0.5;
 
   useEffect(() => {

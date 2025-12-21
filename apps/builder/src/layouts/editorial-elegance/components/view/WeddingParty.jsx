@@ -2,11 +2,13 @@
  * WeddingParty - Bride, Groom, and optional party members
  * Black & white photos recommended
  */
+import { getDefaultAssetUrl } from '../../../../services/defaultAssetService';
+
 function WeddingParty({ translations, currentLang, config = {} }) {
   const weddingParty = config.weddingParty || {};
   const couple = config.couple || {};
-  const bride = weddingParty.bride || couple.bride || { name: 'Bride', image: '/assets/photos/couple2/bride/1.jpeg' };
-  const groom = weddingParty.groom || couple.groom || { name: 'Groom', image: '/assets/photos/couple2/groom/1.jpeg' };
+  const bride = weddingParty.bride || couple.bride || { name: 'Bride', image: getDefaultAssetUrl('couple2', 'bride', '1.jpeg') };
+  const groom = weddingParty.groom || couple.groom || { name: 'Groom', image: getDefaultAssetUrl('couple2', 'groom', '1.jpeg') };
   const members = weddingParty.members || [];
   const showBios = weddingParty.showBios || false;
   const filter = weddingParty.filter || 'bw'; // 'none' | 'bw'

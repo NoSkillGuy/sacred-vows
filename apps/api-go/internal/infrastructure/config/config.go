@@ -15,13 +15,14 @@ import (
 )
 
 type Config struct {
-	Server     ServerConfig
-	Database   DatabaseConfig
-	Auth       AuthConfig
-	Storage    StorageConfig
-	Google     GoogleConfig
-	Publishing PublishingConfig
-	Email      EmailConfig
+	Server       ServerConfig
+	Database     DatabaseConfig
+	Auth         AuthConfig
+	Storage      StorageConfig
+	Google       GoogleConfig
+	Publishing   PublishingConfig
+	PublicAssets PublicAssetsConfig
+	Email        EmailConfig
 }
 
 type ServerConfig struct {
@@ -88,6 +89,11 @@ type PublishingConfig struct {
 	SnapshotRendererNode   string
 }
 
+type PublicAssetsConfig struct {
+	R2Bucket   string // R2 bucket name for public default assets
+	CDNBaseURL string // CDN base URL for public assets
+}
+
 // EmailVendorConfig represents configuration for a single email vendor
 type EmailVendorConfig struct {
 	Provider     string // "mailjet" | "mailgun"
@@ -143,6 +149,10 @@ type ConfigFile struct {
 		PublishedArtifactsDir        string `yaml:"published_artifacts_dir"`
 		PublishedArtifactsPublicBase string `yaml:"published_artifacts_public_base"`
 	} `yaml:"publishing"`
+	PublicAssets struct {
+		R2Bucket   string `yaml:"r2_bucket"`
+		CDNBaseURL string `yaml:"cdn_base_url"`
+	} `yaml:"public_assets"`
 	Email struct {
 		Vendors     string `yaml:"vendors"`
 		FromAddress string `yaml:"from_address"`
@@ -219,6 +229,10 @@ func Load() (*Config, error) {
 			VersionRetentionCount:  getEnvAsInt("PUBLISH_VERSION_RETENTION_COUNT", getYAMLInt(yamlConfig, "publishing.version_retention_count", 3)),
 			SnapshotRendererScript: getEnv("SNAPSHOT_RENDERER_SCRIPT", getYAMLString(yamlConfig, "publishing.snapshot_renderer_script", "")),
 			SnapshotRendererNode:   getEnv("SNAPSHOT_RENDERER_NODE", getYAMLString(yamlConfig, "publishing.snapshot_renderer_node", "node")),
+		},
+		PublicAssets: PublicAssetsConfig{
+			R2Bucket:   getEnv("PUBLIC_ASSETS_R2_BUCKET", getYAMLString(yamlConfig, "public_assets.r2_bucket", "")),
+			CDNBaseURL: getEnv("PUBLIC_ASSETS_CDN_URL", getYAMLString(yamlConfig, "public_assets.cdn_base_url", "")),
 		},
 		Email: loadEmailConfig(yamlConfig),
 	}
@@ -459,7 +473,7 @@ func getYAMLString(cfg *ConfigFile, path string, defaultValue string) string {
 				return cfg.Google.FrontendURL
 			}
 		}
-	case "publishing":
+		case "publishing":
 		switch parts[1] {
 		case "base_domain":
 			if cfg.Publishing.BaseDomain != "" {
@@ -488,6 +502,17 @@ func getYAMLString(cfg *ConfigFile, path string, defaultValue string) string {
 		case "snapshot_renderer_node":
 			if cfg.Publishing.SnapshotRendererNode != "" {
 				return cfg.Publishing.SnapshotRendererNode
+			}
+		}
+	case "public_assets":
+		switch parts[1] {
+		case "r2_bucket":
+			if cfg.PublicAssets.R2Bucket != "" {
+				return cfg.PublicAssets.R2Bucket
+			}
+		case "cdn_base_url":
+			if cfg.PublicAssets.CDNBaseURL != "" {
+				return cfg.PublicAssets.CDNBaseURL
 			}
 		}
 	case "email":

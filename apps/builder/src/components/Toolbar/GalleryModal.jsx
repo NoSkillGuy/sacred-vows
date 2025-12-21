@@ -1,32 +1,34 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useBuilderStore } from '../../store/builderStore';
 import './GalleryModal.css';
 import ImageDeletionNotice from '../AssetManager/ImageDeletionNotice';
+import { getDefaultAssetUrl } from '../../services/defaultAssetService';
 
-const defaultImages = [
+// Generate default images using service (lazy loaded when modal opens)
+const getDefaultImages = () => [
   { category: 'couple', images: [
-    '/assets/photos/couple1/couple/1.jpeg',
-    '/assets/photos/couple1/couple/2.jpeg',
-    '/assets/photos/couple1/couple/3.jpeg',
-    '/assets/photos/couple1/couple/4.jpeg',
-    '/assets/photos/couple1/couple/5.jpeg',
-    '/assets/photos/couple1/couple/6.jpeg',
-    '/assets/photos/couple1/couple/7.jpeg',
-    '/assets/photos/couple1/couple/8.jpeg',
+    getDefaultAssetUrl('couple1', 'couple', '1.jpeg'),
+    getDefaultAssetUrl('couple1', 'couple', '2.jpeg'),
+    getDefaultAssetUrl('couple1', 'couple', '3.jpeg'),
+    getDefaultAssetUrl('couple1', 'couple', '4.jpeg'),
+    getDefaultAssetUrl('couple1', 'couple', '5.jpeg'),
+    getDefaultAssetUrl('couple1', 'couple', '6.jpeg'),
+    getDefaultAssetUrl('couple1', 'couple', '7.jpeg'),
+    getDefaultAssetUrl('couple1', 'couple', '8.jpeg'),
   ]},
   { category: 'bride', images: [
-    '/assets/photos/couple1/bride/1.jpeg',
-    '/assets/photos/couple1/bride/2.jpeg',
-    '/assets/photos/couple1/bride/3.jpeg',
+    getDefaultAssetUrl('couple1', 'bride', '1.jpeg'),
+    getDefaultAssetUrl('couple1', 'bride', '2.jpeg'),
+    getDefaultAssetUrl('couple1', 'bride', '3.jpeg'),
   ]},
   { category: 'groom', images: [
-    '/assets/photos/couple1/groom/1.jpeg',
-    '/assets/photos/couple1/groom/2.jpeg',
+    getDefaultAssetUrl('couple1', 'groom', '1.jpeg'),
+    getDefaultAssetUrl('couple1', 'groom', '2.jpeg'),
   ]},
   { category: 'family', images: [
-    '/assets/photos/couple1/family/1.jpeg',
-    '/assets/photos/couple1/family/2.jpeg',
-    '/assets/photos/couple1/family/3.jpeg',
+    getDefaultAssetUrl('couple1', 'family', '1.jpeg'),
+    getDefaultAssetUrl('couple1', 'family', '2.jpeg'),
+    getDefaultAssetUrl('couple1', 'family', '3.jpeg'),
   ]},
 ];
 
@@ -35,6 +37,7 @@ function GalleryModal({ isOpen, onClose }) {
   const gallery = currentInvitation.data.gallery || {};
   const [activeTab, setActiveTab] = useState('manage');
   const [selectedCategory, setSelectedCategory] = useState('couple');
+  const [defaultImages] = useState(() => getDefaultImages());
   
   // Get gallery images from store
   const galleryImages = gallery.images || [];

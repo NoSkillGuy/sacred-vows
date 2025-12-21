@@ -34,6 +34,10 @@ publishing:
   published_artifacts_dir: "./published"
   published_artifacts_public_base: ""
 
+public_assets:
+  r2_bucket: "sacred-vows-public-assets-prod"  # R2 bucket name for public default assets
+  cdn_base_url: "https://pub.sacredvows.io"  # CDN base URL for public assets (via Cloudflare Worker or R2 public endpoint)
+
 email:
   vendors: "mailjet,mailgun"
   from_address: "noreply@sacredvows.io"

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { formatWeddingDate } from '../../utils/dateFormatter';
 import { useParallax } from '../../hooks/useScrollAnimations';
+import { getDefaultAssetUrl } from '../../../../services/defaultAssetService';
 
 /**
  * EditorialHero - Magazine cover style hero section
@@ -23,7 +24,7 @@ function EditorialHero({ translations, currentLang, config = {} }) {
   // Hero config
   const alignment = hero.alignment || 'center'; // 'center' | 'bottom-left'
   const mediaType = hero.mediaType || 'image'; // 'image' | 'video'
-  const mainImage = hero.mainImage || '/assets/hero-default.jpg';
+  const mainImage = hero.mainImage || getDefaultAssetUrl('couple2', 'couple', '1.jpeg');
   const videoUrl = hero.videoUrl || '';
   const videoPoster = hero.videoPoster || mainImage;
   

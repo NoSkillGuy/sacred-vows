@@ -3,15 +3,19 @@
  * Provides default values for all sections using couple2 assets and real wedding details
  */
 
+import { getLayoutAssetUrl } from '../../services/defaultAssetService';
+
+const LAYOUT_ID = 'editorial-elegance';
+
 export const editorialEleganceDefaults = {
   couple: {
     bride: {
       name: 'Pooja Singh',
-      image: '/assets/photos/couple2/bride/1.jpeg'
+      image: getLayoutAssetUrl(LAYOUT_ID, '/assets/photos/couple2/bride/1.jpeg')
     },
     groom: {
       name: 'Siva Praveen Rayapudi',
-      image: '/assets/photos/couple2/groom/1.jpeg'
+      image: getLayoutAssetUrl(LAYOUT_ID, '/assets/photos/couple2/groom/1.jpeg')
     }
   },
   wedding: {
@@ -26,13 +30,13 @@ export const editorialEleganceDefaults = {
     }
   },
   hero: {
-    mainImage: '/assets/photos/couple2/couple/1.jpeg',
+    mainImage: getLayoutAssetUrl(LAYOUT_ID, '/assets/photos/couple2/couple/1.jpeg'),
     alignment: 'center',
     mediaType: 'image'
   },
   editorialIntro: {
     text: 'Two paths, one story.\nRooted in tradition, bound by love,\nwe invite you to celebrate the beginning of forever.',
-    image: '/assets/photos/couple2/couple/2.jpeg',
+    image: getLayoutAssetUrl(LAYOUT_ID, '/assets/photos/couple2/couple/2.jpeg'),
     alignment: 'right'
   },
   events: {
@@ -48,12 +52,12 @@ export const editorialEleganceDefaults = {
   weddingParty: {
     bride: {
       name: 'Pooja Singh',
-      image: '/assets/photos/couple2/bride/1.jpeg',
+      image: getLayoutAssetUrl(LAYOUT_ID, '/assets/photos/couple2/bride/1.jpeg'),
       bio: ''
     },
     groom: {
       name: 'Siva Praveen Rayapudi',
-      image: '/assets/photos/couple2/groom/1.jpeg',
+      image: getLayoutAssetUrl(LAYOUT_ID, '/assets/photos/couple2/groom/1.jpeg'),
       bio: ''
     },
     members: [],
@@ -62,17 +66,17 @@ export const editorialEleganceDefaults = {
   },
   gallery: {
     images: [
-      { src: '/assets/photos/couple2/couple/1.jpeg', alt: 'Couple photo 1', category: 'couple' },
-      { src: '/assets/photos/couple2/couple/2.jpeg', alt: 'Couple photo 2', category: 'couple' },
-      { src: '/assets/photos/couple2/couple/3.jpeg', alt: 'Couple photo 3', category: 'couple' },
-      { src: '/assets/photos/couple2/couple/4.jpeg', alt: 'Couple photo 4', category: 'couple' },
-      { src: '/assets/photos/couple2/couple/5.jpeg', alt: 'Couple photo 5', category: 'couple' },
-      { src: '/assets/photos/couple2/couple/6.jpeg', alt: 'Couple photo 6', category: 'couple' },
-      { src: '/assets/photos/couple2/groom/1.jpeg', alt: 'Groom photo 1', category: 'groom' },
-      { src: '/assets/photos/couple2/groom/2.jpeg', alt: 'Groom photo 2', category: 'groom' },
-      { src: '/assets/photos/couple2/groom/3.jpeg', alt: 'Groom photo 3', category: 'groom' },
-      { src: '/assets/photos/couple2/groom/4.jpeg', alt: 'Groom photo 4', category: 'groom' },
-      { src: '/assets/photos/couple2/groom/5.jpeg', alt: 'Groom photo 5', category: 'groom' }
+      { src: getLayoutAssetUrl(LAYOUT_ID, '/assets/photos/couple2/couple/1.jpeg'), alt: 'Couple photo 1', category: 'couple' },
+      { src: getLayoutAssetUrl(LAYOUT_ID, '/assets/photos/couple2/couple/2.jpeg'), alt: 'Couple photo 2', category: 'couple' },
+      { src: getLayoutAssetUrl(LAYOUT_ID, '/assets/photos/couple2/couple/3.jpeg'), alt: 'Couple photo 3', category: 'couple' },
+      { src: getLayoutAssetUrl(LAYOUT_ID, '/assets/photos/couple2/couple/4.jpeg'), alt: 'Couple photo 4', category: 'couple' },
+      { src: getLayoutAssetUrl(LAYOUT_ID, '/assets/photos/couple2/couple/5.jpeg'), alt: 'Couple photo 5', category: 'couple' },
+      { src: getLayoutAssetUrl(LAYOUT_ID, '/assets/photos/couple2/couple/6.jpeg'), alt: 'Couple photo 6', category: 'couple' },
+      { src: getLayoutAssetUrl(LAYOUT_ID, '/assets/photos/couple2/groom/1.jpeg'), alt: 'Groom photo 1', category: 'groom' },
+      { src: getLayoutAssetUrl(LAYOUT_ID, '/assets/photos/couple2/groom/2.jpeg'), alt: 'Groom photo 2', category: 'groom' },
+      { src: getLayoutAssetUrl(LAYOUT_ID, '/assets/photos/couple2/groom/3.jpeg'), alt: 'Groom photo 3', category: 'groom' },
+      { src: getLayoutAssetUrl(LAYOUT_ID, '/assets/photos/couple2/groom/4.jpeg'), alt: 'Groom photo 4', category: 'groom' },
+      { src: getLayoutAssetUrl(LAYOUT_ID, '/assets/photos/couple2/groom/5.jpeg'), alt: 'Groom photo 5', category: 'groom' }
     ]
   },
   galleryConfig: {
@@ -80,7 +84,7 @@ export const editorialEleganceDefaults = {
     maxImages: 12
   },
   music: {
-    file: '/assets/music/1.mp3',
+    file: getLayoutAssetUrl(LAYOUT_ID, '/assets/music/1.mp3'),
     volume: 0.5
   }
 };

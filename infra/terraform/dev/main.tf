@@ -28,6 +28,9 @@ module "cloudflare_resources" {
   r2_bucket_location    = var.cloudflare_r2_bucket_location
   enable_worker_route   = var.cloudflare_enable_worker_route
   resolve_cache_ttl_seconds = var.cloudflare_resolve_cache_ttl_seconds
+  public_assets_r2_bucket_name = var.cloudflare_public_assets_r2_bucket_name
+  public_assets_cdn_target = var.cloudflare_public_assets_cdn_target
+  skip_worker_route_if_exists = var.cloudflare_skip_worker_route_if_exists
 
   depends_on = [module.gcp_resources]
 }

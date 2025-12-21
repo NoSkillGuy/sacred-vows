@@ -2,20 +2,22 @@
  * EditorialGallery - Masonry or single-column layout
  * 8-12 large images, no captions, lazy loading
  */
+import { getDefaultAssetUrl } from '../../../../services/defaultAssetService';
+
 function EditorialGallery({ translations, currentLang, config = {} }) {
   const gallery = config.gallery || {};
   const galleryConfig = config.galleryConfig || {};
   const layout = galleryConfig.layout || 'masonry'; // 'masonry' | 'single-column'
   const maxImages = galleryConfig.maxImages || 12;
   
-  // Default gallery images from couple2
+  // Default gallery images from couple2 (fallback only, normally comes from defaults.js)
   const defaultImages = [
-    { src: '/assets/photos/couple2/couple/1.jpeg', alt: 'Couple photo 1', category: 'couple' },
-    { src: '/assets/photos/couple2/couple/2.jpeg', alt: 'Couple photo 2', category: 'couple' },
-    { src: '/assets/photos/couple2/couple/3.jpeg', alt: 'Couple photo 3', category: 'couple' },
-    { src: '/assets/photos/couple2/couple/4.jpeg', alt: 'Couple photo 4', category: 'couple' },
-    { src: '/assets/photos/couple2/couple/5.jpeg', alt: 'Couple photo 5', category: 'couple' },
-    { src: '/assets/photos/couple2/couple/6.jpeg', alt: 'Couple photo 6', category: 'couple' },
+    { src: getDefaultAssetUrl('couple2', 'couple', '1.jpeg'), alt: 'Couple photo 1', category: 'couple' },
+    { src: getDefaultAssetUrl('couple2', 'couple', '2.jpeg'), alt: 'Couple photo 2', category: 'couple' },
+    { src: getDefaultAssetUrl('couple2', 'couple', '3.jpeg'), alt: 'Couple photo 3', category: 'couple' },
+    { src: getDefaultAssetUrl('couple2', 'couple', '4.jpeg'), alt: 'Couple photo 4', category: 'couple' },
+    { src: getDefaultAssetUrl('couple2', 'couple', '5.jpeg'), alt: 'Couple photo 5', category: 'couple' },
+    { src: getDefaultAssetUrl('couple2', 'couple', '6.jpeg'), alt: 'Couple photo 6', category: 'couple' },
   ];
   
   const galleryImages = (gallery.images && gallery.images.length > 0 

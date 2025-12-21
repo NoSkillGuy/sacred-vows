@@ -28,3 +28,18 @@ output "worker_route_pattern" {
   value       = var.enable_worker_route && var.r2_bucket_name != "" ? "*.${var.published_base_domain}/*" : null
 }
 
+output "public_assets_r2_bucket_name" {
+  description = "R2 bucket name for public assets"
+  value       = var.public_assets_r2_bucket_name != "" ? cloudflare_r2_bucket.public_assets[0].name : null
+}
+
+output "public_assets_cdn_dns_record_id" {
+  description = "Public assets CDN DNS record ID (R2 custom domain)"
+  value       = var.public_assets_r2_bucket_name != "" && var.public_assets_cdn_target != "" ? cloudflare_record.public_assets_cdn[0].id : null
+}
+
+output "public_assets_cdn_domain" {
+  description = "Public assets CDN domain name"
+  value       = var.public_assets_r2_bucket_name != "" ? (var.environment == "dev" ? "pub-dev.sacredvows.io" : "pub.sacredvows.io") : null
+}
+

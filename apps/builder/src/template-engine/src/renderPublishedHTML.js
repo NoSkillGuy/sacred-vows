@@ -70,11 +70,25 @@ async function main() {
   process.stdout.write(html);
 }
 
+function isCDNUrl(url) {
+  // Check if URL is a CDN URL (starts with http/https)
+  return url.startsWith('http://') || url.startsWith('https://');
+}
+
+function isDefaultAssetPath(pathname) {
+  // Check if path is a default asset path
+  return pathname.startsWith('/assets/photos/') || 
+         pathname.startsWith('/assets/music/') || 
+         pathname.startsWith('/layouts/');
+}
+
 async function bundleLocalAssets(html) {
-  // Collect references like /assets/... and /layouts/... and embed them as publishable assets.
+  // Collect references like /assets/..., /layouts/..., and CDN URLs
   const fs = await import('node:fs/promises');
   const path = await import('node:path');
   const { fileURLToPath } = await import('node:url');
+  const https = await import('node:https');
+  const http = await import('node:http');
 
   const contentTypeByExt = {
     '.jpg': 'image/jpeg',
@@ -94,7 +108,10 @@ async function bundleLocalAssets(html) {
   let m;
   while ((m = re.exec(html)) !== null) {
     const u = m[1];
-    if (u && (u.startsWith('/assets/') || u.startsWith('/layouts/'))) refs.add(u);
+    // Collect local paths and CDN URLs
+    if (u && (u.startsWith('/assets/') || u.startsWith('/layouts/') || isCDNUrl(u))) {
+      refs.add(u);
+    }
   }
 
   // Resolve builder public directory relative to THIS file, not process.cwd().
@@ -106,6 +123,22 @@ async function bundleLocalAssets(html) {
 
   const rewriteMap = new Map(); // original -> rewritten (keeps query/hash)
 
+  // Helper to fetch from URL
+  async function fetchFromUrl(url) {
+    return new Promise((resolve, reject) => {
+      const client = url.startsWith('https://') ? https : http;
+      client.get(url, (res) => {
+        if (res.statusCode !== 200) {
+          reject(new Error(`HTTP ${res.statusCode}`));
+          return;
+        }
+        const chunks = [];
+        res.on('data', chunk => chunks.push(chunk));
+        res.on('end', () => resolve(Buffer.concat(chunks)));
+      }).on('error', reject);
+    });
+  }
+
   for (const u of refs) {
     // Preserve query/hash in HTML rewriting but strip for local filesystem reads.
     const qIndex = u.indexOf('?');
@@ -114,16 +147,29 @@ async function bundleLocalAssets(html) {
     const pathname = cut >= 0 ? u.slice(0, cut) : u;
     const suffix = cut >= 0 ? u.slice(cut) : '';
 
-    const filePath = path.join(publicRoot, pathname); // pathname starts with /
-    try {
-      const body = await fs.readFile(filePath);
-      const ext = path.extname(filePath).toLowerCase();
-      const contentType = contentTypeByExt[ext] || 'application/octet-stream';
-      const keySuffix = pathname.replace(/^\//, ''); // assets/... or layouts/...
-      assets.push({ keySuffix, contentType, bodyBase64: body.toString('base64') });
-      rewriteMap.set(u, `./${keySuffix}${suffix}`);
-    } catch {
-      // Ignore missing local file; leave reference as-is.
+    // Handle CDN URLs: Keep them as-is in published HTML for CDN benefits
+    if (isCDNUrl(u)) {
+      // CDN URLs are kept as absolute URLs in published HTML
+      // No rewriting needed - they'll be served from CDN
+      continue;
+    }
+
+    // Handle local paths
+    if (isDefaultAssetPath(pathname)) {
+      const filePath = path.join(publicRoot, pathname); // pathname starts with /
+      try {
+        const body = await fs.readFile(filePath);
+        const ext = path.extname(filePath).toLowerCase();
+        const contentType = contentTypeByExt[ext] || 'application/octet-stream';
+        const keySuffix = pathname.replace(/^\//, ''); // assets/... or layouts/...
+        assets.push({ keySuffix, contentType, bodyBase64: body.toString('base64') });
+        rewriteMap.set(u, `./${keySuffix}${suffix}`);
+      } catch {
+        // File not found locally - this is expected for default assets that are now on CDN
+        // Leave reference as-is (it will be a CDN URL from defaults.js)
+        // Or if it's still a local path, it will fail gracefully in published site
+        process.stderr.write(`Warning: Asset not found locally: ${pathname} (may be on CDN)\n`);
+      }
     }
   }
 

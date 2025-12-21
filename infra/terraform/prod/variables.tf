@@ -113,3 +113,21 @@ variable "cloudflare_resolve_cache_ttl_seconds" {
   default     = "30"
 }
 
+variable "cloudflare_public_assets_r2_bucket_name" {
+  description = "R2 bucket name for public assets (default images, layouts, etc.)"
+  type        = string
+  default     = "sacred-vows-public-assets-prod"
+}
+
+variable "cloudflare_public_assets_cdn_target" {
+  description = "CNAME target for public assets CDN (R2 custom domain). Configure R2 custom domain in Cloudflare Dashboard first, then set this to the provided CNAME target (usually {domain}.cdn.cloudflare.net). Leave empty if not yet configured."
+  type        = string
+  default     = ""
+}
+
+variable "cloudflare_skip_worker_route_if_exists" {
+  description = "Skip creating worker route if it already exists (set to true if route was created manually)"
+  type        = bool
+  default     = false
+}
+

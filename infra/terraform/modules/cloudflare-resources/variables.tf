@@ -55,3 +55,21 @@ variable "resolve_cache_ttl_seconds" {
   default     = "30"
 }
 
+variable "public_assets_r2_bucket_name" {
+  description = "R2 bucket name for public assets (default images, layouts, etc.)"
+  type        = string
+  default     = ""
+}
+
+variable "public_assets_cdn_target" {
+  description = "CNAME target for public assets CDN (R2 custom domain). This is provided by R2 when you configure the custom domain in the Cloudflare Dashboard. Format: usually {domain}.cdn.cloudflare.net. Leave empty if custom domain is not yet configured."
+  type        = string
+  default     = ""
+}
+
+variable "skip_worker_route_if_exists" {
+  description = "Skip creating worker route if it already exists (set to true if route was created manually or already imported)"
+  type        = bool
+  default     = false
+}
+

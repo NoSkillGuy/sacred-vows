@@ -3,6 +3,7 @@ import { useBuilderStore, SECTION_TYPES } from '../../store/builderStore';
 import { useLanguage } from '../../hooks/useLanguage';
 import { getLayout, getViewComponents, getEditableComponents, getSharedComponents, hasLayout } from '../../layouts/registry';
 import { parseInvitationData } from '../../layouts/editorial-elegance/utils/dataHelpers';
+import { preloadDefaultAssets } from '../../services/defaultAssetService';
 // Import layouts to ensure they're registered
 import '../../layouts/classic-scroll';
 import '../../layouts/editorial-elegance';
@@ -60,6 +61,54 @@ function PreviewPane({ editMode = true, deviceMode = 'desktop' }) {
   useEffect(() => {
     setModeKey(prev => prev + 1);
   }, [editMode]);
+
+  // Preload default assets when layout changes
+  useEffect(() => {
+    if (layoutId && currentInvitation.data) {
+      // Extract asset paths from invitation data
+      const assetPaths = [];
+      
+      // Hero image
+      if (currentInvitation.data.hero?.mainImage) {
+        assetPaths.push(currentInvitation.data.hero.mainImage);
+      }
+      
+      // Editorial intro image
+      if (currentInvitation.data.editorialIntro?.image) {
+        assetPaths.push(currentInvitation.data.editorialIntro.image);
+      }
+      
+      // Gallery images
+      if (currentInvitation.data.gallery?.images) {
+        currentInvitation.data.gallery.images.forEach(img => {
+          if (img.src) assetPaths.push(img.src);
+        });
+      }
+      
+      // Couple images
+      if (currentInvitation.data.couple?.bride?.image) {
+        assetPaths.push(currentInvitation.data.couple.bride.image);
+      }
+      if (currentInvitation.data.couple?.groom?.image) {
+        assetPaths.push(currentInvitation.data.couple.groom.image);
+      }
+      
+      // Wedding party images
+      if (currentInvitation.data.weddingParty?.bride?.image) {
+        assetPaths.push(currentInvitation.data.weddingParty.bride.image);
+      }
+      if (currentInvitation.data.weddingParty?.groom?.image) {
+        assetPaths.push(currentInvitation.data.weddingParty.groom.image);
+      }
+      
+      // Preload assets in background
+      if (assetPaths.length > 0) {
+        preloadDefaultAssets(layoutId, assetPaths).catch(err => {
+          console.warn('Failed to preload some assets:', err);
+        });
+      }
+    }
+  }, [layoutId, currentInvitation.data]);
 
   // Get enabled sections in order
   const enabledSections = useMemo(() => {
