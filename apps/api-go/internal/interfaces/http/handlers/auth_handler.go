@@ -14,18 +14,18 @@ import (
 )
 
 type AuthHandler struct {
-	registerUC            *authuc.RegisterUseCase
-	loginUC               *authuc.LoginUseCase
-	getCurrentUserUC      *authuc.GetCurrentUserUseCase
-	googleOAuthUC         *authuc.GoogleOAuthUseCase
-	refreshTokenUC        *authuc.RefreshTokenUseCase
+	registerUC             *authuc.RegisterUseCase
+	loginUC                *authuc.LoginUseCase
+	getCurrentUserUC       *authuc.GetCurrentUserUseCase
+	googleOAuthUC          *authuc.GoogleOAuthUseCase
+	refreshTokenUC         *authuc.RefreshTokenUseCase
 	requestPasswordResetUC *authuc.RequestPasswordResetUseCase
-	resetPasswordUC       *authuc.ResetPasswordUseCase
-	refreshTokenRepo      repository.RefreshTokenRepository
-	jwtService            *authinfra.JWTService
-	googleOAuth           *authinfra.GoogleOAuthService
-	hmacKeys              []authinfra.RefreshTokenHMACKey
-	activeHMACKeyID       int16
+	resetPasswordUC        *authuc.ResetPasswordUseCase
+	refreshTokenRepo       repository.RefreshTokenRepository
+	jwtService             *authinfra.JWTService
+	googleOAuth            *authinfra.GoogleOAuthService
+	hmacKeys               []authinfra.RefreshTokenHMACKey
+	activeHMACKeyID        int16
 }
 
 func NewAuthHandler(
@@ -43,17 +43,17 @@ func NewAuthHandler(
 	activeHMACKeyID int16,
 ) *AuthHandler {
 	return &AuthHandler{
-		registerUC:            registerUC,
-		loginUC:               loginUC,
-		getCurrentUserUC:      getCurrentUserUC,
-		googleOAuthUC:         googleOAuthUC,
-		refreshTokenUC:        refreshTokenUC,
+		registerUC:             registerUC,
+		loginUC:                loginUC,
+		getCurrentUserUC:       getCurrentUserUC,
+		googleOAuthUC:          googleOAuthUC,
+		refreshTokenUC:         refreshTokenUC,
 		requestPasswordResetUC: requestPasswordResetUC,
-		resetPasswordUC:       resetPasswordUC,
-		refreshTokenRepo:      refreshTokenRepo,
-		jwtService:            jwtService,
-		googleOAuth:           googleOAuth,
-		hmacKeys:              hmacKeys,
+		resetPasswordUC:        resetPasswordUC,
+		refreshTokenRepo:       refreshTokenRepo,
+		jwtService:             jwtService,
+		googleOAuth:            googleOAuth,
+		hmacKeys:               hmacKeys,
 		activeHMACKeyID:        activeHMACKeyID,
 	}
 }
@@ -523,7 +523,6 @@ type ResetPasswordRequest struct {
 	Token    string `json:"token" binding:"required" example:"abc123..."`
 	Password string `json:"password" binding:"required" example:"newSecurePassword123"`
 }
-
 
 // ForgotPassword handles password reset requests
 // @Summary      Request password reset

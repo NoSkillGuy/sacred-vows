@@ -15,13 +15,14 @@ type User struct {
 }
 
 // Validate validates user entity
+// Note: Password can be empty for OAuth users (who authenticate via OAuth providers)
 func (u *User) Validate() error {
 	if u.Email == "" {
 		return ErrInvalidEmail
 	}
-	if u.Password == "" {
-		return ErrInvalidPassword
-	}
+	// Password validation removed - OAuth users don't have passwords
+	// Regular users will have hashed passwords (non-empty) from bcrypt
+	// Password strength validation happens at use case level via validator.NewPassword
 	return nil
 }
 

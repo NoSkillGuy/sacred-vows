@@ -8,6 +8,7 @@ import (
 	"github.com/sacred-vows/api-go/internal/infrastructure/auth"
 	"github.com/sacred-vows/api-go/internal/interfaces/repository"
 	"github.com/sacred-vows/api-go/pkg/errors"
+	"github.com/segmentio/ksuid"
 	"golang.org/x/oauth2"
 	googleoauth2 "google.golang.org/api/oauth2/v2"
 	"google.golang.org/api/option"
@@ -75,6 +76,9 @@ func (uc *GoogleOAuthUseCase) Execute(ctx context.Context, input GoogleOAuthInpu
 			user.Name = &name
 		}
 
+		// Generate user ID
+		user.ID = ksuid.New().String()
+
 		if err := uc.userRepo.Create(ctx, user); err != nil {
 			return nil, errors.Wrap(errors.ErrInternalServerError.Code, "Failed to create user", err)
 		}
@@ -118,6 +122,9 @@ func (uc *GoogleOAuthUseCase) Verify(ctx context.Context, input GoogleVerifyInpu
 			name := userInfo.Name
 			user.Name = &name
 		}
+
+		// Generate user ID
+		user.ID = ksuid.New().String()
 
 		if err := uc.userRepo.Create(ctx, user); err != nil {
 			return nil, errors.Wrap(errors.ErrInternalServerError.Code, "Failed to create user", err)

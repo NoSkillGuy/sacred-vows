@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { login, isAuthenticated, getCurrentUserFromAPI } from '../../services/authService';
 import { usePetals } from './usePetals';
 import './AuthPage.css';
@@ -45,6 +45,7 @@ const PetalSVG = ({ color = '#e8b4b8' }) => (
 
 function LoginPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -54,6 +55,23 @@ function LoginPage() {
 
   // Generate petals once per mount to avoid animation resets
   const petals = usePetals(10);
+
+  // Check for OAuth error in URL params
+  useEffect(() => {
+    const oauthError = searchParams.get('error');
+    if (oauthError) {
+      const errorMessages = {
+        'no_code': 'Google OAuth did not return an authorization code. Please try again.',
+        'oauth_failed': 'Google OAuth authentication failed. Please try again.',
+        'token_failed': 'Failed to generate authentication token. Please try again.',
+      };
+      setError(errorMessages[oauthError] || 'OAuth authentication failed. Please try again.');
+      // Clean URL
+      const url = new URL(window.location.href);
+      url.searchParams.delete('error');
+      window.history.replaceState({}, '', url.pathname);
+    }
+  }, [searchParams]);
 
   // Check if user is already authenticated on mount
   useEffect(() => {
