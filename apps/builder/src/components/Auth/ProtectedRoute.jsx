@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Navigate, useLocation, useSearchParams } from 'react-router-dom';
 import { isAuthenticated, getCurrentUserFromAPI, refreshAccessToken } from '../../services/authService';
 import { setAccessToken } from '../../services/tokenStorage';
@@ -22,8 +22,27 @@ function ProtectedRoute({ children }) {
   const [isValid, setIsValid] = useState(false);
   const location = useLocation();
   const [searchParams] = useSearchParams();
+  const isMountedRef = useRef(true);
+  const checkInProgressRef = useRef(false);
 
   useEffect(() => {
+    // Prevent multiple concurrent checks
+    if (checkInProgressRef.current) {
+      return;
+    }
+
+    checkInProgressRef.current = true;
+    isMountedRef.current = true;
+
+    // Set a timeout fallback to ensure setIsChecking(false) always runs
+    const timeoutId = setTimeout(() => {
+      if (isMountedRef.current) {
+        setIsValid(false);
+        setIsChecking(false);
+        checkInProgressRef.current = false;
+      }
+    }, 10000); // 10 second timeout
+
     const checkAuth = async () => {
       // Check for OAuth callback token in URL
       const oauthToken = searchParams.get('token');
@@ -32,28 +51,48 @@ function ProtectedRoute({ children }) {
       }
 
       // If no access token, try to refresh using refresh token from cookie
-      if (!isAuthenticated()) {
+      const authenticated = isAuthenticated();
+      if (!authenticated) {
         try {
           await refreshAccessToken();
         } catch (refreshError) {
-          setIsValid(false);
-          setIsChecking(false);
+          if (isMountedRef.current) {
+            setIsValid(false);
+            setIsChecking(false);
+            checkInProgressRef.current = false;
+            clearTimeout(timeoutId);
+          }
           return;
         }
       }
 
       try {
         await getCurrentUserFromAPI();
-        setIsValid(true);
+        if (isMountedRef.current) {
+          setIsValid(true);
+        }
       } catch (error) {
-        setIsValid(false);
+        if (isMountedRef.current) {
+          setIsValid(false);
+        }
       } finally {
-        setIsChecking(false);
+        clearTimeout(timeoutId);
+        if (isMountedRef.current) {
+          setIsChecking(false);
+          checkInProgressRef.current = false;
+        }
       }
     };
 
     checkAuth();
-  }, [searchParams]);
+
+    // Cleanup function
+    return () => {
+      isMountedRef.current = false;
+      checkInProgressRef.current = false;
+      clearTimeout(timeoutId);
+    };
+  }, [searchParams, location.pathname]);
 
   if (isChecking) {
     return (

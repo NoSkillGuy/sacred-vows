@@ -2,6 +2,8 @@ package firestore
 
 import (
 	"context"
+	"encoding/base64"
+	"fmt"
 	"time"
 
 	"cloud.google.com/go/firestore"
@@ -23,11 +25,14 @@ func NewRefreshTokenRepository(client *Client) repository.RefreshTokenRepository
 func (r *refreshTokenRepository) Create(ctx context.Context, token *domain.RefreshToken) error {
 	token.CreatedAt = time.Now()
 
+	// Convert fingerprint bytes to base64 string for Firestore storage
+	fingerprintStr := base64.URLEncoding.EncodeToString(token.TokenFingerprint)
+
 	data := map[string]interface{}{
 		"id":                token.ID,
 		"user_id":           token.UserID,
 		"token_hash":        token.TokenHash,
-		"token_fingerprint":  token.TokenFingerprint,
+		"token_fingerprint": fingerprintStr, // Store as base64 string
 		"hmac_key_id":       token.HMACKeyID,
 		"expires_at":        token.ExpiresAt,
 		"revoked":           token.Revoked,
@@ -40,12 +45,21 @@ func (r *refreshTokenRepository) Create(ctx context.Context, token *domain.Refre
 
 func (r *refreshTokenRepository) FindByTokenFingerprint(ctx context.Context, fingerprint []byte) (*domain.RefreshToken, error) {
 	// Convert byte slice to base64 string for storage/comparison
-	// Note: Firestore doesn't support byte arrays directly, so we store as string
-	fingerprintStr := string(fingerprint)
+	// Note: Firestore doesn't support byte arrays directly, so we store as base64-encoded string
+	// Using base64 ensures valid UTF-8 encoding
+	fingerprintStr := base64.URLEncoding.EncodeToString(fingerprint)
 	
-	iter := r.client.Collection("refresh_tokens").Where("token_fingerprint", "==", fingerprintStr).Limit(1).Documents(ctx)
+	// Create a context with timeout for Firestore query (3 seconds)
+	queryCtx, cancel := context.WithTimeout(ctx, 3*time.Second)
+	defer cancel()
+	
+	iter := r.client.Collection("refresh_tokens").Where("token_fingerprint", "==", fingerprintStr).Limit(1).Documents(queryCtx)
 	docs, err := iter.GetAll()
 	if err != nil {
+		// Check if error is due to timeout
+		if err == context.DeadlineExceeded || err == context.Canceled {
+			return nil, fmt.Errorf("Firestore query timeout (likely missing index on token_fingerprint): %w", err)
+		}
 		return nil, err
 	}
 	if len(docs) == 0 {
@@ -117,9 +131,15 @@ func (r *refreshTokenRepository) docToRefreshToken(doc *firestore.DocumentSnapsh
 		CreatedAt:        getTime(data, "created_at"),
 	}
 
-	// Convert fingerprint string back to byte slice
+	// Convert fingerprint base64 string back to byte slice
 	if fingerprintStr, ok := data["token_fingerprint"].(string); ok {
-		token.TokenFingerprint = []byte(fingerprintStr)
+		// Try to decode as base64 (new format), fallback to direct byte conversion (old format)
+		if fingerprintBytes, err := base64.URLEncoding.DecodeString(fingerprintStr); err == nil {
+			token.TokenFingerprint = fingerprintBytes
+		} else {
+			// Fallback for old format (direct string conversion)
+			token.TokenFingerprint = []byte(fingerprintStr)
+		}
 	}
 
 	return token, nil

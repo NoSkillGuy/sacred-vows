@@ -11,6 +11,33 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
 const USER_KEY = 'user';
 
 /**
+ * Fetch with timeout
+ * @param {string} url - URL to fetch
+ * @param {object} options - Fetch options
+ * @param {number} timeoutMs - Timeout in milliseconds (default: 8000)
+ * @returns {Promise<Response>} Fetch response
+ */
+async function fetchWithTimeout(url, options = {}, timeoutMs = 8000) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+    return response;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new Error('Request timeout - server may be unavailable');
+    }
+    throw error;
+  }
+}
+
+/**
  * Register new user
  * @param {Object} userData - User registration data
  * @returns {Promise<Object>} User and access token
@@ -153,13 +180,13 @@ export function isAuthenticated() {
  */
 export async function refreshAccessToken() {
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/auth/refresh`, {
       method: 'POST',
       credentials: 'include', // Include cookies (refresh token)
       headers: {
         'Content-Type': 'application/json',
       },
-    });
+    }, 8000); // 8 second timeout
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({ error: 'Refresh failed' }));

@@ -55,7 +55,8 @@ func (uc *RefreshTokenUseCase) Execute(ctx context.Context, input RefreshTokenIn
 	}
 
 	var storedToken *domain.RefreshToken
-	for _, k := range uc.orderedHMACKeys() {
+	hmacKeys := uc.orderedHMACKeys()
+	for _, k := range hmacKeys {
 		fp := auth.ComputeRefreshTokenFingerprint(k.Key, tokenBytes)
 		t, findErr := uc.refreshTokenRepo.FindByTokenFingerprint(ctx, fp)
 		if findErr != nil {
