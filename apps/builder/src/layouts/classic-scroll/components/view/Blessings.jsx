@@ -1,8 +1,10 @@
+import { getDefaultAssetUrl } from '../../../../services/defaultAssetService';
+
 function Blessings() {
   return (
     <>
       <div className="blessing-icon ganesh">
-        <img src="/assets/photos/icons/Ganesh.jpeg" alt="Shri Ganesh" className="ganesh-img" />
+        <img src={getDefaultAssetUrl('icons', null, 'Ganesh.jpeg')} alt="Shri Ganesh" className="ganesh-img" />
       </div>
 
       <div className="ganesh-slok">
@@ -15,7 +17,7 @@ function Blessings() {
       </div>
 
       <div className="blessing-icon kalash">
-        <img src="/assets/photos/icons/Kalash.png" alt="Shubh Kalash" className="kalash-img" />
+        <img src={getDefaultAssetUrl('icons', null, 'Kalash.png')} alt="Shubh Kalash" className="kalash-img" />
       </div>
     </>
   );

@@ -11,6 +11,14 @@ const CACHE_VERSION = '1.0.0';
 const CDN_BASE_URL = import.meta.env.VITE_PUBLIC_ASSETS_CDN_URL || '';
 const ENABLE_CACHING = import.meta.env.VITE_ENABLE_ASSET_CACHING !== 'false';
 
+// Validate CDN configuration at module load
+if (!CDN_BASE_URL) {
+  console.error(
+    '❌ VITE_PUBLIC_ASSETS_CDN_URL is not configured. ' +
+    'Assets must be served from R2/MinIO. Please set VITE_PUBLIC_ASSETS_CDN_URL in your .env file.'
+  );
+}
+
 /**
  * Normalize a URL by removing trailing slashes from base and ensuring proper path joining
  * @param {string} base - Base URL (may have trailing slash)
@@ -34,19 +42,20 @@ function normalizeUrl(base, path) {
  * @returns {string} Full URL to the asset
  */
 export function getDefaultAssetUrl(category, subcategory, filename) {
-  // If CDN URL is configured, use it
-  if (CDN_BASE_URL) {
-    if (subcategory) {
-      return normalizeUrl(CDN_BASE_URL, `/defaults/${category}/${subcategory}/${filename}`);
-    }
-    return normalizeUrl(CDN_BASE_URL, `/defaults/${category}/${filename}`);
+  // CDN_BASE_URL is required - assets must be served from R2/MinIO
+  if (!CDN_BASE_URL) {
+    console.error(
+      `getDefaultAssetUrl called but VITE_PUBLIC_ASSETS_CDN_URL is not configured. ` +
+      `Category: ${category}, Subcategory: ${subcategory}, Filename: ${filename}`
+    );
+    // Return empty string to fail gracefully rather than breaking the UI
+    return '';
   }
   
-  // Fallback to local path
   if (subcategory) {
-    return `/assets/${category}/${subcategory}/${filename}`;
+    return normalizeUrl(CDN_BASE_URL, `/defaults/${category}/${subcategory}/${filename}`);
   }
-  return `/assets/${category}/${filename}`;
+  return normalizeUrl(CDN_BASE_URL, `/defaults/${category}/${filename}`);
 }
 
 /**
@@ -56,10 +65,17 @@ export function getDefaultAssetUrl(category, subcategory, filename) {
  * @returns {string} Full URL to the preview image
  */
 export function getLayoutPreviewUrl(layoutId, filename = 'preview.jpg') {
-  if (CDN_BASE_URL) {
-    return normalizeUrl(CDN_BASE_URL, `/defaults/layouts/${layoutId}/${filename}`);
+  // CDN_BASE_URL is required - assets must be served from R2/MinIO
+  if (!CDN_BASE_URL) {
+    console.error(
+      `getLayoutPreviewUrl called but VITE_PUBLIC_ASSETS_CDN_URL is not configured. ` +
+      `LayoutId: ${layoutId}, Filename: ${filename}`
+    );
+    // Return empty string to fail gracefully rather than breaking the UI
+    return '';
   }
-  return `/layouts/${layoutId}/${filename}`;
+  
+  return normalizeUrl(CDN_BASE_URL, `/defaults/layouts/${layoutId}/${filename}`);
 }
 
 /**
@@ -214,10 +230,19 @@ export function getLayoutAssetUrl(layoutId, assetPath) {
     return getDefaultAssetUrl('music', null, filename);
   }
 
-  // Fallback: if CDN is configured and path starts with /, normalize it
-  // Otherwise return as-is (might be user-uploaded asset or relative path)
+  // If CDN is configured and path starts with /, normalize it
+  // This handles any remaining absolute paths that should be on CDN
   if (CDN_BASE_URL && assetPath.startsWith('/')) {
     return normalizeUrl(CDN_BASE_URL, assetPath);
+  }
+  
+  // If CDN is not configured and we have a local path, this is an error
+  // User-uploaded assets might be relative paths or full URLs, so we allow those
+  if (assetPath.startsWith('/') && !assetPath.startsWith('http')) {
+    console.warn(
+      `getLayoutAssetUrl: Local path "${assetPath}" found but VITE_PUBLIC_ASSETS_CDN_URL is not configured. ` +
+      `Assets must be served from R2/MinIO.`
+    );
   }
   
   return assetPath;

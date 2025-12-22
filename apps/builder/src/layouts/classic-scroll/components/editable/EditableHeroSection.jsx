@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import EditableText from '../shared/EditableText';
 import EditableImage from '../shared/EditableImage';
+import { getDefaultAssetUrl } from '../../../../services/defaultAssetService';
 
 /**
  * EditableHeroSection - WYSIWYG editable version of Hero section
@@ -11,7 +12,7 @@ function EditableHeroSection({ onRSVPClick, translations, currentLang, config = 
   
   const wedding = config.wedding || {};
   const countdownTarget = wedding.countdownTarget || '2026-01-23T21:00:00';
-  const heroImage = config.hero?.mainImage || '/assets/photos/couple1/couple/11.jpeg';
+  const heroImage = config.hero?.mainImage || getDefaultAssetUrl('couple1', 'couple', '11.jpeg');
   const couple = config.couple || {};
   const brideName = couple.bride?.name || 'Capt (Dr) Priya Singh';
   const groomName = couple.groom?.name || 'Dr Saurabh Singh';

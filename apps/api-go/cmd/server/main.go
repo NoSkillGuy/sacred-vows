@@ -212,6 +212,7 @@ func main() {
 			SecretAccessKey: cfg.Publishing.R2SecretAccessKey,
 			Bucket:          cfg.Publishing.R2Bucket,
 			PublicBase:      cfg.Publishing.R2PublicBase,
+			Endpoint:        cfg.Publishing.R2Endpoint,
 		})
 		if err != nil {
 			logger.GetLogger().Warn("R2 artifact storage not configured; publishing will fail", zap.Error(err))

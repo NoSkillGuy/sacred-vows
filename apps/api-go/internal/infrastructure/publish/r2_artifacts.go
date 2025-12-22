@@ -29,17 +29,28 @@ type R2Config struct {
 	SecretAccessKey string
 	Bucket          string
 	PublicBase      string
+	Endpoint        string // Optional custom endpoint (for local MinIO, etc.)
 }
 
 func NewR2ArtifactStorage(ctx context.Context, cfg R2Config) (*R2ArtifactStorage, error) {
-	if cfg.AccountID == "" || cfg.AccessKeyID == "" || cfg.SecretAccessKey == "" || cfg.Bucket == "" {
-		return nil, fmt.Errorf("R2 config missing: require R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET")
+	if cfg.AccessKeyID == "" || cfg.SecretAccessKey == "" || cfg.Bucket == "" {
+		return nil, fmt.Errorf("R2 config missing: require R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET")
 	}
 
-	endpoint := fmt.Sprintf("https://%s.r2.cloudflarestorage.com", cfg.AccountID)
+	// Use custom endpoint if provided (for local MinIO), otherwise construct Cloudflare R2 endpoint
+	var endpoint string
+	if cfg.Endpoint != "" {
+		endpoint = cfg.Endpoint
+	} else {
+		if cfg.AccountID == "" {
+			return nil, fmt.Errorf("R2 config missing: require R2_ACCOUNT_ID when using Cloudflare R2 (or provide R2_ENDPOINT for custom endpoint)")
+		}
+		endpoint = fmt.Sprintf("https://%s.r2.cloudflarestorage.com", cfg.AccountID)
+	}
+
 	_, err := url.Parse(endpoint)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("invalid R2 endpoint: %w", err)
 	}
 
 	awsCfg, err := config.LoadDefaultConfig(
@@ -84,6 +95,9 @@ func (s *R2ArtifactStorage) PublicURL(key string) string {
 		// In Worker-only mode, callers should not rely on object URLs.
 		return ""
 	}
+	// publicBase should be configured appropriately:
+	// - For Cloudflare R2 custom domain: https://pub.sacredvows.io (key already includes full path)
+	// - For MinIO: http://localhost:9000/bucket-name (includes bucket in base)
 	return fmt.Sprintf("%s/%s", s.publicBase, key)
 }
 
@@ -185,5 +199,3 @@ func (s *R2ArtifactStorage) DeleteVersion(ctx context.Context, subdomain string,
 
 	return nil
 }
-
-

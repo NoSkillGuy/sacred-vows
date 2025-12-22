@@ -2,6 +2,7 @@ import Hero from '../view/Hero';
 import EditableText from '../shared/EditableText';
 import EditableImage from '../shared/EditableImage';
 import { useEditable } from '../../hooks/useEditable';
+import { getDefaultAssetUrl } from '../../../../services/defaultAssetService';
 
 /**
  * EditableHero - WYSIWYG version of Hero component
@@ -12,7 +13,7 @@ function EditableHero({ config, ...props }) {
   const couple = config?.couple || {};
   const bride = couple.bride || {};
   const groom = couple.groom || {};
-  const heroImage = config?.hero?.mainImage || '/assets/photos/couple1/couple/1.jpeg';
+  const heroImage = config?.hero?.mainImage || getDefaultAssetUrl('couple1', 'couple', '1.jpeg');
 
   // Create editable config by wrapping editable elements
   const editableConfig = {

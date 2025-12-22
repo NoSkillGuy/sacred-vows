@@ -1,4 +1,5 @@
 import EditableText from '../shared/EditableText';
+import { getDefaultAssetUrl } from '../../../../services/defaultAssetService';
 
 /**
  * EditableEventsSection - WYSIWYG editable version of Events section
@@ -38,7 +39,7 @@ function EditableEventsSection({ translations, currentLang, config = {}, onUpdat
   const day2Events = day2Config.events || [
     { emoji: '💐', label: getTranslation('events.jaimala.label') || 'Jaimala', tag: getTranslation('events.jaimala.tag') || 'Exchange of garlands', time: '5:00 PM' },
     { emoji: '🍽️', label: getTranslation('events.dinner.label') || 'Dinner', tag: getTranslation('events.dinner.tag') || 'Feast with family & friends', time: '8:00 PM' },
-    { emoji: null, image: '/assets/photos/icons/3.jpg', label: getTranslation('events.wedding.label') || 'Wedding', tag: getTranslation('events.wedding.tag') || 'Sacred vows', time: '9:00 PM' }
+    { emoji: null, image: getDefaultAssetUrl('icons', null, '3.jpg'), label: getTranslation('events.wedding.label') || 'Wedding', tag: getTranslation('events.wedding.tag') || 'Sacred vows', time: '9:00 PM' }
   ];
   
   const day1Date = day1Config.date || 'Thursday · 22 January 2026';

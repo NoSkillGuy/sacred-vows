@@ -76,16 +76,13 @@ COPY --from=builder /app/config /app/config
 # Build context is repo root, so we can access apps/builder
 COPY apps/builder/src/template-engine /app/builder/template-engine
 
-# Copy layouts directory (needed by renderPublishedHTML.js)
+# Create layouts directory (layouts are mounted as volume in docker-compose.yml)
 # The renderer script imports from ../../layouts/ relative to template-engine/src/
-COPY apps/builder/src/layouts /app/builder/layouts
+RUN mkdir -p /app/builder/layouts
 
-# Copy minimal public directory (only sw.js and manifest.json)
-# Assets are served from R2 in dev/prod, so we only need essential PWA files
-# The bundleLocalAssets function handles CDN URLs correctly when assets are on R2
+# Create public directory (PWA files like sw.js and manifest.json are optional)
+# Assets are served from R2 in dev/prod, so these PWA files are not required in the image
 RUN mkdir -p /app/builder/public
-COPY apps/builder/public/sw.js /app/builder/public/sw.js
-COPY apps/builder/public/manifest.json /app/builder/public/manifest.json
 
 # Install Node.js dependencies for the template engine
 # Use BuildKit cache mount to cache node_modules for faster rebuilds

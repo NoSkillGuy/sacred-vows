@@ -1,15 +1,18 @@
 services:
   api-go:
     build:
-      context: ./apps/api-go
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./apps/api-go/Dockerfile
     ports:
       - "3000:3000"
     environment:
+      APP_ENV: ${APP_ENV:-local}
       GCP_PROJECT_ID: ${GCP_PROJECT_ID:-test-project}
       FIRESTORE_DATABASE: ${FIRESTORE_DATABASE:-(default)}
       FIRESTORE_EMULATOR_HOST: ${FIRESTORE_EMULATOR_HOST:-firestore-emulator:8080}
-      JWT_SECRET: ${JWT_SECRET:-dev-secret-key-min-32-chars-long-for-security}
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-key-min-32-chars-long-for-security-change-me}
+      REFRESH_TOKEN_HMAC_KEYS: ${REFRESH_TOKEN_HMAC_KEYS:-[{"id":1,"key_b64":"dGVzdC1rZXktZm9yLWRldmVsb3BtZW50LW9ubHktMzItY2hhcnMtbG9uZw=="}]}
+      REFRESH_TOKEN_HMAC_ACTIVE_KEY_ID: ${REFRESH_TOKEN_HMAC_ACTIVE_KEY_ID:-1}
       PORT: 3000
       LAYOUTS_DIR: /app/layouts
       UPLOAD_PATH: /app/uploads
@@ -17,8 +20,17 @@ services:
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
       GOOGLE_REDIRECT_URI: http://localhost:3000/api/auth/google/callback
+      # R2/MinIO configuration for local development
+      R2_ENDPOINT: ${R2_ENDPOINT:-http://minio:9000}
+      R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-minioadmin}
+      R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-minioadmin}
+      R2_BUCKET: ${R2_BUCKET:-sacred-vows-published-local}
+      PUBLIC_ASSETS_R2_BUCKET: ${PUBLIC_ASSETS_R2_BUCKET:-sacred-vows-public-assets-local}
+      PUBLIC_ASSETS_CDN_URL: ${PUBLIC_ASSETS_CDN_URL:-http://localhost:9000/sacred-vows-public-assets-local}
     depends_on:
       firestore-emulator:
+        condition: service_healthy
+      minio:
         condition: service_healthy
     volumes:
       - ./apps/builder/layouts:/app/layouts
@@ -35,11 +47,29 @@ services:
     ports:
       - "8080:8080"
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8080"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
       interval: 10s
       timeout: 5s
       retries: 5
 
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"  # S3 API
+      - "9001:9001"  # Web Console
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
 volumes:
   api_go_uploads:
+  minio_data:
 

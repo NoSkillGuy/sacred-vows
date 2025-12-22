@@ -23,15 +23,20 @@ google:
 
 publishing:
   base_domain: "localhost"
-  artifact_store: "filesystem"
-  r2_account_id: ""  # Not used in local
-  r2_bucket: ""  # Not used in local
-  r2_public_base: ""  # Not used in local
+  artifact_store: "r2"  # Use R2 (MinIO) for local development
+  r2_endpoint: "http://localhost:9000"  # MinIO endpoint
+  r2_account_id: "local"  # Not used for MinIO, but required by config
+  r2_bucket: "sacred-vows-published-local"
+  r2_public_base: "http://localhost:9000/sacred-vows-published-local"  # MinIO public URL format
   version_retention_count: 3
   snapshot_renderer_script: ""  # Set via env var if needed
   snapshot_renderer_node: "node"
   published_artifacts_dir: "./published"
   published_artifacts_public_base: "http://localhost:3000"
+
+public_assets:
+  r2_bucket: "sacred-vows-public-assets-local"
+  cdn_base_url: "http://localhost:9000/sacred-vows-public-assets-local"  # Local MinIO public endpoint
 
 email:
   vendors: "mailgun"

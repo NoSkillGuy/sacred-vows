@@ -1,5 +1,6 @@
 import EditableText from '../shared/EditableText';
 import EditableImage from '../shared/EditableImage';
+import { getDefaultAssetUrl } from '../../../../services/defaultAssetService';
 
 /**
  * EditableGallerySection - WYSIWYG editable version of Gallery section
@@ -7,12 +8,12 @@ import EditableImage from '../shared/EditableImage';
 function EditableGallerySection({ translations, currentLang, config = {}, onUpdate }) {
   const gallery = config.gallery || {};
   const galleryImages = gallery.images || [
-    { src: '/assets/photos/couple1/couple/21.jpeg', alt: 'Couple photo 1' },
-    { src: '/assets/photos/couple1/family/22.jpeg', alt: 'Couple photo 2 (portrait)' },
-    { src: '/assets/photos/couple1/couple/23.jpeg', alt: 'Friends and candid moment' },
-    { src: '/assets/photos/couple1/couple/24.jpeg', alt: 'Traditional attire' },
-    { src: '/assets/photos/couple1/couple/25.jpeg', alt: 'Favourite memory together' },
-    { src: '/assets/photos/couple1/couple/26.jpeg', alt: 'Special capture' }
+    { src: getDefaultAssetUrl('couple1', 'couple', '21.jpeg'), alt: 'Couple photo 1' },
+    { src: getDefaultAssetUrl('couple1', 'family', '22.jpeg'), alt: 'Couple photo 2 (portrait)' },
+    { src: getDefaultAssetUrl('couple1', 'couple', '23.jpeg'), alt: 'Friends and candid moment' },
+    { src: getDefaultAssetUrl('couple1', 'couple', '24.jpeg'), alt: 'Traditional attire' },
+    { src: getDefaultAssetUrl('couple1', 'couple', '25.jpeg'), alt: 'Favourite memory together' },
+    { src: getDefaultAssetUrl('couple1', 'couple', '26.jpeg'), alt: 'Special capture' }
   ];
 
   // Get custom translations - handle nested paths

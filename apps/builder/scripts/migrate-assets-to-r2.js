@@ -8,10 +8,13 @@
  *   npm run migrate-assets -- --env=dev --dry-run
  * 
  * Requires environment variables:
- *   R2_ACCOUNT_ID
  *   R2_ACCESS_KEY_ID
  *   R2_SECRET_ACCESS_KEY
  *   PUBLIC_ASSETS_R2_BUCKET (or set via --bucket flag)
+ * 
+ * Optional environment variables:
+ *   R2_ENDPOINT - Custom endpoint (for local MinIO, etc.)
+ *   R2_ACCOUNT_ID - Required only if R2_ENDPOINT is not set (for Cloudflare R2)
  */
 
 import { S3Client, PutObjectCommand, HeadObjectCommand } from '@aws-sdk/client-s3';
@@ -37,16 +40,26 @@ const bucketName = bucketArg
 const accountId = process.env.R2_ACCOUNT_ID;
 const accessKeyId = process.env.R2_ACCESS_KEY_ID;
 const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
+const customEndpoint = process.env.R2_ENDPOINT;
 
-if (!accountId || !accessKeyId || !secretAccessKey) {
+if (!accessKeyId || !secretAccessKey) {
   console.error('Error: Missing required environment variables:');
-  console.error('  R2_ACCOUNT_ID');
   console.error('  R2_ACCESS_KEY_ID');
   console.error('  R2_SECRET_ACCESS_KEY');
   process.exit(1);
 }
 
-const endpoint = `https://${accountId}.r2.cloudflarestorage.com`;
+// Use custom endpoint if provided (for local MinIO), otherwise construct Cloudflare R2 endpoint
+let endpoint;
+if (customEndpoint) {
+  endpoint = customEndpoint;
+} else {
+  if (!accountId) {
+    console.error('Error: Missing R2_ACCOUNT_ID (required when R2_ENDPOINT is not set)');
+    process.exit(1);
+  }
+  endpoint = `https://${accountId}.r2.cloudflarestorage.com`;
+}
 
 // Initialize S3 client for R2
 const s3Client = new S3Client({

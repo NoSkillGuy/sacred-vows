@@ -83,103 +83,44 @@ function isDefaultAssetPath(pathname) {
 }
 
 async function bundleLocalAssets(html) {
-  // Collect references like /assets/..., /layouts/..., and CDN URLs
-  const fs = await import('node:fs/promises');
-  const path = await import('node:path');
-  const { fileURLToPath } = await import('node:url');
-  const https = await import('node:https');
-  const http = await import('node:http');
-
-  const contentTypeByExt = {
-    '.jpg': 'image/jpeg',
-    '.jpeg': 'image/jpeg',
-    '.png': 'image/png',
-    '.webp': 'image/webp',
-    '.gif': 'image/gif',
-    '.svg': 'image/svg+xml',
-    '.mp3': 'audio/mpeg',
-    '.css': 'text/css; charset=utf-8',
-    '.js': 'application/javascript; charset=utf-8',
-    '.json': 'application/json; charset=utf-8',
-  };
-
+  // Collect references to CDN URLs and local paths that should be on CDN
+  // Note: Default assets are now served from R2/MinIO, not filesystem
   const refs = new Set();
   const re = /\b(?:src|href)\s*=\s*"([^"]+)"/g;
   let m;
   while ((m = re.exec(html)) !== null) {
     const u = m[1];
-    // Collect local paths and CDN URLs
-    if (u && (u.startsWith('/assets/') || u.startsWith('/layouts/') || isCDNUrl(u))) {
+    // Collect CDN URLs and local paths (which should already be converted to CDN URLs)
+    if (u && (isCDNUrl(u) || u.startsWith('/assets/') || u.startsWith('/layouts/'))) {
       refs.add(u);
     }
   }
 
-  // Resolve builder public directory relative to THIS file, not process.cwd().
-  // This script is invoked from the API process (cwd varies), so we must be deterministic.
-  const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-  const publicRoot = path.resolve(scriptDir, '../../../public');
   const assets = [];
   let rewrittenHTML = html;
 
-  const rewriteMap = new Map(); // original -> rewritten (keeps query/hash)
-
-  // Helper to fetch from URL
-  async function fetchFromUrl(url) {
-    return new Promise((resolve, reject) => {
-      const client = url.startsWith('https://') ? https : http;
-      client.get(url, (res) => {
-        if (res.statusCode !== 200) {
-          reject(new Error(`HTTP ${res.statusCode}`));
-          return;
-        }
-        const chunks = [];
-        res.on('data', chunk => chunks.push(chunk));
-        res.on('end', () => resolve(Buffer.concat(chunks)));
-      }).on('error', reject);
-    });
-  }
+  // Note: We no longer read from filesystem. All default assets should be:
+  // 1. Already converted to CDN URLs by getLayoutAssetUrl() in defaults.js
+  // 2. Served directly from R2/MinIO in published sites
+  // 3. Only user-uploaded assets (not default assets) should be bundled
 
   for (const u of refs) {
-    // Preserve query/hash in HTML rewriting but strip for local filesystem reads.
-    const qIndex = u.indexOf('?');
-    const hIndex = u.indexOf('#');
-    const cut = [qIndex, hIndex].filter((n) => n >= 0).sort((a, b) => a - b)[0] ?? -1;
-    const pathname = cut >= 0 ? u.slice(0, cut) : u;
-    const suffix = cut >= 0 ? u.slice(cut) : '';
-
-    // Handle CDN URLs: Keep them as-is in published HTML for CDN benefits
+    // CDN URLs are kept as-is in published HTML - they'll be served from CDN
     if (isCDNUrl(u)) {
-      // CDN URLs are kept as absolute URLs in published HTML
-      // No rewriting needed - they'll be served from CDN
       continue;
     }
 
-    // Handle local paths
-    if (isDefaultAssetPath(pathname)) {
-      const filePath = path.join(publicRoot, pathname); // pathname starts with /
-      try {
-        const body = await fs.readFile(filePath);
-        const ext = path.extname(filePath).toLowerCase();
-        const contentType = contentTypeByExt[ext] || 'application/octet-stream';
-        const keySuffix = pathname.replace(/^\//, ''); // assets/... or layouts/...
-        assets.push({ keySuffix, contentType, bodyBase64: body.toString('base64') });
-        rewriteMap.set(u, `./${keySuffix}${suffix}`);
-      } catch {
-        // File not found locally - this is expected for default assets that are now on CDN
-        // Leave reference as-is (it will be a CDN URL from defaults.js)
-        // Or if it's still a local path, it will fail gracefully in published site
-        process.stderr.write(`Warning: Asset not found locally: ${pathname} (may be on CDN)\n`);
-      }
+    // Local paths starting with /assets/ or /layouts/ should have been converted to CDN URLs
+    // If we still see them, it means they weren't converted properly
+    if (isDefaultAssetPath(u)) {
+      process.stderr.write(
+        `Warning: Found local asset path "${u}" in HTML. ` +
+        `This should have been converted to a CDN URL. ` +
+        `Assets must be served from R2/MinIO, not filesystem.\n`
+      );
+      // Leave as-is - it will fail at runtime, making the issue visible
+      continue;
     }
-  }
-
-  if (rewriteMap.size > 0) {
-    // Rewrite only src/href attribute values (avoid accidental replacements in inline scripts/text).
-    rewrittenHTML = rewrittenHTML.replace(/\b(src|href)\s*=\s*"([^"]+)"/g, (match, attr, val) => {
-      const rewritten = rewriteMap.get(val);
-      if (!rewritten) return match;
-      return `${attr}="${rewritten}"`;
-    });
   }
 
   return { rewrittenHTML, assets };

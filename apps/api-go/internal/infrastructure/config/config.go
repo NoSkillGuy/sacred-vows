@@ -70,9 +70,9 @@ type GoogleConfig struct {
 }
 
 type PublishingConfig struct {
-	BaseDomain    string
+	BaseDomain      string
 	SubdomainSuffix string // Optional suffix for subdomain in URL (e.g., "-dev" for dev environment)
-	ArtifactStore string // filesystem|r2
+	ArtifactStore   string // filesystem|r2
 
 	// R2 (S3-compatible)
 	R2AccountID       string
@@ -80,6 +80,7 @@ type PublishingConfig struct {
 	R2SecretAccessKey string
 	R2Bucket          string
 	R2PublicBase      string
+	R2Endpoint        string // Optional custom endpoint (for local MinIO, etc.)
 
 	// Version retention: number of versions to keep (default: 3)
 	VersionRetentionCount int
@@ -143,6 +144,7 @@ type ConfigFile struct {
 		R2AccountID                  string `yaml:"r2_account_id"`
 		R2Bucket                     string `yaml:"r2_bucket"`
 		R2PublicBase                 string `yaml:"r2_public_base"`
+		R2Endpoint                   string `yaml:"r2_endpoint"`
 		VersionRetentionCount        int    `yaml:"version_retention_count"`
 		SnapshotRendererScript       string `yaml:"snapshot_renderer_script"`
 		SnapshotRendererNode         string `yaml:"snapshot_renderer_node"`
@@ -226,6 +228,7 @@ func Load() (*Config, error) {
 			R2SecretAccessKey:      getEnv("R2_SECRET_ACCESS_KEY", ""), // Always from env (sensitive)
 			R2Bucket:               getEnv("R2_BUCKET", getYAMLString(yamlConfig, "publishing.r2_bucket", "")),
 			R2PublicBase:           getEnv("R2_PUBLIC_BASE", getYAMLString(yamlConfig, "publishing.r2_public_base", "")),
+			R2Endpoint:             getEnv("R2_ENDPOINT", getYAMLString(yamlConfig, "publishing.r2_endpoint", "")),
 			VersionRetentionCount:  getEnvAsInt("PUBLISH_VERSION_RETENTION_COUNT", getYAMLInt(yamlConfig, "publishing.version_retention_count", 3)),
 			SnapshotRendererScript: getEnv("SNAPSHOT_RENDERER_SCRIPT", getYAMLString(yamlConfig, "publishing.snapshot_renderer_script", "")),
 			SnapshotRendererNode:   getEnv("SNAPSHOT_RENDERER_NODE", getYAMLString(yamlConfig, "publishing.snapshot_renderer_node", "node")),
@@ -473,7 +476,7 @@ func getYAMLString(cfg *ConfigFile, path string, defaultValue string) string {
 				return cfg.Google.FrontendURL
 			}
 		}
-		case "publishing":
+	case "publishing":
 		switch parts[1] {
 		case "base_domain":
 			if cfg.Publishing.BaseDomain != "" {
