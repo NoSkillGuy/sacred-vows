@@ -373,6 +373,12 @@ func (h *AuthHandler) GoogleCallback(c *gin.Context) {
 		return
 	}
 
+	// Generate and set refresh token in HttpOnly cookie
+	if err := h.setRefreshTokenCookie(c, output.User.ID, output.User.Email); err != nil {
+		c.Redirect(http.StatusTemporaryRedirect, frontendURL+"/login?error=token_failed")
+		return
+	}
+
 	c.Redirect(http.StatusTemporaryRedirect, frontendURL+"/builder?token="+token)
 }
 
