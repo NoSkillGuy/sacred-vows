@@ -218,6 +218,8 @@ curl -I https://api.dev.sacredvows.io/health
    - Common variables:
      - `VITE_API_URL`: `https://api.dev.sacredvows.io/api` (for dev)
      - `VITE_API_URL`: `https://api.sacredvows.io/api` (for prod)
+     - `VITE_PUBLIC_ASSETS_CDN_URL`: `https://dev-pub.sacredvows.io` (for dev)
+     - `VITE_PUBLIC_ASSETS_CDN_URL`: `https://pub.sacredvows.io` (for prod)
    
    **Note**: Vite requires `VITE_` prefix for environment variables to be exposed to the client.
 
@@ -267,6 +269,7 @@ Node version: 18
 **Environment Variables:**
 ```
 VITE_API_URL=https://api.dev.sacredvows.io/api
+VITE_PUBLIC_ASSETS_CDN_URL=https://dev-pub.sacredvows.io
 NODE_VERSION=18
 ```
 
@@ -281,11 +284,13 @@ Configure these in Cloudflare Pages → Settings → Environment variables:
 **Development:**
 ```
 VITE_API_URL=https://api.dev.sacredvows.io/api
+VITE_PUBLIC_ASSETS_CDN_URL=https://dev-pub.sacredvows.io
 ```
 
 **Production:**
 ```
 VITE_API_URL=https://api.sacredvows.io/api
+VITE_PUBLIC_ASSETS_CDN_URL=https://pub.sacredvows.io
 ```
 
 **Note**: 

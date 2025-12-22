@@ -310,6 +310,12 @@ VITE_PUBLIC_ASSETS_CDN_URL=https://dev-pub.sacredvows.io
 VITE_ENABLE_ASSET_CACHING=true
 ```
 
+**Important**: When `VITE_PUBLIC_ASSETS_CDN_URL` is set:
+- Vite sets `publicDir: false`, preventing assets from being copied to `dist`
+- Only `sw.js` and `manifest.json` are copied via a custom plugin
+- Assets remain in the repository for local development but are not deployed
+- Docker builds also exclude assets (only copies essential PWA files)
+
 #### API Go (`apps/api-go/config/dev.yaml`)
 
 ```yaml
