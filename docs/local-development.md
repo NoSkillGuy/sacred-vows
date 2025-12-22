@@ -229,6 +229,83 @@ Access the MinIO web console at http://localhost:9001
   - Set bucket policies
   - View access logs
 
+## Firestore Emulator
+
+The Firestore emulator is included in `docker-compose.yml` and provides a local Firestore database for development.
+
+### Starting the Emulator
+
+The Firestore emulator starts automatically with docker-compose:
+
+```bash
+docker-compose up -d firestore-emulator
+```
+
+Or start all services:
+
+```bash
+docker-compose up -d
+```
+
+### Firebase Emulator UI
+
+The Firebase Emulator Suite includes a web UI for managing your local Firestore data:
+
+- **URL**: http://localhost:4000
+- **Firestore UI**: http://localhost:4000/firestore
+- **Firestore API**: http://localhost:8080
+
+**Features**:
+- Browse collections and documents
+- View and edit document data
+- Add/delete collections and documents
+- Query data visually
+- Export/import data
+
+### Configuration
+
+The emulator is configured via `firebase.json`:
+
+```json
+{
+  "emulators": {
+    "firestore": {
+      "port": 8080,
+      "host": "0.0.0.0"
+    },
+    "ui": {
+      "enabled": true,
+      "port": 4000,
+      "host": "0.0.0.0"
+    }
+  }
+}
+```
+
+### Environment Variables
+
+Your application should connect to the emulator using:
+
+```bash
+FIRESTORE_EMULATOR_HOST=localhost:8080
+GCP_PROJECT_ID=test-project
+```
+
+When running in Docker, use the service name:
+
+```bash
+FIRESTORE_EMULATOR_HOST=firestore-emulator:8080
+```
+
+### Data Persistence
+
+Firestore emulator data is persisted in the `firestore_data` Docker volume. To reset the database:
+
+```bash
+docker-compose down -v firestore-emulator
+docker-compose up -d firestore-emulator
+```
+
 ## Bucket Structure
 
 ### Published Sites Bucket (`sacred-vows-published-local`)

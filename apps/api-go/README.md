@@ -80,17 +80,19 @@ apps/api-go/
 
    **Using Firestore Emulator (recommended for local development)**
    ```bash
-   # Start Firestore emulator
-   gcloud beta emulators firestore start --host-port=localhost:8080
-   
-   # Or use docker-compose which includes the emulator
+   # Start Firestore emulator with UI (via docker-compose - recommended)
    docker-compose up -d firestore-emulator
+   
+   # Or start standalone Firestore emulator (without UI)
+   gcloud beta emulators firestore start --host-port=localhost:8080
    
    # Set environment variables in .env:
    # GCP_PROJECT_ID=test-project
    # FIRESTORE_DATABASE=(default)
    # FIRESTORE_EMULATOR_HOST=localhost:8080
    ```
+   
+   **Firebase Emulator UI**: When using `docker-compose`, the Firebase Emulator UI is available at http://localhost:4000. You can browse collections, view documents, and manage your Firestore data through the web interface.
 
    **Or connect to real Firestore instance**
    ```bash
