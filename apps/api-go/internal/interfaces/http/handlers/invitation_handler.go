@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/sacred-vows/api-go/internal/infrastructure/storage"
 	"github.com/sacred-vows/api-go/internal/usecase/invitation"
 	"github.com/sacred-vows/api-go/pkg/errors"
 	"github.com/sacred-vows/api-go/pkg/logger"
@@ -65,6 +66,7 @@ type InvitationHandler struct {
 	updateUC     *invitation.UpdateInvitationUseCase
 	deleteUC     *invitation.DeleteInvitationUseCase
 	migrateUC    *invitation.MigrateInvitationsUseCase
+	fileStorage  storage.Storage // For deleting assets from storage
 }
 
 func NewInvitationHandler(
@@ -75,6 +77,7 @@ func NewInvitationHandler(
 	updateUC *invitation.UpdateInvitationUseCase,
 	deleteUC *invitation.DeleteInvitationUseCase,
 	migrateUC *invitation.MigrateInvitationsUseCase,
+	fileStorage storage.Storage,
 ) *InvitationHandler {
 	return &InvitationHandler{
 		createUC:     createUC,
@@ -84,6 +87,7 @@ func NewInvitationHandler(
 		updateUC:     updateUC,
 		deleteUC:     deleteUC,
 		migrateUC:    migrateUC,
+		fileStorage:  fileStorage,
 	}
 }
 
@@ -409,7 +413,8 @@ func (h *InvitationHandler) Delete(c *gin.Context) {
 		zap.Bool("hasAuthHeader", authHeader != ""),
 	)
 
-	if err := h.deleteUC.Execute(c.Request.Context(), id); err != nil {
+	output, err := h.deleteUC.Execute(c.Request.Context(), id)
+	if err != nil {
 		appErr, ok := err.(*errors.AppError)
 		if ok {
 			c.JSON(appErr.Code, appErr.ToResponse())
@@ -419,7 +424,23 @@ func (h *InvitationHandler) Delete(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Invitation deleted"})
+	// Delete assets from storage
+	if h.fileStorage != nil && len(output.DeletedAssets) > 0 {
+		for _, deletedAsset := range output.DeletedAssets {
+			// Delete from storage using filename
+			if err := h.fileStorage.DeleteFile(deletedAsset.Filename); err != nil {
+				// Log error but don't fail - asset is already deleted from DB
+				logger.GetLogger().Warn("Failed to delete asset from storage",
+					zap.String("filename", deletedAsset.Filename),
+					zap.Error(err))
+			}
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":       "Invitation deleted",
+		"deletedAssets": len(output.DeletedAssets),
+	})
 }
 
 type MigrateInvitationsRequest struct {

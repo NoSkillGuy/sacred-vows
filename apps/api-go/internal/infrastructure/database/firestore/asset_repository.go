@@ -97,6 +97,100 @@ func (r *assetRepository) docToAsset(doc *firestore.DocumentSnapshot) (*domain.A
 	return r.docToAssetFromData(doc.Data(), doc.Ref.ID), nil
 }
 
+func (r *assetRepository) FindByURLs(ctx context.Context, urls []string) ([]*domain.Asset, error) {
+	if len(urls) == 0 {
+		return []*domain.Asset{}, nil
+	}
+
+	// Firestore 'in' query supports up to 10 items
+	// For more, we need to batch queries
+	var allAssets []*domain.Asset
+	batchSize := 10
+
+	for i := 0; i < len(urls); i += batchSize {
+		end := i + batchSize
+		if end > len(urls) {
+			end = len(urls)
+		}
+		batch := urls[i:end]
+
+		iter := r.client.Collection("assets").Where("url", "in", batch).Documents(ctx)
+		docs, err := iter.GetAll()
+		if err != nil {
+			return nil, err
+		}
+
+		for _, doc := range docs {
+			asset, err := r.docToAsset(doc)
+			if err == nil && asset != nil {
+				allAssets = append(allAssets, asset)
+			}
+		}
+	}
+
+	return allAssets, nil
+}
+
+func (r *assetRepository) FindUsedInInvitations(ctx context.Context, assetID string) ([]string, error) {
+	// Find asset by ID first to get URL
+	asset, err := r.FindByID(ctx, assetID)
+	if err != nil || asset == nil {
+		return []string{}, err
+	}
+
+	// Query asset_usage collection for this asset
+	iter := r.client.Collection("asset_usage").Where("asset_id", "==", assetID).Documents(ctx)
+	docs, err := iter.GetAll()
+	if err != nil {
+		return nil, err
+	}
+
+	invitationIDs := make([]string, 0, len(docs))
+	for _, doc := range docs {
+		data := doc.Data()
+		if invitationID, ok := data["invitation_id"].(string); ok {
+			invitationIDs = append(invitationIDs, invitationID)
+		}
+	}
+
+	return invitationIDs, nil
+}
+
+func (r *assetRepository) TrackUsage(ctx context.Context, assetID, invitationID string) error {
+	// Create or update usage record
+	// Use composite key: assetID_invitationID
+	docID := assetID + "_" + invitationID
+	_, err := r.client.Collection("asset_usage").Doc(docID).Set(ctx, map[string]interface{}{
+		"asset_id":      assetID,
+		"invitation_id": invitationID,
+		"created_at":    time.Now(),
+	})
+	return err
+}
+
+func (r *assetRepository) UntrackUsage(ctx context.Context, assetID, invitationID string) error {
+	docID := assetID + "_" + invitationID
+	_, err := r.client.Collection("asset_usage").Doc(docID).Delete(ctx)
+	return err
+}
+
+func (r *assetRepository) UntrackAllUsage(ctx context.Context, invitationID string) error {
+	// Find all usage records for this invitation
+	iter := r.client.Collection("asset_usage").Where("invitation_id", "==", invitationID).Documents(ctx)
+	docs, err := iter.GetAll()
+	if err != nil {
+		return err
+	}
+
+	// Delete all usage records
+	batch := r.client.Batch()
+	for _, doc := range docs {
+		batch.Delete(doc.Ref)
+	}
+	_, err = batch.Commit(ctx)
+	return err
+}
+
 func (r *assetRepository) docToAssetFromData(data map[string]interface{}, id string) *domain.Asset {
 	asset := &domain.Asset{
 		ID:        id,

@@ -107,10 +107,11 @@ func (r *Router) Setup() *gin.Engine {
 		// Asset routes
 		assets := api.Group("/assets")
 		{
-			assets.POST("/upload", middleware.OptionalAuth(r.jwtService), r.assetHandler.Upload)
-			assets.POST("/upload-url", middleware.OptionalAuth(r.jwtService), r.assetHandler.GenerateSignedURL)
-			assets.GET("", middleware.OptionalAuth(r.jwtService), r.assetHandler.GetAll)
-			assets.DELETE("/delete", middleware.OptionalAuth(r.jwtService), r.assetHandler.Delete)
+			assets.POST("/upload", middleware.AuthenticateToken(r.jwtService), r.assetHandler.Upload)
+			assets.POST("/upload-url", middleware.AuthenticateToken(r.jwtService), r.assetHandler.GenerateSignedURL)
+			assets.GET("", middleware.AuthenticateToken(r.jwtService), r.assetHandler.GetAll)
+			assets.DELETE("/delete", middleware.AuthenticateToken(r.jwtService), r.assetHandler.Delete)
+			assets.POST("/count-by-urls", middleware.AuthenticateToken(r.jwtService), r.assetHandler.CountByURLs)
 		}
 
 		// RSVP routes

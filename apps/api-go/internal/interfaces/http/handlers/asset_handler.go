@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"bytes"
 	"net/http"
 	"path/filepath"
 	"time"
@@ -13,26 +14,38 @@ import (
 )
 
 type AssetHandler struct {
-	uploadUC    *asset.UploadAssetUseCase
-	getAllUC    *asset.GetAllAssetsUseCase
-	deleteUC    *asset.DeleteAssetUseCase
-	fileStorage storage.Storage
-	gcsStorage  storage.SignedURLStorage // Optional, for signed URL generation
+	uploadUC            *asset.UploadAssetUseCase
+	getAllUC            *asset.GetAllAssetsUseCase
+	deleteUC            *asset.DeleteAssetUseCase
+	deleteByURLsUC      *asset.DeleteAssetsByURLsUseCase
+	getByURLsUC         *asset.GetAssetsByURLsUseCase
+	fileStorage         storage.Storage
+	gcsStorage          storage.SignedURLStorage // Optional, for signed URL generation
+	signedURLExpiration time.Duration
+	imageProcessor      *storage.ImageProcessor // Optional, for image optimization
 }
 
 func NewAssetHandler(
 	uploadUC *asset.UploadAssetUseCase,
 	getAllUC *asset.GetAllAssetsUseCase,
 	deleteUC *asset.DeleteAssetUseCase,
+	deleteByURLsUC *asset.DeleteAssetsByURLsUseCase,
+	getByURLsUC *asset.GetAssetsByURLsUseCase,
 	fileStorage storage.Storage,
 	gcsStorage storage.SignedURLStorage, // Optional, can be nil
+	signedURLExpiration time.Duration,
+	imageProcessor *storage.ImageProcessor, // Optional, can be nil
 ) *AssetHandler {
 	return &AssetHandler{
-		uploadUC:    uploadUC,
-		getAllUC:    getAllUC,
-		deleteUC:    deleteUC,
-		fileStorage: fileStorage,
-		gcsStorage:  gcsStorage,
+		uploadUC:            uploadUC,
+		getAllUC:            getAllUC,
+		deleteUC:            deleteUC,
+		deleteByURLsUC:      deleteByURLsUC,
+		getByURLsUC:         getByURLsUC,
+		fileStorage:         fileStorage,
+		gcsStorage:          gcsStorage,
+		signedURLExpiration: signedURLExpiration,
+		imageProcessor:      imageProcessor,
 	}
 }
 
@@ -62,7 +75,7 @@ type AssetsResponse struct {
 
 // Upload uploads a new asset file
 // @Summary      Upload asset
-// @Description  Upload a new asset file (image). Supports optional authentication (anonymous users are supported).
+// @Description  Upload a new asset file (image). Authentication is required.
 // @Tags         assets
 // @Accept       multipart/form-data
 // @Produce      json
@@ -70,16 +83,24 @@ type AssetsResponse struct {
 // @Param        image  formData  file    true  "Image file to upload"
 // @Success      200    {object}  UploadAssetResponse  "Asset uploaded successfully"
 // @Failure      400    {object}  ErrorResponse       "Invalid file or request"
+// @Failure      401    {object}  ErrorResponse       "Authentication required"
 // @Failure      500    {object}  ErrorResponse       "Internal server error"
 // @Router       /assets/upload [post]
 func (h *AssetHandler) Upload(c *gin.Context) {
+	// Require authentication
+	userID, exists := c.Get("userID")
+	if !exists || userID == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+		return
+	}
+
 	file, err := c.FormFile("image")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "No file uploaded"})
 		return
 	}
 
-	// Open file
+	// Open file and read content into buffer
 	src, err := file.Open()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to open file"})
@@ -87,40 +108,43 @@ func (h *AssetHandler) Upload(c *gin.Context) {
 	}
 	defer src.Close()
 
+	// Read file content into buffer (max 10MB, acceptable for images)
+	fileContent := make([]byte, file.Size)
+	_, err = src.Read(fileContent)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to read file"})
+		return
+	}
+
 	// Validate file
-	if err := h.fileStorage.ValidateFile(file.Header.Get("Content-Type"), file.Size); err != nil {
+	mimeType := file.Header.Get("Content-Type")
+	if err := h.fileStorage.ValidateFile(mimeType, file.Size); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Generate unique filename
-	ext := filepath.Ext(file.Filename)
-	uniqueFilename := ksuid.New().String() + ext
-
-	// Save file
-	uploadedFile, err := h.fileStorage.SaveFile(uniqueFilename, file.Filename, file.Header.Get("Content-Type"), file.Size, src)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload failed"})
-		return
+	// Process image if processor is available
+	processedContent := bytes.NewReader(fileContent)
+	finalSize := file.Size
+	if h.imageProcessor != nil {
+		processedReader, newSize, err := h.imageProcessor.ProcessImage(bytes.NewReader(fileContent), mimeType, file.Size)
+		if err == nil && newSize > 0 {
+			processedContent = processedReader.(*bytes.Reader)
+			finalSize = newSize
+		}
+		// If processing fails, use original content
 	}
 
-	userID, _ := c.Get("userID")
-	if userID == nil {
-		userID = "anonymous"
-	}
-
-	// Create asset record
+	// Generate filename and create asset record first
 	output, err := h.uploadUC.Execute(c.Request.Context(), asset.UploadAssetInput{
-		Filename:     uploadedFile.Filename,
-		OriginalName: uploadedFile.OriginalName,
-		Size:         uploadedFile.Size,
-		MimeType:     uploadedFile.MimeType,
+		Filename:     "", // Will be generated by use case
+		OriginalName: file.Filename,
+		Size:         finalSize,
+		MimeType:     mimeType,
 		UserID:       userID.(string),
 	})
 
 	if err != nil {
-		// Clean up file
-		h.fileStorage.DeleteFile(uploadedFile.Filename)
 		appErr, ok := err.(*errors.AppError)
 		if ok {
 			c.JSON(appErr.Code, appErr.ToResponse())
@@ -130,13 +154,23 @@ func (h *AssetHandler) Upload(c *gin.Context) {
 		return
 	}
 
-	// Generate signed URL for GCS assets if using GCS storage
+	// Reset reader to beginning
+	processedContent.Seek(0, 0)
+
+	// Save file to storage using the filename from use case and the processed content
+	_, err = h.fileStorage.SaveFile(output.Filename, file.Filename, mimeType, finalSize, processedContent)
+	if err != nil {
+		// Clean up database record
+		h.deleteUC.Execute(c.Request.Context(), output.URL)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Upload failed"})
+		return
+	}
+
+	// Generate signed URL for GCS or S3 assets if using signed URL storage
 	assetURL := output.URL
 	if h.gcsStorage != nil {
-		// For GCS, the stored URL is the filename (object key)
-		// Generate a signed URL for reading the asset
-		filename := output.Asset.Filename
-		signedURL, err := h.gcsStorage.GenerateSignedURL(c.Request.Context(), filename, "GET", 1*time.Hour)
+		// For GCS/S3, use the filename (object key) to generate signed URL
+		signedURL, err := h.gcsStorage.GenerateSignedURL(c.Request.Context(), output.Filename, "GET", h.signedURLExpiration)
 		if err == nil {
 			assetURL = signedURL
 			// Update the asset DTO with the signed URL
@@ -152,18 +186,21 @@ func (h *AssetHandler) Upload(c *gin.Context) {
 
 // GetAll retrieves all assets for the current user
 // @Summary      List assets
-// @Description  Get all assets for the current user. Supports optional authentication (anonymous users are supported).
+// @Description  Get all assets for the current user. Authentication is required.
 // @Tags         assets
 // @Accept       json
 // @Produce      json
 // @Security     BearerAuth
 // @Success      200  {object}  AssetsResponse   "List of assets"
+// @Failure      401  {object}  ErrorResponse   "Authentication required"
 // @Failure      500  {object}  ErrorResponse   "Internal server error"
 // @Router       /assets [get]
 func (h *AssetHandler) GetAll(c *gin.Context) {
-	userID, _ := c.Get("userID")
-	if userID == nil {
-		userID = "anonymous"
+	// Require authentication
+	userID, exists := c.Get("userID")
+	if !exists || userID == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+		return
 	}
 
 	output, err := h.getAllUC.Execute(c.Request.Context(), userID.(string))
@@ -177,13 +214,12 @@ func (h *AssetHandler) GetAll(c *gin.Context) {
 		return
 	}
 
-	// Generate signed URLs for GCS assets if using GCS storage
+	// Generate signed URLs for GCS/S3 assets if using signed URL storage
 	if h.gcsStorage != nil {
 		for i := range output.Assets {
-			// For GCS, the stored URL contains the filename
-			// Extract filename from URL (format: /uploads/{filename} or just {filename})
+			// For GCS/S3, use the filename to generate signed URL
 			filename := output.Assets[i].Filename
-			signedURL, err := h.gcsStorage.GenerateSignedURL(c.Request.Context(), filename, "GET", 1*time.Hour)
+			signedURL, err := h.gcsStorage.GenerateSignedURL(c.Request.Context(), filename, "GET", h.signedURLExpiration)
 			if err == nil {
 				output.Assets[i].URL = signedURL
 			}
@@ -195,7 +231,7 @@ func (h *AssetHandler) GetAll(c *gin.Context) {
 
 // Delete deletes an asset
 // @Summary      Delete asset
-// @Description  Delete an asset by URL. Supports optional authentication (anonymous users are supported).
+// @Description  Delete an asset by URL. Authentication is required.
 // @Tags         assets
 // @Accept       json
 // @Produce      json
@@ -203,9 +239,17 @@ func (h *AssetHandler) GetAll(c *gin.Context) {
 // @Param        request  body      DeleteAssetRequest  true  "Asset URL to delete"
 // @Success      200      {object}  MessageResponse     "Asset deleted"
 // @Failure      400      {object}  ErrorResponse       "Invalid request"
+// @Failure      401      {object}  ErrorResponse       "Authentication required"
 // @Failure      404      {object}  ErrorResponse       "Asset not found"
 // @Router       /assets/delete [delete]
 func (h *AssetHandler) Delete(c *gin.Context) {
+	// Require authentication
+	userID, exists := c.Get("userID")
+	if !exists || userID == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+		return
+	}
+
 	var req DeleteAssetRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "URL is required"})
@@ -225,7 +269,6 @@ func (h *AssetHandler) Delete(c *gin.Context) {
 	}
 
 	// Delete from storage using the filename
-	// Extract filename from URL (format: /uploads/{filename} or just {filename})
 	filename := asset.Filename
 	if err := h.fileStorage.DeleteFile(filename); err != nil {
 		// Log error but don't fail - asset is already deleted from DB
@@ -295,4 +338,55 @@ func (h *AssetHandler) GenerateSignedURL(c *gin.Context) {
 		"objectKey": uniqueFilename,
 		"expiresIn": int(expiresIn.Seconds()),
 	})
+}
+
+type CountAssetsByURLsRequest struct {
+	URLs []string `json:"urls" binding:"required"`
+}
+
+type CountAssetsByURLsResponse struct {
+	Count int `json:"count"`
+}
+
+// CountByURLs gets the count of assets by URLs
+// @Summary      Count assets by URLs
+// @Description  Get count of existing assets by their URLs. Authentication is required.
+// @Tags         assets
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request  body      CountAssetsByURLsRequest  true  "Array of asset URLs"
+// @Success      200      {object}  CountAssetsByURLsResponse  "Asset count"
+// @Failure      400      {object}  ErrorResponse             "Invalid request"
+// @Failure      401      {object}  ErrorResponse             "Authentication required"
+// @Failure      500      {object}  ErrorResponse             "Internal server error"
+// @Router       /assets/count-by-urls [post]
+func (h *AssetHandler) CountByURLs(c *gin.Context) {
+	// Require authentication
+	_, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+		return
+	}
+
+	var req CountAssetsByURLsRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "URLs array is required"})
+		return
+	}
+
+	output, err := h.getByURLsUC.Execute(c.Request.Context(), asset.GetAssetsByURLsInput{
+		URLs: req.URLs,
+	})
+	if err != nil {
+		appErr, ok := err.(*errors.AppError)
+		if ok {
+			c.JSON(appErr.Code, appErr.ToResponse())
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get asset count"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"count": output.Count})
 }

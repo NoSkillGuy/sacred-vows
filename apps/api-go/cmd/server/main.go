@@ -123,11 +123,11 @@ func main() {
 		// Continue anyway - email service is optional for other features
 	}
 
-	// Initialize storage (GCS if bucket is configured, otherwise filesystem)
+	// Initialize storage (GCS for production, S3/MinIO for local)
 	var fileStorage storage.Storage
 	var gcsStorage storage.SignedURLStorage
 	if cfg.Storage.GCSBucket != "" {
-		// GCS bucket is private - assets accessed via signed URLs, not public URLs
+		// Production: GCS storage
 		gcsStorageImpl, err := storage.NewGCSStorage(ctx, cfg.Storage.GCSBucket, "", cfg.Storage.MaxFileSize, cfg.Storage.AllowedTypes)
 		if err != nil {
 			logger.GetLogger().Fatal("Failed to initialize GCS storage", zap.Error(err))
@@ -135,13 +135,36 @@ func main() {
 		fileStorage = gcsStorageImpl
 		gcsStorage = gcsStorageImpl
 		logger.GetLogger().Info("Using GCS storage", zap.String("bucket", cfg.Storage.GCSBucket))
-	} else {
-		fsStorage, err := storage.NewFileStorage(cfg.Storage.UploadPath, cfg.Storage.MaxFileSize, cfg.Storage.AllowedTypes)
+	} else if cfg.Storage.S3Endpoint != "" && cfg.Storage.S3AccessKeyID != "" && cfg.Storage.S3SecretAccessKey != "" && cfg.Storage.S3Bucket != "" {
+		// Local: S3-compatible storage (MinIO)
+		s3StorageImpl, err := storage.NewS3Storage(ctx, storage.S3Config{
+			AccessKeyID:     cfg.Storage.S3AccessKeyID,
+			SecretAccessKey: cfg.Storage.S3SecretAccessKey,
+			Bucket:          cfg.Storage.S3Bucket,
+			Endpoint:        cfg.Storage.S3Endpoint,
+			PublicEndpoint:  cfg.Storage.S3PublicEndpoint,
+			Region:          cfg.Storage.S3Region,
+		}, cfg.Storage.MaxFileSize, cfg.Storage.AllowedTypes)
 		if err != nil {
-			logger.GetLogger().Fatal("Failed to initialize file storage", zap.Error(err))
+			logger.GetLogger().Fatal("Failed to initialize S3 storage", zap.Error(err))
 		}
-		fileStorage = fsStorage
-		logger.GetLogger().Info("Using filesystem storage", zap.String("path", cfg.Storage.UploadPath))
+		fileStorage = s3StorageImpl
+		gcsStorage = s3StorageImpl
+		logger.GetLogger().Info("Using S3-compatible storage", 
+			zap.String("bucket", cfg.Storage.S3Bucket),
+			zap.String("endpoint", cfg.Storage.S3Endpoint))
+	} else {
+		logger.GetLogger().Fatal("Storage not configured. For production, set GCS_ASSETS_BUCKET. For local, configure S3_ENDPOINT, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, and S3_ASSETS_BUCKET.")
+	}
+
+	// Initialize image processor if max dimensions or quality are configured
+	var imageProcessor *storage.ImageProcessor
+	if cfg.Storage.MaxImageWidth > 0 || cfg.Storage.MaxImageHeight > 0 || cfg.Storage.ImageQuality > 0 {
+		imageProcessor = storage.NewImageProcessor(cfg.Storage.MaxImageWidth, cfg.Storage.MaxImageHeight, cfg.Storage.ImageQuality)
+		logger.GetLogger().Info("Image processor enabled",
+			zap.Int("maxWidth", cfg.Storage.MaxImageWidth),
+			zap.Int("maxHeight", cfg.Storage.MaxImageHeight),
+			zap.Int("quality", cfg.Storage.ImageQuality))
 	}
 
 	// Initialize use cases
@@ -164,12 +187,11 @@ func main() {
 		resetPasswordUC = authUC.NewResetPasswordUseCase(passwordResetRepo, userRepo)
 	}
 
-	createInvitationUC := invitation.NewCreateInvitationUseCase(invitationRepo)
+	createInvitationUC := invitation.NewCreateInvitationUseCase(invitationRepo, assetRepo)
 	getInvitationByIDUC := invitation.NewGetInvitationByIDUseCase(invitationRepo)
 	getAllInvitationsUC := invitation.NewGetAllInvitationsUseCase(invitationRepo)
 	getInvitationPreviewUC := invitation.NewGetInvitationPreviewUseCase(invitationRepo)
-	updateInvitationUC := invitation.NewUpdateInvitationUseCase(invitationRepo)
-	deleteInvitationUC := invitation.NewDeleteInvitationUseCase(invitationRepo)
+	updateInvitationUC := invitation.NewUpdateInvitationUseCase(invitationRepo, assetRepo)
 	migrateInvitationsUC := invitation.NewMigrateInvitationsUseCase(invitationRepo)
 
 	getAllLayoutsUC := layout.NewGetAllLayoutsUseCase(layoutRepo)
@@ -177,9 +199,12 @@ func main() {
 	getLayoutManifestUC := layout.NewGetLayoutManifestUseCase(layoutRepo)
 	getManifestsUC := layout.NewGetManifestsUseCase(layoutRepo)
 
-	uploadAssetUC := asset.NewUploadAssetUseCase(assetRepo, cfg.Storage.UploadPath, cfg.Storage.MaxFileSize, cfg.Storage.AllowedTypes)
+	uploadAssetUC := asset.NewUploadAssetUseCase(assetRepo, cfg.Storage.MaxFileSize, cfg.Storage.AllowedTypes)
 	getAllAssetsUC := asset.NewGetAllAssetsUseCase(assetRepo)
 	deleteAssetUC := asset.NewDeleteAssetUseCase(assetRepo)
+	deleteAssetsByURLsUC := asset.NewDeleteAssetsByURLsUseCase(assetRepo)
+	getAssetsByURLsUC := asset.NewGetAssetsByURLsUseCase(assetRepo)
+	deleteInvitationUC := invitation.NewDeleteInvitationUseCase(invitationRepo, assetRepo, deleteAssetsByURLsUC)
 
 	submitRSVPUC := rsvp.NewSubmitRSVPUseCase(rsvpRepo)
 	getRSVPByInvitationUC := rsvp.NewGetRSVPByInvitationUseCase(rsvpRepo)
@@ -235,9 +260,9 @@ func main() {
 
 	// Initialize handlers
 	authHandler := handlers.NewAuthHandler(registerUC, loginUC, getCurrentUserUC, googleOAuthUC, refreshTokenUC, requestPasswordResetUC, resetPasswordUC, refreshTokenRepo, jwtService, googleOAuthService, hmacKeys, cfg.Auth.RefreshTokenHMACActiveKeyID)
-	invitationHandler := handlers.NewInvitationHandler(createInvitationUC, getInvitationByIDUC, getAllInvitationsUC, getInvitationPreviewUC, updateInvitationUC, deleteInvitationUC, migrateInvitationsUC)
+	invitationHandler := handlers.NewInvitationHandler(createInvitationUC, getInvitationByIDUC, getAllInvitationsUC, getInvitationPreviewUC, updateInvitationUC, deleteInvitationUC, migrateInvitationsUC, fileStorage)
 	layoutHandler := handlers.NewLayoutHandler(getAllLayoutsUC, getLayoutByIDUC, getLayoutManifestUC, getManifestsUC)
-	assetHandler := handlers.NewAssetHandler(uploadAssetUC, getAllAssetsUC, deleteAssetUC, fileStorage, gcsStorage)
+	assetHandler := handlers.NewAssetHandler(uploadAssetUC, getAllAssetsUC, deleteAssetUC, deleteAssetsByURLsUC, getAssetsByURLsUC, fileStorage, gcsStorage, cfg.Storage.SignedURLExpiration, imageProcessor)
 	rsvpHandler := handlers.NewRSVPHandler(submitRSVPUC, getRSVPByInvitationUC)
 	analyticsHandler := handlers.NewAnalyticsHandler(trackViewUC, getAnalyticsByInvitationUC)
 	publishHandler := handlers.NewPublishHandler(validateSubdomainUC, publishInvitationUC, listVersionsUC, rollbackUC, cfg.Publishing.BaseDomain, cfg.Publishing.SubdomainSuffix, cfg.Server.Port)

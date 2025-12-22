@@ -10,11 +10,13 @@ import (
 
 type UpdateInvitationUseCase struct {
 	invitationRepo repository.InvitationRepository
+	assetRepo      repository.AssetRepository
 }
 
-func NewUpdateInvitationUseCase(invitationRepo repository.InvitationRepository) *UpdateInvitationUseCase {
+func NewUpdateInvitationUseCase(invitationRepo repository.InvitationRepository, assetRepo repository.AssetRepository) *UpdateInvitationUseCase {
 	return &UpdateInvitationUseCase{
 		invitationRepo: invitationRepo,
+		assetRepo:      assetRepo,
 	}
 }
 
@@ -57,6 +59,21 @@ func (uc *UpdateInvitationUseCase) Execute(ctx context.Context, input UpdateInvi
 
 	if err := uc.invitationRepo.Update(ctx, invitation); err != nil {
 		return nil, errors.Wrap(errors.ErrInternalServerError.Code, "Failed to update invitation", err)
+	}
+
+	// Update asset usage tracking
+	if uc.assetRepo != nil {
+		// Remove all existing usage tracking for this invitation
+		uc.assetRepo.UntrackAllUsage(ctx, invitation.ID)
+
+		// Track new asset usage
+		assetURLs := extractAssetURLs(invitation.Data)
+		for _, url := range assetURLs {
+			asset, err := uc.assetRepo.FindByURL(ctx, url)
+			if err == nil && asset != nil {
+				uc.assetRepo.TrackUsage(ctx, asset.ID, invitation.ID)
+			}
+		}
 	}
 
 	return &UpdateInvitationOutput{

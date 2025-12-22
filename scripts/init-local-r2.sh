@@ -16,11 +16,13 @@ MINIO_ACCESS_KEY="${MINIO_ACCESS_KEY:-minioadmin}"
 MINIO_SECRET_KEY="${MINIO_SECRET_KEY:-minioadmin}"
 PUBLISHED_BUCKET="${PUBLISHED_BUCKET:-sacred-vows-published-local}"
 PUBLIC_ASSETS_BUCKET="${PUBLIC_ASSETS_BUCKET:-sacred-vows-public-assets-local}"
+ASSETS_BUCKET="${ASSETS_BUCKET:-sacred-vows-assets-local}"
 
 echo -e "${GREEN}🚀 Initializing local R2 (MinIO) environment${NC}"
 echo "   Endpoint: $MINIO_ENDPOINT"
 echo "   Published bucket: $PUBLISHED_BUCKET"
 echo "   Public assets bucket: $PUBLIC_ASSETS_BUCKET"
+echo "   Assets bucket: $ASSETS_BUCKET"
 echo ""
 
 # Check if MinIO is accessible
@@ -64,6 +66,7 @@ echo -e "${GREEN}✓ MinIO client configured${NC}"
 echo -e "${YELLOW}Creating buckets...${NC}"
 mc mb "$ALIAS_NAME/$PUBLISHED_BUCKET" --ignore-existing 2>/dev/null || true
 mc mb "$ALIAS_NAME/$PUBLIC_ASSETS_BUCKET" --ignore-existing 2>/dev/null || true
+mc mb "$ALIAS_NAME/$ASSETS_BUCKET" --ignore-existing 2>/dev/null || true
 echo -e "${GREEN}✓ Buckets created${NC}"
 
 # Set public access policy for public assets bucket

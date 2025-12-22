@@ -14,8 +14,15 @@ auth:
   jwt_clock_skew: "60s"
 
 storage:
-  upload_path: "./uploads"
   max_file_size: 10485760  # 10MB
+  # Use MinIO for local development (S3-compatible)
+  s3_endpoint: "http://localhost:9000"  # MinIO endpoint
+  s3_bucket: "sacred-vows-assets-local"  # MinIO bucket for assets
+  s3_region: "us-east-1"  # MinIO region
+  signed_url_expiration: "1h"
+  max_image_width: 1920
+  max_image_height: 1920
+  image_quality: 85
 
 google:
   redirect_uri: "http://localhost:3000/api/auth/google/callback"

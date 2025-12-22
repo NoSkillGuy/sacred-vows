@@ -22,13 +22,20 @@ services:
       # Google OAuth variables are loaded from env_file (apps/api-go/.env)
       # They are not set here to allow env_file to provide the values
       GOOGLE_REDIRECT_URI: http://localhost:3000/api/auth/google/callback
-      # R2/MinIO configuration for local development
+      # R2/MinIO configuration for local development (publishing)
       R2_ENDPOINT: ${R2_ENDPOINT:-http://minio:9000}
       R2_ACCESS_KEY_ID: ${R2_ACCESS_KEY_ID:-minioadmin}
       R2_SECRET_ACCESS_KEY: ${R2_SECRET_ACCESS_KEY:-minioadmin}
       R2_BUCKET: ${R2_BUCKET:-sacred-vows-published-local}
       PUBLIC_ASSETS_R2_BUCKET: ${PUBLIC_ASSETS_R2_BUCKET:-sacred-vows-public-assets-local}
       PUBLIC_ASSETS_CDN_URL: ${PUBLIC_ASSETS_CDN_URL:-http://localhost:9000/sacred-vows-public-assets-local}
+      # S3/MinIO configuration for assets storage (local development)
+      S3_ENDPOINT: ${S3_ENDPOINT:-http://minio:9000}
+      S3_PUBLIC_ENDPOINT: ${S3_PUBLIC_ENDPOINT:-http://localhost:9000}
+      S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:-minioadmin}
+      S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-minioadmin}
+      S3_ASSETS_BUCKET: ${S3_ASSETS_BUCKET:-sacred-vows-assets-local}
+      S3_REGION: ${S3_REGION:-us-east-1}
     depends_on:
       firestore-emulator:
         condition: service_healthy

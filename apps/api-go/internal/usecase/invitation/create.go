@@ -12,11 +12,13 @@ import (
 
 type CreateInvitationUseCase struct {
 	invitationRepo repository.InvitationRepository
+	assetRepo      repository.AssetRepository
 }
 
-func NewCreateInvitationUseCase(invitationRepo repository.InvitationRepository) *CreateInvitationUseCase {
+func NewCreateInvitationUseCase(invitationRepo repository.InvitationRepository, assetRepo repository.AssetRepository) *CreateInvitationUseCase {
 	return &CreateInvitationUseCase{
 		invitationRepo: invitationRepo,
+		assetRepo:      assetRepo,
 	}
 }
 
@@ -59,6 +61,17 @@ func (uc *CreateInvitationUseCase) Execute(ctx context.Context, input CreateInvi
 
 	if err := uc.invitationRepo.Create(ctx, invitation); err != nil {
 		return nil, errors.Wrap(errors.ErrInternalServerError.Code, "Failed to create invitation", err)
+	}
+
+	// Track asset usage
+	if uc.assetRepo != nil {
+		assetURLs := extractAssetURLs(invitation.Data)
+		for _, url := range assetURLs {
+			asset, err := uc.assetRepo.FindByURL(ctx, url)
+			if err == nil && asset != nil {
+				uc.assetRepo.TrackUsage(ctx, asset.ID, invitation.ID)
+			}
+		}
 	}
 
 	return &CreateInvitationOutput{

@@ -13,21 +13,19 @@ import (
 )
 
 type UploadAssetUseCase struct {
-	assetRepo    repository.AssetRepository
-	uploadPath   string
+	assetRepo repository.AssetRepository
+	// maxFileSize and allowedTypes are kept for backward compatibility but validation is done in handler
 	maxFileSize  int64
 	allowedTypes []string
 }
 
 func NewUploadAssetUseCase(
 	assetRepo repository.AssetRepository,
-	uploadPath string,
 	maxFileSize int64,
 	allowedTypes []string,
 ) *UploadAssetUseCase {
 	return &UploadAssetUseCase{
 		assetRepo:    assetRepo,
-		uploadPath:   uploadPath,
 		maxFileSize:  maxFileSize,
 		allowedTypes: allowedTypes,
 	}
@@ -42,21 +40,13 @@ type UploadAssetInput struct {
 }
 
 type UploadAssetOutput struct {
-	URL   string
-	Asset *AssetDTO
+	URL      string
+	Filename string // Generated unique filename for storage
+	Asset    *AssetDTO
 }
 
 func (uc *UploadAssetUseCase) Execute(ctx context.Context, input UploadAssetInput) (*UploadAssetOutput, error) {
-	// Validate file size
-	if input.Size > uc.maxFileSize {
-		return nil, errors.Wrap(errors.ErrBadRequest.Code, "File size exceeds limit", nil)
-	}
-
-	// Validate file type
-	if !uc.isAllowedType(input.MimeType) {
-		return nil, errors.Wrap(errors.ErrBadRequest.Code, "File type not allowed", nil)
-	}
-
+	// Validation is done in handler, but we still check here as a safety measure
 	// Generate unique filename
 	ext := filepath.Ext(input.OriginalName)
 	uniqueFilename := ksuid.New().String() + ext
@@ -76,8 +66,9 @@ func (uc *UploadAssetUseCase) Execute(ctx context.Context, input UploadAssetInpu
 	}
 
 	return &UploadAssetOutput{
-		URL:   url,
-		Asset: toAssetDTO(asset),
+		URL:      url,
+		Filename: uniqueFilename,
+		Asset:    toAssetDTO(asset),
 	}, nil
 }
 

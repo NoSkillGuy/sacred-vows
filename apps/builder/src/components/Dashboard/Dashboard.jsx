@@ -4,6 +4,7 @@ import { getInvitations, deleteInvitation, updateInvitation } from '../../servic
 import { getCurrentUser, logout } from '../../services/authService';
 import { useToast } from '../Toast/ToastProvider';
 import EditableText from '../../layouts/classic-scroll/components/shared/EditableText';
+import DeleteInvitationModal from './DeleteInvitationModal';
 import './Dashboard.css';
 
 // SVG Icons
@@ -113,6 +114,8 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [invitationToDelete, setInvitationToDelete] = useState(null);
   const dropdownRef = useRef(null);
   const { addToast } = useToast();
 
@@ -148,16 +151,42 @@ function Dashboard() {
     setUser(currentUser);
   }
 
-  async function handleDelete(id) {
-    if (!confirm('Are you sure you want to delete this invitation?')) return;
-    
+  function handleDeleteClick(id) {
+    const invitation = invitations.find(inv => inv.id === id);
+    if (invitation) {
+      setInvitationToDelete(invitation);
+      setDeleteModalOpen(true);
+    }
+  }
+
+  async function handleDeleteConfirm() {
+    if (!invitationToDelete) return;
+
     try {
-      await deleteInvitation(id);
-      setInvitations(invitations.filter(inv => inv.id !== id));
+      await deleteInvitation(invitationToDelete.id);
+      setInvitations(invitations.filter(inv => inv.id !== invitationToDelete.id));
+      setDeleteModalOpen(false);
+      setInvitationToDelete(null);
+      addToast({
+        tone: 'info',
+        title: 'Invitation Deleted',
+        description: 'The invitation has been permanently deleted.',
+        icon: 'heart',
+      });
     } catch (error) {
       console.error('Failed to delete invitation:', error);
-      alert('Failed to delete invitation. Please try again.');
+      addToast({
+        tone: 'error',
+        title: 'Delete Failed',
+        description: 'Failed to delete invitation. Please try again.',
+        icon: 'bell',
+      });
     }
+  }
+
+  function handleDeleteCancel() {
+    setDeleteModalOpen(false);
+    setInvitationToDelete(null);
   }
 
   function getWelcomeToastKey(currentUser) {
@@ -403,7 +432,7 @@ function Dashboard() {
                   key={invitation.id}
                   invitation={invitation}
                   onEdit={() => navigate(`/builder/${invitation.id}`)}
-                  onDelete={() => handleDelete(invitation.id)}
+                  onDelete={() => handleDeleteClick(invitation.id)}
                   onTitleUpdate={handleInvitationTitleUpdate}
                   formatDate={formatDate}
                 />
@@ -412,6 +441,14 @@ function Dashboard() {
           </>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <DeleteInvitationModal
+        isOpen={deleteModalOpen}
+        invitation={invitationToDelete}
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+      />
     </div>
   );
 }

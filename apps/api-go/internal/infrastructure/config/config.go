@@ -56,10 +56,19 @@ type RefreshTokenHMACKey struct {
 }
 
 type StorageConfig struct {
-	UploadPath   string
-	MaxFileSize  int64
-	AllowedTypes []string
-	GCSBucket    string // GCS bucket name for assets (private bucket, accessed via signed URLs)
+	MaxFileSize           int64
+	AllowedTypes         []string
+	GCSBucket            string        // GCS bucket name for assets (private bucket, accessed via signed URLs)
+	S3Endpoint           string        // S3-compatible endpoint for API access (e.g., http://minio:9000 for MinIO)
+	S3PublicEndpoint     string        // S3 public endpoint for presigned URLs (e.g., http://localhost:9000 for browser access)
+	S3AccessKeyID        string        // S3 access key ID
+	S3SecretAccessKey    string        // S3 secret access key
+	S3Bucket             string        // S3 bucket name for assets (used when GCSBucket is not set)
+	S3Region             string        // S3 region (default: us-east-1 for MinIO)
+	SignedURLExpiration  time.Duration // Signed URL expiration duration (default: 1 hour)
+	MaxImageWidth        int           // Maximum image width after resizing (0 = no resize)
+	MaxImageHeight       int           // Maximum image height after resizing (0 = no resize)
+	ImageQuality         int           // JPEG compression quality (1-100, default: 85)
 }
 
 type GoogleConfig struct {
@@ -129,7 +138,6 @@ type ConfigFile struct {
 		JWTClockSkew         string `yaml:"jwt_clock_skew"`
 	} `yaml:"auth"`
 	Storage struct {
-		UploadPath  string `yaml:"upload_path"`
 		MaxFileSize int64  `yaml:"max_file_size"`
 		GCSBucket   string `yaml:"gcs_bucket"`
 	} `yaml:"storage"`
@@ -208,10 +216,19 @@ func Load() (*Config, error) {
 			RefreshTokenHMACActiveKeyID: int16(getEnvAsInt("REFRESH_TOKEN_HMAC_ACTIVE_KEY_ID", 1)), // Always from env (sensitive)
 		},
 		Storage: StorageConfig{
-			UploadPath:   getEnv("UPLOAD_PATH", getYAMLString(yamlConfig, "storage.upload_path", "./uploads")),
-			MaxFileSize:  getYAMLInt64(yamlConfig, "storage.max_file_size", 10*1024*1024),
-			AllowedTypes: []string{"image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"},
-			GCSBucket:    getEnv("GCS_ASSETS_BUCKET", getYAMLString(yamlConfig, "storage.gcs_bucket", "")),
+			MaxFileSize:          getYAMLInt64(yamlConfig, "storage.max_file_size", 10*1024*1024),
+			AllowedTypes:        []string{"image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"},
+			GCSBucket:           getEnv("GCS_ASSETS_BUCKET", getYAMLString(yamlConfig, "storage.gcs_bucket", "")),
+			S3Endpoint:          getEnv("S3_ENDPOINT", getYAMLString(yamlConfig, "storage.s3_endpoint", "")),
+			S3PublicEndpoint:    getEnv("S3_PUBLIC_ENDPOINT", getYAMLString(yamlConfig, "storage.s3_public_endpoint", "")),
+			S3AccessKeyID:       getEnv("S3_ACCESS_KEY_ID", getYAMLString(yamlConfig, "storage.s3_access_key_id", "")),
+			S3SecretAccessKey:   getEnv("S3_SECRET_ACCESS_KEY", ""), // Always from env (sensitive)
+			S3Bucket:            getEnv("S3_ASSETS_BUCKET", getYAMLString(yamlConfig, "storage.s3_bucket", "")),
+			S3Region:           getEnv("S3_REGION", getYAMLString(yamlConfig, "storage.s3_region", "us-east-1")),
+			SignedURLExpiration: parseDuration(getEnv("ASSET_SIGNED_URL_EXPIRATION", getYAMLString(yamlConfig, "storage.signed_url_expiration", "1h")), 1*time.Hour),
+			MaxImageWidth:       getEnvAsInt("ASSET_MAX_IMAGE_WIDTH", getYAMLInt(yamlConfig, "storage.max_image_width", 1920)),
+			MaxImageHeight:      getEnvAsInt("ASSET_MAX_IMAGE_HEIGHT", getYAMLInt(yamlConfig, "storage.max_image_height", 1920)),
+			ImageQuality:        getEnvAsInt("ASSET_IMAGE_QUALITY", getYAMLInt(yamlConfig, "storage.image_quality", 85)),
 		},
 		Google: GoogleConfig{
 			ClientID:     getEnv("GOOGLE_CLIENT_ID", ""),     // Always from env (sensitive)
@@ -456,10 +473,6 @@ func getYAMLString(cfg *ConfigFile, path string, defaultValue string) string {
 		}
 	case "storage":
 		switch parts[1] {
-		case "upload_path":
-			if cfg.Storage.UploadPath != "" {
-				return cfg.Storage.UploadPath
-			}
 		case "gcs_bucket":
 			if cfg.Storage.GCSBucket != "" {
 				return cfg.Storage.GCSBucket
