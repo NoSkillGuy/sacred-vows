@@ -5,9 +5,9 @@ const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/assets/photos/icons/icon-192.png',
-  '/assets/photos/icons/icon-512.png',
-  '/assets/music/1.mp3'
+  // Icons are optional - browsers will handle missing icons gracefully
+  // '/icon-192.png',
+  // '/icon-512.png'
 ];
 
 // Install event - cache resources

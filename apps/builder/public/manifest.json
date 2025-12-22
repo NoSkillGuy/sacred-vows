@@ -1,42 +1,42 @@
 {
-  "name": "Priya & Saurabh Wedding Invitation",
-  "short_name": "Priya & Saurabh Wedding Invite",
-  "description": "Royal wedding invitation of Capt (Dr) Priya Singh & Dr Saurabh Singh",
+  "name": "Sacred Vows - Wedding Invitation Builder",
+  "short_name": "Sacred Vows",
+  "description": "Create beautiful digital wedding invitations that capture the magic of your love story",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#fff8f0",
   "theme_color": "#d4af37",
-  "orientation": "portrait-primary",
+  "orientation": "any",
   "icons": [
     {
-      "src": "assets/photos/icons/icon-192.png",
+      "src": "/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "assets/photos/icons/icon-512.png",
+      "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
   ],
-  "categories": ["lifestyle", "events"],
+  "categories": ["lifestyle", "productivity"],
   "shortcuts": [
     {
-      "name": "RSVP",
-      "short_name": "RSVP",
-      "description": "Quick RSVP",
-      "url": "/#rsvp",
-      "icons": [{ "src": "assets/photos/icons/icon-192.png", "sizes": "96x96", "type": "image/png" }]
+      "name": "Create Invitation",
+      "short_name": "Create",
+      "description": "Start creating a new wedding invitation",
+      "url": "/dashboard?action=create",
+      "icons": [{ "src": "/icon-192.png", "sizes": "96x96", "type": "image/png" }]
     },
     {
-      "name": "Program",
-      "short_name": "Program",
-      "description": "View program details",
-      "url": "/#events",
-      "icons": [{ "src": "assets/photos/icons/icon-192.png", "sizes": "96x96", "type": "image/png" }]
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "View your invitations",
+      "url": "/dashboard",
+      "icons": [{ "src": "/icon-192.png", "sizes": "96x96", "type": "image/png" }]
     }
   ]
 }

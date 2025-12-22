@@ -80,9 +80,12 @@ COPY apps/builder/src/template-engine /app/builder/template-engine
 # The renderer script imports from ../../layouts/ relative to template-engine/src/
 COPY apps/builder/src/layouts /app/builder/layouts
 
-# Copy public directory (needed by bundleLocalAssets function)
-# The bundleLocalAssets function reads from ../../../public relative to template-engine/src/
-COPY apps/builder/public /app/builder/public
+# Copy minimal public directory (only sw.js and manifest.json)
+# Assets are served from R2 in dev/prod, so we only need essential PWA files
+# The bundleLocalAssets function handles CDN URLs correctly when assets are on R2
+RUN mkdir -p /app/builder/public
+COPY apps/builder/public/sw.js /app/builder/public/sw.js
+COPY apps/builder/public/manifest.json /app/builder/public/manifest.json
 
 # Install Node.js dependencies for the template engine
 # Use BuildKit cache mount to cache node_modules for faster rebuilds
