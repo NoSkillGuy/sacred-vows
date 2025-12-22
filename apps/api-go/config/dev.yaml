@@ -37,7 +37,7 @@ publishing:
 
 public_assets:
   r2_bucket: "sacred-vows-public-assets-dev"  # R2 bucket name for public default assets
-  cdn_base_url: "https://pub-dev.sacredvows.io"  # CDN base URL for public assets (via Cloudflare Worker or R2 public endpoint)
+  cdn_base_url: "https://dev-pub.sacredvows.io"  # CDN base URL for public assets (via R2 custom domain - using dev-pub to avoid Worker route conflict)
 
 email:
   vendors: "mailgun"

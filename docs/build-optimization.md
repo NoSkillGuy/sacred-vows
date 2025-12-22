@@ -104,12 +104,12 @@ resource "cloudflare_r2_bucket" "public_assets" {
 ```yaml
 public_assets:
   r2_bucket: "sacred-vows-public-assets-dev"
-  cdn_base_url: "https://pub-dev.sacredvows.io"
+  cdn_base_url: "https://dev-pub.sacredvows.io"
 ```
 
 **Builder Environment Variables** (`apps/builder/env.example`):
 ```bash
-VITE_PUBLIC_ASSETS_CDN_URL=https://pub-dev.sacredvows.io
+VITE_PUBLIC_ASSETS_CDN_URL=https://dev-pub.sacredvows.io
 VITE_ENABLE_ASSET_CACHING=true
 ```
 
@@ -129,7 +129,7 @@ VITE_ENABLE_ASSET_CACHING=true
 ```javascript
 // If CDN is configured:
 // /assets/photos/couple2/bride/1.jpeg 
-// → https://pub-dev.sacredvows.io/defaults/couple2/bride/1.jpeg
+// → https://dev-pub.sacredvows.io/defaults/couple2/bride/1.jpeg
 
 // If CDN is not configured (fallback):
 // → /assets/photos/couple2/bride/1.jpeg (local)
@@ -304,7 +304,7 @@ npm run migrate-assets -- --env=dev --dry-run  # Test first
 
 ```bash
 # CDN Base URL for public assets
-VITE_PUBLIC_ASSETS_CDN_URL=https://pub-dev.sacredvows.io
+VITE_PUBLIC_ASSETS_CDN_URL=https://dev-pub.sacredvows.io
 
 # Enable asset caching (default: true)
 VITE_ENABLE_ASSET_CACHING=true
@@ -315,7 +315,7 @@ VITE_ENABLE_ASSET_CACHING=true
 ```yaml
 public_assets:
   r2_bucket: "sacred-vows-public-assets-dev"
-  cdn_base_url: "https://pub-dev.sacredvows.io"
+  cdn_base_url: "https://dev-pub.sacredvows.io"  # Using dev-pub to avoid Worker route conflict
 ```
 
 #### Terraform (`infra/terraform/dev/terraform.tfvars`)
@@ -336,7 +336,7 @@ cloudflare_public_assets_r2_bucket_name = "sacred-vows-public-assets-dev"
 
 ### R2 Custom Domain Configuration
 
-To serve assets via a custom domain (e.g., `pub-dev.sacredvows.io`), you need to configure the R2 custom domain in Cloudflare Dashboard.
+To serve assets via a custom domain (e.g., `dev-pub.sacredvows.io` for dev, `pub.sacredvows.io` for prod), you need to configure the R2 custom domain in Cloudflare Dashboard.
 
 #### Step 1: Configure Custom Domain in Cloudflare Dashboard
 
@@ -347,7 +347,7 @@ To serve assets via a custom domain (e.g., `pub-dev.sacredvows.io`), you need to
 2. Navigate to **Settings** → **Custom Domain**
 
 3. Click **Add Custom Domain** and enter:
-   - **Dev**: `pub-dev.sacredvows.io`
+   - **Dev**: `dev-pub.sacredvows.io` (note: using `dev-pub` instead of `pub-dev` to avoid Worker route conflict)
    - **Prod**: `pub.sacredvows.io`
 
 4. Cloudflare will automatically:
@@ -364,7 +364,7 @@ Add the CNAME target to your `terraform.tfvars`:
 ```hcl
 # For dev
 cloudflare_public_assets_r2_bucket_name = "sacred-vows-public-assets-dev"
-cloudflare_public_assets_cdn_target = "pub-dev.sacredvows.io.cdn.cloudflare.net"  # Get from dashboard
+cloudflare_public_assets_cdn_target = "dev-pub.sacredvows.io.cdn.cloudflare.net"  # Get from dashboard
 
 # For prod
 cloudflare_public_assets_r2_bucket_name = "sacred-vows-public-assets-prod"
@@ -495,7 +495,7 @@ When properly configured, you should see:
    - Open builder app
    - Select a layout
    - Verify images load from CDN (check Network tab in DevTools)
-   - Look for requests to `pub-dev.sacredvows.io` or `pub.sacredvows.io`
+   - Look for requests to `dev-pub.sacredvows.io` or `pub.sacredvows.io`
    - Verify offline access works (disable network, reload)
 
 2. **Test Published Site**:
@@ -594,7 +594,7 @@ If CDN is not configured, the system automatically falls back to local assets:
    - Wait for DNS propagation (usually 5-15 minutes, can take up to 48 hours globally)
    - Verify CNAME target is correct in `terraform.tfvars`
    - Check that proxy is enabled (orange cloud) in Cloudflare Dashboard
-   - Verify DNS record exists: `dig pub-dev.sacredvows.io` or check Cloudflare Dashboard → DNS → Records
+   - Verify DNS record exists: `dig dev-pub.sacredvows.io` or check Cloudflare Dashboard → DNS → Records
 
 2. **SSL Certificate Not Provisioned**:
    - Wait 5-10 minutes after configuring R2 custom domain
@@ -606,7 +606,7 @@ If CDN is not configured, the system automatically falls back to local assets:
    - **DNS resolves but HTTPS fails**: SSL certificate may still be provisioning (wait 5-10 minutes)
    - **404 errors**: Verify the asset exists in R2 bucket at the correct path (e.g., `defaults/couple1/bride/1.jpeg`)
    - **Connection timeout**: Check that the R2 custom domain is fully configured in Cloudflare Dashboard → R2 → Bucket → Settings → Custom Domain
-   - **Verify DNS**: Use `dig pub-dev.sacredvows.io` to confirm it resolves to Cloudflare IPs
+   - **Verify DNS**: Use `dig dev-pub.sacredvows.io` to confirm it resolves to Cloudflare IPs
 
 ### Cache Issues
 
@@ -624,7 +624,7 @@ If CDN is not configured, the system automatically falls back to local assets:
    - Check Service Worker cache strategy
    - Test with curl to see actual cache headers:
      ```bash
-     curl -I https://pub-dev.sacredvows.io/defaults/couple1/bride/1.jpeg | grep -i cache
+     curl -I https://dev-pub.sacredvows.io/defaults/couple1/bride/1.jpeg | grep -i cache
      ```
 
 ## Future Enhancements

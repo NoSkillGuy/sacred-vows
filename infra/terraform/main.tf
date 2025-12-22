@@ -8,6 +8,8 @@ terraform {
     }
     cloudflare = {
       source  = "cloudflare/cloudflare"
+      # Using v4 - v5 has breaking changes and doesn't support public parameter yet
+      # Public access must be managed manually via Cloudflare Dashboard
       version = "~> 4.40"
     }
     null = {

@@ -2,6 +2,8 @@ terraform {
   required_providers {
     cloudflare = {
       source  = "cloudflare/cloudflare"
+      # Using v4 - v5 has breaking changes and doesn't support public parameter yet
+      # Public access must be managed manually via Cloudflare Dashboard
       version = "~> 4.40"
     }
   }
@@ -40,20 +42,27 @@ resource "cloudflare_r2_bucket" "public_assets" {
   account_id = var.cloudflare_account_id
   name       = var.public_assets_r2_bucket_name
   location   = var.r2_bucket_location  # Use same location as published sites
+  # NOTE: Public access cannot be set via Terraform in provider v4
+  # You must enable it manually via Cloudflare Dashboard:
+  # R2 → sacred-vows-public-assets-dev → Settings → Enable Public Access
 }
 
 # DNS Record for Public Assets CDN (R2 Custom Domain)
-# IMPORTANT: Before this can work, you must configure the R2 custom domain in the Cloudflare Dashboard:
+# IMPORTANT: The R2 custom domain must be configured in Cloudflare Dashboard first:
 # 1. Go to R2 → sacred-vows-public-assets-dev → Settings → Custom Domain
-# 2. Add custom domain: pub-dev.sacredvows.io (or pub.sacredvows.io for prod)
+# 2. Add custom domain: dev-pub.sacredvows.io (or pub.sacredvows.io for prod)
+#    NOTE: Using "dev-pub" instead of "pub-dev" to avoid matching Worker route pattern "*-dev.sacredvows.io"
 # 3. Cloudflare will provide a CNAME target (usually {domain}.cdn.cloudflare.net)
 # 4. Set public_assets_cdn_target in terraform.tfvars to that target value
 # 5. Then run terraform apply to create/manage the DNS record
+#
+# NOTE: For APAC buckets, if you get 404 errors, rebind the custom domain:
+# Delete and re-add it in the Dashboard, then update the CNAME target in terraform.tfvars
 resource "cloudflare_record" "public_assets_cdn" {
   count = var.public_assets_r2_bucket_name != "" && var.public_assets_cdn_target != "" ? 1 : 0
 
   zone_id        = data.cloudflare_zone.main.id
-  name           = var.environment == "dev" ? "pub-dev" : "pub"
+  name           = var.environment == "dev" ? "dev-pub" : "pub"
   type           = "CNAME"
   content        = var.public_assets_cdn_target
   proxied        = true  # Enable Cloudflare proxy for CDN benefits

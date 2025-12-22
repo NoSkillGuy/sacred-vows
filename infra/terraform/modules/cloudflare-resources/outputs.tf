@@ -40,6 +40,6 @@ output "public_assets_cdn_dns_record_id" {
 
 output "public_assets_cdn_domain" {
   description = "Public assets CDN domain name"
-  value       = var.public_assets_r2_bucket_name != "" ? (var.environment == "dev" ? "pub-dev.sacredvows.io" : "pub.sacredvows.io") : null
+  value       = var.public_assets_r2_bucket_name != "" ? (var.environment == "dev" ? "dev-pub.sacredvows.io" : "pub.sacredvows.io") : null
 }
 
