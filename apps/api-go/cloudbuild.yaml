@@ -1,17 +1,18 @@
 steps:
-  # Pull the latest image to use as cache (fails gracefully if image doesn't exist)
+  # Pull the latest image to use its inline cache (fails gracefully if image doesn't exist)
+  # Inline cache is embedded in the image layers, so we pull the image itself
   - name: 'gcr.io/cloud-builders/docker'
     entrypoint: 'bash'
     args:
       - '-c'
       - |
         docker pull asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:latest || exit 0
-        docker pull asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:cache || exit 0
     id: 'pull-cache'
 
-  # Build the Docker image with BuildKit inline cache and layer caching
+  # Build the Docker image with BuildKit inline cache
   # Build context is repo root (.) to access both apps/api-go and apps/builder
   # Dockerfile path is relative to build context (repo root)
+  # Inline cache is embedded in image layers, eliminating the need for separate cache images
   - name: 'gcr.io/cloud-builders/docker'
     args:
       - 'build'
@@ -20,13 +21,9 @@ steps:
       - '-t'
       - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:latest'
       - '--cache-from'
-      - 'type=registry,ref=asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:cache'
-      - '--cache-from'
-      - 'type=registry,ref=asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:latest'
+      - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:latest'
       - '--build-arg'
       - 'BUILDKIT_INLINE_CACHE=1'
-      - '--cache-to'
-      - 'type=registry,ref=asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:cache,mode=max'
       - '-f'
       - 'apps/api-go/Dockerfile'
       - '.'
@@ -34,14 +31,6 @@ steps:
       - 'DOCKER_BUILDKIT=1'
     id: 'build'
     waitFor: ['pull-cache']
-
-  # Push cache image for next build
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      - 'push'
-      - 'asia-northeast1-docker.pkg.dev/$PROJECT_ID/api-dev/api-go:cache'
-    id: 'push-cache'
-    waitFor: ['build']
 
 # Options optimized for FREE TIER usage
 options:
