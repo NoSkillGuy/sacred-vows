@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: ./apps/api-go/Dockerfile
+    env_file:
+      - ./apps/api-go/.env
     ports:
       - "3000:3000"
     environment:
@@ -17,8 +19,8 @@ services:
       LAYOUTS_DIR: /app/layouts
       UPLOAD_PATH: /app/uploads
       FRONTEND_URL: http://localhost:5173
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
-      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      # Google OAuth variables are loaded from env_file (apps/api-go/.env)
+      # They are not set here to allow env_file to provide the values
       GOOGLE_REDIRECT_URI: http://localhost:3000/api/auth/google/callback
       # R2/MinIO configuration for local development
       R2_ENDPOINT: ${R2_ENDPOINT:-http://minio:9000}
