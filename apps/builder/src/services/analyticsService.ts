@@ -53,13 +53,27 @@ export const trackEvent = (name: string, payload: Record<string, unknown> = {}):
 
   persist(event);
 
-  // Optional network hook (ignored if fails or route missing)
-  if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
-    try {
-      const body = JSON.stringify(event);
-      navigator.sendBeacon('/api/analytics/view', body);
-    } catch {
-      /* no-op */
+  // Only send to API if this is an invitation view event with invitationId
+  // The /api/analytics/view endpoint is specifically for tracking published invitation views
+  if (name === 'page_view' && payload.invitationId && typeof payload.invitationId === 'string') {
+    // Send to API in the format it expects (fire-and-forget, no error logging)
+    if (typeof fetch !== 'undefined') {
+      const apiPayload = {
+        invitationId: payload.invitationId,
+        referrer: typeof document !== 'undefined' ? document.referrer || undefined : undefined,
+        userAgent: event.userAgent,
+      };
+      // Use fetch with keepalive for reliability, but don't await or log errors
+      fetch('/api/analytics/view', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(apiPayload),
+        keepalive: true, // Ensures request completes even if page unloads
+      }).catch(() => {
+        // Silently fail - analytics is non-critical and errors shouldn't pollute console
+      });
     }
   }
 
