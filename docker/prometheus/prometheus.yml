@@ -12,7 +12,9 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
-remote_write:
-  - url: http://tempo:3200/api/prom/remote/write
-    send_exemplars: true
+# Remote write to Tempo disabled - endpoint /api/prom/remote/write not available
+# To enable exemplars, configure Tempo to accept Prometheus remote write
+# remote_write:
+#   - url: http://tempo:3200/api/prom/remote/write
+#     send_exemplars: true
 

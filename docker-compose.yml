@@ -64,19 +64,9 @@ services:
       retries: 3
 
   firestore-emulator:
-    image: eclipse-temurin:21-jre-jammy
-    working_dir: /app
-    command: >
-      bash -c "
-        apt-get update &&
-        apt-get install -y --no-install-recommends curl ca-certificates &&
-        curl -fsSL https://deb.nodesource.com/setup_20.x | bash - &&
-        apt-get install -y --no-install-recommends nodejs &&
-        apt-get clean &&
-        rm -rf /var/lib/apt/lists/* &&
-        npm install -g firebase-tools &&
-        firebase emulators:start --only firestore,ui --project test-project
-      "
+    build:
+      context: .
+      dockerfile: ./docker/firestore-emulator/Dockerfile
     ports:
       - "8080:8080"  # Firestore emulator
       - "4000:4000"  # Firebase Emulator UI
@@ -85,11 +75,13 @@ services:
     volumes:
       - ./firebase.json:/app/firebase.json:ro
       - firestore_data:/root/.cache/firebase/emulators
+    command: ["sh", "-c", "firebase emulators:start --only firestore,ui --project ${GCLOUD_PROJECT:-test-project}"]
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:4000"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
 
   minio:
     image: minio/minio:latest
@@ -119,10 +111,11 @@ services:
       - ./docker/tempo/tempo.yml:/etc/tempo/tempo.yml:ro
       - tempo_data:/var/tempo
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3200/api/search"]
+      test: ["CMD", "/tempo", "--version"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 3
+      start_period: 15s
 
   prometheus:
     image: prom/prometheus:latest
