@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef, MouseEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { getLayouts } from '../../services/layoutService';
-import { createInvitation } from '../../services/invitationService';
 import { getCurrentUser, logout, type User } from '../../services/authService';
 import type { LayoutManifest } from '@shared/types/layout';
 import LayoutCardUnified from '../Layouts/LayoutCardUnified';
+import { useLayoutsQuery } from '../../hooks/queries/useLayouts';
+import { useCreateInvitationMutation } from '../../hooks/queries/useInvitations';
 import './Dashboard.css';
 
 // SVG Icons
@@ -54,20 +54,30 @@ interface LayoutWithStatus extends LayoutManifest {
 
 function LayoutGallery(): JSX.Element {
   const navigate = useNavigate();
-  const [layouts, setLayouts] = useState<LayoutWithStatus[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [creating, setCreating] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Query hooks
+  const {
+    data: layoutsData,
+    isLoading: loading,
+    error: queryError,
+    refetch,
+  } = useLayoutsQuery({
+    category: selectedCategory !== 'all' ? selectedCategory : undefined,
+  });
+  const createMutation = useCreateInvitationMutation();
+
+  const layouts = layoutsData?.layouts || [];
+  const categories = layoutsData?.categories || ['all'];
+  const error = queryError ? (queryError as Error).message || 'Failed to load layouts. Please try again.' : null;
+
   useEffect(() => {
-    loadLayouts();
     loadUser();
-  }, [selectedCategory]);
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent): void {
@@ -78,25 +88,6 @@ function LayoutGallery(): JSX.Element {
     document.addEventListener('mousedown', handleClickOutside as EventListener);
     return () => document.removeEventListener('mousedown', handleClickOutside as EventListener);
   }, []);
-
-  async function loadLayouts(): Promise<void> {
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await getLayouts({ 
-        category: selectedCategory !== 'all' ? selectedCategory : undefined 
-      });
-      setLayouts(data?.layouts || []);
-      setCategories(data?.categories || ['all']);
-    } catch (error) {
-      console.error('Failed to load layouts:', error);
-      setError((error as Error).message || 'Failed to load layouts. Please try again.');
-      setLayouts([]);
-      setCategories(['all']);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   function loadUser(): void {
     const currentUser = getCurrentUser();
@@ -120,10 +111,10 @@ function LayoutGallery(): JSX.Element {
         }
       }
       
-      const invitation = await createInvitation({
+      const invitation = await createMutation.mutateAsync({
         layoutId: layout.id,
         title: 'My Wedding Invitation',
-        data: JSON.stringify(initialData),
+        data: initialData as never,
       });
       navigate(`/builder/${invitation.id}`);
     } catch (error) {
@@ -229,7 +220,7 @@ function LayoutGallery(): JSX.Element {
             <div className="error-icon">⚠️</div>
             <h3>Unable to Load Layouts</h3>
             <p>{error}</p>
-            <button className="btn btn-primary" onClick={loadLayouts}>
+            <button className="btn btn-primary" onClick={() => refetch()}>
               Try Again
             </button>
           </div>

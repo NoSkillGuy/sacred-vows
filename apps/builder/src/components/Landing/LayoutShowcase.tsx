@@ -1,9 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useMemo, useState, ReactElement } from 'react';
 import { trackCTA, trackExperiment, trackLayoutDemo, trackLayoutView } from '../../services/analyticsService';
-import { getAllLayoutManifests } from '../../services/layoutService';
 import type { LayoutManifest } from '@shared/types/layout';
 import LayoutCardUnified from '../Layouts/LayoutCardUnified';
+import { useAllLayoutManifestsQuery } from '../../hooks/queries/useLayouts';
 
 // SVG Ornaments for each layout style
 const OrnamentClassic = (): ReactElement => (
@@ -91,30 +91,17 @@ interface LayoutShowcaseProps {
 
 function LayoutShowcase({ onSectionView }: LayoutShowcaseProps): ReactElement {
   const navigate = useNavigate();
-  const [layouts, setLayouts] = useState<LayoutManifest[]>([]);
   const [activeFilter, setActiveFilter] = useState<string>('all');
   const [query, setQuery] = useState<string>('');
   const [demoLayout, setDemoLayout] = useState<EnrichedLayout | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+
+  // Query hook
+  const { data: layouts = [], isLoading: loading } = useAllLayoutManifestsQuery();
 
   useEffect(() => {
     if (onSectionView) onSectionView('layouts');
     trackExperiment('layouts_filters', 'chips_search_v1');
-    loadLayouts();
   }, [onSectionView]);
-
-  async function loadLayouts(): Promise<void> {
-    try {
-      setLoading(true);
-      const manifests = await getAllLayoutManifests();
-      const layoutsList = manifests || [];
-      setLayouts(layoutsList);
-    } catch (error) {
-      console.error('Failed to load layouts', error);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   const filters = useMemo<Filter[]>(() => {
     const categories = Array.from(

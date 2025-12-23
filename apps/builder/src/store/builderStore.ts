@@ -76,21 +76,21 @@ function saveToStorage(invitation: InvitationData): void {
 }
 
 interface BuilderStoreState {
-  // Current invitation being edited
+  // Current invitation being edited (UI state only - server state managed by TanStack Query)
   currentInvitation: InvitationData;
 
   // Current layout manifest (loaded from API/file)
   currentLayoutManifest: LayoutManifest | null;
 
-  // Loading and error states
-  loading: boolean;
-  error: string | null;
+  // UI state only - saving state for autosave feedback
   saving: boolean;
   lastSavedAt: number | null;
 }
 
 interface BuilderStoreActions {
   // Layout Manifest Management
+  // Note: loadLayoutManifest tries registry first, then falls back to API
+  // For server state, use useLayoutManifestQuery hook instead
   loadLayoutManifest: () => Promise<LayoutManifest | null>;
   getLayoutFromRegistry: (layoutId: string) => unknown;
   setCurrentInvitation: (invitation: Partial<InvitationData>) => Promise<void>;
@@ -123,9 +123,6 @@ interface BuilderStoreActions {
   // Utility
   clearAutosave: () => void;
   resetToDefault: () => void;
-  setLoading: (loading: boolean) => void;
-  setError: (error: string | null) => void;
-  clearError: () => void;
 }
 
 type BuilderStore = BuilderStoreState & BuilderStoreActions;
@@ -168,9 +165,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
     // Current layout manifest (loaded from API/file)
     currentLayoutManifest: null,
 
-    // Loading and error states
-    loading: false,
-    error: null,
+    // UI state only - saving state for autosave feedback
     saving: false,
     lastSavedAt: null,
 
@@ -940,20 +935,6 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
       saveToStorage(defaultInvitation);
     },
 
-    /**
-     * Set loading state
-     */
-    setLoading: (loading: boolean): void => set({ loading }),
-
-    /**
-     * Set error state
-     */
-    setError: (error: string | null): void => set({ error }),
-
-    /**
-     * Clear error
-     */
-    clearError: (): void => set({ error: null }),
   };
 });
 

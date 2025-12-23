@@ -1,10 +1,15 @@
 import { useState, useEffect, useRef, MouseEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { getInvitations, deleteInvitation, updateInvitation, type Invitation } from '../../services/invitationService';
 import { getCurrentUser, logout, type User } from '../../services/authService';
 import { useToast } from '../Toast/ToastProvider';
 import EditableText from '../../layouts/classic-scroll/components/shared/EditableText';
 import DeleteInvitationModal from './DeleteInvitationModal';
+import {
+  useInvitationsQuery,
+  useDeleteInvitationMutation,
+  useUpdateInvitationMutation,
+  type Invitation,
+} from '../../hooks/queries/useInvitations';
 import './Dashboard.css';
 
 // SVG Icons
@@ -114,8 +119,6 @@ const WELCOME_TOAST_DELAY_MS = 280;
 
 function Dashboard(): JSX.Element {
   const navigate = useNavigate();
-  const [invitations, setInvitations] = useState<Invitation[]>([]);
-  const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -123,8 +126,12 @@ function Dashboard(): JSX.Element {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { addToast } = useToast();
 
+  // Query hooks
+  const { data: invitations = [], isLoading: loading, error } = useInvitationsQuery();
+  const deleteMutation = useDeleteInvitationMutation();
+  const updateMutation = useUpdateInvitationMutation();
+
   useEffect(() => {
-    loadInvitations();
     loadUser();
   }, []);
 
@@ -137,18 +144,6 @@ function Dashboard(): JSX.Element {
     document.addEventListener('mousedown', handleClickOutside as EventListener);
     return () => document.removeEventListener('mousedown', handleClickOutside as EventListener);
   }, []);
-
-  async function loadInvitations(): Promise<void> {
-    try {
-      setLoading(true);
-      const data = await getInvitations();
-      setInvitations(data);
-    } catch (error) {
-      console.error('Failed to load invitations:', error);
-    } finally {
-      setLoading(false);
-    }
-  }
 
   function loadUser(): void {
     const currentUser = getCurrentUser();
@@ -167,8 +162,7 @@ function Dashboard(): JSX.Element {
     if (!invitationToDelete) return;
 
     try {
-      await deleteInvitation(invitationToDelete.id);
-      setInvitations(invitations.filter(inv => inv.id !== invitationToDelete.id));
+      await deleteMutation.mutateAsync(invitationToDelete.id);
       setDeleteModalOpen(false);
       setInvitationToDelete(null);
       addToast({
@@ -230,20 +224,20 @@ function Dashboard(): JSX.Element {
 
   async function handleInvitationTitleUpdate(id: string, newTitle: string): Promise<void> {
     const trimmedTitle = newTitle?.trim() || 'Untitled Invitation';
-    const previousInvitations = invitations;
-
-    // Optimistically update UI
-    setInvitations(prev => prev.map(inv => (
-      inv.id === id ? { ...inv, title: trimmedTitle } : inv
-    )));
 
     try {
-      await updateInvitation(id, { title: trimmedTitle });
+      await updateMutation.mutateAsync({
+        id,
+        updates: { title: trimmedTitle },
+      });
     } catch (error) {
       console.error('Failed to update invitation title:', error);
-      alert('Could not update the invitation name. Please try again.');
-      // Revert on failure
-      setInvitations(previousInvitations);
+      addToast({
+        tone: 'error',
+        title: 'Update Failed',
+        description: 'Could not update the invitation name. Please try again.',
+        icon: 'bell',
+      });
     }
   }
 

@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import BuilderSidebar from '../BuilderSidebar/BuilderSidebar';
 import PreviewPane from '../Preview/PreviewPane';
-import { getInvitation } from '../../services/invitationService';
 import { useBuilderStore } from '../../store/builderStore';
+import { useInvitationQuery } from '../../hooks/queries/useInvitations';
+import { useLayoutManifestQuery } from '../../hooks/queries/useLayouts';
 import type { Invitation } from '../../services/invitationService';
 import './BuilderLayout.css';
 
@@ -15,38 +16,49 @@ function BuilderLayout(): JSX.Element {
   const { setCurrentInvitation, loadLayoutManifest } = useBuilderStore();
   const [editMode, setEditMode] = useState(true);
   const [deviceMode, setDeviceMode] = useState<DeviceMode>('desktop');
-  const [invitation, setInvitation] = useState<Invitation | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+
+  // Query hooks
+  const {
+    data: invitation,
+    isLoading: invitationLoading,
+    error: invitationError,
+  } = useInvitationQuery(invitationId, Boolean(invitationId));
+
+  const {
+    data: layoutManifest,
+    isLoading: manifestLoading,
+  } = useLayoutManifestQuery(invitation?.layoutId, Boolean(invitation?.layoutId));
+
+  const loading = invitationLoading || manifestLoading;
+  const error = invitationError ? 'Failed to load invitation' : null;
 
   useEffect(() => {
-    if (invitationId) {
-      loadInvitation();
-    } else {
+    if (!invitationId) {
       // No invitation ID, redirect to dashboard
       navigate('/dashboard');
+      return;
     }
   }, [invitationId, navigate]);
 
-  async function loadInvitation(): Promise<void> {
-    if (!invitationId) return;
-    
-    try {
-      setLoading(true);
-      setError(null);
-      const data = await getInvitation(invitationId);
-      await setCurrentInvitation(data);
-      await loadLayoutManifest();
-      setInvitation(data);
-    } catch (err) {
-      console.error('Failed to load invitation:', err);
-      setError('Failed to load invitation');
+  useEffect(() => {
+    if (invitation) {
+      setCurrentInvitation(invitation);
+    }
+  }, [invitation, setCurrentInvitation]);
+
+  useEffect(() => {
+    if (layoutManifest && invitation) {
+      // Load layout manifest into store if needed
+      loadLayoutManifest();
+    }
+  }, [layoutManifest, invitation, loadLayoutManifest]);
+
+  useEffect(() => {
+    if (error && invitationId) {
       // Redirect to dashboard if invitation not found
       setTimeout(() => navigate('/dashboard'), 2000);
-    } finally {
-      setLoading(false);
     }
-  }
+  }, [error, invitationId, navigate]);
 
   if (loading) {
     return (
@@ -140,8 +152,6 @@ function BuilderLayout(): JSX.Element {
         <PreviewPane 
           editMode={editMode}
           deviceMode={deviceMode}
-          invitation={invitation}
-          onInvitationUpdate={setInvitation}
         />
       </div>
     </div>
