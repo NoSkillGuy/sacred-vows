@@ -19,3 +19,6 @@ bin/
 go.work
 
 server
+
+# Air temporary build directory
+tmp/

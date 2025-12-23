@@ -35,6 +35,8 @@ This starts:
 - **Grafana** (Observability): http://localhost:3001 (login: `admin`/`admin`)
 - **API Server**: http://localhost:3000
 
+**Note:** The `api-go` service includes hot reloading support. When you edit Go source files locally, the server will automatically rebuild and restart. See the "Start Development Servers" section below for details.
+
 Or start individual services:
 
 ```bash
@@ -103,15 +105,38 @@ public_assets:
 
 ### 5. Start Development Servers
 
+#### Option A: Local Development with Hot Reloading (Recommended)
+
 ```bash
-# Start API (if not using docker-compose)
+# Start API with hot reloading (automatically rebuilds on file changes)
 cd apps/api-go
-go run cmd/server/main.go
+make dev
+
+# Or using Docker with hot reloading (built-in)
+docker-compose up api-go
 
 # Start Builder (in another terminal)
 cd apps/builder
 npm run dev
 ```
+
+#### Option B: Standard Development (Manual Restart)
+
+```bash
+# Start API (if not using docker-compose)
+cd apps/api-go
+make run
+# Or: go run cmd/server/main.go
+
+# Start Builder (in another terminal)
+cd apps/builder
+npm run dev
+```
+
+**Hot Reloading:**
+- `make dev` uses [Air](https://github.com/cosmtrek/air) to automatically rebuild and restart the server when you change `.go` files
+- Install Air with: `go install github.com/cosmtrek/air@latest`
+- The `api-go` Docker service includes hot reloading with source code mounted as a volume - just run `docker-compose up api-go`
 
 ## Switching Between Filesystem and R2
 

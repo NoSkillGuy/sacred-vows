@@ -156,6 +156,30 @@ make run
 go run cmd/server/main.go
 ```
 
+### Hot Reloading (Development)
+
+For automatic rebuild and restart on file changes, use the `dev` target which uses [Air](https://github.com/cosmtrek/air):
+
+```bash
+# Install Air (if not already installed)
+go install github.com/cosmtrek/air@latest
+
+# Run with hot reloading
+make dev
+```
+
+**What it does:**
+- Watches for changes in `.go` files in `cmd/`, `internal/`, and `pkg/` directories
+- Automatically rebuilds the application when files change
+- Restarts the server gracefully
+- Shows build errors in the console
+
+**Difference between `make run` and `make dev`:**
+- `make run`: Runs the server once. You need to manually restart after code changes.
+- `make dev`: Runs Air, which automatically rebuilds and restarts on file changes.
+
+The Air configuration is in `.air.toml`. You can customize watch patterns, build commands, and other settings there.
+
 ### Production Build
 
 ```bash
@@ -169,13 +193,21 @@ make build
 ### Docker
 
 ```bash
-# Build and run with docker-compose
+# Build and run with docker-compose (includes hot reloading)
 docker-compose up api-go
 
 # Or build Docker image
 docker build -t api-go .
 docker run -p 3000:3000 api-go
 ```
+
+**Docker Hot Reloading:**
+The `api-go` service uses a development Dockerfile that includes:
+- Go compiler for building
+- Air for hot reloading
+- Source code mounted as volume for live updates
+
+When you edit files locally, Air in the container will detect changes and automatically rebuild and restart the server.
 
 ## API Endpoints
 

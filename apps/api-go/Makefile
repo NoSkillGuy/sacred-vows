@@ -1,4 +1,4 @@
-.PHONY: build run test clean swagger build-cleanup cleanup
+.PHONY: build run dev test clean swagger build-cleanup cleanup
 
 build: swagger
 	go build -o bin/server ./cmd/server
@@ -8,6 +8,10 @@ build-cleanup:
 
 run: swagger
 	go run ./cmd/server
+
+dev: swagger
+	@which air > /dev/null || (echo "Error: Air is not installed. Install it with: go install github.com/cosmtrek/air@latest" && exit 1)
+	air
 
 test:
 	go test ./...
