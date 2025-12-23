@@ -18,7 +18,7 @@ func TestCreateInvitationUseCase_Integration_StatusInResponse(t *testing.T) {
 		},
 	}
 
-	useCase := NewCreateInvitationUseCase(mockRepo)
+	useCase := NewCreateInvitationUseCase(mockRepo, nil)
 	input := CreateInvitationInput{
 		LayoutID: "classic-scroll",
 		Data:     json.RawMessage(`{}`),

@@ -50,7 +50,7 @@ func TestCreateInvitationUseCase_Execute_DefaultStatusToDraft(t *testing.T) {
 		},
 	}
 
-	useCase := NewCreateInvitationUseCase(mockRepo)
+	useCase := NewCreateInvitationUseCase(mockRepo, nil)
 	input := CreateInvitationInput{
 		LayoutID: "classic-scroll",
 		Data:     json.RawMessage(`{}`),
@@ -111,7 +111,7 @@ func TestCreateInvitationUseCase_Execute_WithTitle(t *testing.T) {
 		},
 	}
 
-	useCase := NewCreateInvitationUseCase(mockRepo)
+	useCase := NewCreateInvitationUseCase(mockRepo, nil)
 	title := "My Wedding Invitation"
 	input := CreateInvitationInput{
 		LayoutID: "classic-scroll",
@@ -161,7 +161,7 @@ func TestCreateInvitationUseCase_Execute_DefaultLayoutID(t *testing.T) {
 		},
 	}
 
-	useCase := NewCreateInvitationUseCase(mockRepo)
+	useCase := NewCreateInvitationUseCase(mockRepo, nil)
 	input := CreateInvitationInput{
 		LayoutID: "", // Empty layout ID should default to "classic-scroll"
 		Data:     json.RawMessage(`{}`),
