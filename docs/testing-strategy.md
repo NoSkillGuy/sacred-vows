@@ -93,16 +93,29 @@ npm run test:e2e tests/e2e/auth-flow.spec.ts
 apps/builder/
 ├── src/
 │   ├── store/
-│   │   └── builderStore.test.ts          # Unit tests
+│   │   └── builderStore.test.ts          # Unit tests - Store logic
 │   ├── utils/
-│   │   ├── assetUtils.test.ts
-│   │   ├── jwtDecoder.test.ts
-│   │   └── translations.test.ts
+│   │   ├── assetUtils.test.ts            # Unit tests - Asset utilities
+│   │   ├── jwtDecoder.test.ts            # Unit tests - JWT utilities
+│   │   └── translations.test.ts          # Unit tests - Translation data
+│   ├── services/
+│   │   ├── authService.test.ts           # Unit tests - Auth service
+│   │   ├── invitationService.test.ts      # Unit tests - Invitation service
+│   │   ├── assetService.test.ts          # Unit tests - Asset service
+│   │   ├── layoutService.test.ts         # Unit tests - Layout service
+│   │   └── fontService.test.ts           # Unit tests - Font service
+│   ├── hooks/
+│   │   ├── useLanguage.test.ts           # Unit tests - Language hook
+│   │   └── queries/
+│   │       ├── useInvitations.test.ts    # Unit tests - Invitation hooks
+│   │       └── useLayouts.test.ts        # Unit tests - Layout hooks
 │   ├── components/
 │   │   ├── Auth/
-│   │   │   └── SignupPage.test.tsx       # Integration tests
+│   │   │   ├── SignupPage.test.tsx       # Integration tests
+│   │   │   └── LoginPage.test.tsx        # Integration tests
 │   │   ├── Dashboard/
-│   │   │   └── Dashboard.test.tsx
+│   │   │   ├── Dashboard.test.tsx        # Integration tests
+│   │   │   └── dashboardStats.test.ts   # Unit tests - Stats calculation
 │   │   └── Landing/
 │   │       └── __tests__/
 │   │           └── LandingPage.integration.test.tsx
@@ -131,11 +144,56 @@ apps/builder/
 - Layout switching with data preservation
 - Autosave triggering
 
+**Service Layer** (`src/services/`)
+- **authService.test.ts** - Authentication operations
+  - User registration with token storage
+  - User login and logout
+  - Token refresh flow
+  - Password reset requests
+  - Current user retrieval
+- **invitationService.test.ts** - Invitation CRUD operations
+  - Fetching all invitations
+  - Fetching single invitation
+  - Creating new invitations
+  - Updating invitations
+  - Deleting invitations
+  - Autosave with debouncing
+- **assetService.test.ts** - Asset management
+  - Image upload validation (file size, type)
+  - Multiple image uploads
+  - Asset deletion
+  - Fetching all assets
+  - Asset count by URLs
+- **layoutService.test.ts** - Layout operations
+  - Fetching layouts with filters (category, featured)
+  - Fetching single layout
+  - Fetching layout manifests
+  - Getting all layout manifests
+- **fontService.test.ts** - Font management
+  - Getting all available fonts
+  - Font type and style information
+  - Google and premium font handling
+
 **Utility Functions** (`src/utils/`)
-- JWT decoding and expiration checks
-- Asset URL extraction from data structures
-- Translation logic
+- JWT decoding and expiration checks (`jwtDecoder.test.ts`)
+- Asset URL extraction from data structures (`assetUtils.test.ts`)
+- Translation data structure validation (`translations.test.ts`)
 - Any pure functions with clear inputs/outputs
+
+**Custom Hooks** (`src/hooks/`)
+- **useLanguage.test.ts** - Language switching
+  - Language initialization from localStorage
+  - Language updates and persistence
+  - Translation retrieval
+  - Document language attribute updates
+- **useInvitations.test.ts** - Invitation query hooks
+  - Fetching all invitations
+  - Fetching single invitation
+  - Query enable/disable behavior
+- **useLayouts.test.ts** - Layout query hooks
+  - Fetching layouts with options
+  - Fetching all layout manifests
+  - Fetching single layout and manifest
 
 **Password Logic**
 - zxcvbn integration
@@ -187,6 +245,73 @@ describe('assetUtils', () => {
 });
 ```
 
+### Example: Service Test
+
+```typescript
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { getInvitations } from './invitationService';
+
+// Mock apiClient
+vi.mock('./apiClient', () => ({
+  apiRequest: vi.fn(),
+}));
+
+describe('invitationService', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should fetch all invitations successfully', async () => {
+    const { apiRequest } = await import('./apiClient');
+    const mockInvitations = [
+      {
+        id: 'inv-1',
+        userId: '1',
+        layoutId: 'classic-scroll',
+        data: { couple: { bride: { name: 'Sarah' } } },
+      },
+    ];
+
+    vi.mocked(apiRequest).mockResolvedValue({
+      ok: true,
+      json: async () => ({ invitations: mockInvitations }),
+    } as Response);
+
+    const result = await getInvitations();
+
+    expect(result).toEqual(mockInvitations);
+    expect(apiRequest).toHaveBeenCalledWith('/invitations', { method: 'GET' });
+  });
+});
+```
+
+### Example: Hook Test
+
+```typescript
+import { describe, it, expect, beforeEach } from 'vitest';
+import { renderHook, act } from '@testing-library/react';
+import { useLanguage } from './useLanguage';
+
+describe('useLanguage', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    document.documentElement.lang = 'en';
+  });
+
+  it('should update language when updateLanguage is called', () => {
+    const { result } = renderHook(() => useLanguage());
+
+    act(() => {
+      result.current.updateLanguage('te');
+    });
+
+    expect(result.current.currentLang).toBe('te');
+    expect(localStorage.getItem('wedding-lang')).toBe('te');
+    expect(document.documentElement.lang).toBe('te');
+  });
+});
+```
+
 ## Integration Tests
 
 ### What to Test
@@ -198,6 +323,20 @@ describe('assetUtils', () => {
 - Navigation/routing
 - State management integration
 
+**Auth Pages** (`src/components/Auth/`)
+- **SignupPage.test.tsx** - User registration flow
+  - Form rendering with all fields
+  - Password strength validation
+  - Form validation and submission
+  - API error handling
+  - Navigation links
+- **LoginPage.test.tsx** - User login flow
+  - Form rendering
+  - Successful login with navigation
+  - Invalid credentials error handling
+  - Loading states during submission
+  - Navigation to signup and forgot password
+
 **Component + Store Integration**
 - Pages that interact with Zustand stores
 - Routing with MemoryRouter
@@ -206,27 +345,46 @@ describe('assetUtils', () => {
 ### Example: Page Integration Test
 
 ```typescript
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
-import SignupPage from './SignupPage';
+import LoginPage from './LoginPage';
 
-describe('SignupPage', () => {
-  it('should show password strength as user types', async () => {
+// Mock useNavigate
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
+
+describe('LoginPage', () => {
+  beforeEach(() => {
+    mockNavigate.mockClear();
+    localStorage.clear();
+  });
+
+  it('should submit form with valid credentials', async () => {
     const user = userEvent.setup();
     render(
       <BrowserRouter>
-        <SignupPage />
+        <LoginPage />
       </BrowserRouter>
     );
 
+    const emailInput = screen.getByLabelText('Email Address');
     const passwordInput = screen.getByLabelText('Password');
-    await user.type(passwordInput, 'StrongP@ssw0rd123!');
-    await user.click(passwordInput);
+    const submitButton = screen.getByRole('button', { name: /sign in/i });
+
+    await user.type(emailInput, 'test@example.com');
+    await user.type(passwordInput, 'password123');
+    await user.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/strong password/i)).toBeInTheDocument();
+      expect(mockNavigate).toHaveBeenCalledWith('/app');
     });
   });
 });
@@ -310,12 +468,48 @@ MSW is automatically set up in `src/tests/setup.ts`. No additional configuration
 
 Coverage is a signal, not a goal. We focus on confidence over percentages.
 
-| Layer | Coverage Target |
-|-------|----------------|
-| Utils / Stores | 80-90% |
-| Pages | 60-70% |
-| UI Components | Selective (no strict threshold) |
-| E2E | Critical flows only |
+| Layer | Coverage Target | Current Status |
+|-------|----------------|----------------|
+| Utils / Stores | 80-90% | ✅ Comprehensive coverage |
+| Services | 80-90% | ✅ Comprehensive coverage |
+| Hooks | 80-90% | ✅ Comprehensive coverage |
+| Pages | 60-70% | ✅ Good coverage (Auth pages, Dashboard) |
+| UI Components | Selective (no strict threshold) | ✅ Selective coverage |
+| E2E | Critical flows only | ✅ Critical flows covered |
+
+### Current Test Coverage Summary
+
+**Unit Tests (60+ tests)**
+- ✅ **Services** - Complete coverage of all service layers:
+  - `authService` (15 tests) - Registration, login, logout, token refresh, password reset
+  - `invitationService` (7 tests) - CRUD operations, autosave
+  - `assetService` (7 tests) - Upload validation, deletion, fetching
+  - `layoutService` (6 tests) - Layout fetching with filters
+  - `fontService` (3 tests) - Font list retrieval
+- ✅ **Utilities** - Core utility functions:
+  - `assetUtils` - Asset URL extraction
+  - `jwtDecoder` - JWT decoding and expiration
+  - `translations` - Translation data validation
+  - `dashboardStats` - Stats calculation
+- ✅ **Hooks** - Custom React hooks:
+  - `useLanguage` (6 tests) - Language switching and translations
+  - `useInvitations` (3 tests) - Invitation query hooks
+  - `useLayouts` (4 tests) - Layout query hooks
+- ✅ **Stores** - Zustand store logic:
+  - `builderStore` - State management, data updates, theme management
+
+**Integration Tests (15+ tests)**
+- ✅ **Auth Pages**:
+  - `SignupPage` - Form validation, password strength, submission
+  - `LoginPage` - Login flow, error handling, navigation
+- ✅ **Dashboard**:
+  - `Dashboard` - Stats display, invitation lists, navigation
+- ✅ **Landing Page**:
+  - Personalization modal flow, localStorage persistence
+
+**E2E Tests**
+- ✅ Auth flow (registration, login, logout, password reset)
+- ✅ Create website flow (dashboard navigation, invitation creation)
 
 ## Testing Principles
 
@@ -458,6 +652,30 @@ jobs:
 - [Playwright Documentation](https://playwright.dev/)
 - [Testing Best Practices](https://kentcdodds.com/blog/common-mistakes-with-react-testing-library)
 
+## Testing Workflow
+
+### Iterative Test Development Process
+
+Each test case must follow this strict workflow:
+
+1. **Write ONE test case** - Focus on a single, specific test scenario
+2. **Run the test** - Execute the test to verify it works (`npm test` for frontend)
+3. **Verify success** - Ensure the test passes completely before proceeding
+4. **Move to next test** - Only after current test passes, write the next test case
+
+**Rules:**
+- Never write multiple tests without running them individually
+- Never proceed to the next test if the current one fails
+- Fix any failing tests immediately before continuing
+- Run tests frequently: `npm test` (frontend)
+- Use watch mode for faster feedback: `npm test -- --watch`
+
+**Benefits:**
+- Catches issues early
+- Ensures each test is valid before building on it
+- Prevents accumulation of failing tests
+- Maintains test suite health
+
 ## Getting Started
 
 1. **Run existing tests** to verify setup:
@@ -472,4 +690,45 @@ jobs:
 4. **Add E2E tests** - Test critical user flows
 
 Remember: Start small, expand gradually, and focus on confidence over coverage.
+
+## Test Maintenance
+
+### Adding New Tests
+
+When adding new functionality:
+
+1. **Service Layer** - Add tests in `src/services/[serviceName].test.ts`
+   - Test all public methods
+   - Test error cases
+   - Mock dependencies (apiClient, tokenStorage, etc.)
+
+2. **Hooks** - Add tests in `src/hooks/[hookName].test.ts`
+   - Test hook behavior with React Testing Library's `renderHook`
+   - Test state changes and side effects
+   - Mock dependencies appropriately
+
+3. **Pages** - Add integration tests in `src/components/[PageName]/[PageName].test.tsx`
+   - Test user interactions
+   - Test API integration with MSW
+   - Test navigation and routing
+
+4. **Utilities** - Add tests in `src/utils/[utilName].test.ts`
+   - Test all exported functions
+   - Test edge cases and error conditions
+
+### Running Specific Tests
+
+```bash
+# Run a specific test file
+npm test authService.test.ts
+
+# Run tests matching a pattern
+npm test -- -t "should login"
+
+# Run tests in a specific directory
+npm test -- src/services/
+
+# Run with coverage for a specific file
+npm run test:coverage -- authService.test.ts
+```
 
