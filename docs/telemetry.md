@@ -122,10 +122,16 @@ docker-compose up -d tempo prometheus grafana
 ### Access Points
 
 - **Grafana**: http://localhost:3001 (admin/admin)
-- **Tempo UI**: http://localhost:3200
+  - Use Grafana to view traces from Tempo
+  - Navigate to **Explore** → Select **Tempo** data source
+- **Tempo API**: http://localhost:3200
+  - API endpoints for querying traces programmatically
+  - Note: Tempo does not have a built-in web UI; use Grafana to view traces
 - **Prometheus**: http://localhost:9090
 
 ### Viewing Traces
+
+**Note**: Tempo does not have a built-in web UI. All trace viewing is done through Grafana.
 
 1. Open Grafana at http://localhost:3001
 2. Navigate to **Explore** (compass icon in left sidebar)
@@ -134,6 +140,10 @@ docker-compose up -d tempo prometheus grafana
    - Search by service name: `{service.name="sacred-vows-api"}`
    - Search by request ID: `{http.request_id="<uuid>"}`
    - Search by trace ID: `<trace-id>`
+
+**Tempo API Endpoints** (for programmatic access):
+- `GET /api/search` - Search for traces
+- `GET /api/traces/{traceID}` - Get a specific trace by ID
 
 ### Viewing Metrics
 
@@ -294,8 +304,9 @@ Metrics use low-cardinality labels only:
 3. **Check Tempo is running:**
    ```bash
    docker-compose ps tempo
-   curl http://localhost:3200/ready
+   curl http://localhost:3200/api/search
    ```
+   If Tempo is running, you should get a JSON response with traces (may be empty if no traces have been sent yet).
 
 4. **Check application logs** for observability initialization errors
 
