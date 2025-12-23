@@ -1,0 +1,34 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Get the root directory of the repository
+ROOT_DIR="$(git rev-parse --show-toplevel)"
+
+echo "Running pre-commit tests..."
+
+# Run Go tests
+echo "Running Go API tests..."
+cd "$ROOT_DIR/apps/api-go" && make test
+if [ $? -ne 0 ]; then
+  echo "❌ Go tests failed"
+  exit 1
+fi
+
+# Run Builder unit tests
+echo "Running Builder unit tests..."
+cd "$ROOT_DIR/apps/builder" && npm test -- --run
+if [ $? -ne 0 ]; then
+  echo "❌ Builder tests failed"
+  exit 1
+fi
+
+# Run Edge Worker typecheck
+echo "Running Edge Worker typecheck..."
+cd "$ROOT_DIR/apps/edge-worker" && npm run typecheck
+if [ $? -ne 0 ]; then
+  echo "❌ Edge Worker typecheck failed"
+  exit 1
+fi
+
+echo "✅ All tests passed!"
+

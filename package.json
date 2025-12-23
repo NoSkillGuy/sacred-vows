@@ -1,0 +1,16 @@
+{
+  "name": "sacred-vows",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Wedding invitation platform monorepo",
+  "scripts": {
+    "test": "npm run test:go && npm run test:builder && npm run test:edge-worker",
+    "test:go": "cd apps/api-go && make test",
+    "test:builder": "cd apps/builder && npm test -- --run",
+    "test:edge-worker": "cd apps/edge-worker && npm run typecheck"
+  },
+  "devDependencies": {
+    "husky": "^9.0.11"
+  }
+}
+
