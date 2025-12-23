@@ -14,13 +14,14 @@
     "noEmit": true,
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
+    "types": ["node"],
     "paths": {
       "@/*": ["./src/*"],
       "@shared/*": ["./src/shared/src/*"],
       "@template-engine/*": ["./src/template-engine/src/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "tests/**/*"],
   "exclude": ["node_modules", "dist"]
 }
 

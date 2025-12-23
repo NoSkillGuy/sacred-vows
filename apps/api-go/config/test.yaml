@@ -1,0 +1,59 @@
+# Test environment configuration
+# Non-sensitive settings only - sensitive values come from .env file or environment variables
+
+server:
+  port: "3001"  # Different port to avoid conflicts with dev server
+  read_timeout: "15s"
+  write_timeout: "15s"
+
+auth:
+  jwt_access_expiration: "15m"
+  jwt_refresh_expiration: "30d"
+  jwt_issuer: "sacred-vows-api-test"
+  jwt_audience: "sacred-vows-client-test"
+  jwt_clock_skew: "60s"
+
+storage:
+  max_file_size: 10485760  # 10MB
+  # Use MinIO for test environment (S3-compatible)
+  s3_endpoint: "http://localhost:9000"  # MinIO endpoint
+  s3_bucket: "sacred-vows-assets-test"  # Test bucket for assets
+  s3_region: "us-east-1"  # MinIO region
+  signed_url_expiration: "1h"
+  max_image_width: 1920
+  max_image_height: 1920
+  image_quality: 85
+
+google:
+  redirect_uri: "http://localhost:3001/api/auth/google/callback"
+  frontend_url: "http://localhost:5173"
+
+publishing:
+  base_domain: "localhost"
+  artifact_store: "r2"  # Use R2 (MinIO) for test environment
+  r2_endpoint: "http://localhost:9000"  # MinIO endpoint
+  r2_account_id: "test"  # Not used for MinIO, but required by config
+  r2_bucket: "sacred-vows-published-test"  # Test bucket for published sites
+  r2_public_base: "http://localhost:9000/sacred-vows-published-test"  # MinIO public URL format
+  version_retention_count: 3
+  snapshot_renderer_script: ""  # Set via env var if needed
+  snapshot_renderer_node: "node"
+  published_artifacts_dir: "./published-test"
+  published_artifacts_public_base: "http://localhost:3001"
+
+public_assets:
+  r2_bucket: "sacred-vows-public-assets-test"  # Test bucket for public assets
+  cdn_base_url: "http://localhost:9000/sacred-vows-public-assets-test"  # Local MinIO public endpoint
+
+email:
+  vendors: "mailgun"
+  from_address: "noreply@test.localhost"
+  from_name: "Sacred Vows Test"
+  mailjet:
+    daily_limit: 200
+    monthly_limit: 6000
+  mailgun:
+    domain: ""
+    daily_limit: 100
+    monthly_limit: 3000
+
