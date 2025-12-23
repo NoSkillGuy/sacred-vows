@@ -17,6 +17,30 @@ import (
 // It can be converted to/from json.RawMessage
 type JSONData string
 
+// UnmarshalJSON implements json.Unmarshaler to handle both JSON strings and JSON objects
+func (j *JSONData) UnmarshalJSON(data []byte) error {
+	// Handle null
+	if len(data) == 4 && string(data) == "null" {
+		*j = JSONData("{}")
+		return nil
+	}
+	// Try to unmarshal as a string first
+	var str string
+	if err := json.Unmarshal(data, &str); err == nil {
+		*j = JSONData(str)
+		return nil
+	}
+	// If not a string, treat it as raw JSON and convert to string
+	*j = JSONData(data)
+	return nil
+}
+
+// MarshalJSON implements json.Marshaler
+func (j JSONData) MarshalJSON() ([]byte, error) {
+	// Return as a JSON string
+	return json.Marshal(string(j))
+}
+
 // ToRawMessage converts JSONData to json.RawMessage
 func (j JSONData) ToRawMessage() json.RawMessage {
 	return json.RawMessage(j)
@@ -259,6 +283,9 @@ func (h *InvitationHandler) GetByID(c *gin.Context) {
 func (h *InvitationHandler) Create(c *gin.Context) {
 	var req CreateInvitationRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
+		logger.GetLogger().Warn("Create invitation: Invalid request",
+			zap.Error(err),
+		)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return
 	}
