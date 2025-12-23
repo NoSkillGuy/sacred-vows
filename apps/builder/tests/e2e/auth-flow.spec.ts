@@ -34,29 +34,17 @@ test.describe('Auth Flow', () => {
     await page.fill('input[name="email"]', 'test@example.com');
     await page.fill('input[name="password"]', 'password123');
 
-    // Submit form
-    await page.click('button[type="submit"]');
+    // Submit form and wait for navigation
+    await Promise.all([
+      page.waitForURL(/.*app|.*dashboard|.*layouts/, { timeout: 10000 }),
+      page.click('button[type="submit"]'),
+    ]);
 
-    // Wait for form submission to complete
-    await page.waitForLoadState('networkidle');
+    // Verify we're no longer on the login page
+    await expect(page).not.toHaveURL(/.*login/);
     
-    // Wait a bit for potential redirect
-    await page.waitForTimeout(1000);
-
-    // Check if login succeeded by checking for error message and current URL
-    const errorVisible = await page.locator('.auth-error').isVisible({ timeout: 2000 }).catch(() => false);
-    const currentUrl = page.url();
-    const isStillOnLogin = currentUrl.includes('/login');
-    
-    if (errorVisible || isStillOnLogin) {
-      // Login failed - this is expected if backend isn't running or credentials don't exist
-      // In a real test environment, you'd want to set up test data first
-      console.log('Login failed - this may be expected if backend is not running');
-      return; // Test will pass but do nothing
-    }
-
-    // Should redirect to app/dashboard/layouts after successful login
-    await expect(page).toHaveURL(/.*app|.*dashboard|.*layouts/, { timeout: 10000 });
+    // Verify we're on an authenticated page
+    await expect(page).toHaveURL(/.*app|.*dashboard|.*layouts/, { timeout: 5000 });
   });
 
   test('should show error for invalid credentials', async ({ page }) => {
@@ -107,27 +95,24 @@ test.describe('Auth Flow', () => {
     await page.goto('/login');
     await page.fill('input[name="email"]', 'test@example.com');
     await page.fill('input[name="password"]', 'password123');
-    await page.click('button[type="submit"]');
+    
+    // Submit form and wait for navigation
+    await Promise.all([
+      page.waitForURL(/.*app|.*dashboard|.*layouts/, { timeout: 10000 }),
+      page.click('button[type="submit"]'),
+    ]);
 
-    // Wait for form submission
-    await page.waitForLoadState('networkidle');
-
-    // Check if login succeeded
-    const errorVisible = await page.locator('.auth-error').isVisible().catch(() => false);
-    if (errorVisible) {
-      // Login failed - skip logout test
-      console.log('Login failed - skipping logout test');
-      return;
-    }
-
-    // Wait for redirect to app/dashboard/layouts
-    await expect(page).toHaveURL(/.*app|.*dashboard|.*layouts/, { timeout: 10000 });
+    // Verify we're on an authenticated page
+    await expect(page).toHaveURL(/.*app|.*dashboard|.*layouts/, { timeout: 5000 });
 
     // Find and click logout button
     // Try multiple possible selectors for logout button
     const logoutButton = page.locator('button:has-text("Logout"), button:has-text("Sign out"), [data-testid="logout"]').first();
     if (await logoutButton.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await logoutButton.click();
+      await Promise.all([
+        page.waitForURL(/.*login/, { timeout: 5000 }),
+        logoutButton.click(),
+      ]);
       // Should redirect to login page
       await expect(page).toHaveURL(/.*login/, { timeout: 5000 });
     } else {

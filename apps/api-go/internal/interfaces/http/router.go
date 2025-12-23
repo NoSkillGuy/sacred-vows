@@ -1,6 +1,8 @@
 package http
 
 import (
+	"os"
+
 	"github.com/gin-gonic/gin"
 	"github.com/sacred-vows/api-go/internal/infrastructure/auth"
 	"github.com/sacred-vows/api-go/internal/interfaces/http/handlers"
@@ -81,6 +83,13 @@ func (r *Router) Setup() *gin.Engine {
 			auth.POST("/google/verify", r.authHandler.GoogleVerify)
 			auth.POST("/forgot-password", r.authHandler.ForgotPassword)
 			auth.POST("/reset-password", r.authHandler.ResetPassword)
+			
+			// Test-only endpoint: Delete user (only enabled in local/test environments)
+			appEnv := os.Getenv("APP_ENV")
+			enableTestEndpoints := os.Getenv("ENABLE_TEST_ENDPOINTS") == "true"
+			if appEnv == "local" || enableTestEndpoints {
+				auth.DELETE("/user", middleware.AuthenticateToken(r.jwtService), r.authHandler.DeleteUser)
+			}
 		}
 
 		// Invitation routes

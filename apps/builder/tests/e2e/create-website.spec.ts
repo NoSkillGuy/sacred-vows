@@ -12,69 +12,29 @@ test.describe('Create Website Flow', () => {
     await page.goto('/login');
     await page.fill('input[name="email"]', 'test@example.com');
     await page.fill('input[name="password"]', 'password123');
-    await page.click('button[type="submit"]');
     
-    // Wait for form submission
-    await page.waitForLoadState('networkidle');
+    // Submit form and wait for navigation
+    await Promise.all([
+      page.waitForURL(/.*app|.*dashboard|.*layouts/, { timeout: 10000 }),
+      page.click('button[type="submit"]'),
+    ]);
     
-    // Wait a bit for potential redirect
-    await page.waitForTimeout(1000);
-    
-    // Check if login succeeded by checking for error message and URL
-    const errorVisible = await page.locator('.auth-error').isVisible({ timeout: 2000 }).catch(() => false);
-    const currentUrl = page.url();
-    const isStillOnLogin = currentUrl.includes('/login');
-    
-    // If we see an error or are still on login page, login definitely failed
-    if (errorVisible || isStillOnLogin) {
-      console.log('Login failed in beforeEach - error visible or still on login page, skipping authenticated tests');
-      loginSucceeded = false;
-      return; // Exit early - don't try to wait for redirect
-    }
-    
-    // We're not on login page and no error visible - try to confirm redirect
-    // Use a short timeout since we've already waited
-    try {
-      await expect(page).toHaveURL(/.*app|.*dashboard|.*layouts/, { timeout: 2000 });
-      loginSucceeded = true;
-      console.log('Login succeeded - redirect confirmed');
-    } catch (e) {
-      // Redirect confirmation failed - double check we're not on login
-      const finalUrl = page.url();
-      if (finalUrl.includes('/login')) {
-        console.log('Login failed in beforeEach - still on login page after redirect check, skipping authenticated tests');
-        loginSucceeded = false;
-      } else {
-        // We're on some other page - might be a different error state
-        // Check one more time for error message
-        const finalErrorVisible = await page.locator('.auth-error').isVisible({ timeout: 1000 }).catch(() => false);
-        loginSucceeded = !finalErrorVisible;
-        if (!loginSucceeded) {
-          console.log('Login failed in beforeEach - error detected after redirect check, skipping authenticated tests');
-        } else {
-          console.log('Login may have succeeded - on non-login page without error');
-        }
-      }
-    }
+    // Verify we're on an authenticated page
+    await expect(page).toHaveURL(/.*app|.*dashboard|.*layouts/, { timeout: 5000 });
+    loginSucceeded = true;
   });
 
   test('should navigate to dashboard', async ({ page }) => {
-    if (!loginSucceeded) {
-      console.log('Skipping test - login failed');
-      return; // Test will pass but do nothing
-    }
+    expect(loginSucceeded).toBe(true);
     
     await page.goto('/dashboard');
     
-    // Should see dashboard content
-    await expect(page.locator('text=/dashboard|invitations|create/i')).toBeVisible();
+    // Should see dashboard content - use first() to handle multiple matches
+    await expect(page.locator('text=/dashboard|invitations|create/i').first()).toBeVisible();
   });
 
   test('should create new invitation', async ({ page }) => {
-    if (!loginSucceeded) {
-      console.log('Skipping test - login failed');
-      return; // Test will pass but do nothing
-    }
+    expect(loginSucceeded).toBe(true);
     
     await page.goto('/dashboard');
 
@@ -87,29 +47,24 @@ test.describe('Create Website Flow', () => {
   });
 
   test('should select layout', async ({ page }) => {
-    if (!loginSucceeded) {
-      console.log('Skipping test - login failed');
-      return; // Test will pass but do nothing
-    }
+    expect(loginSucceeded).toBe(true);
     
     await page.goto('/layouts');
 
-    // Wait for layouts to load
-    await expect(page.locator('text=/classic|editorial|layout/i')).toBeVisible();
+    // Wait for layouts to load - use a more specific locator
+    // Look for the heading "Choose Your Perfect Layout" or a layout title
+    await expect(page.locator('h2:has-text("Choose Your Perfect Layout"), h3:has-text("Classic Scroll"), h3:has-text("Editorial Elegance")').first()).toBeVisible({ timeout: 10000 });
 
-    // Click on a layout card
-    const layoutCard = page.locator('[data-layout-id], .layout-card, article').first();
-    await layoutCard.click();
+    // Click on a layout card - use the "Select Layout" button which is more specific
+    const selectButton = page.locator('button:has-text("Select Layout")').first();
+    await selectButton.click();
 
     // Should navigate to builder or show layout details
-    await expect(page).toHaveURL(/.*builder|.*layout/);
+    await expect(page).toHaveURL(/.*builder|.*layout/, { timeout: 10000 });
   });
 
   test('should navigate to builder with invitation', async ({ page }) => {
-    if (!loginSucceeded) {
-      console.log('Skipping test - login failed');
-      return; // Test will pass but do nothing
-    }
+    expect(loginSucceeded).toBe(true);
     
     // Assuming we have an invitation ID from previous test or setup
     await page.goto('/dashboard');

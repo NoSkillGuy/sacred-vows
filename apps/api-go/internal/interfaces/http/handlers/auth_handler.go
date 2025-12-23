@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -17,6 +18,7 @@ type AuthHandler struct {
 	registerUC             *authuc.RegisterUseCase
 	loginUC                *authuc.LoginUseCase
 	getCurrentUserUC       *authuc.GetCurrentUserUseCase
+	deleteUserUC           *authuc.DeleteUserUseCase
 	googleOAuthUC          *authuc.GoogleOAuthUseCase
 	refreshTokenUC         *authuc.RefreshTokenUseCase
 	requestPasswordResetUC *authuc.RequestPasswordResetUseCase
@@ -32,6 +34,7 @@ func NewAuthHandler(
 	registerUC *authuc.RegisterUseCase,
 	loginUC *authuc.LoginUseCase,
 	getCurrentUserUC *authuc.GetCurrentUserUseCase,
+	deleteUserUC *authuc.DeleteUserUseCase,
 	googleOAuthUC *authuc.GoogleOAuthUseCase,
 	refreshTokenUC *authuc.RefreshTokenUseCase,
 	requestPasswordResetUC *authuc.RequestPasswordResetUseCase,
@@ -46,6 +49,7 @@ func NewAuthHandler(
 		registerUC:             registerUC,
 		loginUC:                loginUC,
 		getCurrentUserUC:       getCurrentUserUC,
+		deleteUserUC:           deleteUserUC,
 		googleOAuthUC:          googleOAuthUC,
 		refreshTokenUC:         refreshTokenUC,
 		requestPasswordResetUC: requestPasswordResetUC,
@@ -328,6 +332,53 @@ func (h *AuthHandler) GetCurrentUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"user": output.User,
+	})
+}
+
+// DeleteUser deletes a user (TEST ONLY - only available in local/test environments)
+// @Summary      Delete user (TEST ONLY)
+// @Description  Deletes the currently authenticated user. This endpoint is only available in test/local environments for test cleanup purposes.
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200      {object}  MessageResponse    "User deleted successfully"
+// @Failure      401      {object}  ErrorResponse      "Authentication required"
+// @Failure      404      {object}  ErrorResponse      "User not found"
+// @Failure      500      {object}  ErrorResponse      "Internal server error"
+// @Router       /auth/user [delete]
+func (h *AuthHandler) DeleteUser(c *gin.Context) {
+	// Check if test endpoints are enabled (only in local/test environments)
+	appEnv := os.Getenv("APP_ENV")
+	enableTestEndpoints := os.Getenv("ENABLE_TEST_ENDPOINTS") == "true"
+
+	if appEnv != "local" && !enableTestEndpoints {
+		c.JSON(http.StatusForbidden, gin.H{"error": "This endpoint is only available in test environments"})
+		return
+	}
+
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+		return
+	}
+
+	err := h.deleteUserUC.Execute(c.Request.Context(), userID.(string))
+	if err != nil {
+		appErr, ok := err.(*errors.AppError)
+		if ok {
+			c.JSON(appErr.Code, appErr.ToResponse())
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
+		return
+	}
+
+	// Also revoke all refresh tokens for this user
+	_ = h.refreshTokenRepo.RevokeByUserID(c.Request.Context(), userID.(string))
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "User deleted successfully",
 	})
 }
 

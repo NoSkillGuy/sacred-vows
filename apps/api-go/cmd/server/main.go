@@ -150,7 +150,7 @@ func main() {
 		}
 		fileStorage = s3StorageImpl
 		gcsStorage = s3StorageImpl
-		logger.GetLogger().Info("Using S3-compatible storage", 
+		logger.GetLogger().Info("Using S3-compatible storage",
 			zap.String("bucket", cfg.Storage.S3Bucket),
 			zap.String("endpoint", cfg.Storage.S3Endpoint))
 	} else {
@@ -171,6 +171,7 @@ func main() {
 	registerUC := authUC.NewRegisterUseCase(userRepo)
 	loginUC := authUC.NewLoginUseCase(userRepo)
 	getCurrentUserUC := authUC.NewGetCurrentUserUseCase(userRepo)
+	deleteUserUC := authUC.NewDeleteUserUseCase(userRepo)
 	googleOAuthUC := authUC.NewGoogleOAuthUseCaseWithService(userRepo, googleOAuthService.GetOAuthConfig(), googleOAuthService)
 
 	hmacKeys := make([]auth.RefreshTokenHMACKey, 0, len(cfg.Auth.RefreshTokenHMACKeys))
@@ -259,7 +260,7 @@ func main() {
 	rollbackUC := publishUC.NewRollbackPublishedSiteUseCase(publishedSiteRepo, artifactStore)
 
 	// Initialize handlers
-	authHandler := handlers.NewAuthHandler(registerUC, loginUC, getCurrentUserUC, googleOAuthUC, refreshTokenUC, requestPasswordResetUC, resetPasswordUC, refreshTokenRepo, jwtService, googleOAuthService, hmacKeys, cfg.Auth.RefreshTokenHMACActiveKeyID)
+	authHandler := handlers.NewAuthHandler(registerUC, loginUC, getCurrentUserUC, deleteUserUC, googleOAuthUC, refreshTokenUC, requestPasswordResetUC, resetPasswordUC, refreshTokenRepo, jwtService, googleOAuthService, hmacKeys, cfg.Auth.RefreshTokenHMACActiveKeyID)
 	invitationHandler := handlers.NewInvitationHandler(createInvitationUC, getInvitationByIDUC, getAllInvitationsUC, getInvitationPreviewUC, updateInvitationUC, deleteInvitationUC, migrateInvitationsUC, fileStorage)
 	layoutHandler := handlers.NewLayoutHandler(getAllLayoutsUC, getLayoutByIDUC, getLayoutManifestUC, getManifestsUC)
 	assetHandler := handlers.NewAssetHandler(uploadAssetUC, getAllAssetsUC, deleteAssetUC, deleteAssetsByURLsUC, getAssetsByURLsUC, fileStorage, gcsStorage, cfg.Storage.SignedURLExpiration, imageProcessor)
