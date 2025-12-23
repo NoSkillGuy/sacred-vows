@@ -6,6 +6,7 @@
  */
 
 import type { LayoutManifest } from '@shared/types/layout';
+import { getLayoutPreviewUrl } from '../../services/defaultAssetService';
 
 export const classicScrollManifest: LayoutManifest = {
   id: 'classic-scroll',
@@ -13,8 +14,9 @@ export const classicScrollManifest: LayoutManifest = {
   version: '1.0.0',
   
   metadata: {
+    name: 'Classic Scroll',
     description: 'Traditional single-column layout with elegant typography and centered content. Perfect for couples who appreciate classic design and formal celebrations.',
-    previewImage: '/layouts/classic-scroll/preview.jpg',
+    previewImage: getLayoutPreviewUrl('classic-scroll', 'preview.jpg'),
     tags: ['elegant', 'classic', 'traditional', 'scroll', 'vertical'],
     author: 'Sacred Vows',
     version: '1.0.0',

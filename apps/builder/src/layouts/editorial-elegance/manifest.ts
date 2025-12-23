@@ -6,6 +6,7 @@
  */
 
 import type { LayoutManifest } from '@shared/types/layout';
+import { getLayoutPreviewUrl } from '../../services/defaultAssetService';
 
 export const editorialEleganceManifest: LayoutManifest = {
   id: 'editorial-elegance',
@@ -13,8 +14,9 @@ export const editorialEleganceManifest: LayoutManifest = {
   version: '1.0.0',
   
   metadata: {
+    name: 'Editorial Elegance',
     description: 'Luxury magazine-style layout with minimal design, typography-led aesthetics, and editorial photography. Perfect for couples who appreciate subtle luxury and modern design.',
-    previewImage: '/layouts/editorial-elegance/preview.jpg',
+    previewImage: getLayoutPreviewUrl('editorial-elegance', 'preview.jpg'),
     tags: ['luxury', 'minimal', 'editorial', 'modern', 'premium', 'magazine'],
     author: 'Sacred Vows',
     version: '1.0.0',

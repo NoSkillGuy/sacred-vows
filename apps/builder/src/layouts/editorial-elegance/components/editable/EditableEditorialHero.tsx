@@ -22,7 +22,7 @@ function EditableEditorialHero({ translations, currentLang, config = {}, onUpdat
   
   const alignment = hero.alignment || 'center';
   const mediaType = hero.mediaType || 'image';
-  const mainImage = hero.mainImage || '/assets/hero-default.jpg';
+  const mainImage = hero.mainImage || '';
   const videoUrl = hero.videoUrl || '';
   const videoPoster = hero.videoPoster || mainImage;
   

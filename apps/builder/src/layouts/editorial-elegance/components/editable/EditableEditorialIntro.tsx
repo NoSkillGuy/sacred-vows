@@ -8,7 +8,7 @@ function EditableEditorialIntro({ translations, currentLang, config = {}, onUpda
   const editorialIntro = config.editorialIntro || {};
   const introText = editorialIntro.text || 
     'Two paths, one story.\nRooted in tradition, bound by love,\nwe invite you to celebrate the beginning of forever.';
-  const introImage = editorialIntro.image || '/assets/couple-portrait.jpg';
+  const introImage = editorialIntro.image || '';
   const alignment = editorialIntro.alignment || 'right';
   
   return (

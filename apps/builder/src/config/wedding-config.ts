@@ -5,6 +5,10 @@
  * This configuration is separated into:
  * 1. Universal Content Data - Shared across all layouts
  * 2. Layout Configuration - Per-layout settings (sections, themes)
+ * 
+ * NOTE: Asset paths in this config use the old format (/assets/photos/..., /assets/music/...)
+ * These paths will be automatically converted to CDN URLs by getLayoutAssetUrl() when used
+ * in layout-specific contexts. Components should use getLayoutAssetUrl() when rendering images.
  */
 
 import { 

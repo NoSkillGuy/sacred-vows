@@ -145,11 +145,11 @@ function generateBodyHTML(invitation: InvitationData, translations?: Record<stri
   
   // Hero Section
   const heroData = (data as Record<string, unknown>)?.hero as { mainImage?: string } | undefined;
-  const heroImage = heroData?.mainImage || '/assets/hero-default.jpg';
+  const heroImage = heroData?.mainImage || '';
   html += `
     <section class="ee-hero" data-alignment="center">
       <div class="ee-hero-media">
-        <img src="${heroImage}" alt="${brideName} & ${groomName}" class="ee-hero-image" />
+        ${heroImage ? `<img src="${heroImage}" alt="${brideName} & ${groomName}" class="ee-hero-image" />` : ''}
         <div class="ee-hero-overlay"></div>
       </div>
       <div class="ee-hero-content">
