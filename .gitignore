@@ -46,6 +46,10 @@ logs/
 # Builder build output
 apps/builder/dist/
 
+# Test results
+apps/builder/playwright-report/
+apps/builder/test-results/
+
 # Published site artifacts (local filesystem artifact store)
 apps/api-go/published/sites/
 
