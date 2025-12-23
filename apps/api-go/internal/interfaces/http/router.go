@@ -5,9 +5,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/sacred-vows/api-go/internal/infrastructure/auth"
+	"github.com/sacred-vows/api-go/internal/infrastructure/config"
 	"github.com/sacred-vows/api-go/internal/interfaces/http/handlers"
 	"github.com/sacred-vows/api-go/internal/interfaces/http/middleware"
 	"github.com/sacred-vows/api-go/pkg/logger"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
@@ -24,6 +26,7 @@ type Router struct {
 	resolveAPIHandler *handlers.PublishedResolveAPIHandler
 	jwtService        *auth.JWTService
 	frontendURL       string
+	observabilityCfg  config.ObservabilityConfig
 }
 
 func NewRouter(
@@ -38,6 +41,7 @@ func NewRouter(
 	resolveAPIHandler *handlers.PublishedResolveAPIHandler,
 	jwtService *auth.JWTService,
 	frontendURL string,
+	observabilityCfg config.ObservabilityConfig,
 ) *Router {
 	return &Router{
 		authHandler:       authHandler,
@@ -51,6 +55,7 @@ func NewRouter(
 		resolveAPIHandler: resolveAPIHandler,
 		jwtService:        jwtService,
 		frontendURL:       frontendURL,
+		observabilityCfg:  observabilityCfg,
 	}
 }
 
@@ -60,6 +65,15 @@ func (r *Router) Setup() *gin.Engine {
 
 	// Middleware
 	router.Use(gin.Recovery())
+	
+	// Request ID middleware (early in chain for correlation)
+	router.Use(middleware.RequestIDMiddleware())
+	
+	// OpenTelemetry middleware (if enabled)
+	if r.observabilityCfg.Enabled {
+		router.Use(otelgin.Middleware(r.observabilityCfg.ServiceName))
+	}
+	
 	router.Use(middleware.CORS(r.frontendURL))
 	router.Use(middleware.ErrorHandler())
 	router.Use(logger.GinLogger())

@@ -15,14 +15,15 @@ import (
 )
 
 type Config struct {
-	Server       ServerConfig
-	Database     DatabaseConfig
-	Auth         AuthConfig
-	Storage      StorageConfig
-	Google       GoogleConfig
-	Publishing   PublishingConfig
-	PublicAssets PublicAssetsConfig
-	Email        EmailConfig
+	Server        ServerConfig
+	Database      DatabaseConfig
+	Auth          AuthConfig
+	Storage       StorageConfig
+	Google        GoogleConfig
+	Publishing    PublishingConfig
+	PublicAssets  PublicAssetsConfig
+	Email         EmailConfig
+	Observability ObservabilityConfig
 }
 
 type ServerConfig struct {
@@ -121,6 +122,16 @@ type EmailConfig struct {
 	Vendors     []EmailVendorConfig
 	FromAddress string // Default from address (used if vendor doesn't specify)
 	FromName    string // Default from name (used if vendor doesn't specify)
+}
+
+type ObservabilityConfig struct {
+	Enabled              bool    // OTEL_ENABLED, default: true in dev/local, false in prod unless explicitly enabled
+	ExporterEndpoint     string  // OTEL_EXPORTER_OTLP_ENDPOINT
+	ExporterProtocol     string  // OTEL_EXPORTER_OTLP_PROTOCOL, default: grpc
+	ServiceName          string  // OTEL_SERVICE_NAME, default: sacred-vows-api
+	ServiceVersion       string  // from git SHA or build info
+	DeploymentEnvironment string // OTEL_RESOURCE_ATTRIBUTES or APP_ENV
+	SamplingRate         float64 // OTEL_TRACES_SAMPLER_ARG, default: 0.1 for normal, 1.0 for errors
 }
 
 // ConfigFile represents the YAML config file structure
@@ -255,6 +266,7 @@ func Load() (*Config, error) {
 			CDNBaseURL: getEnv("PUBLIC_ASSETS_CDN_URL", getYAMLString(yamlConfig, "public_assets.cdn_base_url", "")),
 		},
 		Email: loadEmailConfig(yamlConfig),
+		Observability: loadObservabilityConfig(yamlConfig),
 	}
 
 	if err := config.validate(); err != nil {
@@ -685,6 +697,57 @@ func loadEmailConfig(yamlConfig *ConfigFile) EmailConfig {
 
 	// If no vendors configured, return empty config (will be handled by factory)
 	return cfg
+}
+
+// loadObservabilityConfig loads observability configuration
+func loadObservabilityConfig(yamlConfig *ConfigFile) ObservabilityConfig {
+	appEnv := getEnv("APP_ENV", "local")
+	
+	// Default enabled to true for dev/local, false for prod unless explicitly set
+	enabledDefault := appEnv == "local" || appEnv == "dev"
+	enabledStr := getEnv("OTEL_ENABLED", "")
+	var enabled bool
+	if enabledStr == "" {
+		enabled = enabledDefault
+	} else {
+		enabled = enabledStr == "true" || enabledStr == "1"
+	}
+
+	// Get service version from env or use "unknown"
+	serviceVersion := getEnv("OTEL_SERVICE_VERSION", getEnv("GIT_SHA", "unknown"))
+	
+	// Get deployment environment from APP_ENV or OTEL_RESOURCE_ATTRIBUTES
+	deploymentEnv := appEnv
+	if resourceAttrs := getEnv("OTEL_RESOURCE_ATTRIBUTES", ""); resourceAttrs != "" {
+		// Parse deployment.environment from OTEL_RESOURCE_ATTRIBUTES if present
+		// Format: "key1=value1,key2=value2"
+		parts := strings.Split(resourceAttrs, ",")
+		for _, part := range parts {
+			kv := strings.SplitN(strings.TrimSpace(part), "=", 2)
+			if len(kv) == 2 && kv[0] == "deployment.environment" {
+				deploymentEnv = kv[1]
+				break
+			}
+		}
+	}
+
+	// Parse sampling rate
+	samplingRate := 0.1 // default 10%
+	if samplerArg := getEnv("OTEL_TRACES_SAMPLER_ARG", ""); samplerArg != "" {
+		if rate, err := strconv.ParseFloat(samplerArg, 64); err == nil {
+			samplingRate = rate
+		}
+	}
+
+	return ObservabilityConfig{
+		Enabled:              enabled,
+		ExporterEndpoint:     getEnv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4317"),
+		ExporterProtocol:     getEnv("OTEL_EXPORTER_OTLP_PROTOCOL", "grpc"),
+		ServiceName:          getEnv("OTEL_SERVICE_NAME", "sacred-vows-api"),
+		ServiceVersion:       serviceVersion,
+		DeploymentEnvironment: deploymentEnv,
+		SamplingRate:         samplingRate,
+	}
 }
 
 // contains checks if a comma-separated string contains a value

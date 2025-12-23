@@ -1,0 +1,25 @@
+package observability
+
+import (
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/sdk/resource"
+	semconv "go.opentelemetry.io/otel/semconv/v1.27.0"
+)
+
+// NewResource creates a new OpenTelemetry resource with service attributes
+func NewResource(serviceName, serviceVersion, deploymentEnvironment string) (*resource.Resource, error) {
+	attrs := []attribute.KeyValue{
+		semconv.ServiceNameKey.String(serviceName),
+		semconv.ServiceVersionKey.String(serviceVersion),
+		attribute.String("deployment.environment", deploymentEnvironment),
+	}
+
+	return resource.Merge(
+		resource.Default(),
+		resource.NewWithAttributes(
+			semconv.SchemaURL,
+			attrs...,
+		),
+	)
+}
+

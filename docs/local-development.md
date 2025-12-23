@@ -19,23 +19,31 @@ For local development, we use MinIO (an S3-compatible storage server) to simulat
 
 ## Quick Start
 
-### 1. Start MinIO
+### 1. Start Services
 
-MinIO is included in `docker-compose.yml`. Start it along with other services:
-
-```bash
-docker-compose up -d minio
-```
-
-Or start all services:
+All services are included in `docker-compose.yml`. Start them all:
 
 ```bash
 docker-compose up -d
 ```
 
-MinIO will be available at:
-- **API**: http://localhost:9000
-- **Console**: http://localhost:9001 (login: `minioadmin` / `minioadmin`)
+This starts:
+- **Firestore Emulator**: http://localhost:8080 (API), http://localhost:4000 (UI)
+- **MinIO**: http://localhost:9000 (API), http://localhost:9001 (Console, login: `minioadmin`/`minioadmin`)
+- **Tempo** (Observability): http://localhost:3200 (UI), OTLP gRPC on 4317, HTTP on 4318
+- **Prometheus** (Observability): http://localhost:9090
+- **Grafana** (Observability): http://localhost:3001 (login: `admin`/`admin`)
+- **API Server**: http://localhost:3000
+
+Or start individual services:
+
+```bash
+# Just MinIO
+docker-compose up -d minio
+
+# Just observability stack
+docker-compose up -d tempo prometheus grafana
+```
 
 ### 2. Initialize Buckets and Upload Assets
 
@@ -369,11 +377,43 @@ defaults/
 | Public Access | Custom domain (e.g., `pub.sacredvows.io`) | Direct MinIO URL |
 | Buckets | `sacred-vows-published-prod` | `sacred-vows-published-local` |
 
+## Observability
+
+The local development environment includes a full observability stack for distributed tracing and metrics:
+
+- **Tempo**: Distributed tracing backend (http://localhost:3200)
+- **Prometheus**: Metrics collection (http://localhost:9090)
+- **Grafana**: Visualization and dashboards (http://localhost:3001, admin/admin)
+
+### Quick Start
+
+Observability services start automatically with `docker-compose up -d`. To start just the observability stack:
+
+```bash
+docker-compose up -d tempo prometheus grafana
+```
+
+### Viewing Traces
+
+1. Open Grafana: http://localhost:3001
+2. Navigate to **Explore** (compass icon)
+3. Select **Tempo** data source
+4. Search by service: `{service.name="sacred-vows-api"}` or by request ID: `{http.request_id="<uuid>"}`
+
+### Configuration
+
+Observability is enabled by default in local development. See [Telemetry Documentation](./telemetry.md) for:
+- Detailed configuration options
+- Request ID and trace correlation
+- How to disable observability
+- Production setup instructions
+
 ## Next Steps
 
 - [ ] Start MinIO: `docker-compose up -d minio`
 - [ ] Initialize buckets: `./scripts/init-local-r2.sh`
 - [ ] Configure environment variables
+- [ ] Explore traces in Grafana: http://localhost:3001
 - [ ] Test publishing an invitation
 - [ ] Verify assets load from MinIO
 - [ ] Check MinIO console for uploaded files

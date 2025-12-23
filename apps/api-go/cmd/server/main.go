@@ -34,6 +34,7 @@ import (
 	"github.com/sacred-vows/api-go/internal/infrastructure/config"
 	"github.com/sacred-vows/api-go/internal/infrastructure/database/firestore"
 	"github.com/sacred-vows/api-go/internal/infrastructure/email"
+	"github.com/sacred-vows/api-go/internal/infrastructure/observability"
 	publishinfra "github.com/sacred-vows/api-go/internal/infrastructure/publish"
 	"github.com/sacred-vows/api-go/internal/infrastructure/storage"
 	httpRouter "github.com/sacred-vows/api-go/internal/interfaces/http"
@@ -270,8 +271,38 @@ func main() {
 	resolveHandler := handlers.NewPublishedSiteResolveHandler(publishedSiteRepo, cfg.Publishing.BaseDomain)
 	resolveAPIHandler := handlers.NewPublishedResolveAPIHandler(publishedSiteRepo, cfg.Publishing.BaseDomain)
 
+	// Initialize observability if enabled
+	if cfg.Observability.Enabled {
+		tracerCfg := observability.TracerConfig{
+			Enabled:               cfg.Observability.Enabled,
+			Endpoint:              cfg.Observability.ExporterEndpoint,
+			Protocol:              cfg.Observability.ExporterProtocol,
+			ServiceName:           cfg.Observability.ServiceName,
+			ServiceVersion:        cfg.Observability.ServiceVersion,
+			DeploymentEnvironment: cfg.Observability.DeploymentEnvironment,
+			SamplingRate:          cfg.Observability.SamplingRate,
+		}
+		meterCfg := observability.MeterConfig{
+			Enabled:               cfg.Observability.Enabled,
+			Endpoint:              cfg.Observability.ExporterEndpoint,
+			Protocol:              cfg.Observability.ExporterProtocol,
+			ServiceName:           cfg.Observability.ServiceName,
+			ServiceVersion:        cfg.Observability.ServiceVersion,
+			DeploymentEnvironment: cfg.Observability.DeploymentEnvironment,
+		}
+		if err := observability.Init(ctx, tracerCfg, meterCfg); err != nil {
+			logger.GetLogger().Warn("Failed to initialize observability", zap.Error(err))
+		} else {
+			// Initialize metrics
+			meter := observability.Meter("sacred-vows-api")
+			if err := observability.InitMetrics(meter); err != nil {
+				logger.GetLogger().Warn("Failed to initialize metrics", zap.Error(err))
+			}
+		}
+	}
+
 	// Setup router
-	router := httpRouter.NewRouter(authHandler, invitationHandler, layoutHandler, assetHandler, rsvpHandler, analyticsHandler, publishHandler, resolveHandler, resolveAPIHandler, jwtService, cfg.Google.FrontendURL)
+	router := httpRouter.NewRouter(authHandler, invitationHandler, layoutHandler, assetHandler, rsvpHandler, analyticsHandler, publishHandler, resolveHandler, resolveAPIHandler, jwtService, cfg.Google.FrontendURL, cfg.Observability)
 	engine := router.Setup()
 
 	// Create HTTP server
@@ -303,6 +334,15 @@ func main() {
 
 	if err := srv.Shutdown(ctx); err != nil {
 		logger.GetLogger().Fatal("Server forced to shutdown", zap.Error(err))
+	}
+
+	// Shutdown observability (flush telemetry)
+	if cfg.Observability.Enabled {
+		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer shutdownCancel()
+		if err := observability.Shutdown(shutdownCtx); err != nil {
+			logger.GetLogger().Warn("Failed to shutdown observability", zap.Error(err))
+		}
 	}
 
 	logger.GetLogger().Info("Server exited")

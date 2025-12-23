@@ -4,6 +4,8 @@
  */
 
 import { getAccessToken, clearAccessToken } from './tokenStorage';
+import { generateRequestId } from '../lib/observability';
+import { trace } from '@opentelemetry/api';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
@@ -79,15 +81,26 @@ export async function apiRequest(url: string, options: RequestOptions = {}): Pro
   // Ensure URL is absolute
   const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url.startsWith('/') ? url : `/${url}`}`;
 
+  // Generate request ID for correlation
+  const requestId = generateRequestId();
+
   // Get current access token
   const token = getAccessToken();
 
+  // Get current span to add request ID attribute
+  const activeSpan = trace.getActiveSpan();
+  if (activeSpan) {
+    activeSpan.setAttribute('http.request_id', requestId);
+  }
+
   // Prepare headers
   // Don't set Content-Type for FormData - browser will set it with boundary
+  // Fetch instrumentation automatically adds traceparent header for trace propagation
   const isFormData = options.body instanceof FormData;
   const headers: HeadersInit = {
     ...(!isFormData && { 'Content-Type': 'application/json' }),
     ...(token && { 'Authorization': `Bearer ${token}` }),
+    'X-Request-ID': requestId, // Add request ID header for correlation
     ...options.headers,
   };
 
@@ -113,7 +126,7 @@ export async function apiRequest(url: string, options: RequestOptions = {}): Pro
       try {
         await refreshAccessToken();
         
-        // Get new token and retry original request
+        // Get new token and retry original request (use same request ID)
         const newToken = getAccessToken();
         if (newToken) {
           response = await fetch(fullUrl, {
@@ -121,6 +134,7 @@ export async function apiRequest(url: string, options: RequestOptions = {}): Pro
             headers: {
               ...headers,
               'Authorization': `Bearer ${newToken}`,
+              'X-Request-ID': requestId, // Preserve request ID on retry
             },
             credentials: 'include',
           });
