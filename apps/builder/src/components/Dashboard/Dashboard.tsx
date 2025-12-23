@@ -464,9 +464,27 @@ function InvitationCard({ invitation, onEdit, onDelete, onTitleUpdate, formatDat
   
   // Extract couple names from data if available (used as fallback)
   const coupleData = data?.couple || {};
-  const fallbackCoupleName = coupleData.bride && coupleData.groom 
-    ? `${coupleData.bride} & ${coupleData.groom}`
-    : 'Untitled Invitation';
+  const getBrideName = (): string | undefined => {
+    if (!coupleData.bride) return undefined;
+    if (typeof coupleData.bride === 'string') return coupleData.bride;
+    if (typeof coupleData.bride === 'object' && 'name' in coupleData.bride) {
+      return (coupleData.bride as { name?: string }).name;
+    }
+    return undefined;
+  };
+  const getGroomName = (): string | undefined => {
+    if (!coupleData.groom) return undefined;
+    if (typeof coupleData.groom === 'string') return coupleData.groom;
+    if (typeof coupleData.groom === 'object' && 'name' in coupleData.groom) {
+      return (coupleData.groom as { name?: string }).name;
+    }
+    return undefined;
+  };
+  const brideName = getBrideName();
+  const groomName = getGroomName();
+  const fallbackCoupleName = brideName && groomName
+    ? `${brideName} & ${groomName}`
+    : brideName || groomName || 'Untitled Invitation';
   const displayTitle = title?.trim() || fallbackCoupleName;
   
   const weddingDate = (data as { weddingDate?: string })?.weddingDate || createdAt;

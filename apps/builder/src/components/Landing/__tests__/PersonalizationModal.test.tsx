@@ -67,7 +67,7 @@ describe('PersonalizationModal', () => {
     it('should display explanation text about live preview', () => {
       render(<PersonalizationModal isOpen={true} onClose={vi.fn()} />);
       expect(screen.getByText(/We'd love to personalize your preview!/)).toBeInTheDocument();
-      expect(screen.getByText(/see them in the live preview card/)).toBeInTheDocument();
+      expect(screen.getByText(/see them update in real-time/i)).toBeInTheDocument();
     });
   });
 

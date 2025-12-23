@@ -2,36 +2,14 @@
  * LandingPage Integration Tests
  * 
  * These tests verify the complete user flow for personalization.
- * To run these tests, a testing framework (Jest + React Testing Library) needs to be set up.
- * 
- * Test Framework Setup Required:
- * - @testing-library/react
- * - @testing-library/jest-dom
- * - @testing-library/user-event
- * - jest
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import LandingPage from '../LandingPage';
-
-// Mock localStorage
-const localStorageMock = (() => {
-  let store = {};
-  return {
-    getItem: vi.fn((key) => store[key] || null),
-    setItem: vi.fn((key, value) => {
-      store[key] = value.toString();
-    }),
-    removeItem: vi.fn((key) => {
-      delete store[key];
-    }),
-    clear: vi.fn(() => {
-      store = {};
-    }),
-  };
-})();
 
 // Mock analytics service
 vi.mock('../../../services/analyticsService', () => ({
@@ -42,49 +20,84 @@ vi.mock('../../../services/analyticsService', () => ({
 }));
 
 const renderLandingPage = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false,
+      },
+    },
+  });
+
   return render(
-    <BrowserRouter>
-      <LandingPage />
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <LandingPage />
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 };
 
 describe('LandingPage Personalization Integration', () => {
   beforeEach(() => {
-    Object.defineProperty(window, 'localStorage', {
-      value: localStorageMock,
-    });
-    localStorageMock.clear();
-  });
-
-  afterEach(() => {
+    localStorage.clear();
     vi.clearAllMocks();
   });
 
+  afterEach(() => {
+    // Only clean up timers if fake timers were used
+    if (vi.isFakeTimers()) {
+      vi.runOnlyPendingTimers();
+      vi.useRealTimers();
+    }
+  });
+
   describe('User Flow', () => {
-    it('should show modal when user visits page for first time', () => {
+    it('should show modal when user visits page for first time', async () => {
+      vi.useFakeTimers();
       renderLandingPage();
       
+      // Advance timers to trigger modal (15 second delay)
+      await act(async () => {
+        vi.advanceTimersByTime(15000);
+      });
+      
       expect(screen.getByText('Personalize Your Preview')).toBeInTheDocument();
+      vi.useRealTimers();
     });
 
     it('should save data to localStorage when user fills form and saves', async () => {
+      vi.useFakeTimers();
+      const user = userEvent.setup({ delay: null });
       renderLandingPage();
       
+      // Advance timers to trigger modal (15 second delay)
+      await act(async () => {
+        vi.advanceTimersByTime(15000);
+      });
+      
+      // Modal should be visible
+      expect(screen.getByText('Personalize Your Preview')).toBeInTheDocument();
+      
+      // Switch to real timers for user interactions
+      vi.useRealTimers();
+      
       // Fill form
-      fireEvent.change(screen.getByLabelText("Bride's Name"), { target: { value: 'Sarah' } });
-      fireEvent.change(screen.getByLabelText("Groom's Name"), { target: { value: 'John' } });
-      fireEvent.change(screen.getByLabelText('Wedding Date'), { target: { value: '2025-12-15' } });
-      fireEvent.change(screen.getByLabelText('Venue / Place'), { target: { value: 'Grand Hotel' } });
+      await user.type(screen.getByLabelText("Bride's Name"), 'Sarah');
+      await user.type(screen.getByLabelText("Groom's Name"), 'John');
+      await user.type(screen.getByLabelText('Wedding Date'), '2025-12-15');
+      await user.type(screen.getByLabelText('Venue / Place'), 'Grand Hotel');
       
       // Save
-      fireEvent.click(screen.getByText('Save & Preview'));
+      await user.click(screen.getByText('Save & Preview'));
       
-      // Verify localStorage was called
-      expect(localStorageMock.setItem).toHaveBeenCalledWith(
-        'landing-personalization-data',
-        expect.stringContaining('Sarah')
-      );
+      // Verify localStorage was updated
+      await waitFor(() => {
+        const stored = localStorage.getItem('landing-personalization-data');
+        expect(stored).toBeTruthy();
+        const parsed = JSON.parse(stored!);
+        expect(parsed.brideName).toBe('Sarah');
+        expect(parsed.groomName).toBe('John');
+      });
       
       // Modal should close
       await waitFor(() => {
@@ -99,7 +112,7 @@ describe('LandingPage Personalization Integration', () => {
         weddingDate: '2025-12-15',
         venue: 'Grand Hotel',
       };
-      localStorageMock.setItem('landing-personalization-data', JSON.stringify(personalizationData));
+      localStorage.setItem('landing-personalization-data', JSON.stringify(personalizationData));
       
       renderLandingPage();
       
@@ -113,7 +126,7 @@ describe('LandingPage Personalization Integration', () => {
         weddingDate: '2025-12-15',
         venue: 'Grand Hotel',
       };
-      localStorageMock.setItem('landing-personalization-data', JSON.stringify(personalizationData));
+      localStorage.setItem('landing-personalization-data', JSON.stringify(personalizationData));
       
       renderLandingPage();
       
@@ -127,32 +140,77 @@ describe('LandingPage Personalization Integration', () => {
 
   describe('Partial Completion', () => {
     it('should save correctly when user fills only bride name', async () => {
+      vi.useFakeTimers();
+      const user = userEvent.setup({ delay: null });
       renderLandingPage();
       
-      fireEvent.change(screen.getByLabelText("Bride's Name"), { target: { value: 'Sarah' } });
-      fireEvent.click(screen.getByText('Save & Preview'));
+      // Advance timers to trigger modal (15 second delay)
+      await act(async () => {
+        vi.advanceTimersByTime(15000);
+      });
       
-      expect(localStorageMock.setItem).toHaveBeenCalled();
-      const savedData = JSON.parse(localStorageMock.setItem.mock.calls[0][1]);
-      expect(savedData.brideName).toBe('Sarah');
-      expect(savedData.groomName).toBe('');
+      // Modal should be visible
+      expect(screen.getByText('Personalize Your Preview')).toBeInTheDocument();
+      
+      // Switch to real timers for user interactions
+      vi.useRealTimers();
+      
+      await user.type(screen.getByLabelText("Bride's Name"), 'Sarah');
+      await user.click(screen.getByText('Save & Preview'));
+      
+      await waitFor(() => {
+        const stored = localStorage.getItem('landing-personalization-data');
+        expect(stored).toBeTruthy();
+        const savedData = JSON.parse(stored!);
+        expect(savedData.brideName).toBe('Sarah');
+        expect(savedData.groomName).toBe('');
+      });
     });
 
     it('should save correctly when user fills only date', async () => {
+      vi.useFakeTimers();
+      const user = userEvent.setup({ delay: null });
       renderLandingPage();
       
-      fireEvent.change(screen.getByLabelText('Wedding Date'), { target: { value: '2025-12-15' } });
-      fireEvent.click(screen.getByText('Save & Preview'));
+      // Advance timers to trigger modal (15 second delay)
+      await act(async () => {
+        vi.advanceTimersByTime(15000);
+      });
       
-      expect(localStorageMock.setItem).toHaveBeenCalled();
-      const savedData = JSON.parse(localStorageMock.setItem.mock.calls[0][1]);
-      expect(savedData.weddingDate).toBe('2025-12-15');
+      // Modal should be visible
+      expect(screen.getByText('Personalize Your Preview')).toBeInTheDocument();
+      
+      // Switch to real timers for user interactions
+      vi.useRealTimers();
+      
+      await user.type(screen.getByLabelText('Wedding Date'), '2025-12-15');
+      await user.click(screen.getByText('Save & Preview'));
+      
+      await waitFor(() => {
+        const stored = localStorage.getItem('landing-personalization-data');
+        expect(stored).toBeTruthy();
+        const savedData = JSON.parse(stored!);
+        expect(savedData.weddingDate).toBe('2025-12-15');
+      });
     });
 
     it('should close modal and show defaults when user skips all fields', async () => {
+      vi.useFakeTimers();
+      const user = userEvent.setup({ delay: null });
       renderLandingPage();
       
-      fireEvent.click(screen.getByText('Skip'));
+      // Advance timers to trigger modal (15 second delay)
+      await act(async () => {
+        vi.advanceTimersByTime(15000);
+      });
+      
+      // Modal should be visible
+      expect(screen.getByText('Personalize Your Preview')).toBeInTheDocument();
+      
+      // Switch to real timers for user interactions
+      vi.useRealTimers();
+      
+      await user.click(screen.getByText('Skip'));
       
       // Modal should close
       await waitFor(() => {

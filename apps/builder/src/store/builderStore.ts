@@ -402,15 +402,16 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
         const manifestSectionIds = new Set(currentLayoutManifest.sections.map(s => s.id));
         sections = sections.filter(s => manifestSectionIds.has(s.id));
         
-        // Ensure sections maintain manifest order
+        // Use order property first (respects user reordering), fallback to manifest order
         const manifestOrder = new Map<string, number>();
         currentLayoutManifest.sections.forEach((s, index) => {
           manifestOrder.set(s.id, index);
         });
         
         sections = sections.sort((a, b) => {
-          const orderA = manifestOrder.get(a.id) ?? a.order;
-          const orderB = manifestOrder.get(b.id) ?? b.order;
+          // Prioritize order property over manifest order to respect user reordering
+          const orderA = a.order ?? manifestOrder.get(a.id) ?? 0;
+          const orderB = b.order ?? manifestOrder.get(b.id) ?? 0;
           return orderA - orderB;
         });
       } else {

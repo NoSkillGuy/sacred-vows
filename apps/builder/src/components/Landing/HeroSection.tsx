@@ -249,7 +249,9 @@ function HeroSection({ onSectionView }: HeroSectionProps): ReactElement {
   const displayDate = personalizationData?.weddingDate 
     ? formatDate(personalizationData.weddingDate) || DEFAULT_DATE
     : DEFAULT_DATE;
-  const venue = personalizationData?.venue || DEFAULT_VENUE;
+  const venue = personalizationData?.venue 
+    ? personalizationData.venue.toUpperCase() 
+    : DEFAULT_VENUE;
 
   // Generate petals with random properties
   const petals: Petal[] = [...Array(15)].map((_, i) => ({

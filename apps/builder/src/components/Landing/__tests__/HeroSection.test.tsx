@@ -12,7 +12,8 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, act } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import HeroSection from '../HeroSection';
 
@@ -55,6 +56,11 @@ describe('HeroSection Personalization', () => {
   });
 
   afterEach(() => {
+    // Only clean up timers if fake timers were used
+    if (vi.isFakeTimers()) {
+      vi.runOnlyPendingTimers();
+      vi.useRealTimers();
+    }
     vi.clearAllMocks();
   });
 
@@ -84,8 +90,13 @@ describe('HeroSection Personalization', () => {
       
       renderHeroSection();
       
+      // Modal should not be visible when data exists
+      expect(screen.queryByText('Personalize Your Preview')).not.toBeInTheDocument();
+      
+      // Check showcase card shows personalized data
       await waitFor(() => {
-        expect(screen.getByText('Sarah')).toBeInTheDocument();
+        const sarahElements = screen.getAllByText('Sarah');
+        expect(sarahElements.length).toBeGreaterThan(0);
         expect(screen.getByText('John')).toBeInTheDocument();
         expect(screen.getByText('GRAND HOTEL')).toBeInTheDocument();
       });
@@ -113,9 +124,13 @@ describe('HeroSection Personalization', () => {
       
       renderHeroSection();
       
+      // Modal should not be visible when data exists
+      expect(screen.queryByText('Personalize Your Preview')).not.toBeInTheDocument();
+      
       await waitFor(() => {
-        // Date should be formatted as "DECEMBER 15, 2025"
-        expect(screen.getByText(/DECEMBER 15, 2025/i)).toBeInTheDocument();
+        // Date should be formatted as "DECEMBER 15, 2025" - check that at least one exists
+        const dateElements = screen.getAllByText(/DECEMBER 15, 2025/i);
+        expect(dateElements.length).toBeGreaterThan(0);
       });
     });
 
@@ -150,10 +165,17 @@ describe('HeroSection Personalization', () => {
   });
 
   describe('Modal Integration', () => {
-    it('should show modal on first visit (no localStorage data)', () => {
+    it('should show modal on first visit (no localStorage data)', async () => {
+      vi.useFakeTimers();
       renderHeroSection();
       
+      // Advance timers to trigger modal (15 second delay)
+      await act(async () => {
+        vi.advanceTimersByTime(15000);
+      });
+      
       expect(screen.getByText('Personalize Your Preview')).toBeInTheDocument();
+      vi.useRealTimers();
     });
 
     it('should not show modal if data exists', () => {
@@ -171,23 +193,28 @@ describe('HeroSection Personalization', () => {
     });
 
     it('should update showcase card after modal save', async () => {
+      vi.useFakeTimers();
+      const user = userEvent.setup({ delay: null });
       renderHeroSection();
+      
+      // Advance timers to trigger modal (15 second delay)
+      await act(async () => {
+        vi.advanceTimersByTime(15000);
+      });
       
       // Modal should be visible
       expect(screen.getByText('Personalize Your Preview')).toBeInTheDocument();
       
+      // Switch to real timers for user interactions
+      vi.useRealTimers();
+      
       // Fill form and save
-      const brideInput = screen.getByLabelText("Bride's Name");
-      const groomInput = screen.getByLabelText("Groom's Name");
-      const dateInput = screen.getByLabelText('Wedding Date');
-      const venueInput = screen.getByLabelText('Venue / Place');
+      await user.type(screen.getByLabelText("Bride's Name"), 'Sarah');
+      await user.type(screen.getByLabelText("Groom's Name"), 'John');
+      await user.type(screen.getByLabelText('Wedding Date'), '2025-12-15');
+      await user.type(screen.getByLabelText('Venue / Place'), 'Grand Hotel');
       
-      fireEvent.change(brideInput, { target: { value: 'Sarah' } });
-      fireEvent.change(groomInput, { target: { value: 'John' } });
-      fireEvent.change(dateInput, { target: { value: '2025-12-15' } });
-      fireEvent.change(venueInput, { target: { value: 'Grand Hotel' } });
-      
-      fireEvent.click(screen.getByText('Save & Preview'));
+      await user.click(screen.getByText('Save & Preview'));
       
       // Modal should close
       await waitFor(() => {
