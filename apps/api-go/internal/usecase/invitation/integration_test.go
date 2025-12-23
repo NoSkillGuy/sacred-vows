@@ -6,17 +6,15 @@ import (
 	"testing"
 
 	"github.com/sacred-vows/api-go/internal/domain"
+	"github.com/stretchr/testify/mock"
 )
 
 // TestCreateInvitationUseCase_Integration_StatusInResponse tests that
 // when creating a new invitation, the response includes status="draft"
 func TestCreateInvitationUseCase_Integration_StatusInResponse(t *testing.T) {
 	// Arrange
-	mockRepo := &mockInvitationRepository{
-		createFunc: func(ctx context.Context, invitation *domain.Invitation) error {
-			return nil
-		},
-	}
+	mockRepo := new(mockInvitationRepository)
+	mockRepo.On("Create", mock.Anything, mock.Anything).Return(nil)
 
 	useCase := NewCreateInvitationUseCase(mockRepo, nil)
 	input := CreateInvitationInput{
@@ -67,12 +65,8 @@ func TestGetAllInvitationsUseCase_Integration_DefaultStatus(t *testing.T) {
 		},
 	}
 
-	mockRepo := &mockInvitationRepositoryWithFind{
-		mockInvitationRepository: mockInvitationRepository{},
-		findByUserIDFunc: func(ctx context.Context, userID string) ([]*domain.Invitation, error) {
-			return invitationsWithoutStatus, nil
-		},
-	}
+	mockRepo := new(mockInvitationRepository)
+	mockRepo.On("FindByUserID", mock.Anything, "user-123").Return(invitationsWithoutStatus, nil)
 
 	useCase := NewGetAllInvitationsUseCase(mockRepo)
 
@@ -130,12 +124,8 @@ func TestGetAllInvitationsUseCase_Integration_PreserveExistingStatus(t *testing.
 		},
 	}
 
-	mockRepo := &mockInvitationRepositoryWithFind{
-		mockInvitationRepository: mockInvitationRepository{},
-		findByUserIDFunc: func(ctx context.Context, userID string) ([]*domain.Invitation, error) {
-			return invitationsWithStatus, nil
-		},
-	}
+	mockRepo := new(mockInvitationRepository)
+	mockRepo.On("FindByUserID", mock.Anything, "user-123").Return(invitationsWithStatus, nil)
 
 	useCase := NewGetAllInvitationsUseCase(mockRepo)
 
@@ -165,19 +155,3 @@ func TestGetAllInvitationsUseCase_Integration_PreserveExistingStatus(t *testing.
 	}
 }
 
-// Update mockInvitationRepository to support FindByUserID
-type mockInvitationRepositoryWithFind struct {
-	mockInvitationRepository
-	findByUserIDFunc func(ctx context.Context, userID string) ([]*domain.Invitation, error)
-}
-
-func (m *mockInvitationRepositoryWithFind) FindByUserID(ctx context.Context, userID string) ([]*domain.Invitation, error) {
-	if m.findByUserIDFunc != nil {
-		return m.findByUserIDFunc(ctx, userID)
-	}
-	return nil, nil
-}
-
-func (m *mockInvitationRepositoryWithFind) MigrateUserInvitations(ctx context.Context, fromUserID, toUserID string) (int, error) {
-	return 0, nil
-}
