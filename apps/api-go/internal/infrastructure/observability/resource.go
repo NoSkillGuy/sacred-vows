@@ -14,12 +14,10 @@ func NewResource(serviceName, serviceVersion, deploymentEnvironment string) (*re
 		attribute.String("deployment.environment", deploymentEnvironment),
 	}
 
-	return resource.Merge(
-		resource.Default(),
-		resource.NewWithAttributes(
-			semconv.SchemaURL,
-			attrs...,
-		),
-	)
+	// Create resource directly with semconv schema to avoid conflicts with resource.Default()
+	// which may use a different schema version
+	return resource.NewWithAttributes(
+		semconv.SchemaURL,
+		attrs...,
+	), nil
 }
-
