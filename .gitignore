@@ -46,6 +46,10 @@ logs/
 # Builder build output
 apps/builder/dist/
 
+# Go build output
+apps/api-go/main
+apps/api-go/bin/
+
 # Test results
 apps/builder/playwright-report/
 apps/builder/test-results/
