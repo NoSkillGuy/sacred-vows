@@ -14,7 +14,6 @@ function ImageUploader({ onUpload, onUploadComplete }: ImageUploaderProps): Reac
   const [uploading, setUploading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<Record<number, number>>({});
   const [uploadErrors, setUploadErrors] = useState<Record<number, string>>({});
-  const [retrying, setRetrying] = useState<Record<number, boolean>>({});
   const [dragActive, setDragActive] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { addToast } = useToast();
@@ -86,7 +85,6 @@ function ImageUploader({ onUpload, onUploadComplete }: ImageUploaderProps): Reac
     setUploading(true);
     setUploadErrors({});
     setUploadProgress({});
-    setRetrying({});
 
     try {
       const results = await uploadImages(validFiles, (fileIndex, progress) => {

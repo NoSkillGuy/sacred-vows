@@ -5,7 +5,7 @@ interface Image {
   src?: string;
   url?: string;
   alt?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface ImageGalleryProps {
