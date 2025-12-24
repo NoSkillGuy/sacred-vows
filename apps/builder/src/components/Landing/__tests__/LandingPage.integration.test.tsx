@@ -91,18 +91,24 @@ describe("LandingPage Personalization Integration", () => {
       await user.click(screen.getByText("Save & Preview"));
 
       // Verify localStorage was updated
-      await waitFor(() => {
-        const stored = localStorage.getItem("landing-personalization-data");
-        expect(stored).toBeTruthy();
-        const parsed = JSON.parse(stored!);
-        expect(parsed.brideName).toBe("Sarah");
-        expect(parsed.groomName).toBe("John");
-      }, { timeout: 10000 });
+      await waitFor(
+        () => {
+          const stored = localStorage.getItem("landing-personalization-data");
+          expect(stored).toBeTruthy();
+          const parsed = JSON.parse(stored!);
+          expect(parsed.brideName).toBe("Sarah");
+          expect(parsed.groomName).toBe("John");
+        },
+        { timeout: 10000 }
+      );
 
       // Modal should close
-      await waitFor(() => {
-        expect(screen.queryByText("Personalize Your Preview")).not.toBeInTheDocument();
-      }, { timeout: 10000 });
+      await waitFor(
+        () => {
+          expect(screen.queryByText("Personalize Your Preview")).not.toBeInTheDocument();
+        },
+        { timeout: 10000 }
+      );
     }, 15000);
 
     it("should not show modal when user visits again after saving", () => {
