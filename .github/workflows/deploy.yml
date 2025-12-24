@@ -34,7 +34,7 @@ jobs:
           # FREE TIER OPTIMIZATION:
           # - Default: E2_MEDIUM (qualifies for 2,500 build-minutes/month FREE)
           # - With caching, builds are 1-3min, allowing ~800-2,500 builds/month within free tier
-          # 
+          #
           # To use paid machine type (NOT recommended for free tier):
           # - Set GitHub secret BUILD_MACHINE_TYPE=E2_HIGHCPU_8 (faster but always paid)
           # - This will cost ~$0.031/build and does NOT count toward free tier
@@ -42,14 +42,14 @@ jobs:
         run: |
           # Get short commit SHA for image tagging
           SHORT_SHA=$(git rev-parse --short HEAD)
-          
+
           # Build command - optimized for FREE TIER usage
           BUILD_CMD="gcloud builds submit \
             --config=apps/api-go/cloudbuild.yaml \
             --project ${{ secrets.GCP_PROJECT_ID }} \
             --region asia-northeast1 \
             --substitutions=_TAG=$SHORT_SHA"
-          
+
           # Only override machine type if explicitly set (not recommended - breaks free tier)
           if [ -n "$BUILD_MACHINE_TYPE" ]; then
             BUILD_CMD="$BUILD_CMD --machine-type=$BUILD_MACHINE_TYPE"
@@ -59,13 +59,13 @@ jobs:
             echo "✅ Using FREE TIER machine type: E2_MEDIUM (2,500 build-minutes/month free)"
             echo "   With caching, builds are typically 1-3min, allowing ~800-2,500 builds/month FREE"
           fi
-          
+
           # Submit build using cloudbuild.yaml for optimized caching
           # This uses BuildKit cache mounts, inline cache, and Docker layer caching for faster builds
           # Run from repo root so build context includes both apps/api-go and apps/builder
           # Using synchronous mode (no --async) for simpler error handling and faster feedback
           eval $BUILD_CMD
-          
+
           echo "Build completed successfully"
 
       - name: Deploy to Cloud Run
@@ -82,30 +82,30 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           echo "Purging Cloudflare DNS cache for api.dev.sacredvows.io..."
-          
+
           # Get zone ID for sacredvows.io
           ZONE_RESPONSE=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=sacredvows.io" \
             -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
             -H "Content-Type: application/json")
-          
+
           ZONE_ID=$(echo "$ZONE_RESPONSE" | jq -r '.result[0].id')
-          
+
           if [ "$ZONE_ID" = "null" ] || [ -z "$ZONE_ID" ]; then
             echo "Error: Could not find zone ID for sacredvows.io"
             echo "Response: $ZONE_RESPONSE"
             exit 1
           fi
-          
+
           echo "Found zone ID: $ZONE_ID"
-          
+
           # Purge everything cache (this forces Cloudflare to re-resolve DNS)
           PURGE_RESPONSE=$(curl -s -X POST "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/purge_cache" \
             -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
             -H "Content-Type: application/json" \
             -d '{"purge_everything":true}')
-          
+
           SUCCESS=$(echo "$PURGE_RESPONSE" | jq -r '.success')
-          
+
           if [ "$SUCCESS" = "true" ]; then
             echo "✅ Successfully purged Cloudflare cache"
           else
@@ -134,7 +134,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20.19.0'
 
       - name: Install dependencies
         working-directory: ./apps/edge-worker
