@@ -15,21 +15,21 @@ import (
 )
 
 type AuthHandler struct {
-	registerUC                *authuc.RegisterUseCase
-	loginUC                   *authuc.LoginUseCase
-	getCurrentUserUC          *authuc.GetCurrentUserUseCase
-	deleteUserUC              *authuc.DeleteUserUseCase
-	googleOAuthUC             *authuc.GoogleOAuthUseCase
-	refreshTokenUC            *authuc.RefreshTokenUseCase
-	requestPasswordResetUC    *authuc.RequestPasswordResetUseCase
-	resetPasswordUC           *authuc.ResetPasswordUseCase
+	registerUC                 *authuc.RegisterUseCase
+	loginUC                    *authuc.LoginUseCase
+	getCurrentUserUC           *authuc.GetCurrentUserUseCase
+	deleteUserUC               *authuc.DeleteUserUseCase
+	googleOAuthUC              *authuc.GoogleOAuthUseCase
+	refreshTokenUC             *authuc.RefreshTokenUseCase
+	requestPasswordResetUC     *authuc.RequestPasswordResetUseCase
+	resetPasswordUC            *authuc.ResetPasswordUseCase
 	requestPasswordChangeOTPUC *authuc.RequestPasswordChangeOTPUseCase
-	verifyPasswordChangeOTPUC *authuc.VerifyPasswordChangeOTPUseCase
-	refreshTokenRepo          repository.RefreshTokenRepository
-	jwtService                *authinfra.JWTService
-	googleOAuth               *authinfra.GoogleOAuthService
-	hmacKeys                  []authinfra.RefreshTokenHMACKey
-	activeHMACKeyID           int16
+	verifyPasswordChangeOTPUC  *authuc.VerifyPasswordChangeOTPUseCase
+	refreshTokenRepo           repository.RefreshTokenRepository
+	jwtService                 *authinfra.JWTService
+	googleOAuth                *authinfra.GoogleOAuthService
+	hmacKeys                   []authinfra.RefreshTokenHMACKey
+	activeHMACKeyID            int16
 }
 
 func NewAuthHandler(
@@ -50,21 +50,21 @@ func NewAuthHandler(
 	activeHMACKeyID int16,
 ) *AuthHandler {
 	return &AuthHandler{
-		registerUC:                registerUC,
-		loginUC:                   loginUC,
-		getCurrentUserUC:          getCurrentUserUC,
-		deleteUserUC:              deleteUserUC,
-		googleOAuthUC:             googleOAuthUC,
-		refreshTokenUC:            refreshTokenUC,
-		requestPasswordResetUC:    requestPasswordResetUC,
-		resetPasswordUC:           resetPasswordUC,
+		registerUC:                 registerUC,
+		loginUC:                    loginUC,
+		getCurrentUserUC:           getCurrentUserUC,
+		deleteUserUC:               deleteUserUC,
+		googleOAuthUC:              googleOAuthUC,
+		refreshTokenUC:             refreshTokenUC,
+		requestPasswordResetUC:     requestPasswordResetUC,
+		resetPasswordUC:            resetPasswordUC,
 		requestPasswordChangeOTPUC: requestPasswordChangeOTPUC,
-		verifyPasswordChangeOTPUC: verifyPasswordChangeOTPUC,
-		refreshTokenRepo:          refreshTokenRepo,
-		jwtService:                jwtService,
-		googleOAuth:               googleOAuth,
-		hmacKeys:                  hmacKeys,
-		activeHMACKeyID:           activeHMACKeyID,
+		verifyPasswordChangeOTPUC:  verifyPasswordChangeOTPUC,
+		refreshTokenRepo:           refreshTokenRepo,
+		jwtService:                 jwtService,
+		googleOAuth:                googleOAuth,
+		hmacKeys:                   hmacKeys,
+		activeHMACKeyID:            activeHMACKeyID,
 	}
 }
 

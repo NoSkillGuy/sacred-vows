@@ -47,4 +47,3 @@ func Init(ctx context.Context, tracerCfg TracerConfig, meterCfg MeterConfig) err
 
 	return nil
 }
-

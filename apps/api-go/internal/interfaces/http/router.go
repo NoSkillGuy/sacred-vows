@@ -9,9 +9,9 @@ import (
 	"github.com/sacred-vows/api-go/internal/interfaces/http/handlers"
 	"github.com/sacred-vows/api-go/internal/interfaces/http/middleware"
 	"github.com/sacred-vows/api-go/pkg/logger"
-	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 )
 
 type Router struct {

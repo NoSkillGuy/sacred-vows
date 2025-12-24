@@ -13,7 +13,3 @@ type EmailService interface {
 	// with the provided 6-digit OTP code
 	SendPasswordChangeOTPEmail(ctx context.Context, toEmail string, otp string) error
 }
-
-
-
-

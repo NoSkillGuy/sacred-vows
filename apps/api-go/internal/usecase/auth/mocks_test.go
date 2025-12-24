@@ -142,12 +142,12 @@ func (m *MockRefreshTokenRepository) DeleteExpired(ctx context.Context) error {
 
 // MockPasswordChangeOTPRepository is a hand-written mock implementation of PasswordChangeOTPRepository
 type MockPasswordChangeOTPRepository struct {
-	CreateFn            func(ctx context.Context, otp *domain.PasswordChangeOTP) error
-	FindByUserIDFn      func(ctx context.Context, userID string) (*domain.PasswordChangeOTP, error)
-	FindByOTPHashFn     func(ctx context.Context, hash string) (*domain.PasswordChangeOTP, error)
+	CreateFn             func(ctx context.Context, otp *domain.PasswordChangeOTP) error
+	FindByUserIDFn       func(ctx context.Context, userID string) (*domain.PasswordChangeOTP, error)
+	FindByOTPHashFn      func(ctx context.Context, hash string) (*domain.PasswordChangeOTP, error)
 	InvalidateByUserIDFn func(ctx context.Context, userID string) error
-	IncrementAttemptsFn func(ctx context.Context, otpID string) error
-	MarkAsUsedFn        func(ctx context.Context, otpID string) error
+	IncrementAttemptsFn  func(ctx context.Context, otpID string) error
+	MarkAsUsedFn         func(ctx context.Context, otpID string) error
 }
 
 func (m *MockPasswordChangeOTPRepository) Create(ctx context.Context, otp *domain.PasswordChangeOTP) error {

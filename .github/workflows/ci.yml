@@ -21,8 +21,20 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
       - name: Install root dependencies
         run: npm ci
+
+      - name: Install swag (for docs generation)
+        run: go install github.com/swaggo/swag/cmd/swag@latest
+
+      - name: Generate Go docs (for linting)
+        working-directory: ./apps/api-go
+        run: make swagger
 
       - name: Lint Go code
         working-directory: ./apps/api-go
@@ -33,13 +45,13 @@ jobs:
       - name: Lint Builder
         working-directory: ./apps/builder
         run: |
-          npm ci
+          npm ci --legacy-peer-deps
           npm run lint
 
       - name: Lint Edge Worker
         working-directory: ./apps/edge-worker
         run: |
-          npm ci
+          npm ci --legacy-peer-deps
           npm run lint
 
   format-check:
@@ -56,6 +68,11 @@ jobs:
 
       - name: Install root dependencies
         run: npm ci
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
 
       - name: Check Go formatting
         working-directory: ./apps/api-go
@@ -98,7 +115,7 @@ jobs:
       - name: Install Builder dependencies
         if: matrix.test-type == 'builder'
         working-directory: ./apps/builder
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Test Builder
         if: matrix.test-type == 'builder'
@@ -108,7 +125,7 @@ jobs:
       - name: Install Edge Worker dependencies
         if: matrix.test-type == 'edge-worker'
         working-directory: ./apps/edge-worker
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Test Edge Worker (Type Check)
         if: matrix.test-type == 'edge-worker'
