@@ -85,5 +85,3 @@ func RateLimit(burst int, refillPerSecond float64) gin.HandlerFunc {
 		c.Next()
 	}
 }
-
-

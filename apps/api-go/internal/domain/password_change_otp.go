@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	MaxOTPAttempts = 5
+	MaxOTPAttempts      = 5
 	OTPValidityDuration = 5 * time.Minute
 )
 
@@ -80,4 +80,3 @@ func NewPasswordChangeOTP(id, userID, email, otpHash string, expiresAt time.Time
 
 	return otp, nil
 }
-

@@ -6,14 +6,14 @@ import (
 
 // RefreshToken represents a refresh token entity
 type RefreshToken struct {
-	ID              string
-	UserID          string
-	TokenHash       string
+	ID               string
+	UserID           string
+	TokenHash        string
 	TokenFingerprint []byte
-	HMACKeyID       int16
-	ExpiresAt       time.Time
-	Revoked         bool
-	CreatedAt       time.Time
+	HMACKeyID        int16
+	ExpiresAt        time.Time
+	Revoked          bool
+	CreatedAt        time.Time
 }
 
 // Validate validates refresh token entity
@@ -65,4 +65,3 @@ func NewRefreshToken(id, userID, tokenHash string, tokenFingerprint []byte, hmac
 
 	return token, nil
 }
-

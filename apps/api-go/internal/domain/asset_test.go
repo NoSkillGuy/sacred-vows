@@ -92,4 +92,3 @@ func TestNewAsset_ValidData_ReturnsAsset(t *testing.T) {
 	assert.Equal(t, userID, asset.UserID, "User ID should match")
 	assert.Equal(t, size, asset.Size, "Size should match")
 }
-

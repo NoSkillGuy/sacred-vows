@@ -180,4 +180,3 @@ func (c *Client) BatchWithTracing(ctx context.Context, fn func(*firestore.WriteB
 	span.SetStatus(codes.Ok, "")
 	return nil
 }
-

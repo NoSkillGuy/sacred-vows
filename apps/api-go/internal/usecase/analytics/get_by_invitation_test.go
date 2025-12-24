@@ -56,4 +56,3 @@ func TestGetAnalyticsByInvitationUseCase_Execute_InvitationHasAnalytics_ReturnsA
 	assert.Equal(t, 1, output.RSVPs, "RSVPs count should be 1")
 	require.Len(t, output.Analytics, 2, "Should return 2 analytics")
 }
-

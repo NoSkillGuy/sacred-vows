@@ -57,19 +57,19 @@ type RefreshTokenHMACKey struct {
 }
 
 type StorageConfig struct {
-	MaxFileSize           int64
-	AllowedTypes         []string
-	GCSBucket            string        // GCS bucket name for assets (private bucket, accessed via signed URLs)
-	S3Endpoint           string        // S3-compatible endpoint for API access (e.g., http://minio:9000 for MinIO)
-	S3PublicEndpoint     string        // S3 public endpoint for presigned URLs (e.g., http://localhost:9000 for browser access)
-	S3AccessKeyID        string        // S3 access key ID
-	S3SecretAccessKey    string        // S3 secret access key
-	S3Bucket             string        // S3 bucket name for assets (used when GCSBucket is not set)
-	S3Region             string        // S3 region (default: us-east-1 for MinIO)
-	SignedURLExpiration  time.Duration // Signed URL expiration duration (default: 1 hour)
-	MaxImageWidth        int           // Maximum image width after resizing (0 = no resize)
-	MaxImageHeight       int           // Maximum image height after resizing (0 = no resize)
-	ImageQuality         int           // JPEG compression quality (1-100, default: 85)
+	MaxFileSize         int64
+	AllowedTypes        []string
+	GCSBucket           string        // GCS bucket name for assets (private bucket, accessed via signed URLs)
+	S3Endpoint          string        // S3-compatible endpoint for API access (e.g., http://minio:9000 for MinIO)
+	S3PublicEndpoint    string        // S3 public endpoint for presigned URLs (e.g., http://localhost:9000 for browser access)
+	S3AccessKeyID       string        // S3 access key ID
+	S3SecretAccessKey   string        // S3 secret access key
+	S3Bucket            string        // S3 bucket name for assets (used when GCSBucket is not set)
+	S3Region            string        // S3 region (default: us-east-1 for MinIO)
+	SignedURLExpiration time.Duration // Signed URL expiration duration (default: 1 hour)
+	MaxImageWidth       int           // Maximum image width after resizing (0 = no resize)
+	MaxImageHeight      int           // Maximum image height after resizing (0 = no resize)
+	ImageQuality        int           // JPEG compression quality (1-100, default: 85)
 }
 
 type GoogleConfig struct {
@@ -125,13 +125,13 @@ type EmailConfig struct {
 }
 
 type ObservabilityConfig struct {
-	Enabled              bool    // OTEL_ENABLED, default: true in dev/local, false in prod unless explicitly enabled
-	ExporterEndpoint     string  // OTEL_EXPORTER_OTLP_ENDPOINT
-	ExporterProtocol     string  // OTEL_EXPORTER_OTLP_PROTOCOL, default: grpc
-	ServiceName          string  // OTEL_SERVICE_NAME, default: sacred-vows-api
-	ServiceVersion       string  // from git SHA or build info
-	DeploymentEnvironment string // OTEL_RESOURCE_ATTRIBUTES or APP_ENV
-	SamplingRate         float64 // OTEL_TRACES_SAMPLER_ARG, default: 0.1 for normal, 1.0 for errors
+	Enabled               bool    // OTEL_ENABLED, default: true in dev/local, false in prod unless explicitly enabled
+	ExporterEndpoint      string  // OTEL_EXPORTER_OTLP_ENDPOINT
+	ExporterProtocol      string  // OTEL_EXPORTER_OTLP_PROTOCOL, default: grpc
+	ServiceName           string  // OTEL_SERVICE_NAME, default: sacred-vows-api
+	ServiceVersion        string  // from git SHA or build info
+	DeploymentEnvironment string  // OTEL_RESOURCE_ATTRIBUTES or APP_ENV
+	SamplingRate          float64 // OTEL_TRACES_SAMPLER_ARG, default: 0.1 for normal, 1.0 for errors
 }
 
 // ConfigFile represents the YAML config file structure
@@ -227,7 +227,7 @@ func Load() (*Config, error) {
 			RefreshTokenHMACActiveKeyID: int16(getEnvAsInt("REFRESH_TOKEN_HMAC_ACTIVE_KEY_ID", 1)), // Always from env (sensitive)
 		},
 		Storage: StorageConfig{
-			MaxFileSize:          getYAMLInt64(yamlConfig, "storage.max_file_size", 10*1024*1024),
+			MaxFileSize:         getYAMLInt64(yamlConfig, "storage.max_file_size", 10*1024*1024),
 			AllowedTypes:        []string{"image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"},
 			GCSBucket:           getEnv("GCS_ASSETS_BUCKET", getYAMLString(yamlConfig, "storage.gcs_bucket", "")),
 			S3Endpoint:          getEnv("S3_ENDPOINT", getYAMLString(yamlConfig, "storage.s3_endpoint", "")),
@@ -235,7 +235,7 @@ func Load() (*Config, error) {
 			S3AccessKeyID:       getEnv("S3_ACCESS_KEY_ID", getYAMLString(yamlConfig, "storage.s3_access_key_id", "")),
 			S3SecretAccessKey:   getEnv("S3_SECRET_ACCESS_KEY", ""), // Always from env (sensitive)
 			S3Bucket:            getEnv("S3_ASSETS_BUCKET", getYAMLString(yamlConfig, "storage.s3_bucket", "")),
-			S3Region:           getEnv("S3_REGION", getYAMLString(yamlConfig, "storage.s3_region", "us-east-1")),
+			S3Region:            getEnv("S3_REGION", getYAMLString(yamlConfig, "storage.s3_region", "us-east-1")),
 			SignedURLExpiration: parseDuration(getEnv("ASSET_SIGNED_URL_EXPIRATION", getYAMLString(yamlConfig, "storage.signed_url_expiration", "1h")), 1*time.Hour),
 			MaxImageWidth:       getEnvAsInt("ASSET_MAX_IMAGE_WIDTH", getYAMLInt(yamlConfig, "storage.max_image_width", 1920)),
 			MaxImageHeight:      getEnvAsInt("ASSET_MAX_IMAGE_HEIGHT", getYAMLInt(yamlConfig, "storage.max_image_height", 1920)),
@@ -265,7 +265,7 @@ func Load() (*Config, error) {
 			R2Bucket:   getEnv("PUBLIC_ASSETS_R2_BUCKET", getYAMLString(yamlConfig, "public_assets.r2_bucket", "")),
 			CDNBaseURL: getEnv("PUBLIC_ASSETS_CDN_URL", getYAMLString(yamlConfig, "public_assets.cdn_base_url", "")),
 		},
-		Email: loadEmailConfig(yamlConfig),
+		Email:         loadEmailConfig(yamlConfig),
 		Observability: loadObservabilityConfig(yamlConfig),
 	}
 
@@ -702,7 +702,7 @@ func loadEmailConfig(yamlConfig *ConfigFile) EmailConfig {
 // loadObservabilityConfig loads observability configuration
 func loadObservabilityConfig(yamlConfig *ConfigFile) ObservabilityConfig {
 	appEnv := getEnv("APP_ENV", "local")
-	
+
 	// Default enabled to true for dev/local, false for prod unless explicitly set
 	enabledDefault := appEnv == "local" || appEnv == "dev"
 	enabledStr := getEnv("OTEL_ENABLED", "")
@@ -715,7 +715,7 @@ func loadObservabilityConfig(yamlConfig *ConfigFile) ObservabilityConfig {
 
 	// Get service version from env or use "unknown"
 	serviceVersion := getEnv("OTEL_SERVICE_VERSION", getEnv("GIT_SHA", "unknown"))
-	
+
 	// Get deployment environment from APP_ENV or OTEL_RESOURCE_ATTRIBUTES
 	deploymentEnv := appEnv
 	if resourceAttrs := getEnv("OTEL_RESOURCE_ATTRIBUTES", ""); resourceAttrs != "" {
@@ -740,13 +740,13 @@ func loadObservabilityConfig(yamlConfig *ConfigFile) ObservabilityConfig {
 	}
 
 	return ObservabilityConfig{
-		Enabled:              enabled,
-		ExporterEndpoint:     getEnv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4317"),
-		ExporterProtocol:     getEnv("OTEL_EXPORTER_OTLP_PROTOCOL", "grpc"),
-		ServiceName:          getEnv("OTEL_SERVICE_NAME", "sacred-vows-api"),
-		ServiceVersion:       serviceVersion,
+		Enabled:               enabled,
+		ExporterEndpoint:      getEnv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4317"),
+		ExporterProtocol:      getEnv("OTEL_EXPORTER_OTLP_PROTOCOL", "grpc"),
+		ServiceName:           getEnv("OTEL_SERVICE_NAME", "sacred-vows-api"),
+		ServiceVersion:        serviceVersion,
 		DeploymentEnvironment: deploymentEnv,
-		SamplingRate:         samplingRate,
+		SamplingRate:          samplingRate,
 	}
 }
 

@@ -105,4 +105,3 @@ func (r *publishedSiteRepository) docToPublishedSite(doc *firestore.DocumentSnap
 
 	return site, nil
 }
-

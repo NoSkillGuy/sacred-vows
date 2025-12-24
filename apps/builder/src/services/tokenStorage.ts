@@ -4,7 +4,7 @@
  * Access tokens are short-lived and should not persist across browser sessions
  */
 
-import { scheduleTokenRefresh, stopTokenRefresh } from './tokenRefreshScheduler';
+import { scheduleTokenRefresh, stopTokenRefresh } from "./tokenRefreshScheduler";
 
 let accessToken: string | null = null;
 
@@ -14,7 +14,7 @@ let accessToken: string | null = null;
  */
 export function setAccessToken(token: string | null): void {
   accessToken = token;
-  
+
   // Schedule proactive token refresh before expiration
   if (token) {
     scheduleTokenRefresh(token);
@@ -47,4 +47,3 @@ export function clearAccessToken(): void {
 export function hasAccessToken(): boolean {
   return accessToken !== null;
 }
-

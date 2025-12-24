@@ -54,7 +54,7 @@ func (r *analyticsRepository) CountByType(ctx context.Context, invitationID stri
 		Where("invitation_id", "==", invitationID).
 		Where("type", "==", string(analyticsType)).
 		Documents(ctx)
-	
+
 	docs, err := iter.GetAll()
 	if err != nil {
 		return 0, err
@@ -84,4 +84,3 @@ func (r *analyticsRepository) docToAnalytics(doc *firestore.DocumentSnapshot) *d
 
 	return analytics
 }
-
