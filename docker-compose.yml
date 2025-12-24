@@ -63,6 +63,47 @@ services:
       timeout: 10s
       retries: 3
 
+  builder:
+    build:
+      context: .
+      dockerfile: ./apps/builder/Dockerfile.dev
+    env_file:
+      - ./apps/builder/.env.docker
+    ports:
+      - "5173:5173"
+    environment:
+      # Pass Vite environment variables from env_file
+      # Vite reads these at dev server start
+      VITE_API_URL: ${VITE_API_URL:-http://api-go:3000/api}
+      VITE_PUBLIC_ASSETS_CDN_URL: ${VITE_PUBLIC_ASSETS_CDN_URL:-http://localhost:9000/sacred-vows-public-assets-local}
+      VITE_ENABLE_ASSET_CACHING: ${VITE_ENABLE_ASSET_CACHING:-true}
+      VITE_OTEL_ENABLED: ${VITE_OTEL_ENABLED:-true}
+      VITE_OTEL_EXPORTER_OTLP_ENDPOINT: ${VITE_OTEL_EXPORTER_OTLP_ENDPOINT:-http://tempo:4318}
+      VITE_OTEL_SERVICE_NAME: ${VITE_OTEL_SERVICE_NAME:-sacred-vows-web}
+      VITE_OTEL_SERVICE_VERSION: ${VITE_OTEL_SERVICE_VERSION:-unknown}
+      VITE_OTEL_DEPLOYMENT_ENVIRONMENT: ${VITE_OTEL_DEPLOYMENT_ENVIRONMENT:-local}
+      VITE_OTEL_TRACES_SAMPLER_RATIO: ${VITE_OTEL_TRACES_SAMPLER_RATIO:-0.01}
+    depends_on:
+      api-go:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      tempo:
+        condition: service_healthy
+    volumes:
+      # Mount source code for hot reloading - Vite will watch for changes
+      - ./apps/builder:/app:rw
+      # Exclude node_modules and dist from volume to avoid conflicts
+      # Use anonymous volume to preserve node_modules in container
+      - /app/node_modules
+      - /app/dist
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:5173"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
   firestore-emulator:
     build:
       context: .
