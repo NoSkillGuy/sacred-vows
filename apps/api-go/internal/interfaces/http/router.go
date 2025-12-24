@@ -65,21 +65,22 @@ func (r *Router) Setup() *gin.Engine {
 
 	// Middleware
 	router.Use(gin.Recovery())
-	
+
 	// Request ID middleware (early in chain for correlation)
 	router.Use(middleware.RequestIDMiddleware())
-	
+
 	// OpenTelemetry middleware (if enabled)
 	if r.observabilityCfg.Enabled {
 		router.Use(otelgin.Middleware(r.observabilityCfg.ServiceName))
 	}
-	
+
 	router.Use(middleware.CORS(r.frontendURL))
 	router.Use(middleware.ErrorHandler())
 	router.Use(logger.GinLogger())
 
-	// Health check
+	// Health check (support both GET and HEAD for health checks)
 	router.GET("/health", handlers.HealthCheck)
+	router.HEAD("/health", handlers.HealthCheck)
 
 	// API routes
 	api := router.Group("/api")
