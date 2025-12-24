@@ -27,7 +27,9 @@ This repository uses comprehensive pre-commit hooks to ensure code quality, secu
 ### 3. Fast Unit Tests
 
 - **Go**: Runs `go test ./... -short` (only if Go files changed)
-- **TypeScript**: Type checking via `tsc --noEmit` (only if TS files changed)
+- **TypeScript**:
+  - **Builder**: Runs `vitest --run` (only if builder TS/TSX files changed)
+  - **Edge Worker**: Type checking via `tsc --noEmit` (only if edge-worker TS files changed)
 
 ### 4. Commit Message Linting
 
@@ -118,7 +120,8 @@ The configuration file is already set up at `apps/api-go/.golangci.yml`.
 
 The hooks are designed to be fast. If they're slow:
 - Only changed files are processed
-- Tests run with `-short` flag
+- Go tests run with `-short` flag
+- TypeScript tests run with `--run` flag (non-watch mode)
 - Type checking only runs on changed TypeScript files
 
 ### Hook fails but code looks fine

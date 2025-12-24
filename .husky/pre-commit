@@ -1,30 +1,73 @@
+# Colors for output
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# Track executed checks
+CHECKS_RUN=()
+
 # Run file checks (size, type, secrets, whitespace)
 echo "🔍 Running file checks..."
 ./scripts/pre-commit-checks.sh || exit 1
+CHECKS_RUN+=("✅ File checks (size, secrets, whitespace)")
 
 # Validate markdown files (only if markdown files changed)
 if git diff --cached --name-only | grep -q '\.md$'; then
   echo "📝 Validating markdown files..."
   node scripts/validate-markdown.js || exit 1
+  CHECKS_RUN+=("✅ Markdown validation")
 fi
 
 # Run lint-staged (formatting and linting)
 echo "🎨 Running formatters and linters..."
 npx lint-staged || exit 1
+CHECKS_RUN+=("✅ Formatting & linting")
 
 # Run fast unit tests (only if Go files changed)
 if git diff --cached --name-only | grep -q '\.go$'; then
   echo "🧪 Running Go tests..."
   cd apps/api-go && go test ./... -short || exit 1
   cd ../..
+  CHECKS_RUN+=("✅ Go tests")
 fi
 
-# Type check TypeScript (only if TS files changed)
+# Type check and test TypeScript (only if TS files changed)
 if git diff --cached --name-only | grep -qE '\.(ts|tsx)$'; then
   echo "🔷 Type checking TypeScript..."
   if git diff --cached --name-only | grep -q 'apps/edge-worker/.*\.ts$'; then
     cd apps/edge-worker && npm run typecheck || exit 1
     cd ../..
+    CHECKS_RUN+=("✅ Edge-worker type checking")
   fi
   # Builder type checking is handled by ESLint with TypeScript parser
+
+  # Run TypeScript tests (only if builder TS files changed)
+  if git diff --cached --name-only | grep -qE 'apps/builder/.*\.(ts|tsx)$'; then
+    echo "🧪 Running TypeScript tests..."
+    cd apps/builder && npm test -- --run || exit 1
+    cd ../..
+    CHECKS_RUN+=("✅ TypeScript tests (builder)")
+  fi
 fi
+
+# Print summary report
+echo ""
+echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${BLUE}📊 Pre-commit Hook Summary${NC}"
+echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo ""
+
+if [ ${#CHECKS_RUN[@]} -eq 0 ]; then
+  echo -e "${YELLOW}⚠️  No checks were executed (no relevant files changed)${NC}"
+else
+  echo -e "${GREEN}Checks executed:${NC}"
+  for check in "${CHECKS_RUN[@]}"; do
+    echo -e "  ${check}"
+  done
+fi
+
+echo ""
+echo -e "${GREEN}✅ All pre-commit checks passed successfully!${NC}"
+echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo ""
