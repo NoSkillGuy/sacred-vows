@@ -45,7 +45,6 @@ function RSVPModal({ isOpen, onClose, translations, currentLang, config = {} }) 
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setName(storedName);
     } else {
-
       setName("");
     }
 

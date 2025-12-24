@@ -10,10 +10,9 @@ When the user invokes `/fix-pr`, fetch the GitHub PR, read all PR comments, chec
    - Git remote tracking information
 
 2. **Repository information**:
-   - Repository: `NoSkillGuy/sacred-vows` (from git remote)
+   - Repository: Detect from git remote using: `git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/'`
    - **Use GitHub MCP server for all GitHub operations** (not `gh` CLI)
-   - Owner: `NoSkillGuy`
-   - Repo: `sacred-vows`
+   - Owner and Repo: Extract from the detected repository string (format: `owner/repo`)
 
 3. **Current branch**: Ensure you're on the PR branch before making fixes
 
@@ -43,7 +42,7 @@ All GitHub operations should use these MCP functions:
 
 2. **Get PR details** using GitHub MCP:
    - Use `mcp_github_pull_request_read` with method `get`
-   - Repository: `NoSkillGuy/sacred-vows`
+   - Repository: Detect from git remote (see Step 1.2)
    - Extract: number, title, body, author, state, baseRefName, headRefName, headRefOid
    - Get files using method `get_files`
    - Get commits from the PR data
@@ -78,17 +77,17 @@ Use GitHub MCP server to fetch all comments:
 
 1. **Get all PR comments** (general comments):
    - Use `mcp_github_pull_request_read` with method `get_comments`
-   - Repository: `NoSkillGuy/sacred-vows`
+   - Repository: Detect from git remote (see Step 1.2)
    - Extract: body, author, createdAt for each comment
 
 2. **Get all review comments** (inline comments and review threads):
    - Use `mcp_github_pull_request_read` with method `get_review_comments`
-   - Repository: `NoSkillGuy/sacred-vows`
+   - Repository: Detect from git remote (see Step 1.2)
    - Extract: body, path, line, author, thread information
 
 3. **Get all reviews**:
    - Use `mcp_github_pull_request_read` with method `get_reviews`
-   - Repository: `NoSkillGuy/sacred-vows`
+   - Repository: Detect from git remote (see Step 1.2)
    - Extract: body, state, author, comments for each review
 
 ### Step 3: Check CI Status
@@ -97,14 +96,14 @@ Use GitHub MCP server to check CI status:
 
 1. **Get CI check status**:
    - Use `mcp_github_pull_request_read` with method `get_status`
-   - Repository: `NoSkillGuy/sacred-vows`
+   - Repository: Detect from git remote (see Step 1.2)
    - This returns the status of the head commit in the PR
    - Extract: check run names, conclusions, status, details URLs
 
 2. **Get detailed check runs** (if needed):
    - Get the head commit SHA from PR data (`headRefOid`)
    - Use `mcp_github_get_commit` with `include_diff: false`
-   - Repository: `NoSkillGuy/sacred-vows`
+   - Repository: Detect from git remote (see Step 1.2)
    - The commit data includes check run information
 
 3. **Identify failing checks**:
@@ -415,25 +414,25 @@ After all fixes are complete and tests pass, respond to review comments explaini
 
 1. **For inline review comments** (comments on specific lines):
    - Use `mcp_github_add_comment_to_pending_review` to add replies to review comments
-   - Repository: `NoSkillGuy/sacred-vows`
+   - Repository: Detect from git remote (see Step 1.2)
    - Provide: PR number, file path, line number, comment body explaining the fix
    - Example body: "✅ Fixed! I've [description of fix]. The changes address your feedback by [explanation]."
 
 2. **For general PR comments**:
    - Use `mcp_github_add_issue_comment` (PRs are issues in GitHub)
-   - Repository: `NoSkillGuy/sacred-vows`
+   - Repository: Detect from git remote (see Step 1.2)
    - Issue number: PR number
    - Body: "✅ Fixed! [Description of how the comment was addressed]"
 
 3. **For review threads** (if you have a pending review):
    - Use `mcp_github_pull_request_review_write` with method `create`
-   - Repository: `NoSkillGuy/sacred-vows`
+   - Repository: Detect from git remote (see Step 1.2)
    - Event: `COMMENT` or `APPROVE` (if all changes addressed)
    - Body: Summary of all fixes addressing the review feedback
 
 4. **Create summary comment** (if multiple comments addressed):
    - Use `mcp_github_add_issue_comment`
-   - Repository: `NoSkillGuy/sacred-vows`
+   - Repository: Detect from git remote (see Step 1.2)
    - Issue number: PR number
    - Body:
      ```
@@ -504,7 +503,7 @@ After all fixes are complete and tests pass, respond to review comments explaini
    - If user provided PR number: use it directly
    - Otherwise: try to detect from current git branch
    - If still not found: ask user for PR number
-   - Repository: `NoSkillGuy/sacred-vows` (from git remote)
+   - Repository: Detect from git remote using: `git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/'`
 
 2. **Check for merge conflicts**:
    - Fetch base branch
@@ -654,6 +653,6 @@ npm run format
 - Monitor CI status after pushing fixes
 - Reply to review comments to show that feedback was addressed
 - **Use GitHub MCP server for all GitHub operations** - do not use `gh` CLI
-- Repository: `NoSkillGuy/sacred-vows`
+- Repository: Always detect dynamically from git remote using: `git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/'`
 - All GitHub API calls should use MCP functions, not shell commands
 
