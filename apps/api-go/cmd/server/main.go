@@ -37,6 +37,7 @@ import (
 	"github.com/sacred-vows/api-go/internal/infrastructure/observability"
 	publishinfra "github.com/sacred-vows/api-go/internal/infrastructure/publish"
 	"github.com/sacred-vows/api-go/internal/infrastructure/storage"
+	"github.com/sacred-vows/api-go/internal/interfaces/clock"
 	httpRouter "github.com/sacred-vows/api-go/internal/interfaces/http"
 	"github.com/sacred-vows/api-go/internal/interfaces/http/handlers"
 	"github.com/sacred-vows/api-go/internal/interfaces/repository"
@@ -175,17 +176,20 @@ func main() {
 	deleteUserUC := authUC.NewDeleteUserUseCase(userRepo)
 	googleOAuthUC := authUC.NewGoogleOAuthUseCaseWithService(userRepo, googleOAuthService.GetOAuthConfig(), googleOAuthService)
 
+	// Initialize clock
+	clk := clock.NewRealClock()
+
 	hmacKeys := make([]auth.RefreshTokenHMACKey, 0, len(cfg.Auth.RefreshTokenHMACKeys))
 	for _, k := range cfg.Auth.RefreshTokenHMACKeys {
 		hmacKeys = append(hmacKeys, auth.RefreshTokenHMACKey{ID: k.ID, Key: k.Key})
 	}
-	refreshTokenUC := authUC.NewRefreshTokenUseCase(refreshTokenRepo, userRepo, jwtService, hmacKeys, cfg.Auth.RefreshTokenHMACActiveKeyID)
+	refreshTokenUC := authUC.NewRefreshTokenUseCase(refreshTokenRepo, userRepo, jwtService, clk, hmacKeys, cfg.Auth.RefreshTokenHMACActiveKeyID)
 
 	// Password reset use cases (only if email service is configured)
 	var requestPasswordResetUC *authUC.RequestPasswordResetUseCase
 	var resetPasswordUC *authUC.ResetPasswordUseCase
 	if emailService != nil {
-		requestPasswordResetUC = authUC.NewRequestPasswordResetUseCase(userRepo, passwordResetRepo, emailService, cfg.Google.FrontendURL)
+		requestPasswordResetUC = authUC.NewRequestPasswordResetUseCase(userRepo, passwordResetRepo, emailService, clk, cfg.Google.FrontendURL)
 		resetPasswordUC = authUC.NewResetPasswordUseCase(passwordResetRepo, userRepo)
 	}
 
@@ -256,7 +260,7 @@ func main() {
 			artifactStore = artifactStoreConcrete
 		}
 	}
-	publishInvitationUC := publishUC.NewPublishInvitationUseCase(invitationRepo, publishedSiteRepo, snapshotGen, artifactStore, cfg.Publishing.VersionRetentionCount)
+	publishInvitationUC := publishUC.NewPublishInvitationUseCase(invitationRepo, publishedSiteRepo, snapshotGen, artifactStore, clk, cfg.Publishing.VersionRetentionCount)
 	listVersionsUC := publishUC.NewListPublishedVersionsUseCase(publishedSiteRepo, artifactStore)
 	rollbackUC := publishUC.NewRollbackPublishedSiteUseCase(publishedSiteRepo, artifactStore)
 

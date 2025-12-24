@@ -3,9 +3,9 @@ package publish
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/sacred-vows/api-go/internal/domain"
+	"github.com/sacred-vows/api-go/internal/interfaces/clock"
 	"github.com/sacred-vows/api-go/internal/interfaces/repository"
 	"github.com/sacred-vows/api-go/pkg/logger"
 	"github.com/segmentio/ksuid"
@@ -17,6 +17,7 @@ type PublishInvitationUseCase struct {
 	publishedRepo       repository.PublishedSiteRepository
 	snapshotGen         SnapshotGenerator
 	artifactStore       ArtifactStorage
+	clock               clock.Clock
 	versionRetentionCount int
 }
 
@@ -25,6 +26,7 @@ func NewPublishInvitationUseCase(
 	publishedRepo repository.PublishedSiteRepository,
 	snapshotGen SnapshotGenerator,
 	artifactStore ArtifactStorage,
+	clk clock.Clock,
 	versionRetentionCount int,
 ) *PublishInvitationUseCase {
 	return &PublishInvitationUseCase{
@@ -32,6 +34,7 @@ func NewPublishInvitationUseCase(
 		publishedRepo:        publishedRepo,
 		snapshotGen:           snapshotGen,
 		artifactStore:         artifactStore,
+		clock:                clk,
 		versionRetentionCount: versionRetentionCount,
 	}
 }
@@ -70,7 +73,7 @@ func (uc *PublishInvitationUseCase) Execute(ctx context.Context, invitationID, o
 		return "", 0, "", err
 	}
 
-	now := time.Now()
+	now := uc.clock.Now()
 	if site == nil {
 		site = &domain.PublishedSite{
 			ID:             ksuid.New().String(),

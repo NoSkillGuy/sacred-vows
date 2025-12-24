@@ -2,10 +2,10 @@ package auth
 
 import (
 	"context"
-	"time"
 
 	"github.com/sacred-vows/api-go/internal/domain"
 	"github.com/sacred-vows/api-go/internal/infrastructure/auth"
+	"github.com/sacred-vows/api-go/internal/interfaces/clock"
 	"github.com/sacred-vows/api-go/internal/interfaces/repository"
 	"github.com/sacred-vows/api-go/pkg/errors"
 )
@@ -14,6 +14,7 @@ type RefreshTokenUseCase struct {
 	refreshTokenRepo repository.RefreshTokenRepository
 	userRepo         repository.UserRepository
 	jwtService       *auth.JWTService
+	clock            clock.Clock
 	hmacKeys         []auth.RefreshTokenHMACKey
 	activeHMACKeyID  int16
 }
@@ -22,6 +23,7 @@ func NewRefreshTokenUseCase(
 	refreshTokenRepo repository.RefreshTokenRepository,
 	userRepo repository.UserRepository,
 	jwtService *auth.JWTService,
+	clk clock.Clock,
 	hmacKeys []auth.RefreshTokenHMACKey,
 	activeHMACKeyID int16,
 ) *RefreshTokenUseCase {
@@ -29,6 +31,7 @@ func NewRefreshTokenUseCase(
 		refreshTokenRepo: refreshTokenRepo,
 		userRepo:         userRepo,
 		jwtService:       jwtService,
+		clock:            clk,
 		hmacKeys:         hmacKeys,
 		activeHMACKeyID:  activeHMACKeyID,
 	}
@@ -119,7 +122,7 @@ func (uc *RefreshTokenUseCase) Execute(ctx context.Context, input RefreshTokenIn
 	newFingerprint := auth.ComputeRefreshTokenFingerprint(activeKey.Key, newTokenBytes)
 
 	// Create new refresh token entity
-	expiresAt := time.Now().Add(uc.jwtService.GetRefreshExpiration())
+	expiresAt := uc.clock.Now().Add(uc.jwtService.GetRefreshExpiration())
 	newRefreshTokenEntity, err := domain.NewRefreshToken(
 		newTokenID,
 		user.ID,

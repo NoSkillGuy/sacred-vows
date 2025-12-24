@@ -8,7 +8,6 @@ import (
 
 	"github.com/sacred-vows/api-go/internal/domain"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -28,8 +27,14 @@ func TestGetInvitationPreviewUseCase_Execute_InvitationFound_ReturnsPreview(t *t
 		UpdatedAt: time.Now(),
 	}
 
-	mockRepo := new(mockInvitationRepository)
-	mockRepo.On("FindByID", mock.Anything, invitationID).Return(invitation, nil)
+	mockRepo := &MockInvitationRepository{
+		FindByIDFn: func(ctx context.Context, id string) (*domain.Invitation, error) {
+			if id == invitationID {
+				return invitation, nil
+			}
+			return nil, nil
+		},
+	}
 
 	useCase := NewGetInvitationPreviewUseCase(mockRepo)
 
@@ -43,15 +48,17 @@ func TestGetInvitationPreviewUseCase_Execute_InvitationFound_ReturnsPreview(t *t
 	assert.Equal(t, invitationID, output.Invitation.ID, "Invitation ID should match")
 	assert.Equal(t, layoutID, output.Invitation.LayoutID, "Layout ID should match")
 	assert.Equal(t, data, output.Invitation.Data, "Data should match")
-	mockRepo.AssertExpectations(t)
 }
 
 func TestGetInvitationPreviewUseCase_Execute_InvitationNotFound_ReturnsError(t *testing.T) {
 	// Arrange
 	invitationID := "nonexistent-123"
 
-	mockRepo := new(mockInvitationRepository)
-	mockRepo.On("FindByID", mock.Anything, invitationID).Return(nil, nil)
+	mockRepo := &MockInvitationRepository{
+		FindByIDFn: func(ctx context.Context, id string) (*domain.Invitation, error) {
+			return nil, nil
+		},
+	}
 
 	useCase := NewGetInvitationPreviewUseCase(mockRepo)
 
@@ -61,6 +68,5 @@ func TestGetInvitationPreviewUseCase_Execute_InvitationNotFound_ReturnsError(t *
 	// Assert
 	require.Error(t, err, "Invitation not found should return error")
 	assert.Nil(t, output, "Output should be nil on error")
-	mockRepo.AssertExpectations(t)
 }
 

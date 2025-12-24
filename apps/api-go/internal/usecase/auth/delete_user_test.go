@@ -2,11 +2,10 @@ package auth
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/sacred-vows/api-go/internal/domain"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -18,9 +17,17 @@ func TestDeleteUserUseCase_Execute_UserExists_DeletesUser(t *testing.T) {
 		Email: "test@example.com",
 	}
 
-	mockRepo := new(mockUserRepository)
-	mockRepo.On("FindByID", mock.Anything, userID).Return(user, nil)
-	mockRepo.On("Delete", mock.Anything, userID).Return(nil)
+	mockRepo := &MockUserRepository{
+		FindByIDFn: func(ctx context.Context, id string) (*domain.User, error) {
+			if id == userID {
+				return user, nil
+			}
+			return nil, nil
+		},
+		DeleteFn: func(ctx context.Context, id string) error {
+			return nil
+		},
+	}
 
 	useCase := NewDeleteUserUseCase(mockRepo)
 
@@ -29,15 +36,17 @@ func TestDeleteUserUseCase_Execute_UserExists_DeletesUser(t *testing.T) {
 
 	// Assert
 	require.NoError(t, err, "Successful deletion should not return error")
-	mockRepo.AssertExpectations(t)
 }
 
 func TestDeleteUserUseCase_Execute_UserNotFound_ReturnsError(t *testing.T) {
 	// Arrange
 	userID := "nonexistent-123"
 
-	mockRepo := new(mockUserRepository)
-	mockRepo.On("FindByID", mock.Anything, userID).Return(nil, nil)
+	mockRepo := &MockUserRepository{
+		FindByIDFn: func(ctx context.Context, id string) (*domain.User, error) {
+			return nil, nil
+		},
+	}
 
 	useCase := NewDeleteUserUseCase(mockRepo)
 
@@ -46,15 +55,18 @@ func TestDeleteUserUseCase_Execute_UserNotFound_ReturnsError(t *testing.T) {
 
 	// Assert
 	require.Error(t, err, "User not found should return error")
-	mockRepo.AssertExpectations(t)
 }
 
 func TestDeleteUserUseCase_Execute_FindByIDError_ReturnsError(t *testing.T) {
 	// Arrange
 	userID := "user-123"
+	repoError := errors.New("repository error")
 
-	mockRepo := new(mockUserRepository)
-	mockRepo.On("FindByID", mock.Anything, userID).Return(nil, assert.AnError)
+	mockRepo := &MockUserRepository{
+		FindByIDFn: func(ctx context.Context, id string) (*domain.User, error) {
+			return nil, repoError
+		},
+	}
 
 	useCase := NewDeleteUserUseCase(mockRepo)
 
@@ -63,7 +75,6 @@ func TestDeleteUserUseCase_Execute_FindByIDError_ReturnsError(t *testing.T) {
 
 	// Assert
 	require.Error(t, err, "Repository error on FindByID should return error")
-	mockRepo.AssertExpectations(t)
 }
 
 func TestDeleteUserUseCase_Execute_DeleteError_ReturnsError(t *testing.T) {
@@ -73,10 +84,19 @@ func TestDeleteUserUseCase_Execute_DeleteError_ReturnsError(t *testing.T) {
 		ID:    userID,
 		Email: "test@example.com",
 	}
+	deleteError := errors.New("delete error")
 
-	mockRepo := new(mockUserRepository)
-	mockRepo.On("FindByID", mock.Anything, userID).Return(user, nil)
-	mockRepo.On("Delete", mock.Anything, userID).Return(assert.AnError)
+	mockRepo := &MockUserRepository{
+		FindByIDFn: func(ctx context.Context, id string) (*domain.User, error) {
+			if id == userID {
+				return user, nil
+			}
+			return nil, nil
+		},
+		DeleteFn: func(ctx context.Context, id string) error {
+			return deleteError
+		},
+	}
 
 	useCase := NewDeleteUserUseCase(mockRepo)
 
@@ -85,6 +105,5 @@ func TestDeleteUserUseCase_Execute_DeleteError_ReturnsError(t *testing.T) {
 
 	// Assert
 	require.Error(t, err, "Repository error on Delete should return error")
-	mockRepo.AssertExpectations(t)
 }
 

@@ -123,10 +123,81 @@ Each use case package includes a `dto.go` file that defines:
 
 ## Testing
 
-Use cases should be easily testable by mocking repository interfaces:
+Use cases should be easily testable by mocking repository interfaces. We use hand-written mocks with function fields for clarity and maintainability.
+
+### Mock Pattern
+
+Each use case package includes a `mocks_test.go` file with hand-written mocks:
 
 ```go
-mockRepo := &MockUserRepository{}
-useCase := NewRegisterUseCase(mockRepo)
-// Test use case with mocked dependencies
+// mocks_test.go
+type MockUserRepository struct {
+	CreateFn     func(ctx context.Context, user *domain.User) error
+	FindByIDFn   func(ctx context.Context, id string) (*domain.User, error)
+	FindByEmailFn func(ctx context.Context, email string) (*domain.User, error)
+	// ... other methods
+}
+
+func (m *MockUserRepository) Create(ctx context.Context, user *domain.User) error {
+	if m.CreateFn != nil {
+		return m.CreateFn(ctx, user)
+	}
+	return nil
+}
 ```
+
+### Test Example
+
+```go
+func TestRegisterUseCase_Execute(t *testing.T) {
+	mockRepo := &MockUserRepository{
+		FindByEmailFn: func(ctx context.Context, email string) (*domain.User, error) {
+			return nil, nil  // User doesn't exist
+		},
+		CreateFn: func(ctx context.Context, user *domain.User) error {
+			return nil
+		},
+	}
+	
+	useCase := NewRegisterUseCase(mockRepo)
+	// ... test logic
+}
+```
+
+### Table-Driven Tests
+
+For similar test cases, use table-driven tests with configurable mocks:
+
+```go
+tests := []struct {
+	name      string
+	mockSetup func() *MockUserRepository
+	input     RegisterInput
+	wantErr   bool
+	validate  func(*testing.T, *RegisterOutput)
+}{
+	// ... test cases
+}
+```
+
+### Clock Injection
+
+For time-dependent logic, inject a `Clock` interface instead of using `time.Now()` directly:
+
+```go
+type UseCase struct {
+	clock clock.Clock
+}
+
+// In production
+useCase := NewUseCase(clock.NewRealClock())
+
+// In tests
+mockClock := &MockClock{
+	NowFn: func() time.Time {
+		return fixedTime
+	},
+}
+```
+
+See `docs/testing-best-practices.md` for comprehensive testing guidelines.

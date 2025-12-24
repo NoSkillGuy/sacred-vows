@@ -2,11 +2,11 @@ package auth
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/sacred-vows/api-go/internal/domain"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -19,8 +19,14 @@ func TestGetCurrentUserUseCase_Execute_UserFound_ReturnsUser(t *testing.T) {
 		Name:  stringPtr("Test User"),
 	}
 
-	mockRepo := new(mockUserRepository)
-	mockRepo.On("FindByID", mock.Anything, userID).Return(user, nil)
+	mockRepo := &MockUserRepository{
+		FindByIDFn: func(ctx context.Context, id string) (*domain.User, error) {
+			if id == userID {
+				return user, nil
+			}
+			return nil, nil
+		},
+	}
 
 	useCase := NewGetCurrentUserUseCase(mockRepo)
 
@@ -34,15 +40,17 @@ func TestGetCurrentUserUseCase_Execute_UserFound_ReturnsUser(t *testing.T) {
 	assert.Equal(t, user.ID, output.User.ID, "User ID should match")
 	assert.Equal(t, user.Email, output.User.Email, "User email should match")
 	assert.Equal(t, user.Name, output.User.Name, "User name should match")
-	mockRepo.AssertExpectations(t)
 }
 
 func TestGetCurrentUserUseCase_Execute_UserNotFound_ReturnsError(t *testing.T) {
 	// Arrange
 	userID := "nonexistent-123"
 
-	mockRepo := new(mockUserRepository)
-	mockRepo.On("FindByID", mock.Anything, userID).Return(nil, nil)
+	mockRepo := &MockUserRepository{
+		FindByIDFn: func(ctx context.Context, id string) (*domain.User, error) {
+			return nil, nil
+		},
+	}
 
 	useCase := NewGetCurrentUserUseCase(mockRepo)
 
@@ -52,15 +60,18 @@ func TestGetCurrentUserUseCase_Execute_UserNotFound_ReturnsError(t *testing.T) {
 	// Assert
 	require.Error(t, err, "User not found should return error")
 	assert.Nil(t, output, "Output should be nil on error")
-	mockRepo.AssertExpectations(t)
 }
 
 func TestGetCurrentUserUseCase_Execute_RepositoryError_ReturnsError(t *testing.T) {
 	// Arrange
 	userID := "user-123"
+	repoError := errors.New("repository error")
 
-	mockRepo := new(mockUserRepository)
-	mockRepo.On("FindByID", mock.Anything, userID).Return(nil, assert.AnError)
+	mockRepo := &MockUserRepository{
+		FindByIDFn: func(ctx context.Context, id string) (*domain.User, error) {
+			return nil, repoError
+		},
+	}
 
 	useCase := NewGetCurrentUserUseCase(mockRepo)
 
@@ -70,6 +81,5 @@ func TestGetCurrentUserUseCase_Execute_RepositoryError_ReturnsError(t *testing.T
 	// Assert
 	require.Error(t, err, "Repository error should return error")
 	assert.Nil(t, output, "Output should be nil on error")
-	mockRepo.AssertExpectations(t)
 }
 

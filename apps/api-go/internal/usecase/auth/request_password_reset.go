@@ -9,6 +9,7 @@ import (
 	"github.com/sacred-vows/api-go/internal/domain"
 	"github.com/sacred-vows/api-go/internal/infrastructure/auth"
 	emailInterface "github.com/sacred-vows/api-go/internal/interfaces/email"
+	"github.com/sacred-vows/api-go/internal/interfaces/clock"
 	"github.com/sacred-vows/api-go/internal/interfaces/repository"
 	"github.com/sacred-vows/api-go/pkg/errors"
 	"github.com/segmentio/ksuid"
@@ -18,6 +19,7 @@ type RequestPasswordResetUseCase struct {
 	userRepo    repository.UserRepository
 	tokenRepo   repository.PasswordResetRepository
 	emailService emailInterface.EmailService
+	clock       clock.Clock
 	frontendURL string
 }
 
@@ -25,12 +27,14 @@ func NewRequestPasswordResetUseCase(
 	userRepo repository.UserRepository,
 	tokenRepo repository.PasswordResetRepository,
 	emailService emailInterface.EmailService,
+	clk clock.Clock,
 	frontendURL string,
 ) *RequestPasswordResetUseCase {
 	return &RequestPasswordResetUseCase{
 		userRepo:     userRepo,
 		tokenRepo:    tokenRepo,
 		emailService: emailService,
+		clock:        clk,
 		frontendURL:  frontendURL,
 	}
 }
@@ -70,7 +74,7 @@ func (uc *RequestPasswordResetUseCase) Execute(ctx context.Context, input Reques
 	tokenHash := auth.HashTokenForStorage(rawToken)
 
 	// Set expiry to 24 hours from now
-	expiresAt := time.Now().Add(24 * time.Hour)
+	expiresAt := uc.clock.Now().Add(24 * time.Hour)
 
 	// Create password reset token entity
 	token, err := domain.NewPasswordResetToken(

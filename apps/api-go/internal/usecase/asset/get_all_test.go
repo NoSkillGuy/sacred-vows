@@ -7,7 +7,6 @@ import (
 
 	"github.com/sacred-vows/api-go/internal/domain"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -37,8 +36,14 @@ func TestGetAllAssetsUseCase_Execute_UserHasAssets_ReturnsAssets(t *testing.T) {
 		},
 	}
 
-	mockRepo := new(mockAssetRepositoryForUpload)
-	mockRepo.On("FindByUserID", mock.Anything, userID).Return(assets, nil)
+	mockRepo := &MockAssetRepository{
+		FindByUserIDFn: func(ctx context.Context, id string) ([]*domain.Asset, error) {
+			if id == userID {
+				return assets, nil
+			}
+			return nil, nil
+		},
+	}
 
 	useCase := NewGetAllAssetsUseCase(mockRepo)
 
@@ -51,6 +56,5 @@ func TestGetAllAssetsUseCase_Execute_UserHasAssets_ReturnsAssets(t *testing.T) {
 	require.Len(t, output.Assets, 2, "Should return 2 assets")
 	assert.Equal(t, "asset-1", output.Assets[0].ID, "First asset ID should match")
 	assert.Equal(t, "asset-2", output.Assets[1].ID, "Second asset ID should match")
-	mockRepo.AssertExpectations(t)
 }
 

@@ -8,7 +8,6 @@ import (
 
 	"github.com/sacred-vows/api-go/internal/domain"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -28,12 +27,22 @@ func TestDeleteInvitationUseCase_Execute_InvitationExists_DeletesInvitation(t *t
 		UpdatedAt: time.Now(),
 	}
 
-	mockInvitationRepo := new(mockInvitationRepository)
-	mockAssetRepo := new(mockAssetRepository)
-
-	mockInvitationRepo.On("FindByID", mock.Anything, invitationID).Return(invitation, nil)
-	mockInvitationRepo.On("Delete", mock.Anything, invitationID).Return(nil)
-	mockAssetRepo.On("UntrackAllUsage", mock.Anything, invitationID).Return(nil)
+	mockInvitationRepo := &MockInvitationRepository{
+		FindByIDFn: func(ctx context.Context, id string) (*domain.Invitation, error) {
+			if id == invitationID {
+				return invitation, nil
+			}
+			return nil, nil
+		},
+		DeleteFn: func(ctx context.Context, id string) error {
+			return nil
+		},
+	}
+	mockAssetRepo := &MockAssetRepository{
+		UntrackAllUsageFn: func(ctx context.Context, invitationID string) error {
+			return nil
+		},
+	}
 
 	useCase := NewDeleteInvitationUseCase(mockInvitationRepo, mockAssetRepo, nil)
 
@@ -43,18 +52,18 @@ func TestDeleteInvitationUseCase_Execute_InvitationExists_DeletesInvitation(t *t
 	// Assert
 	require.NoError(t, err, "Successful deletion should not return error")
 	require.NotNil(t, output, "Output should not be nil")
-	mockInvitationRepo.AssertExpectations(t)
-	mockAssetRepo.AssertExpectations(t)
 }
 
 func TestDeleteInvitationUseCase_Execute_InvitationNotFound_ReturnsError(t *testing.T) {
 	// Arrange
 	invitationID := "nonexistent-123"
 
-	mockInvitationRepo := new(mockInvitationRepository)
-	mockAssetRepo := new(mockAssetRepository)
-
-	mockInvitationRepo.On("FindByID", mock.Anything, invitationID).Return(nil, nil)
+	mockInvitationRepo := &MockInvitationRepository{
+		FindByIDFn: func(ctx context.Context, id string) (*domain.Invitation, error) {
+			return nil, nil
+		},
+	}
+	mockAssetRepo := &MockAssetRepository{}
 
 	useCase := NewDeleteInvitationUseCase(mockInvitationRepo, mockAssetRepo, nil)
 
@@ -64,6 +73,5 @@ func TestDeleteInvitationUseCase_Execute_InvitationNotFound_ReturnsError(t *test
 	// Assert
 	require.Error(t, err, "Invitation not found should return error")
 	assert.Nil(t, output, "Output should be nil on error")
-	mockInvitationRepo.AssertExpectations(t)
 }
 

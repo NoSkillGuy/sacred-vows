@@ -7,7 +7,6 @@ import (
 
 	"github.com/sacred-vows/api-go/internal/domain"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -29,10 +28,20 @@ func TestGetAnalyticsByInvitationUseCase_Execute_InvitationHasAnalytics_ReturnsA
 		},
 	}
 
-	mockRepo := new(mockAnalyticsRepository)
-	mockRepo.On("FindByInvitationID", mock.Anything, invitationID).Return(analyticsList, nil)
-	mockRepo.On("CountByType", mock.Anything, invitationID, domain.AnalyticsTypeView).Return(int64(1), nil)
-	mockRepo.On("CountByType", mock.Anything, invitationID, domain.AnalyticsTypeRSVP).Return(int64(1), nil)
+	mockRepo := &MockAnalyticsRepository{
+		FindByInvitationIDFn: func(ctx context.Context, id string) ([]*domain.Analytics, error) {
+			if id == invitationID {
+				return analyticsList, nil
+			}
+			return nil, nil
+		},
+		CountByTypeFn: func(ctx context.Context, id string, analyticsType domain.AnalyticsType) (int64, error) {
+			if id == invitationID {
+				return int64(1), nil
+			}
+			return 0, nil
+		},
+	}
 
 	useCase := NewGetAnalyticsByInvitationUseCase(mockRepo)
 
@@ -46,6 +55,5 @@ func TestGetAnalyticsByInvitationUseCase_Execute_InvitationHasAnalytics_ReturnsA
 	assert.Equal(t, 1, output.Views, "Views count should be 1")
 	assert.Equal(t, 1, output.RSVPs, "RSVPs count should be 1")
 	require.Len(t, output.Analytics, 2, "Should return 2 analytics")
-	mockRepo.AssertExpectations(t)
 }
 

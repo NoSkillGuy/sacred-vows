@@ -6,57 +6,17 @@ import (
 	"testing"
 
 	"github.com/sacred-vows/api-go/internal/domain"
-	"github.com/stretchr/testify/mock"
 )
-
-// mockInvitationRepository is a mock implementation of InvitationRepository
-type mockInvitationRepository struct {
-	mock.Mock
-}
-
-func (m *mockInvitationRepository) Create(ctx context.Context, invitation *domain.Invitation) error {
-	args := m.Called(ctx, invitation)
-	return args.Error(0)
-}
-
-func (m *mockInvitationRepository) FindByID(ctx context.Context, id string) (*domain.Invitation, error) {
-	args := m.Called(ctx, id)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*domain.Invitation), args.Error(1)
-}
-
-func (m *mockInvitationRepository) FindByUserID(ctx context.Context, userID string) ([]*domain.Invitation, error) {
-	args := m.Called(ctx, userID)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).([]*domain.Invitation), args.Error(1)
-}
-
-func (m *mockInvitationRepository) Update(ctx context.Context, invitation *domain.Invitation) error {
-	args := m.Called(ctx, invitation)
-	return args.Error(0)
-}
-
-func (m *mockInvitationRepository) Delete(ctx context.Context, id string) error {
-	args := m.Called(ctx, id)
-	return args.Error(0)
-}
-
-func (m *mockInvitationRepository) MigrateUserInvitations(ctx context.Context, fromUserID, toUserID string) (int, error) {
-	args := m.Called(ctx, fromUserID, toUserID)
-	return args.Int(0), args.Error(1)
-}
 
 func TestCreateInvitationUseCase_Execute_DefaultStatusToDraft(t *testing.T) {
 	// Arrange
 	var savedInvitation *domain.Invitation
-	mockRepo := new(mockInvitationRepository)
-	mockRepo.On("Create", mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
-		savedInvitation = args.Get(1).(*domain.Invitation)
-	}).Return(nil)
+	mockRepo := &MockInvitationRepository{
+		CreateFn: func(ctx context.Context, invitation *domain.Invitation) error {
+			savedInvitation = invitation
+			return nil
+		},
+	}
 
 	useCase := NewCreateInvitationUseCase(mockRepo, nil)
 	input := CreateInvitationInput{
@@ -113,8 +73,11 @@ func TestCreateInvitationUseCase_Execute_DefaultStatusToDraft(t *testing.T) {
 
 func TestCreateInvitationUseCase_Execute_WithTitle(t *testing.T) {
 	// Arrange
-	mockRepo := new(mockInvitationRepository)
-	mockRepo.On("Create", mock.Anything, mock.Anything).Return(nil)
+	mockRepo := &MockInvitationRepository{
+		CreateFn: func(ctx context.Context, invitation *domain.Invitation) error {
+			return nil
+		},
+	}
 
 	useCase := NewCreateInvitationUseCase(mockRepo, nil)
 	title := "My Wedding Invitation"
@@ -159,10 +122,12 @@ func TestCreateInvitationUseCase_Execute_WithTitle(t *testing.T) {
 func TestCreateInvitationUseCase_Execute_DefaultLayoutID(t *testing.T) {
 	// Arrange
 	var savedInvitation *domain.Invitation
-	mockRepo := new(mockInvitationRepository)
-	mockRepo.On("Create", mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
-		savedInvitation = args.Get(1).(*domain.Invitation)
-	}).Return(nil)
+	mockRepo := &MockInvitationRepository{
+		CreateFn: func(ctx context.Context, invitation *domain.Invitation) error {
+			savedInvitation = invitation
+			return nil
+		},
+	}
 
 	useCase := NewCreateInvitationUseCase(mockRepo, nil)
 	input := CreateInvitationInput{

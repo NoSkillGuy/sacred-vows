@@ -92,6 +92,7 @@ func TestRefreshTokenUseCase_LookupTriesOlderKeys(t *testing.T) {
 		refreshTokenRepo: repo,
 		userRepo:         &fakeUserRepo{},
 		jwtService:       authinfra.NewJWTService(strings.Repeat("s", 32), 15*time.Minute, 30*24*time.Hour, "iss", "aud", 60*time.Second),
+		clock:            &MockClock{},
 		hmacKeys:         keys,
 		activeHMACKeyID:  2,
 	}

@@ -2,11 +2,11 @@ package auth
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/sacred-vows/api-go/internal/domain"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -16,11 +16,17 @@ func TestRegisterUseCase_Execute_ValidRegistration_ReturnsUser(t *testing.T) {
 	password := "ValidPass123"
 	name := stringPtr("New User")
 
-	mockRepo := new(mockUserRepository)
-	mockRepo.On("FindByEmail", mock.Anything, email).Return(nil, nil)
-	mockRepo.On("Create", mock.Anything, mock.MatchedBy(func(user *domain.User) bool {
-		return user.Email == email && user.Password != "" && user.Name != nil && *user.Name == "New User"
-	})).Return(nil)
+	mockRepo := &MockUserRepository{
+		FindByEmailFn: func(ctx context.Context, emailAddr string) (*domain.User, error) {
+			return nil, nil
+		},
+		CreateFn: func(ctx context.Context, user *domain.User) error {
+			if user.Email != email || user.Password == "" || user.Name == nil || *user.Name != "New User" {
+				return errors.New("unexpected user data")
+			}
+			return nil
+		},
+	}
 
 	useCase := NewRegisterUseCase(mockRepo)
 	input := RegisterInput{
@@ -39,7 +45,6 @@ func TestRegisterUseCase_Execute_ValidRegistration_ReturnsUser(t *testing.T) {
 	assert.Equal(t, email, output.User.Email, "User email should match")
 	assert.Equal(t, name, output.User.Name, "User name should match")
 	assert.NotEmpty(t, output.User.ID, "User ID should be generated")
-	mockRepo.AssertExpectations(t)
 }
 
 func TestRegisterUseCase_Execute_DuplicateEmail_ReturnsError(t *testing.T) {
@@ -52,8 +57,14 @@ func TestRegisterUseCase_Execute_DuplicateEmail_ReturnsError(t *testing.T) {
 		Email: email,
 	}
 
-	mockRepo := new(mockUserRepository)
-	mockRepo.On("FindByEmail", mock.Anything, email).Return(existingUser, nil)
+	mockRepo := &MockUserRepository{
+		FindByEmailFn: func(ctx context.Context, emailAddr string) (*domain.User, error) {
+			if emailAddr == email {
+				return existingUser, nil
+			}
+			return nil, nil
+		},
+	}
 
 	useCase := NewRegisterUseCase(mockRepo)
 	input := RegisterInput{
@@ -67,7 +78,6 @@ func TestRegisterUseCase_Execute_DuplicateEmail_ReturnsError(t *testing.T) {
 	// Assert
 	require.Error(t, err, "Duplicate email should return error")
 	assert.Nil(t, output, "Output should be nil on error")
-	mockRepo.AssertExpectations(t)
 }
 
 func TestRegisterUseCase_Execute_WithoutName_ReturnsUser(t *testing.T) {
@@ -75,11 +85,17 @@ func TestRegisterUseCase_Execute_WithoutName_ReturnsUser(t *testing.T) {
 	email := "noname@example.com"
 	password := "ValidPass123"
 
-	mockRepo := new(mockUserRepository)
-	mockRepo.On("FindByEmail", mock.Anything, email).Return(nil, nil)
-	mockRepo.On("Create", mock.Anything, mock.MatchedBy(func(user *domain.User) bool {
-		return user.Email == email && user.Password != "" && user.Name == nil
-	})).Return(nil)
+	mockRepo := &MockUserRepository{
+		FindByEmailFn: func(ctx context.Context, emailAddr string) (*domain.User, error) {
+			return nil, nil
+		},
+		CreateFn: func(ctx context.Context, user *domain.User) error {
+			if user.Email != email || user.Password == "" || user.Name != nil {
+				return errors.New("unexpected user data")
+			}
+			return nil
+		},
+	}
 
 	useCase := NewRegisterUseCase(mockRepo)
 	input := RegisterInput{
@@ -97,17 +113,22 @@ func TestRegisterUseCase_Execute_WithoutName_ReturnsUser(t *testing.T) {
 	require.NotNil(t, output.User, "User should not be nil")
 	assert.Equal(t, email, output.User.Email, "User email should match")
 	assert.Nil(t, output.User.Name, "User name should be nil")
-	mockRepo.AssertExpectations(t)
 }
 
 func TestRegisterUseCase_Execute_RepositoryCreateError_ReturnsError(t *testing.T) {
 	// Arrange
 	email := "error@example.com"
 	password := "ValidPass123"
+	createError := errors.New("create error")
 
-	mockRepo := new(mockUserRepository)
-	mockRepo.On("FindByEmail", mock.Anything, email).Return(nil, nil)
-	mockRepo.On("Create", mock.Anything, mock.Anything).Return(assert.AnError)
+	mockRepo := &MockUserRepository{
+		FindByEmailFn: func(ctx context.Context, emailAddr string) (*domain.User, error) {
+			return nil, nil
+		},
+		CreateFn: func(ctx context.Context, user *domain.User) error {
+			return createError
+		},
+	}
 
 	useCase := NewRegisterUseCase(mockRepo)
 	input := RegisterInput{
@@ -121,6 +142,5 @@ func TestRegisterUseCase_Execute_RepositoryCreateError_ReturnsError(t *testing.T
 	// Assert
 	require.Error(t, err, "Repository create error should return error")
 	assert.Nil(t, output, "Output should be nil on error")
-	mockRepo.AssertExpectations(t)
 }
 

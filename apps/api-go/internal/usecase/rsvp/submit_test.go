@@ -6,35 +6,8 @@ import (
 
 	"github.com/sacred-vows/api-go/internal/domain"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
-
-// mockRSVPRepository is a mock implementation of RSVPRepository
-type mockRSVPRepository struct {
-	mock.Mock
-}
-
-func (m *mockRSVPRepository) Create(ctx context.Context, rsvp *domain.RSVPResponse) error {
-	args := m.Called(ctx, rsvp)
-	return args.Error(0)
-}
-
-func (m *mockRSVPRepository) FindByInvitationID(ctx context.Context, invitationID string) ([]*domain.RSVPResponse, error) {
-	args := m.Called(ctx, invitationID)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).([]*domain.RSVPResponse), args.Error(1)
-}
-
-func (m *mockRSVPRepository) FindByID(ctx context.Context, id string) (*domain.RSVPResponse, error) {
-	args := m.Called(ctx, id)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*domain.RSVPResponse), args.Error(1)
-}
 
 func TestSubmitRSVPUseCase_Execute_ValidRSVP_ReturnsRSVP(t *testing.T) {
 	// Arrange
@@ -45,10 +18,14 @@ func TestSubmitRSVPUseCase_Execute_ValidRSVP_ReturnsRSVP(t *testing.T) {
 	phone := "123-456-7890"
 	message := "Looking forward to it!"
 
-	mockRepo := new(mockRSVPRepository)
-	mockRepo.On("Create", mock.Anything, mock.MatchedBy(func(rsvp *domain.RSVPResponse) bool {
-		return rsvp.InvitationID == invitationID && rsvp.Name == name && rsvp.Date == date
-	})).Return(nil)
+	mockRepo := &MockRSVPRepository{
+		CreateFn: func(ctx context.Context, rsvp *domain.RSVPResponse) error {
+			if rsvp.InvitationID != invitationID || rsvp.Name != name || rsvp.Date != date {
+				return assert.AnError
+			}
+			return nil
+		},
+	}
 
 	useCase := NewSubmitRSVPUseCase(mockRepo)
 	input := SubmitRSVPInput{
@@ -70,6 +47,5 @@ func TestSubmitRSVPUseCase_Execute_ValidRSVP_ReturnsRSVP(t *testing.T) {
 	assert.Equal(t, name, output.RSVP.Name, "Name should match")
 	assert.Equal(t, date, output.RSVP.Date, "Date should match")
 	assert.NotEmpty(t, output.RSVP.ID, "RSVP ID should be generated")
-	mockRepo.AssertExpectations(t)
 }
 

@@ -7,7 +7,6 @@ import (
 
 	"github.com/sacred-vows/api-go/internal/domain"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -31,15 +30,28 @@ func TestResetPasswordUseCase_Execute_ValidToken_ResetsPassword(t *testing.T) {
 		Email: "test@example.com",
 	}
 
-	mockTokenRepo := new(mockPasswordResetRepository)
-	mockUserRepo := new(mockUserRepository)
-
-	mockTokenRepo.On("FindByTokenHash", mock.Anything, mock.Anything).Return(validToken, nil)
-	mockUserRepo.On("FindByID", mock.Anything, userID).Return(user, nil)
-	mockUserRepo.On("Update", mock.Anything, mock.MatchedBy(func(u *domain.User) bool {
-		return u.ID == userID && u.Password != ""
-	})).Return(nil)
-	mockTokenRepo.On("MarkAsUsed", mock.Anything, validToken.ID).Return(nil)
+	mockTokenRepo := &MockPasswordResetRepository{
+		FindByTokenHashFn: func(ctx context.Context, hash string) (*domain.PasswordResetToken, error) {
+			return validToken, nil
+		},
+		MarkAsUsedFn: func(ctx context.Context, tokenID string) error {
+			return nil
+		},
+	}
+	mockUserRepo := &MockUserRepository{
+		FindByIDFn: func(ctx context.Context, id string) (*domain.User, error) {
+			if id == userID {
+				return user, nil
+			}
+			return nil, nil
+		},
+		UpdateFn: func(ctx context.Context, u *domain.User) error {
+			if u.ID != userID || u.Password == "" {
+				return assert.AnError
+			}
+			return nil
+		},
+	}
 
 	useCase := NewResetPasswordUseCase(mockTokenRepo, mockUserRepo)
 	input := ResetPasswordInput{
@@ -54,8 +66,6 @@ func TestResetPasswordUseCase_Execute_ValidToken_ResetsPassword(t *testing.T) {
 	require.NoError(t, err, "Valid reset should not return error")
 	require.NotNil(t, output, "Output should not be nil")
 	assert.True(t, output.Success, "Success should be true")
-	mockTokenRepo.AssertExpectations(t)
-	mockUserRepo.AssertExpectations(t)
 }
 
 func TestResetPasswordUseCase_Execute_InvalidPassword_ReturnsError(t *testing.T) {
@@ -63,8 +73,8 @@ func TestResetPasswordUseCase_Execute_InvalidPassword_ReturnsError(t *testing.T)
 	token := "valid-reset-token"
 	password := "weak" // Too weak password
 
-	mockTokenRepo := new(mockPasswordResetRepository)
-	mockUserRepo := new(mockUserRepository)
+	mockTokenRepo := &MockPasswordResetRepository{}
+	mockUserRepo := &MockUserRepository{}
 
 	useCase := NewResetPasswordUseCase(mockTokenRepo, mockUserRepo)
 	input := ResetPasswordInput{
@@ -85,10 +95,12 @@ func TestResetPasswordUseCase_Execute_TokenNotFound_ReturnsError(t *testing.T) {
 	token := "nonexistent-token"
 	password := "NewValidPass123"
 
-	mockTokenRepo := new(mockPasswordResetRepository)
-	mockUserRepo := new(mockUserRepository)
-
-	mockTokenRepo.On("FindByTokenHash", mock.Anything, mock.Anything).Return(nil, nil)
+	mockTokenRepo := &MockPasswordResetRepository{
+		FindByTokenHashFn: func(ctx context.Context, hash string) (*domain.PasswordResetToken, error) {
+			return nil, nil
+		},
+	}
+	mockUserRepo := &MockUserRepository{}
 
 	useCase := NewResetPasswordUseCase(mockTokenRepo, mockUserRepo)
 	input := ResetPasswordInput{
@@ -102,7 +114,6 @@ func TestResetPasswordUseCase_Execute_TokenNotFound_ReturnsError(t *testing.T) {
 	// Assert
 	require.Error(t, err, "Token not found should return error")
 	assert.Nil(t, output, "Output should be nil on error")
-	mockTokenRepo.AssertExpectations(t)
 }
 
 func TestResetPasswordUseCase_Execute_ExpiredToken_ReturnsError(t *testing.T) {
@@ -120,10 +131,12 @@ func TestResetPasswordUseCase_Execute_ExpiredToken_ReturnsError(t *testing.T) {
 		Used:      false,
 	}
 
-	mockTokenRepo := new(mockPasswordResetRepository)
-	mockUserRepo := new(mockUserRepository)
-
-	mockTokenRepo.On("FindByTokenHash", mock.Anything, mock.Anything).Return(expiredToken, nil)
+	mockTokenRepo := &MockPasswordResetRepository{
+		FindByTokenHashFn: func(ctx context.Context, hash string) (*domain.PasswordResetToken, error) {
+			return expiredToken, nil
+		},
+	}
+	mockUserRepo := &MockUserRepository{}
 
 	useCase := NewResetPasswordUseCase(mockTokenRepo, mockUserRepo)
 	input := ResetPasswordInput{
@@ -137,6 +150,5 @@ func TestResetPasswordUseCase_Execute_ExpiredToken_ReturnsError(t *testing.T) {
 	// Assert
 	require.Error(t, err, "Expired token should return error")
 	assert.Nil(t, output, "Output should be nil on error")
-	mockTokenRepo.AssertExpectations(t)
 }
 

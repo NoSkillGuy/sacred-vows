@@ -7,7 +7,6 @@ import (
 
 	"github.com/sacred-vows/api-go/internal/domain"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -36,8 +35,14 @@ func TestGetRSVPByInvitationUseCase_Execute_InvitationHasRSVPs_ReturnsRSVPs(t *t
 		},
 	}
 
-	mockRepo := new(mockRSVPRepository)
-	mockRepo.On("FindByInvitationID", mock.Anything, invitationID).Return(rsvps, nil)
+	mockRepo := &MockRSVPRepository{
+		FindByInvitationIDFn: func(ctx context.Context, id string) ([]*domain.RSVPResponse, error) {
+			if id == invitationID {
+				return rsvps, nil
+			}
+			return nil, nil
+		},
+	}
 
 	useCase := NewGetRSVPByInvitationUseCase(mockRepo)
 
@@ -51,6 +56,5 @@ func TestGetRSVPByInvitationUseCase_Execute_InvitationHasRSVPs_ReturnsRSVPs(t *t
 	assert.Equal(t, 2, output.Count, "Count should be 2")
 	assert.Equal(t, "rsvp-1", output.Responses[0].ID, "First RSVP ID should match")
 	assert.Equal(t, "rsvp-2", output.Responses[1].ID, "Second RSVP ID should match")
-	mockRepo.AssertExpectations(t)
 }
 

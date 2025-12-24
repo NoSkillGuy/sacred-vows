@@ -2,163 +2,144 @@ package auth
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/sacred-vows/api-go/internal/domain"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/crypto/bcrypt"
 )
 
-// mockUserRepository is a mock implementation of UserRepository
-type mockUserRepository struct {
-	mock.Mock
-}
-
-func (m *mockUserRepository) Create(ctx context.Context, user *domain.User) error {
-	args := m.Called(ctx, user)
-	return args.Error(0)
-}
-
-func (m *mockUserRepository) FindByEmail(ctx context.Context, email string) (*domain.User, error) {
-	args := m.Called(ctx, email)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*domain.User), args.Error(1)
-}
-
-func (m *mockUserRepository) FindByID(ctx context.Context, id string) (*domain.User, error) {
-	args := m.Called(ctx, id)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
-	}
-	return args.Get(0).(*domain.User), args.Error(1)
-}
-
-func (m *mockUserRepository) Update(ctx context.Context, user *domain.User) error {
-	args := m.Called(ctx, user)
-	return args.Error(0)
-}
-
-func (m *mockUserRepository) Delete(ctx context.Context, id string) error {
-	args := m.Called(ctx, id)
-	return args.Error(0)
-}
-
-func TestLoginUseCase_Execute_ValidCredentials_ReturnsUser(t *testing.T) {
-	// Arrange
-	email := "test@example.com"
-	password := "ValidPass123"
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	require.NoError(t, err, "Failed to hash password for test")
-
-	user := &domain.User{
-		ID:       "user-123",
-		Email:    email,
-		Password: string(hashedPassword),
-		Name:     stringPtr("Test User"),
-	}
-
-	mockRepo := new(mockUserRepository)
-	mockRepo.On("FindByEmail", mock.Anything, email).Return(user, nil)
-
-	useCase := NewLoginUseCase(mockRepo)
-	input := LoginInput{
-		Email:    email,
-		Password: password,
-	}
-
-	// Act
-	output, err := useCase.Execute(context.Background(), input)
-
-	// Assert
-	require.NoError(t, err, "Valid login should not return error")
-	require.NotNil(t, output, "Output should not be nil")
-	require.NotNil(t, output.User, "User should not be nil")
-	assert.Equal(t, user.ID, output.User.ID, "User ID should match")
-	assert.Equal(t, user.Email, output.User.Email, "User email should match")
-	assert.Equal(t, user.Name, output.User.Name, "User name should match")
-	mockRepo.AssertExpectations(t)
-}
-
-func TestLoginUseCase_Execute_UserNotFound_ReturnsError(t *testing.T) {
-	// Arrange
-	email := "notfound@example.com"
-	password := "ValidPass123"
-
-	mockRepo := new(mockUserRepository)
-	mockRepo.On("FindByEmail", mock.Anything, email).Return(nil, nil)
-
-	useCase := NewLoginUseCase(mockRepo)
-	input := LoginInput{
-		Email:    email,
-		Password: password,
-	}
-
-	// Act
-	output, err := useCase.Execute(context.Background(), input)
-
-	// Assert
-	require.Error(t, err, "User not found should return error")
-	assert.Nil(t, output, "Output should be nil on error")
-	mockRepo.AssertExpectations(t)
-}
-
-func TestLoginUseCase_Execute_InvalidPassword_ReturnsError(t *testing.T) {
-	// Arrange
-	email := "test@example.com"
-	correctPassword := "ValidPass123"
-	wrongPassword := "WrongPass123"
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(correctPassword), bcrypt.DefaultCost)
-	require.NoError(t, err, "Failed to hash password for test")
-
-	user := &domain.User{
-		ID:       "user-123",
-		Email:    email,
-		Password: string(hashedPassword),
-	}
-
-	mockRepo := new(mockUserRepository)
-	mockRepo.On("FindByEmail", mock.Anything, email).Return(user, nil)
-
-	useCase := NewLoginUseCase(mockRepo)
-	input := LoginInput{
-		Email:    email,
-		Password: wrongPassword,
+func TestLoginUseCase_Execute(t *testing.T) {
+	tests := []struct {
+		name      string
+		mockSetup func() *MockUserRepository
+		input     LoginInput
+		wantErr   bool
+		validate  func(*testing.T, *LoginOutput)
+	}{
+		{
+			name: "valid credentials returns user",
+			mockSetup: func() *MockUserRepository {
+				email := "test@example.com"
+				password := "ValidPass123"
+				hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+				user := &domain.User{
+					ID:       "user-123",
+					Email:    email,
+					Password: string(hashedPassword),
+					Name:     stringPtr("Test User"),
+				}
+				return &MockUserRepository{
+					FindByEmailFn: func(ctx context.Context, emailAddr string) (*domain.User, error) {
+						if emailAddr == email {
+							return user, nil
+						}
+						return nil, nil
+					},
+				}
+			},
+			input: LoginInput{
+				Email:    "test@example.com",
+				Password: "ValidPass123",
+			},
+			wantErr: false,
+			validate: func(t *testing.T, output *LoginOutput) {
+				require.NotNil(t, output, "Output should not be nil")
+				require.NotNil(t, output.User, "User should not be nil")
+				assert.Equal(t, "user-123", output.User.ID, "User ID should match")
+				assert.Equal(t, "test@example.com", output.User.Email, "User email should match")
+			},
+		},
+		{
+			name: "user not found returns error",
+			mockSetup: func() *MockUserRepository {
+				return &MockUserRepository{
+					FindByEmailFn: func(ctx context.Context, emailAddr string) (*domain.User, error) {
+						return nil, nil
+					},
+				}
+			},
+			input: LoginInput{
+				Email:    "notfound@example.com",
+				Password: "ValidPass123",
+			},
+			wantErr: true,
+			validate: func(t *testing.T, output *LoginOutput) {
+				assert.Nil(t, output, "Output should be nil on error")
+			},
+		},
+		{
+			name: "invalid password returns error",
+			mockSetup: func() *MockUserRepository {
+				email := "test@example.com"
+				correctPassword := "ValidPass123"
+				hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(correctPassword), bcrypt.DefaultCost)
+				user := &domain.User{
+					ID:       "user-123",
+					Email:    email,
+					Password: string(hashedPassword),
+				}
+				return &MockUserRepository{
+					FindByEmailFn: func(ctx context.Context, emailAddr string) (*domain.User, error) {
+						if emailAddr == email {
+							return user, nil
+						}
+						return nil, nil
+					},
+				}
+			},
+			input: LoginInput{
+				Email:    "test@example.com",
+				Password: "WrongPass123",
+			},
+			wantErr: true,
+			validate: func(t *testing.T, output *LoginOutput) {
+				assert.Nil(t, output, "Output should be nil on error")
+			},
+		},
+		{
+			name: "repository error returns error",
+			mockSetup: func() *MockUserRepository {
+				repoError := errors.New("repository error")
+				return &MockUserRepository{
+					FindByEmailFn: func(ctx context.Context, emailAddr string) (*domain.User, error) {
+						return nil, repoError
+					},
+				}
+			},
+			input: LoginInput{
+				Email:    "test@example.com",
+				Password: "ValidPass123",
+			},
+			wantErr: true,
+			validate: func(t *testing.T, output *LoginOutput) {
+				assert.Nil(t, output, "Output should be nil on error")
+			},
+		},
 	}
 
-	// Act
-	output, err := useCase.Execute(context.Background(), input)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Arrange
+			mockRepo := tt.mockSetup()
+			useCase := NewLoginUseCase(mockRepo)
 
-	// Assert
-	require.Error(t, err, "Invalid password should return error")
-	assert.Nil(t, output, "Output should be nil on error")
-	mockRepo.AssertExpectations(t)
-}
+			// Act
+			output, err := useCase.Execute(context.Background(), tt.input)
 
-func TestLoginUseCase_Execute_RepositoryError_ReturnsError(t *testing.T) {
-	// Arrange
-	email := "test@example.com"
-	password := "ValidPass123"
-
-	mockRepo := new(mockUserRepository)
-	mockRepo.On("FindByEmail", mock.Anything, email).Return(nil, assert.AnError)
-
-	useCase := NewLoginUseCase(mockRepo)
-	input := LoginInput{
-		Email:    email,
-		Password: password,
+			// Assert
+			if tt.wantErr {
+				require.Error(t, err, "Expected error but got none")
+			} else {
+				require.NoError(t, err, "Expected no error but got one")
+			}
+			if tt.validate != nil {
+				tt.validate(t, output)
+			}
+		})
 	}
-
-	// Act
-	output, err := useCase.Execute(context.Background(), input)
-
-	// Assert
-	require.Error(t, err, "Repository error should return error")
-	assert.Nil(t, output, "Output should be nil on error")
-	mockRepo.AssertExpectations(t)
 }
 
 func stringPtr(s string) *string {

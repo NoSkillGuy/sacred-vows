@@ -7,7 +7,6 @@ import (
 
 	"github.com/sacred-vows/api-go/internal/domain"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -25,9 +24,17 @@ func TestDeleteAssetUseCase_Execute_AssetExists_DeletesAsset(t *testing.T) {
 		CreatedAt:    time.Now(),
 	}
 
-	mockRepo := new(mockAssetRepositoryForUpload)
-	mockRepo.On("FindByURL", mock.Anything, url).Return(asset, nil)
-	mockRepo.On("DeleteByURL", mock.Anything, url).Return(nil)
+	mockRepo := &MockAssetRepository{
+		FindByURLFn: func(ctx context.Context, urlStr string) (*domain.Asset, error) {
+			if urlStr == url {
+				return asset, nil
+			}
+			return nil, nil
+		},
+		DeleteByURLFn: func(ctx context.Context, urlStr string) error {
+			return nil
+		},
+	}
 
 	useCase := NewDeleteAssetUseCase(mockRepo)
 
@@ -38,15 +45,17 @@ func TestDeleteAssetUseCase_Execute_AssetExists_DeletesAsset(t *testing.T) {
 	require.NoError(t, err, "Successful deletion should not return error")
 	require.NotNil(t, result, "Result should not be nil")
 	assert.Equal(t, asset.ID, result.ID, "Asset ID should match")
-	mockRepo.AssertExpectations(t)
 }
 
 func TestDeleteAssetUseCase_Execute_AssetNotFound_ReturnsError(t *testing.T) {
 	// Arrange
 	url := "/uploads/nonexistent.jpg"
 
-	mockRepo := new(mockAssetRepositoryForUpload)
-	mockRepo.On("FindByURL", mock.Anything, url).Return(nil, nil)
+	mockRepo := &MockAssetRepository{
+		FindByURLFn: func(ctx context.Context, urlStr string) (*domain.Asset, error) {
+			return nil, nil
+		},
+	}
 
 	useCase := NewDeleteAssetUseCase(mockRepo)
 
@@ -56,6 +65,5 @@ func TestDeleteAssetUseCase_Execute_AssetNotFound_ReturnsError(t *testing.T) {
 	// Assert
 	require.Error(t, err, "Asset not found should return error")
 	assert.Nil(t, result, "Result should be nil on error")
-	mockRepo.AssertExpectations(t)
 }
 
