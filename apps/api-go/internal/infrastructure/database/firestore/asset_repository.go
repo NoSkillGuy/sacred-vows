@@ -208,4 +208,3 @@ func (r *assetRepository) docToAssetFromData(data map[string]interface{}, id str
 
 	return asset
 }
-

@@ -1,20 +1,20 @@
-import { useBuilderStore } from '../../../store/builderStore';
+import { useBuilderStore } from "../../../store/builderStore";
 
 /**
  * Hook for WYSIWYG editing
  * Provides update function that connects to the store
  */
 export function useEditable() {
-  const { updateInvitationData, updateNestedData } = useBuilderStore();
+  const { updateInvitationData } = useBuilderStore();
 
   const handleUpdate = (path: string, value: unknown): void => {
     // Handle translation paths differently
-    if (path.startsWith('translations.')) {
+    if (path.startsWith("translations.")) {
       // Translations are managed separately, update the invitation data structure
       // For now, we'll store custom translations in the invitation data
-      const translationKey = path.replace('translations.', '');
+      const translationKey = path.replace("translations.", "");
       updateInvitationData(`customTranslations.${translationKey}`, value);
-    } else if (path.includes('.')) {
+    } else if (path.includes(".")) {
       // Nested path like 'couple.bride.name'
       updateInvitationData(path, value);
     } else {
@@ -27,4 +27,3 @@ export function useEditable() {
 }
 
 export default useEditable;
-

@@ -82,4 +82,3 @@ func RecordHTTPError(method, route string, statusCode int) {
 		httpErrorCount.Add(context.Background(), 1, otelmetric.WithAttributes(attrs...))
 	}
 }
-

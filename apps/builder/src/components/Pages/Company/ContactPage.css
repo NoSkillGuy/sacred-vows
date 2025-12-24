@@ -40,7 +40,7 @@
 }
 
 .form-header h2 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -86,7 +86,7 @@
 }
 
 .form-success h3 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.75rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -104,7 +104,7 @@
    =================================== */
 
 .contact-info h3 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -247,4 +247,3 @@
     padding: 1.75rem;
   }
 }
-

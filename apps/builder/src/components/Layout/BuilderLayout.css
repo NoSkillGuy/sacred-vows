@@ -19,8 +19,7 @@
   justify-content: center;
   align-items: stretch;
   padding: 0;
-  background: 
+  background:
     linear-gradient(135deg, rgba(254, 241, 240, 0.3) 0%, transparent 50%),
-    linear-gradient(225deg, rgba(245, 230, 211, 0.3) 0%, transparent 50%),
-    var(--builder-bg);
+    linear-gradient(225deg, rgba(245, 230, 211, 0.3) 0%, transparent 50%), var(--builder-bg);
 }

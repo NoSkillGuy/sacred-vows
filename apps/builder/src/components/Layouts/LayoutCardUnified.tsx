@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
-import './LayoutCardUnified.css';
-import LayoutPreviewBackground from './LayoutPreviewBackground';
+import React, { useMemo } from "react";
+import "./LayoutCardUnified.css";
+import LayoutPreviewBackground from "./LayoutPreviewBackground";
 
 function resolveTheme(layout) {
   if (layout.defaultTheme) return layout.defaultTheme;
@@ -11,11 +11,11 @@ function resolveTheme(layout) {
 function LayoutCardUnified({
   layout,
   onPrimaryAction,
-  primaryLabel = 'Use This Layout',
+  primaryLabel = "Use This Layout",
   primaryDisabled = false,
   primaryLoading = false,
   onSecondaryAction,
-  secondaryLabel = 'View Demo',
+  secondaryLabel = "View Demo",
   showSecondary = false,
   onCardClick,
   active = false,
@@ -24,20 +24,18 @@ function LayoutCardUnified({
 }) {
   const resolvedTheme = useMemo(() => resolveTheme(layout), [layout]);
   const colors = resolvedTheme?.colors;
-  const requiredColorKeys = ['primary', 'background', 'accent', 'text'];
+  const requiredColorKeys = ["primary", "background", "accent", "text"];
   const hasAllColors = requiredColorKeys.every((key) => colors?.[key]);
 
   if (!resolvedTheme || !hasAllColors) {
-    console.warn('Layout missing required theme colors', layout?.id || layout?.name);
+    console.warn("Layout missing required theme colors", layout?.id || layout?.name);
     return null;
   }
 
-  const { primary, background, accent, text } = colors;
+  // Colors destructured but unused - keeping for potential future use
+  // const { primary, background, accent, text } = colors;
 
-  const baseTags = [
-    ...(layout.tags || []),
-    layout.isFeatured ? 'featured' : null,
-  ].filter(Boolean);
+  const baseTags = [...(layout.tags || []), layout.isFeatured ? "featured" : null].filter(Boolean);
 
   const seenTags = new Set();
   const tags = [];
@@ -55,10 +53,8 @@ function LayoutCardUnified({
       : null;
 
   const displayTags = tags.slice(0, 4);
-  const isReady = layout.status === 'ready' || layout.isAvailable;
-  const badge =
-    badgeOverride ||
-    (!isReady ? 'Coming Soon' : layout.isFeatured ? 'Featured' : null);
+  const isReady = layout.status === "ready" || layout.isAvailable;
+  const badge = badgeOverride || (!isReady ? "Coming Soon" : layout.isFeatured ? "Featured" : null);
 
   const handleCardClick = () => {
     if (onCardClick) onCardClick(layout);
@@ -76,23 +72,17 @@ function LayoutCardUnified({
 
   return (
     <div
-      className={`layout-card-unified ${!isReady ? 'coming-soon' : ''} ${active ? 'active' : ''}`}
+      className={`layout-card-unified ${!isReady ? "coming-soon" : ""} ${active ? "active" : ""}`}
       onClick={handleCardClick}
     >
-      {badge && (
-        <div className={`unified-badge ${!isReady ? 'coming' : ''}`}>
-          {badge}
-        </div>
-      )}
+      {badge && <div className={`unified-badge ${!isReady ? "coming" : ""}`}>{badge}</div>}
 
-      {showActiveBadge && active && (
-        <div className="unified-active-badge">Current</div>
-      )}
+      {showActiveBadge && active && <div className="unified-active-badge">Current</div>}
 
       <div className="unified-preview-pane">
         {/* Layout-specific preview background */}
         <LayoutPreviewBackground layoutId={layout.id} />
-          
+
         {/* Layout name and description (overlay) */}
         <div className="unified-preview-header">
           <h3 className="unified-preview-title">{layout.name}</h3>
@@ -128,17 +118,13 @@ function LayoutCardUnified({
               </button>
             )}
             {showSecondary && onSecondaryAction && (
-              <button
-                className="unified-btn secondary"
-                onClick={handleSecondary}
-              >
+              <button className="unified-btn secondary" onClick={handleSecondary}>
                 {secondaryLabel}
               </button>
             )}
           </div>
         </div>
       )}
-
     </div>
   );
 }

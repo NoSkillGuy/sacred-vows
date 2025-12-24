@@ -1,0 +1,167 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install swag (for docs generation)
+        run: go install github.com/swaggo/swag/cmd/swag@latest
+
+      - name: Generate Go docs (for linting)
+        working-directory: ./apps/api-go
+        run: make swagger
+
+      - name: Lint Go code
+        working-directory: ./apps/api-go
+        run: |
+          go fmt ./...
+          go vet ./...
+
+      - name: Install Builder dependencies
+        working-directory: ./apps/builder
+        run: npm ci --legacy-peer-deps
+
+      - name: Lint Builder
+        working-directory: ./apps/builder
+        run: npm run lint
+
+      - name: Install Edge Worker dependencies
+        working-directory: ./apps/edge-worker
+        run: npm ci --legacy-peer-deps
+
+      - name: Lint Edge Worker
+        working-directory: ./apps/edge-worker
+        run: npm run lint
+
+  format-check:
+    name: Format Check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Check Go formatting
+        working-directory: ./apps/api-go
+        run: |
+          if [ "$(gofmt -l . | wc -l)" -gt 0 ]; then
+            echo "❌ Go code is not formatted. Run 'go fmt ./...' to fix."
+            gofmt -d .
+            exit 1
+          fi
+
+      - name: Check Prettier formatting
+        run: npm run format:check
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        test-type: [go, builder, edge-worker]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Setup Go
+        if: matrix.test-type == 'go'
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+
+      - name: Install swag (for docs generation)
+        if: matrix.test-type == 'go'
+        run: go install github.com/swaggo/swag/cmd/swag@latest
+
+      - name: Generate Go docs (for tests)
+        if: matrix.test-type == 'go'
+        working-directory: ./apps/api-go
+        run: make swagger
+
+      - name: Test Go
+        if: matrix.test-type == 'go'
+        working-directory: ./apps/api-go
+        run: make test
+
+      - name: Install Builder dependencies
+        if: matrix.test-type == 'builder'
+        working-directory: ./apps/builder
+        run: npm ci --legacy-peer-deps
+
+      - name: Test Builder
+        if: matrix.test-type == 'builder'
+        working-directory: ./apps/builder
+        run: npm test -- --run
+
+      - name: Install Edge Worker dependencies
+        if: matrix.test-type == 'edge-worker'
+        working-directory: ./apps/edge-worker
+        run: npm ci --legacy-peer-deps
+
+      - name: Test Edge Worker (Type Check)
+        if: matrix.test-type == 'edge-worker'
+        working-directory: ./apps/edge-worker
+        run: npm run typecheck
+
+  pre-commit-checks:
+    name: Pre-commit Checks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run pre-commit checks
+        run: |
+          chmod +x ./scripts/pre-commit-checks.sh
+          ./scripts/pre-commit-checks.sh
+

@@ -13,7 +13,7 @@ import (
 // FilesystemArtifactStorage stores published artifacts on local disk.
 // This is a development-friendly implementation that can be swapped for S3/R2 later.
 type FilesystemArtifactStorage struct {
-	rootDir   string
+	rootDir    string
 	publicBase string // e.g. http://localhost:3000
 }
 
@@ -111,5 +111,3 @@ func (s *FilesystemArtifactStorage) DeleteVersion(ctx context.Context, subdomain
 
 	return nil
 }
-
-

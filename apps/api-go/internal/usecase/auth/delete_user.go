@@ -34,4 +34,3 @@ func (uc *DeleteUserUseCase) Execute(ctx context.Context, userID string) error {
 
 	return nil
 }
-
