@@ -243,12 +243,13 @@ Post a comprehensive review summary that includes:
      COMMIT_SHA=$(gh pr view <PR_NUMBER> --json headRefOid --jq '.headRefOid')
 
      # Create a review with inline comments
-     gh api repos/NoSkillGuy/sacred-vows/pulls/<PR_NUMBER>/reviews \
-       -X POST \
-       -f body="Review summary with overall assessment" \
-       -f event="COMMENT" \
-       -f commit_id="$COMMIT_SHA" \
-       -f comments='[
+     # First, create a JSON file with the review data
+     cat > /tmp/review.json <<EOF
+     {
+       "body": "Review summary with overall assessment",
+       "event": "COMMENT",
+       "commit_id": "$COMMIT_SHA",
+       "comments": [
          {
            "path": "file/path.go",
            "line": 123,
@@ -261,7 +262,14 @@ Post a comprehensive review summary that includes:
            "body": "Another comment",
            "side": "RIGHT"
          }
-       ]'
+       ]
+     }
+     EOF
+
+     # Post the review using --input to preserve JSON array structure
+     gh api repos/NoSkillGuy/sacred-vows/pulls/<PR_NUMBER>/reviews \
+       -X POST \
+       --input /tmp/review.json
      ```
 
 5. **Provide feedback to user**:

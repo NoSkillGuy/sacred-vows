@@ -224,10 +224,13 @@ If merge conflicts are detected, resolve them systematically:
 
 7. **Complete the merge**:
    ```bash
+   # Format conflicted files list with bullet points
+   CONFLICT_LIST=$(echo "$CONFLICTED_FILES" | head -5 | sed 's/^/  - /')
+
    git commit -m "chore: resolve merge conflicts with $BASE_BRANCH
 
    Resolved conflicts in:
-   - $(echo $CONFLICTED_FILES | tr '\n' '\n' - | head -5)
+   $CONFLICT_LIST
 
    Merged latest changes from $BASE_BRANCH while preserving PR changes."
    ```
