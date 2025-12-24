@@ -8,7 +8,7 @@ import (
 
 // MockRSVPRepository is a hand-written mock implementation of RSVPRepository
 type MockRSVPRepository struct {
-	CreateFn              func(ctx context.Context, rsvp *domain.RSVPResponse) error
+	CreateFn             func(ctx context.Context, rsvp *domain.RSVPResponse) error
 	FindByInvitationIDFn func(ctx context.Context, invitationID string) ([]*domain.RSVPResponse, error)
 	FindByIDFn           func(ctx context.Context, id string) (*domain.RSVPResponse, error)
 }
@@ -33,4 +33,3 @@ func (m *MockRSVPRepository) FindByID(ctx context.Context, id string) (*domain.R
 	}
 	return nil, nil
 }
-

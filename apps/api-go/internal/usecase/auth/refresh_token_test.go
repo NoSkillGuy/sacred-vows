@@ -13,7 +13,7 @@ import (
 )
 
 type fakeRefreshTokenRepo struct {
-	byFP map[string]*domain.RefreshToken
+	byFP    map[string]*domain.RefreshToken
 	created *domain.RefreshToken
 }
 
@@ -27,10 +27,12 @@ func (f *fakeRefreshTokenRepo) FindByTokenFingerprint(ctx context.Context, finge
 	}
 	return f.byFP[string(fingerprint)], nil
 }
-func (f *fakeRefreshTokenRepo) FindByID(ctx context.Context, id string) (*domain.RefreshToken, error) { return nil, nil }
-func (f *fakeRefreshTokenRepo) RevokeByUserID(ctx context.Context, userID string) error                 { return nil }
-func (f *fakeRefreshTokenRepo) RevokeByID(ctx context.Context, id string) error                         { return nil }
-func (f *fakeRefreshTokenRepo) DeleteExpired(ctx context.Context) error                                  { return nil }
+func (f *fakeRefreshTokenRepo) FindByID(ctx context.Context, id string) (*domain.RefreshToken, error) {
+	return nil, nil
+}
+func (f *fakeRefreshTokenRepo) RevokeByUserID(ctx context.Context, userID string) error { return nil }
+func (f *fakeRefreshTokenRepo) RevokeByID(ctx context.Context, id string) error         { return nil }
+func (f *fakeRefreshTokenRepo) DeleteExpired(ctx context.Context) error                 { return nil }
 
 type fakeUserRepo struct{}
 
@@ -76,14 +78,14 @@ func TestRefreshTokenUseCase_LookupTriesOlderKeys(t *testing.T) {
 	}
 
 	stored := &domain.RefreshToken{
-		ID:              "rt1",
-		UserID:          "u1",
-		TokenHash:       hash,
+		ID:               "rt1",
+		UserID:           "u1",
+		TokenHash:        hash,
 		TokenFingerprint: oldFP,
-		HMACKeyID:       1,
-		ExpiresAt:       time.Now().Add(1 * time.Hour),
-		Revoked:         false,
-		CreatedAt:       time.Now(),
+		HMACKeyID:        1,
+		ExpiresAt:        time.Now().Add(1 * time.Hour),
+		Revoked:          false,
+		CreatedAt:        time.Now(),
 	}
 
 	repo := &fakeRefreshTokenRepo{byFP: map[string]*domain.RefreshToken{string(oldFP): stored}}
@@ -115,5 +117,3 @@ func TestRefreshTokenUseCase_LookupTriesOlderKeys(t *testing.T) {
 		t.Fatalf("expected new token stored with active key id 2, got %d", repo.created.HMACKeyID)
 	}
 }
-
-

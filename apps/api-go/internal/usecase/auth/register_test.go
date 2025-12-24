@@ -143,4 +143,3 @@ func TestRegisterUseCase_Execute_RepositoryCreateError_ReturnsError(t *testing.T
 	require.Error(t, err, "Repository create error should return error")
 	assert.Nil(t, output, "Output should be nil on error")
 }
-

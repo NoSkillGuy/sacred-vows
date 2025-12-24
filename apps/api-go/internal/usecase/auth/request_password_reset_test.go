@@ -86,4 +86,3 @@ func TestRequestPasswordResetUseCase_Execute_UserNotFound_ReturnsSuccess(t *test
 	require.NotNil(t, output, "Output should not be nil")
 	assert.True(t, output.Success, "Success should be true (security best practice)")
 }
-

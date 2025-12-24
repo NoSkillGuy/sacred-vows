@@ -121,4 +121,3 @@ func calculateDimensions(width, height, maxWidth, maxHeight int) (int, int) {
 
 	return newWidth, newHeight
 }
-

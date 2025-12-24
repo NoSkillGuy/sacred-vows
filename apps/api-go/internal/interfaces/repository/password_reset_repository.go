@@ -13,7 +13,3 @@ type PasswordResetRepository interface {
 	MarkAsUsed(ctx context.Context, tokenID string) error
 	DeleteExpired(ctx context.Context) error
 }
-
-
-
-

@@ -41,7 +41,7 @@ func toInvitationDTO(invitation *domain.Invitation) *InvitationDTO {
 	if title != nil {
 		dto.Title = title
 	}
-	
+
 	// Default status to "draft" if not present
 	if status != nil {
 		dto.Status = status

@@ -1,29 +1,45 @@
-import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { getCurrentUserFromAPI, requestPasswordChangeOTP, verifyPasswordChangeOTP } from '../../services/authService';
-import { User } from '../../services/authService';
-import './ProfilePage.css';
+import { useState, useEffect, useCallback, ChangeEvent, FormEvent } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  getCurrentUserFromAPI,
+  requestPasswordChangeOTP,
+  verifyPasswordChangeOTP,
+} from "../../services/authService";
+import { User } from "../../services/authService";
+import "./ProfilePage.css";
 
-type PasswordChangeState = 'idle' | 'requesting' | 'otp-sent' | 'verifying' | 'success' | 'error';
+type PasswordChangeState = "idle" | "requesting" | "otp-sent" | "verifying" | "success" | "error";
 
 function ProfilePage(): JSX.Element {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [passwordChangeState, setPasswordChangeState] = useState<PasswordChangeState>('idle');
+  const [passwordChangeState, setPasswordChangeState] = useState<PasswordChangeState>("idle");
   const [formData, setFormData] = useState({
-    newPassword: '',
-    confirmPassword: '',
-    otp: '',
+    newPassword: "",
+    confirmPassword: "",
+    otp: "",
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [cooldownSeconds, setCooldownSeconds] = useState(0);
   const [expirySeconds, setExpirySeconds] = useState(0);
   const [attemptsRemaining, setAttemptsRemaining] = useState(5);
 
+  const loadUser = useCallback(async (): Promise<void> => {
+    try {
+      const userData = await getCurrentUserFromAPI();
+      setUser(userData);
+    } catch (err) {
+      console.error("Failed to load user:", err);
+      navigate("/login");
+    } finally {
+      setLoading(false);
+    }
+  }, [navigate]);
+
   useEffect(() => {
     loadUser();
-  }, []);
+  }, [loadUser]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -44,12 +60,12 @@ function ProfilePage(): JSX.Element {
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
-    if (expirySeconds > 0 && passwordChangeState === 'otp-sent') {
+    if (expirySeconds > 0 && passwordChangeState === "otp-sent") {
       interval = setInterval(() => {
         setExpirySeconds((prev) => {
           if (prev <= 1) {
-            setPasswordChangeState('idle');
-            setError('OTP has expired. Please request a new one.');
+            setPasswordChangeState("idle");
+            setError("OTP has expired. Please request a new one.");
             return 0;
           }
           return prev - 1;
@@ -61,96 +77,84 @@ function ProfilePage(): JSX.Element {
     };
   }, [expirySeconds, passwordChangeState]);
 
-  const loadUser = async (): Promise<void> => {
-    try {
-      const userData = await getCurrentUserFromAPI();
-      setUser(userData);
-    } catch (err) {
-      console.error('Failed to load user:', err);
-      navigate('/login');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
-    setError('');
+    setError("");
   };
 
   const handleRequestOTP = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
-    setError('');
-    setPasswordChangeState('requesting');
+    setError("");
+    setPasswordChangeState("requesting");
 
     // Validate passwords match
     if (formData.newPassword !== formData.confirmPassword) {
-      setError('Passwords do not match. Please try again.');
-      setPasswordChangeState('idle');
+      setError("Passwords do not match. Please try again.");
+      setPasswordChangeState("idle");
       return;
     }
 
     // Validate password strength (basic check)
     if (formData.newPassword.length < 8) {
-      setError('Password must be at least 8 characters long.');
-      setPasswordChangeState('idle');
+      setError("Password must be at least 8 characters long.");
+      setPasswordChangeState("idle");
       return;
     }
 
     try {
       if (!user?.email) {
-        throw new Error('User email not found');
+        throw new Error("User email not found");
       }
       await requestPasswordChangeOTP(user.email);
-      setPasswordChangeState('otp-sent');
+      setPasswordChangeState("otp-sent");
       setCooldownSeconds(30);
       setExpirySeconds(300); // 5 minutes
       setAttemptsRemaining(5);
-      setFormData({ ...formData, otp: '' });
+      setFormData({ ...formData, otp: "" });
     } catch (err) {
-      setError((err as Error).message || 'Failed to send OTP. Please try again.');
-      setPasswordChangeState('idle');
+      setError((err as Error).message || "Failed to send OTP. Please try again.");
+      setPasswordChangeState("idle");
     }
   };
 
   const handleVerifyOTP = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
-    setError('');
-    setPasswordChangeState('verifying');
+    setError("");
+    setPasswordChangeState("verifying");
 
     // Validate OTP format (6 digits)
     if (!/^\d{6}$/.test(formData.otp)) {
-      setError('Please enter a valid 6-digit OTP code.');
-      setPasswordChangeState('otp-sent');
+      setError("Please enter a valid 6-digit OTP code.");
+      setPasswordChangeState("otp-sent");
       return;
     }
 
     try {
       await verifyPasswordChangeOTP(formData.otp, formData.newPassword);
-      setPasswordChangeState('success');
-      setFormData({ newPassword: '', confirmPassword: '', otp: '' });
+      setPasswordChangeState("success");
+      setFormData({ newPassword: "", confirmPassword: "", otp: "" });
       setExpirySeconds(0);
       setCooldownSeconds(0);
-      
+
       // Reset to idle after 3 seconds
       setTimeout(() => {
-        setPasswordChangeState('idle');
+        setPasswordChangeState("idle");
       }, 3000);
     } catch (err) {
-      const errorMessage = (err as Error).message || 'Failed to verify OTP. Please try again.';
+      const errorMessage = (err as Error).message || "Failed to verify OTP. Please try again.";
       setError(errorMessage);
-      setPasswordChangeState('otp-sent');
-      
+      setPasswordChangeState("otp-sent");
+
       // Extract attempt count from error message if available
       const attemptMatch = errorMessage.match(/(\d+) attempt\(s\) remaining/);
       if (attemptMatch) {
         setAttemptsRemaining(parseInt(attemptMatch[1], 10));
-      } else if (errorMessage.includes('Maximum attempts reached')) {
+      } else if (errorMessage.includes("Maximum attempts reached")) {
         setAttemptsRemaining(0);
-        setPasswordChangeState('idle');
+        setPasswordChangeState("idle");
         setExpirySeconds(0);
       }
     }
@@ -160,43 +164,43 @@ function ProfilePage(): JSX.Element {
     if (cooldownSeconds > 0) {
       return;
     }
-    setError('');
-    setPasswordChangeState('requesting');
+    setError("");
+    setPasswordChangeState("requesting");
 
     // Validate passwords match
     if (formData.newPassword !== formData.confirmPassword) {
-      setError('Passwords do not match. Please try again.');
-      setPasswordChangeState('idle');
+      setError("Passwords do not match. Please try again.");
+      setPasswordChangeState("idle");
       return;
     }
 
     // Validate password strength (basic check)
     if (formData.newPassword.length < 8) {
-      setError('Password must be at least 8 characters long.');
-      setPasswordChangeState('idle');
+      setError("Password must be at least 8 characters long.");
+      setPasswordChangeState("idle");
       return;
     }
 
     try {
       if (!user?.email) {
-        throw new Error('User email not found');
+        throw new Error("User email not found");
       }
       await requestPasswordChangeOTP(user.email);
-      setPasswordChangeState('otp-sent');
+      setPasswordChangeState("otp-sent");
       setCooldownSeconds(30);
       setExpirySeconds(300); // 5 minutes
       setAttemptsRemaining(5);
-      setFormData({ ...formData, otp: '' });
+      setFormData({ ...formData, otp: "" });
     } catch (err) {
-      setError((err as Error).message || 'Failed to send OTP. Please try again.');
-      setPasswordChangeState('idle');
+      setError((err as Error).message || "Failed to send OTP. Please try again.");
+      setPasswordChangeState("idle");
     }
   };
 
   const formatTime = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   if (loading) {
@@ -223,11 +227,11 @@ function ProfilePage(): JSX.Element {
             <div className="user-info">
               <div className="info-row">
                 <span className="info-label">Email:</span>
-                <span className="info-value">{user?.email || 'N/A'}</span>
+                <span className="info-value">{user?.email || "N/A"}</span>
               </div>
               <div className="info-row">
                 <span className="info-label">Name:</span>
-                <span className="info-value">{user?.name || 'Not set'}</span>
+                <span className="info-value">{user?.name || "Not set"}</span>
               </div>
             </div>
           </section>
@@ -235,8 +239,8 @@ function ProfilePage(): JSX.Element {
           {/* Password Change Section */}
           <section className="profile-section">
             <h2>Change Password</h2>
-            
-            {passwordChangeState === 'idle' && (
+
+            {passwordChangeState === "idle" && (
               <form onSubmit={handleRequestOTP} className="password-form">
                 <div className="form-group">
                   <label htmlFor="newPassword">New Password</label>
@@ -271,17 +275,17 @@ function ProfilePage(): JSX.Element {
               </form>
             )}
 
-            {passwordChangeState === 'requesting' && (
+            {passwordChangeState === "requesting" && (
               <div className="loading-state">
                 <p>Sending verification code...</p>
               </div>
             )}
 
-            {passwordChangeState === 'otp-sent' && (
+            {passwordChangeState === "otp-sent" && (
               <div className="otp-section">
                 <div className="otp-info">
                   <p className="otp-message">
-                    We've sent a 6-digit verification code to <strong>{user?.email}</strong>.
+                    We&apos;ve sent a 6-digit verification code to <strong>{user?.email}</strong>.
                     Please check your email and enter the code below.
                   </p>
                   {expirySeconds > 0 && (
@@ -314,8 +318,14 @@ function ProfilePage(): JSX.Element {
                   </div>
                   {error && <div className="error-message">{error}</div>}
                   <div className="form-actions">
-                    <button type="submit" className="btn btn-primary" disabled={passwordChangeState === 'verifying'}>
-                      {passwordChangeState === 'verifying' ? 'Verifying...' : 'Verify & Update Password'}
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={passwordChangeState === "verifying"}
+                    >
+                      {passwordChangeState === "verifying"
+                        ? "Verifying..."
+                        : "Verify & Update Password"}
                     </button>
                     <button
                       type="button"
@@ -323,26 +333,26 @@ function ProfilePage(): JSX.Element {
                       onClick={handleResendOTP}
                       disabled={cooldownSeconds > 0}
                     >
-                      {cooldownSeconds > 0 ? `Resend (${cooldownSeconds}s)` : 'Resend Code'}
+                      {cooldownSeconds > 0 ? `Resend (${cooldownSeconds}s)` : "Resend Code"}
                     </button>
                   </div>
                 </form>
               </div>
             )}
 
-            {passwordChangeState === 'verifying' && (
+            {passwordChangeState === "verifying" && (
               <div className="loading-state">
                 <p>Verifying code...</p>
               </div>
             )}
 
-            {passwordChangeState === 'success' && (
+            {passwordChangeState === "success" && (
               <div className="success-message">
                 <p>✓ Password updated successfully!</p>
               </div>
             )}
 
-            {passwordChangeState === 'error' && error && (
+            {passwordChangeState === "error" && error && (
               <div className="error-message">{error}</div>
             )}
           </section>
@@ -353,4 +363,3 @@ function ProfilePage(): JSX.Element {
 }
 
 export default ProfilePage;
-
