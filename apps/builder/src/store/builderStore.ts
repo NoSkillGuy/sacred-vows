@@ -218,7 +218,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
 
         // Validate and sync sections against manifest
         const { validateSectionsAgainstManifest } = get();
-        const validatedSections = validateSectionsAgainstManifest(manifest);
+        validateSectionsAgainstManifest(manifest);
 
         // Get updated invitation after section validation
         const { currentInvitation: updatedInvitationAfterValidation } = get();
@@ -343,7 +343,6 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
       }
 
       const currentSections = currentInvitation.layoutConfig?.sections || [];
-      const manifestSectionIds = manifest.sections.map((s) => s.id);
 
       // Create a map of current sections by ID for quick lookup
       const currentSectionsMap = new Map<string, SectionConfig>();

@@ -174,7 +174,7 @@ function EditableText({
         isSettingUpRef.current = false;
       });
     }
-  }, [isEditing]); // Intentionally not including displayValue to prevent re-runs
+  }, [isEditing, displayValue]);
 
   const Tag = tag;
 

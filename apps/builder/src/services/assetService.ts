@@ -108,7 +108,7 @@ export async function uploadImage(
           try {
             const data = JSON.parse(xhr.responseText) as UploadResponse;
             resolve({ url: data.url, asset: data.asset });
-          } catch (_error) {
+          } catch {
             reject(new Error("Invalid response from server"));
           }
         } else {

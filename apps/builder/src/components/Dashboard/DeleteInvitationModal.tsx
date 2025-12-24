@@ -12,16 +12,6 @@ function DeleteInvitationModal({ isOpen, invitation, onConfirm, onCancel }) {
   const invitationTitle = invitation?.title || "Untitled Invitation";
   const requiresConfirmText = invitationTitle.toLowerCase();
 
-  useEffect(() => {
-    if (isOpen && invitation?.data) {
-      loadAssetCount();
-    } else {
-      setAssetCount(0);
-      setConfirmText("");
-      setError(null);
-    }
-  }, [isOpen, invitation, loadAssetCount]);
-
   const loadAssetCount = useCallback(async () => {
     if (!invitation?.data) return;
 
@@ -49,6 +39,16 @@ function DeleteInvitationModal({ isOpen, invitation, onConfirm, onCancel }) {
       setLoading(false);
     }
   }, [invitation?.data]);
+
+  useEffect(() => {
+    if (isOpen && invitation?.data) {
+      loadAssetCount();
+    } else {
+      setAssetCount(0);
+      setConfirmText("");
+      setError(null);
+    }
+  }, [isOpen, invitation, loadAssetCount]);
 
   function handleConfirm() {
     if (confirmText.toLowerCase() !== requiresConfirmText) {

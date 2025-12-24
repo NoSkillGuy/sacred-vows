@@ -16,7 +16,7 @@ async function waitForServer(url: string, maxRetries = 30, delay = 1000): Promis
       if (response.ok) {
         return;
       }
-    } catch (error) {
+    } catch {
       // Server not ready yet, continue waiting
     }
     await new Promise((resolve) => setTimeout(resolve, delay));
@@ -27,7 +27,7 @@ async function waitForServer(url: string, maxRetries = 30, delay = 1000): Promis
 /**
  * Global setup: Initialize test environment and create test user
  */
-async function globalSetup(config: FullConfig) {
+async function globalSetup(_config: FullConfig) {
   console.log("=== E2E Test Global Setup ===");
 
   try {

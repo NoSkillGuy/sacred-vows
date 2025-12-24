@@ -24,7 +24,6 @@ import ConfettiLayer from "./view/ConfettiLayer";
 import CelebrateButton from "./view/CelebrateButton";
 
 // Import editable components
-import EditableHero from "./editable/EditableHero";
 import EditableHeroSection from "./editable/EditableHeroSection";
 import EditableCoupleSection from "./editable/EditableCoupleSection";
 import EditableFathersLetterSection from "./editable/EditableFathersLetterSection";

@@ -40,11 +40,15 @@ function RSVPModal({ isOpen, onClose, translations, currentLang, config = {} }) 
     if (!isOpen) return;
 
     const storedName = localStorage.getItem("wedding-guest-name");
+    // Initialize state from localStorage - this is acceptable for initialization
     if (storedName) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setName(storedName);
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setName("");
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDate(defaultArrivalDate);
   }, [isOpen, defaultArrivalDate]);
 

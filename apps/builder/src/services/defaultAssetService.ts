@@ -215,8 +215,7 @@ export function getLayoutAssetUrl(layoutId: string, assetPath: string): string {
     } else if (pathParts.length === 1) {
       // Handle case where there's only category, no subcategory
       // e.g., /assets/photos/couple2/1.jpeg
-      const [category, ...filenameParts] = pathParts;
-      const _filename = filenameParts.join("/") || pathParts[0];
+      const [category] = pathParts;
       // Try to extract filename from the last part
       const lastPart = pathParts[pathParts.length - 1];
       if (lastPart.includes(".")) {

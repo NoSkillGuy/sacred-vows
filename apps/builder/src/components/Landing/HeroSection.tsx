@@ -185,6 +185,8 @@ function HeroSection({ onSectionView }: HeroSectionProps): ReactElement {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const data = JSON.parse(stored) as PersonalizationData;
+        // Initialize state from localStorage - this is acceptable for initialization
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setPersonalizationData(data);
       } else {
         // Show modal after 15 seconds to give users time to understand the website
@@ -210,6 +212,8 @@ function HeroSection({ onSectionView }: HeroSectionProps): ReactElement {
   }, []);
 
   useEffect(() => {
+    // Initialize mounted state - this is acceptable for initialization
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     if (onSectionView && sectionRef.current) {
       onSectionView("hero");
