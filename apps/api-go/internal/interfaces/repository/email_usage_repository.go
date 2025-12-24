@@ -18,5 +18,3 @@ type EmailUsageRepository interface {
 	// ResetDailyCount resets the daily count (for cleanup/maintenance)
 	ResetDailyCount(ctx context.Context, vendor, date string) error
 }
-
-

@@ -33,5 +33,3 @@ type ArtifactStorage interface {
 	// DeleteVersion deletes all artifacts for a specific version of a subdomain
 	DeleteVersion(ctx context.Context, subdomain string, version int) error
 }
-
-

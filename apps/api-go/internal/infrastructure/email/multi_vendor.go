@@ -12,11 +12,11 @@ import (
 )
 
 type multiVendorService struct {
-	vendors        []vendorService
-	usageRepo      repository.EmailUsageRepository
-	currentIndex   int
-	mu             sync.Mutex
-	defaultFrom    string
+	vendors         []vendorService
+	usageRepo       repository.EmailUsageRepository
+	currentIndex    int
+	mu              sync.Mutex
+	defaultFrom     string
 	defaultFromName string
 }
 
@@ -199,5 +199,3 @@ func (s *multiVendorService) getNextVendor() vendorService {
 	s.currentIndex = (s.currentIndex + 1) % len(s.vendors)
 	return vendor
 }
-
-

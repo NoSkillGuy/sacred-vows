@@ -8,9 +8,9 @@ import (
 
 // MockAnalyticsRepository is a hand-written mock implementation of AnalyticsRepository
 type MockAnalyticsRepository struct {
-	CreateFn            func(ctx context.Context, analytics *domain.Analytics) error
+	CreateFn             func(ctx context.Context, analytics *domain.Analytics) error
 	FindByInvitationIDFn func(ctx context.Context, invitationID string) ([]*domain.Analytics, error)
-	CountByTypeFn       func(ctx context.Context, invitationID string, analyticsType domain.AnalyticsType) (int64, error)
+	CountByTypeFn        func(ctx context.Context, invitationID string, analyticsType domain.AnalyticsType) (int64, error)
 }
 
 func (m *MockAnalyticsRepository) Create(ctx context.Context, analytics *domain.Analytics) error {
@@ -33,4 +33,3 @@ func (m *MockAnalyticsRepository) CountByType(ctx context.Context, invitationID 
 	}
 	return 0, nil
 }
-

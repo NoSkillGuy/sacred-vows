@@ -34,11 +34,11 @@ func TestNewPasswordChangeOTP_ValidInput_CreatesOTP(t *testing.T) {
 
 func TestNewPasswordChangeOTP_InvalidInput_ReturnsError(t *testing.T) {
 	tests := []struct {
-		name     string
-		id       string
-		userID   string
-		email    string
-		otpHash  string
+		name      string
+		id        string
+		userID    string
+		email     string
+		otpHash   string
 		expiresAt time.Time
 	}{
 		{"empty ID", "", "user-123", "test@example.com", "hash", time.Now().Add(5 * time.Minute)},
@@ -85,11 +85,11 @@ func TestPasswordChangeOTP_IsExpired(t *testing.T) {
 
 func TestPasswordChangeOTP_IsValid(t *testing.T) {
 	tests := []struct {
-		name         string
-		used         bool
-		expired      bool
-		maxAttempts   bool
-		want         bool
+		name        string
+		used        bool
+		expired     bool
+		maxAttempts bool
+		want        bool
 	}{
 		{"valid", false, false, false, true},
 		{"used", true, false, false, false},
@@ -167,4 +167,3 @@ func TestPasswordChangeOTP_IsMaxAttemptsReached(t *testing.T) {
 		})
 	}
 }
-

@@ -65,4 +65,3 @@ func TestNewUser_InvalidEmail_ReturnsError(t *testing.T) {
 	require.Error(t, err, "Invalid email should return error")
 	assert.Nil(t, user, "User should be nil on error")
 }
-

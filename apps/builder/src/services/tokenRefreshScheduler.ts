@@ -3,7 +3,7 @@
  * Proactively refreshes access tokens before they expire
  */
 
-import { getTimeUntilExpiration } from '../utils/jwtDecoder';
+import { getTimeUntilExpiration } from "../utils/jwtDecoder";
 
 // Refresh token 1 minute before expiration (safety margin)
 const REFRESH_BUFFER_MS = 60 * 1000; // 1 minute
@@ -26,7 +26,7 @@ export function scheduleTokenRefresh(token: string): void {
   const timeUntilExpiration = getTimeUntilExpiration(token);
   if (!timeUntilExpiration) {
     // Token is invalid or already expired
-    console.warn('Cannot schedule refresh: token is invalid or expired');
+    console.warn("Cannot schedule refresh: token is invalid or expired");
     return;
   }
 
@@ -53,30 +53,30 @@ export function scheduleTokenRefresh(token: string): void {
 async function performTokenRefresh(): Promise<void> {
   // Prevent multiple simultaneous refresh attempts
   if (isRefreshing) {
-    console.log('Token refresh already in progress, skipping');
+    console.log("Token refresh already in progress, skipping");
     return;
   }
 
   isRefreshing = true;
 
   try {
-    console.log('Proactively refreshing access token...');
+    console.log("Proactively refreshing access token...");
     // Import dynamically to avoid circular dependency
-    const { refreshAccessToken } = await import('./authService');
+    const { refreshAccessToken } = await import("./authService");
     await refreshAccessToken();
-    console.log('Token refreshed successfully');
-    
+    console.log("Token refreshed successfully");
+
     // Get the new token and schedule next refresh
     // Import dynamically to avoid circular dependency
-    const { getAccessToken } = await import('./tokenStorage');
+    const { getAccessToken } = await import("./tokenStorage");
     const newToken = getAccessToken();
-    
+
     if (newToken) {
       // Schedule next refresh for the new token
       scheduleTokenRefresh(newToken);
     }
   } catch (error) {
-    console.error('Proactive token refresh failed:', error);
+    console.error("Proactive token refresh failed:", error);
     // Don't clear token here - let the existing 401 handler deal with it
     // The scheduler will stop, and reactive refresh will handle the next API call
   } finally {
@@ -102,16 +102,16 @@ export function stopTokenRefresh(): void {
  * When page becomes visible, check if we need to refresh immediately
  */
 function handleVisibilityChange(): void {
-  if (document.visibilityState === 'visible') {
+  if (document.visibilityState === "visible") {
     // Page became visible, check if we need to refresh
     // Import dynamically to avoid circular dependency
-    import('./tokenStorage').then(({ getAccessToken }) => {
+    import("./tokenStorage").then(({ getAccessToken }) => {
       const token = getAccessToken();
       if (token) {
         const timeUntilExpiration = getTimeUntilExpiration(token);
         // If token expires soon (within buffer time), refresh immediately
         if (timeUntilExpiration && timeUntilExpiration <= REFRESH_BUFFER_MS) {
-          console.log('Page visible and token expiring soon, refreshing immediately');
+          console.log("Page visible and token expiring soon, refreshing immediately");
           performTokenRefresh();
         } else if (timeUntilExpiration) {
           // Reschedule refresh for the remaining time
@@ -123,7 +123,6 @@ function handleVisibilityChange(): void {
 }
 
 // Set up page visibility listener
-if (typeof document !== 'undefined') {
-  document.addEventListener('visibilitychange', handleVisibilityChange);
+if (typeof document !== "undefined") {
+  document.addEventListener("visibilitychange", handleVisibilityChange);
 }
-

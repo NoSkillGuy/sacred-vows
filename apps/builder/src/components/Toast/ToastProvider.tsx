@@ -1,15 +1,23 @@
-import { createContext, useCallback, useContext, useMemo, useState, useEffect, ReactNode } from 'react';
-import { createPortal } from 'react-dom';
-import './Toast.css';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import { createPortal } from "react-dom";
+import "./Toast.css";
 
 interface Toast {
   id: string;
   title: string;
   description: string;
   duration: number;
-  tone: 'info' | 'success' | 'warning' | 'error';
-  icon: 'heart' | 'bell';
-  ariaLive: 'polite' | 'assertive' | 'off';
+  tone: "info" | "success" | "warning" | "error";
+  icon: "heart" | "bell";
+  ariaLive: "polite" | "assertive" | "off";
   tooltip?: string;
 }
 
@@ -19,9 +27,9 @@ interface ToastInput {
   description?: string;
   message?: string;
   duration?: number;
-  tone?: 'info' | 'success' | 'warning' | 'error';
-  icon?: 'heart' | 'bell';
-  ariaLive?: 'polite' | 'assertive' | 'off';
+  tone?: "info" | "success" | "warning" | "error";
+  icon?: "heart" | "bell";
+  ariaLive?: "polite" | "assertive" | "off";
   tooltip?: string;
 }
 
@@ -36,7 +44,7 @@ const DEFAULT_DURATION = 5600;
 const MAX_TOASTS = 3;
 
 function generateId(): string {
-  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
     return crypto.randomUUID();
   }
   return `toast-${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -59,12 +67,12 @@ export function ToastProvider({ children }: ToastProviderProps): JSX.Element {
     const id = toastInput.id || generateId();
     const toast: Toast = {
       id,
-      title: toastInput.title || 'Notification',
-      description: toastInput.description || toastInput.message || '',
-      duration: typeof toastInput.duration === 'number' ? toastInput.duration : DEFAULT_DURATION,
-      tone: toastInput.tone || 'info',
-      icon: toastInput.icon || 'heart',
-      ariaLive: toastInput.ariaLive || 'polite',
+      title: toastInput.title || "Notification",
+      description: toastInput.description || toastInput.message || "",
+      duration: typeof toastInput.duration === "number" ? toastInput.duration : DEFAULT_DURATION,
+      tone: toastInput.tone || "info",
+      icon: toastInput.icon || "heart",
+      ariaLive: toastInput.ariaLive || "polite",
       tooltip: toastInput.tooltip,
     };
 
@@ -88,10 +96,7 @@ export function ToastProvider({ children }: ToastProviderProps): JSX.Element {
   return (
     <ToastContext.Provider value={value}>
       {children}
-      {createPortal(
-        <ToastContainer toasts={toasts} onDismiss={removeToast} />,
-        document.body
-      )}
+      {createPortal(<ToastContainer toasts={toasts} onDismiss={removeToast} />, document.body)}
     </ToastContext.Provider>
   );
 }
@@ -99,7 +104,7 @@ export function ToastProvider({ children }: ToastProviderProps): JSX.Element {
 export function useToast(): ToastContextValue {
   const context = useContext(ToastContext);
   if (!context) {
-    throw new Error('useToast must be used within a ToastProvider');
+    throw new Error("useToast must be used within a ToastProvider");
   }
   return context;
 }
@@ -139,11 +144,11 @@ function ToastItem({ toast, onDismiss }: ToastItemProps): JSX.Element {
     <div
       className={`toast toast-${tone}`}
       role="status"
-      aria-live={ariaLive || 'polite'}
+      aria-live={ariaLive || "polite"}
       title={tooltip || description || title}
     >
       <div className="toast-icon" aria-hidden="true">
-        {icon === 'heart' ? <HeartIcon /> : <BellIcon />}
+        {icon === "heart" ? <HeartIcon /> : <BellIcon />}
       </div>
 
       <div className="toast-body">
@@ -179,4 +184,3 @@ function BellIcon(): JSX.Element {
     </svg>
   );
 }
-

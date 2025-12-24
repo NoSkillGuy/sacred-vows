@@ -88,4 +88,3 @@ func TestNewRSVPResponse_ValidData_ReturnsRSVP(t *testing.T) {
 	assert.Equal(t, date, rsvp.Date, "Date should match")
 	assert.Equal(t, &email, rsvp.Email, "Email should match")
 }
-
