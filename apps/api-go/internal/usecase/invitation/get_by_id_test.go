@@ -27,10 +27,10 @@ func TestGetInvitationByIDUseCase_Execute(t *testing.T) {
 				layoutID := "classic-scroll"
 				data := json.RawMessage(`{"title": "My Wedding"}`)
 				invitation := &domain.Invitation{
-					ID:       invitationID,
-					UserID:   userID,
-					LayoutID: layoutID,
-					Data:     data,
+					ID:        invitationID,
+					UserID:    userID,
+					LayoutID:  layoutID,
+					Data:      data,
 					CreatedAt: time.Now(),
 					UpdatedAt: time.Now(),
 				}
@@ -91,4 +91,3 @@ func TestGetInvitationByIDUseCase_Execute(t *testing.T) {
 		})
 	}
 }
-

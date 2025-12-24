@@ -1,11 +1,11 @@
 /**
  * Classic Scroll Layout Export Styles
- * 
+ *
  * Generates CSS for exporting the classic-scroll layout.
  * This ensures styles in the export match the builder preview.
  */
 
-import type { InvitationData } from '@shared/types/wedding-data';
+import type { InvitationData } from "@shared/types/wedding-data";
 
 /**
  * Generate CSS for the invitation export
@@ -27,20 +27,20 @@ export async function generateCSS(invitation: InvitationData): Promise<string> {
     }
 
     body {
-      font-family: "${fonts.body || 'Poppins'}", system-ui, sans-serif;
-      background: ${colors.background?.page || colors.background || '#fff8f0'};
-      color: ${colors.text?.primary || colors.text || '#2f2933'};
+      font-family: "${fonts.body || "Poppins"}", system-ui, sans-serif;
+      background: ${colors.background?.page || colors.background || "#fff8f0"};
+      color: ${colors.text?.primary || colors.text || "#2f2933"};
       -webkit-font-smoothing: antialiased;
       line-height: 1.6;
     }
 
     h1, h2, h3, h4, h5, h6 {
-      font-family: "${fonts.heading || 'Playfair Display'}", serif;
+      font-family: "${fonts.heading || "Playfair Display"}", serif;
       font-weight: 600;
     }
 
     .script-font {
-      font-family: "${fonts.script || 'Great Vibes'}", cursive;
+      font-family: "${fonts.script || "Great Vibes"}", cursive;
     }
 
     img {
@@ -49,13 +49,13 @@ export async function generateCSS(invitation: InvitationData): Promise<string> {
     }
 
     a {
-      color: ${colors.primary || '#d4af37'};
+      color: ${colors.primary || "#d4af37"};
       text-decoration: none;
     }
 
     button {
-      font-family: "${fonts.body || 'Poppins'}", system-ui, sans-serif;
-      background: ${colors.primary || '#d4af37'};
+      font-family: "${fonts.body || "Poppins"}", system-ui, sans-serif;
+      background: ${colors.primary || "#d4af37"};
       color: white;
       border: none;
       padding: 12px 24px;
@@ -76,4 +76,3 @@ export async function generateCSS(invitation: InvitationData): Promise<string> {
 }
 
 export default generateCSS;
-

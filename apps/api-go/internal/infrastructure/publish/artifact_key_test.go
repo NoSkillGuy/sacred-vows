@@ -31,5 +31,3 @@ func TestValidateArtifactKey(t *testing.T) {
 		})
 	}
 }
-
-

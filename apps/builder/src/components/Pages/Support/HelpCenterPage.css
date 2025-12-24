@@ -36,7 +36,7 @@
   padding: 1.25rem 1.5rem 1.25rem 3.75rem;
   border: 2px solid var(--builder-border);
   border-radius: 100px;
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   font-size: 1.05rem;
   color: var(--text-dark);
   background: var(--white);
@@ -102,7 +102,7 @@
 }
 
 .category-card h3 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -131,7 +131,7 @@
 }
 
 .category-articles li::before {
-  content: '•';
+  content: "•";
   position: absolute;
   left: 0;
   color: var(--rose);
@@ -216,7 +216,7 @@
 }
 
 .contact-card h2 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 2rem;
   font-weight: 500;
   color: var(--text-dark);
@@ -292,4 +292,3 @@
     left: 1rem;
   }
 }
-

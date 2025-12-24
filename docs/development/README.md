@@ -5,6 +5,8 @@ This section covers development practices, testing, and workflows.
 ## Documentation
 
 - [Testing Strategy](./testing-strategy.md) - Testing approach, pyramid, and best practices
+- [Branch Protection](./branch-protection.md) - GitHub branch protection rules and CI requirements
+- [Pre-commit Hooks](./pre-commit-hooks.md) - Pre-commit validation and formatting
 
 ## Development Practices
 
