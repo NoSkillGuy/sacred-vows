@@ -10,7 +10,7 @@ on:
 jobs:
   auto-merge:
     name: Enable Auto-merge
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     # Only run on pull requests
     if: github.event.pull_request != '' || (github.event.check_suite != '' && github.event.check_suite.pull_requests.length > 0)
     permissions:
