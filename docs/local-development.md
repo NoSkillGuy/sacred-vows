@@ -52,14 +52,14 @@ docker-compose up -d tempo prometheus grafana
 Run the initialization script:
 
 ```bash
-./scripts/init-local-r2.sh
+./apps/builder/scripts/init-local-r2.sh
 ```
 
 This script will:
 - Check MinIO availability
 - Create required buckets (`sacred-vows-published-local` and `sacred-vows-public-assets-local`)
 - Set public access policy for the public assets bucket
-- Upload default assets from `apps/builder/public/assets`
+- Upload default assets from `apps/builder/scripts/assets`
 
 ### 3. Configure Environment Variables
 
@@ -436,7 +436,7 @@ Observability is enabled by default in local development. See [Telemetry Documen
 ## Next Steps
 
 - [ ] Start MinIO: `docker-compose up -d minio`
-- [ ] Initialize buckets: `./scripts/init-local-r2.sh`
+- [ ] Initialize buckets: `./apps/builder/scripts/init-local-r2.sh`
 - [ ] Configure environment variables
 - [ ] Explore traces in Grafana: http://localhost:3001
 - [ ] Test publishing an invitation

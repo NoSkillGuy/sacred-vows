@@ -245,7 +245,7 @@ npm run migrate-assets -- --env=dev --dry-run  # Test first
 ```
 
 **What It Does**:
-1. Scans `apps/builder/public/assets/` and `apps/builder/public/layouts/`
+1. Scans `apps/builder/scripts/assets/` and `apps/builder/scripts/layouts/`
 2. Uploads files to R2 with structure: `defaults/{category}/{subcategory}/{filename}`
 3. Creates manifest file at `defaults/manifest.json`
 4. Skips files that already exist in R2
@@ -517,7 +517,7 @@ When properly configured, you should see:
 #### Adding New Default Assets
 
 1. **Add Files Locally**:
-   - Place files in `apps/builder/public/assets/` or `apps/builder/public/layouts/`
+   - Place files in `apps/builder/scripts/assets/` or `apps/builder/scripts/layouts/`
    - Follow existing directory structure
 
 2. **Upload to R2**:

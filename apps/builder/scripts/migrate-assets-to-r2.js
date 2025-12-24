@@ -190,12 +190,12 @@ async function migrate() {
   console.log(`   Bucket: ${bucketName}`);
   console.log(`   Dry run: ${dryRun ? 'YES' : 'NO'}\n`);
 
-  // Resolve public directory relative to this script (in builder app)
-  const builderPublicDir = join(__dirname, '..', 'public');
+  // Resolve assets directory relative to this script's location (same directory)
+  const scriptsDir = __dirname;
   
   // Process assets/photos (couple1, couple2)
   console.log('📸 Processing photos...');
-  const photosDir = join(builderPublicDir, 'assets', 'photos');
+  const photosDir = join(scriptsDir, 'assets', 'photos');
   for (const coupleDir of ['couple1', 'couple2']) {
     const couplePath = join(photosDir, coupleDir);
     try {
@@ -214,7 +214,7 @@ async function migrate() {
 
   // Process layouts
   console.log('\n🎨 Processing layout previews...');
-  const layoutsDir = join(builderPublicDir, 'layouts');
+  const layoutsDir = join(scriptsDir, 'layouts');
   try {
     await stat(layoutsDir);
     manifest.layouts = {};
@@ -229,7 +229,7 @@ async function migrate() {
 
   // Process music
   console.log('\n🎵 Processing music...');
-  const musicDir = join(builderPublicDir, 'assets', 'music');
+  const musicDir = join(scriptsDir, 'assets', 'music');
   try {
     await stat(musicDir);
     manifest.music = {};

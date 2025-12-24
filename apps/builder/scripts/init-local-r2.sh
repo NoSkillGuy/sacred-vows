@@ -95,33 +95,33 @@ mc anonymous set-json /tmp/public-policy.json "$ALIAS_NAME/$PUBLIC_ASSETS_BUCKET
 rm -f /tmp/public-policy.json
 echo -e "${GREEN}✓ Public access policy set${NC}"
 
-# Upload default assets if builder directory exists
-BUILDER_DIR="apps/builder"
-if [ -d "$BUILDER_DIR/public/assets" ]; then
+# Upload default assets if assets directory exists (relative to this script's location)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -d "$SCRIPT_DIR/assets" ]; then
   echo -e "${YELLOW}Uploading default assets...${NC}"
   echo "   This may take a while..."
   
   # Upload photos
-  if [ -d "$BUILDER_DIR/public/assets/photos" ]; then
+  if [ -d "$SCRIPT_DIR/assets/photos" ]; then
     echo "   Uploading photos..."
-    mc cp --recursive "$BUILDER_DIR/public/assets/photos/" "$ALIAS_NAME/$PUBLIC_ASSETS_BUCKET/defaults/" --exclude "*.DS_Store" 2>/dev/null || true
+    mc cp --recursive "$SCRIPT_DIR/assets/photos/" "$ALIAS_NAME/$PUBLIC_ASSETS_BUCKET/defaults/" --exclude "*.DS_Store" 2>/dev/null || true
   fi
   
   # Upload layouts
-  if [ -d "$BUILDER_DIR/public/layouts" ]; then
+  if [ -d "$SCRIPT_DIR/layouts" ]; then
     echo "   Uploading layouts..."
-    mc cp --recursive "$BUILDER_DIR/public/layouts/" "$ALIAS_NAME/$PUBLIC_ASSETS_BUCKET/defaults/layouts/" --exclude "*.DS_Store" 2>/dev/null || true
+    mc cp --recursive "$SCRIPT_DIR/layouts/" "$ALIAS_NAME/$PUBLIC_ASSETS_BUCKET/defaults/layouts/" --exclude "*.DS_Store" 2>/dev/null || true
   fi
   
   # Upload music
-  if [ -d "$BUILDER_DIR/public/assets/music" ]; then
+  if [ -d "$SCRIPT_DIR/assets/music" ]; then
     echo "   Uploading music..."
-    mc cp --recursive "$BUILDER_DIR/public/assets/music/" "$ALIAS_NAME/$PUBLIC_ASSETS_BUCKET/defaults/music/" --exclude "*.DS_Store" 2>/dev/null || true
+    mc cp --recursive "$SCRIPT_DIR/assets/music/" "$ALIAS_NAME/$PUBLIC_ASSETS_BUCKET/defaults/music/" --exclude "*.DS_Store" 2>/dev/null || true
   fi
   
   echo -e "${GREEN}✓ Default assets uploaded${NC}"
 else
-  echo -e "${YELLOW}⚠ Builder directory not found, skipping asset upload${NC}"
+  echo -e "${YELLOW}⚠ Assets directory not found, skipping asset upload${NC}"
   echo "   You can upload assets later using: npm run migrate-assets"
 fi
 
