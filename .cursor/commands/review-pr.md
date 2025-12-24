@@ -10,7 +10,8 @@ When the user invokes `/review-pr`, fetch the GitHub PR, perform a thorough code
    - Git remote tracking information
 
 2. **Repository information**:
-   - Repository: `NoSkillGuy/sacred-vows` (from git remote)
+   - Repository: Detect from git remote using: `git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/'`
+   - Owner and Repo: Extract from the detected repository string (format: `owner/repo`)
    - Use `gh` CLI for all GitHub operations
 
 ## Review Process
@@ -160,7 +161,8 @@ Use `gh` CLI to post review comments. For inline comments on specific lines, use
    COMMIT_SHA=$(gh pr view <PR_NUMBER> --json headRefOid --jq '.headRefOid')
 
    # Post inline comment on a specific line
-   gh api repos/NoSkillGuy/sacred-vows/pulls/<PR_NUMBER>/comments \
+   REPO=$(git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/')
+   gh api repos/$REPO/pulls/<PR_NUMBER>/comments \
      -X POST \
      -f body="Comment text" \
      -f commit_id="$COMMIT_SHA" \
@@ -171,18 +173,21 @@ Use `gh` CLI to post review comments. For inline comments on specific lines, use
 
 2. **For general PR comments** (not tied to specific lines):
    ```bash
-   gh pr comment <PR_NUMBER> --body "Comment text" --repo NoSkillGuy/sacred-vows
+   REPO=$(git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/')
+   gh pr comment <PR_NUMBER> --body "Comment text" --repo $REPO
    ```
 
 3. **For review summary** (overall review comment):
    ```bash
-   gh pr review <PR_NUMBER> --comment --body "Review summary" --repo NoSkillGuy/sacred-vows
+   REPO=$(git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/')
+   gh pr review <PR_NUMBER> --comment --body "Review summary" --repo $REPO
    ```
 
 4. **For review with approval/rejection**:
    ```bash
-   gh pr review <PR_NUMBER> --approve --body "Review summary" --repo NoSkillGuy/sacred-vows
-   gh pr review <PR_NUMBER> --request-changes --body "Review summary" --repo NoSkillGuy/sacred-vows
+   REPO=$(git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/')
+   gh pr review <PR_NUMBER> --approve --body "Review summary" --repo $REPO
+   gh pr review <PR_NUMBER> --request-changes --body "Review summary" --repo $REPO
    ```
 
 **Note**:
@@ -267,7 +272,8 @@ Post a comprehensive review summary that includes:
      EOF
 
      # Post the review using --input to preserve JSON array structure
-     gh api repos/NoSkillGuy/sacred-vows/pulls/<PR_NUMBER>/reviews \
+     REPO=$(git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/')
+     gh api repos/$REPO/pulls/<PR_NUMBER>/reviews \
        -X POST \
        --input /tmp/review.json
      ```
