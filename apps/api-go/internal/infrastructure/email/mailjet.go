@@ -14,10 +14,10 @@ import (
 )
 
 type mailjetService struct {
-	client              *mailjet.Client
-	fromEmail           string
-	fromName            string
-	passwordResetTmpl   *template.Template
+	client                *mailjet.Client
+	fromEmail             string
+	fromName              string
+	passwordResetTmpl     *template.Template
 	passwordChangeOTPTmpl *template.Template
 }
 
@@ -48,10 +48,10 @@ func NewMailjetService(cfg config.EmailVendorConfig) (emailInterface.EmailServic
 	}
 
 	return &mailjetService{
-		client:              client,
-		fromEmail:           cfg.FromAddress,
-		fromName:            cfg.FromName,
-		passwordResetTmpl:   passwordResetTmpl,
+		client:                client,
+		fromEmail:             cfg.FromAddress,
+		fromName:              cfg.FromName,
+		passwordResetTmpl:     passwordResetTmpl,
 		passwordChangeOTPTmpl: passwordChangeOTPTmpl,
 	}, nil
 }
@@ -84,7 +84,7 @@ func (s *mailjetService) SendPasswordResetEmail(ctx context.Context, toEmail str
 					Email: toEmail,
 				},
 			},
-			Subject: "Reset your Sacred Vows password",
+			Subject:  "Reset your Sacred Vows password",
 			HTMLPart: htmlBody.String(),
 		},
 	}
@@ -172,5 +172,3 @@ func getTemplatePath(filename string) string {
 	// If none found, return the first candidate (will fail with a clear error)
 	return candidates[0]
 }
-
-
