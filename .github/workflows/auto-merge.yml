@@ -108,7 +108,63 @@ jobs:
                 }
               }
             } else {
+              // Provide detailed diagnostic information about why PR is blocked
               console.log(`PR #${prNumber} is not ready for merge. State: ${pr.mergeable_state}, Mergeable: ${pr.mergeable}`);
+
+              // Get more details about what's blocking
+              const reasons = [];
+
+              if (pr.mergeable_state === 'blocked') {
+                reasons.push('Branch protection requirements not met');
+
+                // Check status checks
+                const { data: statuses } = await github.rest.repos.getCombinedStatusForRef({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  ref: pr.head.sha
+                });
+
+                const failingChecks = statuses.statuses.filter(s => s.state === 'failure' || s.state === 'error');
+                if (failingChecks.length > 0) {
+                  reasons.push(`Failing status checks: ${failingChecks.map(c => c.context).join(', ')}`);
+                }
+
+                // Check if branch is behind
+                const { data: compare } = await github.rest.repos.compareCommits({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  base: pr.base.sha,
+                  head: pr.head.sha
+                });
+                if (compare.behind_by > 0) {
+                  reasons.push(`Branch is ${compare.behind_by} commit(s) behind base branch`);
+                }
+
+                // Check review status
+                const { data: reviews } = await github.rest.pulls.listReviews({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: prNumber
+                });
+                const approvals = reviews.filter(r => r.state === 'APPROVED');
+                if (approvals.length === 0) {
+                  reasons.push('No approvals yet (requires 1 approval)');
+                }
+              } else if (pr.mergeable_state === 'behind') {
+                reasons.push('Branch is behind the base branch');
+              } else if (pr.mergeable_state === 'dirty') {
+                reasons.push('Merge conflicts detected');
+              } else if (pr.mergeable_state === 'unstable') {
+                reasons.push('Status checks are still running or unstable');
+              } else if (pr.mergeable_state === 'unknown') {
+                reasons.push('Mergeable state is unknown (GitHub is still calculating)');
+              }
+
+              if (reasons.length > 0) {
+                console.log(`Blocking reasons:`);
+                reasons.forEach(reason => console.log(`  - ${reason}`));
+              }
+
               console.log(`Waiting for all checks to pass and requirements to be met...`);
             }
 
