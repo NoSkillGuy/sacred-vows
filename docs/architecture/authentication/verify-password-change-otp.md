@@ -43,7 +43,7 @@ sequenceDiagram
         VerifyOTPUC-->>API: Error: OTP not found (401)
         API-->>Frontend: 401 Unauthorized
     else OTP found
-        VerifyOTPUC->>VerifyOTPUC: Check OTP validity<br/>(not expired, not used, attempts < 5)
+        VerifyOTPUC->>VerifyOTPUC: Check OTP validity<br/>(not expired, not used, attempts &lt; 5)
 
         alt OTP expired
             VerifyOTPUC-->>API: Error: OTP expired (401)

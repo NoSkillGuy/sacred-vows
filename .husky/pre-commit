@@ -2,6 +2,12 @@
 echo "🔍 Running file checks..."
 ./scripts/pre-commit-checks.sh || exit 1
 
+# Validate markdown files (only if markdown files changed)
+if git diff --cached --name-only | grep -q '\.md$'; then
+  echo "📝 Validating markdown files..."
+  node scripts/validate-markdown.js || exit 1
+fi
+
 # Run lint-staged (formatting and linting)
 echo "🎨 Running formatters and linters..."
 npx lint-staged || exit 1
