@@ -29,7 +29,7 @@ func (r *layoutRepository) Create(ctx context.Context, layout *domain.Layout) er
 	data := map[string]interface{}{
 		"id":            layout.ID,
 		"name":          layout.Name,
-		"description":  layout.Description,
+		"description":   layout.Description,
 		"preview_image": layout.PreviewImage,
 		"tags":          layout.Tags,
 		"version":       layout.Version,
@@ -141,4 +141,3 @@ func (r *layoutRepository) docToLayout(doc *firestore.DocumentSnapshot) (*domain
 
 	return layout, nil
 }
-

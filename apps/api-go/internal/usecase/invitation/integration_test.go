@@ -168,4 +168,3 @@ func TestGetAllInvitationsUseCase_Integration_PreserveExistingStatus(t *testing.
 		t.Errorf("Expected third invitation (without status) to default to 'draft'")
 	}
 }
-

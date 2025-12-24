@@ -48,11 +48,11 @@ func (r *refreshTokenRepository) FindByTokenFingerprint(ctx context.Context, fin
 	// Note: Firestore doesn't support byte arrays directly, so we store as base64-encoded string
 	// Using base64 ensures valid UTF-8 encoding
 	fingerprintStr := base64.URLEncoding.EncodeToString(fingerprint)
-	
+
 	// Create a context with timeout for Firestore query (3 seconds)
 	queryCtx, cancel := context.WithTimeout(ctx, 3*time.Second)
 	defer cancel()
-	
+
 	iter := r.client.Collection("refresh_tokens").Where("token_fingerprint", "==", fingerprintStr).Limit(1).Documents(queryCtx)
 	docs, err := iter.GetAll()
 	if err != nil {
@@ -122,13 +122,13 @@ func (r *refreshTokenRepository) DeleteExpired(ctx context.Context) error {
 func (r *refreshTokenRepository) docToRefreshToken(doc *firestore.DocumentSnapshot) (*domain.RefreshToken, error) {
 	data := doc.Data()
 	token := &domain.RefreshToken{
-		ID:               doc.Ref.ID,
-		UserID:           getString(data, "user_id"),
-		TokenHash:        getString(data, "token_hash"),
-		HMACKeyID:        int16(getInt(data, "hmac_key_id")),
-		ExpiresAt:        getTime(data, "expires_at"),
-		Revoked:          getBool(data, "revoked"),
-		CreatedAt:        getTime(data, "created_at"),
+		ID:        doc.Ref.ID,
+		UserID:    getString(data, "user_id"),
+		TokenHash: getString(data, "token_hash"),
+		HMACKeyID: int16(getInt(data, "hmac_key_id")),
+		ExpiresAt: getTime(data, "expires_at"),
+		Revoked:   getBool(data, "revoked"),
+		CreatedAt: getTime(data, "created_at"),
 	}
 
 	// Convert fingerprint base64 string back to byte slice
@@ -144,6 +144,3 @@ func (r *refreshTokenRepository) docToRefreshToken(doc *firestore.DocumentSnapsh
 
 	return token, nil
 }
-
-
-
