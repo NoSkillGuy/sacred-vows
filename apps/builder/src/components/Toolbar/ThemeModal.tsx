@@ -33,8 +33,6 @@ function ThemeModal({ isOpen, onClose }) {
 
   // Get current theme
   const theme = getTheme();
-  const colors = theme.colors || {};
-  const fonts = theme.fonts || {};
   const currentPreset = theme.preset || "custom";
 
   // Get theme presets from manifest; if manifest has none, fall back to layout config
@@ -57,7 +55,7 @@ function ThemeModal({ isOpen, onClose }) {
       bodyFont: themeFonts.body || "",
       scriptFont: themeFonts.script || "",
     };
-  }, [getTheme, currentInvitation.layoutConfig?.theme]);
+  }, [getTheme]);
 
   const [formData, setFormData] = useState(defaultFormData);
   const prevThemeRef = useRef(currentInvitation.layoutConfig?.theme);
@@ -65,7 +63,10 @@ function ThemeModal({ isOpen, onClose }) {
   // Update formData when theme changes externally
   useEffect(() => {
     if (prevThemeRef.current !== currentInvitation.layoutConfig?.theme) {
-      setFormData(defaultFormData);
+      // Use setTimeout to defer setState and avoid synchronous setState in effect
+      setTimeout(() => {
+        setFormData(defaultFormData);
+      }, 0);
       prevThemeRef.current = currentInvitation.layoutConfig?.theme;
     }
   }, [defaultFormData, currentInvitation.layoutConfig?.theme, getTheme]);

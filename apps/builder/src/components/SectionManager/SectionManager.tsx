@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useBuilderStore } from "../../store/builderStore";
 import { SECTION_METADATA } from "@shared/types/wedding-data";
 import "./SectionManager.css";
@@ -114,7 +114,7 @@ function SectionManager({ isOpen, onClose }) {
   // Derive sections from store - no need for state
   const sections = useMemo(() => {
     return getAllSections();
-  }, [getAllSections, currentLayoutManifest]);
+  }, [getAllSections]);
 
   // Get section metadata (name, icon, description)
   const getSectionInfo = (sectionId) => {

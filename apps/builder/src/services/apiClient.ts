@@ -145,7 +145,7 @@ export async function apiRequest(url: string, options: RequestOptions = {}): Pro
           }
           throw new Error("Session expired. Please login again.");
         }
-      } catch (_refreshError) {
+      } catch {
         // Refresh failed, clear auth and redirect to login
         clearAccessToken();
         if (typeof window !== "undefined") {

@@ -209,7 +209,7 @@ export const handlers = [
 
   // Request password change OTP
   http.post(`${API_BASE_URL}/auth/password/request-otp`, async ({ request }) => {
-    const _body = (await request.json()) as { email: string };
+    await request.json(); // Parse body but don't use it
 
     // Check for cooldown error (simulate by checking a header or query param)
     const url = new URL(request.url);
