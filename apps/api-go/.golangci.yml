@@ -1,0 +1,122 @@
+# golangci-lint configuration
+# Install: go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+# Run: golangci-lint run
+
+run:
+  timeout: 5m
+  tests: true
+  skip-dirs:
+    - vendor
+    - bin
+    - dist
+
+linters:
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - typecheck
+    - unused
+    - gofmt
+    - goimports
+    - misspell
+    - unconvert
+    - unparam
+    - gocritic
+    - gosec
+    - exportloopref
+    - goconst
+    - gocognit
+    - gocyclo
+    - dupl
+    - funlen
+    - lll
+    - nakedret
+    - noctx
+    - rowserrcheck
+    - sqlclosecheck
+    - thelper
+    - tparallel
+    - wrapcheck
+    - errname
+    - errorlint
+    - exhaustive
+    - gochecknoglobals
+    - gochecknoinits
+    - goerr113
+    - goheader
+    - gomnd
+    - gomodguard
+    - goprintffuncname
+    - ifshort
+    - importas
+    - interfacer
+    - makezero
+    - maligned
+    - nestif
+    - nolintlint
+    - nosprintfhostport
+    - scopelint
+    - structcheck
+    - stylecheck
+    - tagliatelle
+    - varcheck
+    - whitespace
+
+linters-settings:
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - experimental
+      - opinionated
+      - performance
+      - style
+  gocyclo:
+    min-complexity: 15
+  dupl:
+    threshold: 100
+  funlen:
+    lines: 100
+    statements: 50
+  goconst:
+    min-len: 3
+    min-occurrences: 3
+  gocognit:
+    min-complexity: 15
+  lll:
+    line-length: 120
+  misspell:
+    locale: US
+  nakedret:
+    max-func-lines: 30
+  noctx:
+    check-http-resource-retrieval: true
+  nolintlint:
+    allow-unused: false
+    allow-no-explanation: []
+    require-explanation: []
+    require-specific: false
+  govet:
+    check-shadowing: true
+    enable-all: true
+  staticcheck:
+    checks: ["all"]
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - errcheck
+        - gosec
+        - funlen
+        - gocognit
+        - gocyclo
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  exclude-use-default: false
+

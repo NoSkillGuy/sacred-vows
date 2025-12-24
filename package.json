@@ -7,10 +7,32 @@
     "test": "npm run test:go && npm run test:builder && npm run test:edge-worker",
     "test:go": "cd apps/api-go && make test",
     "test:builder": "cd apps/builder && npm test -- --run",
-    "test:edge-worker": "cd apps/edge-worker && npm run typecheck"
+    "test:edge-worker": "cd apps/edge-worker && npm run typecheck",
+    "test:fast": "cd apps/api-go && go test ./... -short",
+    "lint": "npm run lint:builder && npm run lint:edge-worker && npm run lint:go",
+    "lint:builder": "cd apps/builder && npx eslint . --ext .ts,.tsx",
+    "lint:edge-worker": "cd apps/edge-worker && npx eslint . --ext .ts",
+    "lint:go": "cd apps/api-go && go fmt ./... && go vet ./...",
+    "format": "npm run format:builder && npm run format:edge-worker",
+    "format:builder": "cd apps/builder && npx prettier --write \"**/*.{ts,tsx,js,jsx,json,css}\"",
+    "format:edge-worker": "cd apps/edge-worker && npx prettier --write \"**/*.{ts,json}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,yml,yaml}\"",
+    "deps:check": "npm run deps:check:builder && npm run deps:check:edge-worker",
+    "deps:check:builder": "cd apps/builder && npm audit --production --audit-level=moderate || true",
+    "deps:check:edge-worker": "cd apps/edge-worker && npm audit --production --audit-level=moderate || true",
+    "pre-commit": "./scripts/pre-commit-checks.sh",
+    "prepare": "husky"
   },
   "devDependencies": {
-    "husky": "^9.0.11"
+    "@commitlint/cli": "^20.2.0",
+    "@commitlint/config-conventional": "^20.2.0",
+    "@typescript-eslint/eslint-plugin": "^8.50.1",
+    "@typescript-eslint/parser": "^8.50.1",
+    "eslint": "^9.39.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "husky": "^9.0.11",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.7.4"
   }
 }
-

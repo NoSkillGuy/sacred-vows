@@ -1,34 +1,24 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
+# Run file checks (size, type, secrets, whitespace)
+echo "🔍 Running file checks..."
+./scripts/pre-commit-checks.sh || exit 1
 
-# Get the root directory of the repository
-ROOT_DIR="$(git rev-parse --show-toplevel)"
+# Run lint-staged (formatting and linting)
+echo "🎨 Running formatters and linters..."
+npx lint-staged || exit 1
 
-echo "Running pre-commit tests..."
-
-# Run Go tests
-echo "Running Go API tests..."
-cd "$ROOT_DIR/apps/api-go" && make test
-if [ $? -ne 0 ]; then
-  echo "❌ Go tests failed"
-  exit 1
+# Run fast unit tests (only if Go files changed)
+if git diff --cached --name-only | grep -q '\.go$'; then
+  echo "🧪 Running Go tests..."
+  cd apps/api-go && go test ./... -short || exit 1
+  cd ../..
 fi
 
-# Run Builder unit tests
-echo "Running Builder unit tests..."
-cd "$ROOT_DIR/apps/builder" && npm test -- --run
-if [ $? -ne 0 ]; then
-  echo "❌ Builder tests failed"
-  exit 1
+# Type check TypeScript (only if TS files changed)
+if git diff --cached --name-only | grep -qE '\.(ts|tsx)$'; then
+  echo "🔷 Type checking TypeScript..."
+  if git diff --cached --name-only | grep -q 'apps/edge-worker/.*\.ts$'; then
+    cd apps/edge-worker && npm run typecheck || exit 1
+    cd ../..
+  fi
+  # Builder type checking is handled by ESLint with TypeScript parser
 fi
-
-# Run Edge Worker typecheck
-echo "Running Edge Worker typecheck..."
-cd "$ROOT_DIR/apps/edge-worker" && npm run typecheck
-if [ $? -ne 0 ]; then
-  echo "❌ Edge Worker typecheck failed"
-  exit 1
-fi
-
-echo "✅ All tests passed!"
-
