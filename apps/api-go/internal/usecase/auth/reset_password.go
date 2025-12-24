@@ -95,4 +95,3 @@ func (uc *ResetPasswordUseCase) Execute(ctx context.Context, input ResetPassword
 
 	return &ResetPasswordOutput{Success: true}, nil
 }
-

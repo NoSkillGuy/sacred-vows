@@ -24,7 +24,7 @@
   background: var(--white);
   border: 2px solid var(--builder-border);
   border-radius: 100px;
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   font-size: 0.9rem;
   font-weight: 500;
   color: var(--text-medium);
@@ -175,7 +175,7 @@
 }
 
 .tutorial-content h3 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.2rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -219,7 +219,7 @@
 }
 
 .tutorial-steps li::before {
-  content: '✓';
+  content: "✓";
   position: absolute;
   left: 0;
   color: var(--sage-dark);
@@ -232,7 +232,7 @@
 }
 
 .tutorial-steps li.more::before {
-  content: '';
+  content: "";
 }
 
 .tutorial-cta {
@@ -241,7 +241,7 @@
   background: transparent;
   border: 2px solid var(--rose);
   border-radius: 100px;
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -266,7 +266,7 @@
 }
 
 .tutorials-help h2 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 2rem;
   font-weight: 500;
   color: var(--text-dark);
@@ -320,4 +320,3 @@
     flex-direction: column;
   }
 }
-

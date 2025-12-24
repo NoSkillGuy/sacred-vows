@@ -44,7 +44,7 @@ func (r *passwordChangeOTPRepository) FindByUserID(ctx context.Context, userID s
 		OrderBy("created_at", firestore.Desc).
 		Limit(1).
 		Documents(ctx)
-	
+
 	docs, err := iter.GetAll()
 	if err != nil {
 		return nil, err
@@ -52,17 +52,17 @@ func (r *passwordChangeOTPRepository) FindByUserID(ctx context.Context, userID s
 	if len(docs) == 0 {
 		return nil, nil
 	}
-	
+
 	otp, err := r.docToPasswordChangeOTP(docs[0])
 	if err != nil {
 		return nil, err
 	}
-	
+
 	// Check if expired
 	if otp.IsExpired() {
 		return nil, nil
 	}
-	
+
 	return otp, nil
 }
 
@@ -84,16 +84,16 @@ func (r *passwordChangeOTPRepository) InvalidateByUserID(ctx context.Context, us
 		Where("user_id", "==", userID).
 		Where("used", "==", false).
 		Documents(ctx)
-	
+
 	docs, err := iter.GetAll()
 	if err != nil {
 		return err
 	}
-	
+
 	if len(docs) == 0 {
 		return nil
 	}
-	
+
 	// Mark all as used (invalidate them)
 	batch := r.client.Batch()
 	for _, doc := range docs {
@@ -101,7 +101,7 @@ func (r *passwordChangeOTPRepository) InvalidateByUserID(ctx context.Context, us
 			{Path: "used", Value: true},
 		})
 	}
-	
+
 	_, err = batch.Commit(ctx)
 	return err
 }
@@ -112,10 +112,10 @@ func (r *passwordChangeOTPRepository) IncrementAttempts(ctx context.Context, otp
 	if err != nil {
 		return err
 	}
-	
+
 	data := doc.Data()
 	currentCount := getInt(data, "attempt_count")
-	
+
 	_, err = r.client.Collection("password_change_otps").Doc(otpID).Update(ctx, []firestore.Update{
 		{Path: "attempt_count", Value: currentCount + 1},
 	})
@@ -144,4 +144,3 @@ func (r *passwordChangeOTPRepository) docToPasswordChangeOTP(doc *firestore.Docu
 
 	return otp, nil
 }
-

@@ -55,7 +55,7 @@
   position: absolute;
   top: 1rem;
   left: 1.5rem;
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 5rem;
   color: var(--white);
   opacity: 0.3;
@@ -63,7 +63,7 @@
 }
 
 .story-quote {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.5rem;
   font-weight: 500;
   font-style: italic;
@@ -127,7 +127,7 @@
 }
 
 .stat-number {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 2.75rem;
   font-weight: 700;
   background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
@@ -196,7 +196,7 @@
 }
 
 .value-card h3 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.4rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -255,7 +255,7 @@
 }
 
 .team-avatar::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: -4px;
   border-radius: 50%;
@@ -263,14 +263,14 @@
 }
 
 .team-avatar span {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--white);
 }
 
 .team-card h3 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -302,7 +302,7 @@
 }
 
 .about-cta h2 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 2.25rem;
   font-weight: 500;
   color: var(--text-dark);
@@ -379,4 +379,3 @@
     font-size: 1.25rem;
   }
 }
-

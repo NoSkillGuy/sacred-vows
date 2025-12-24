@@ -1,17 +1,17 @@
-import { useState, useEffect, useRef } from 'react';
-import { getDefaultAssetUrl } from '../../../../services/defaultAssetService';
+import { useState, useEffect, useRef } from "react";
+import { getDefaultAssetUrl } from "../../../../services/defaultAssetService";
 
 /**
  * EditorialHeader - Minimal floating music control
  * Matches editorial elegance aesthetic with subtle design
  */
-function EditorialHeader({ translations, currentLang, config = {} }) {
+function EditorialHeader({ _translations, _currentLang, config = {} }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef(null);
-  
+
   const music = config.music || {};
-  const musicFile = music.file || getDefaultAssetUrl('music', null, '1.mp3');
-  const musicVolume = typeof music.volume === 'number' ? music.volume : 0.5;
+  const musicFile = music.file || getDefaultAssetUrl("music", null, "1.mp3");
+  const musicVolume = typeof music.volume === "number" ? music.volume : 0.5;
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -21,9 +21,9 @@ function EditorialHeader({ translations, currentLang, config = {} }) {
     const handlePause = () => setIsPlaying(false);
     const handleEnded = () => setIsPlaying(false);
 
-    audio.addEventListener('play', handlePlay);
-    audio.addEventListener('pause', handlePause);
-    audio.addEventListener('ended', handleEnded);
+    audio.addEventListener("play", handlePlay);
+    audio.addEventListener("pause", handlePause);
+    audio.addEventListener("ended", handleEnded);
 
     // Set volume
     audio.volume = musicVolume;
@@ -42,9 +42,9 @@ function EditorialHeader({ translations, currentLang, config = {} }) {
     }
 
     return () => {
-      audio.removeEventListener('play', handlePlay);
-      audio.removeEventListener('pause', handlePause);
-      audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener("play", handlePlay);
+      audio.removeEventListener("pause", handlePause);
+      audio.removeEventListener("ended", handleEnded);
     };
   }, [musicFile, musicVolume]);
 
@@ -69,11 +69,11 @@ function EditorialHeader({ translations, currentLang, config = {} }) {
         <button
           className="ee-music-toggle"
           onClick={toggleMusic}
-          aria-label={isPlaying ? 'Pause music' : 'Play music'}
-          title={isPlaying ? 'Pause music' : 'Play music'}
+          aria-label={isPlaying ? "Pause music" : "Play music"}
+          title={isPlaying ? "Pause music" : "Play music"}
         >
-          <span className={`ee-music-icon ${isPlaying ? 'ee-music-playing' : ''}`}>
-            {isPlaying ? '⏸' : '▶'}
+          <span className={`ee-music-icon ${isPlaying ? "ee-music-playing" : ""}`}>
+            {isPlaying ? "⏸" : "▶"}
           </span>
         </button>
       </header>
@@ -85,4 +85,3 @@ function EditorialHeader({ translations, currentLang, config = {} }) {
 }
 
 export default EditorialHeader;
-

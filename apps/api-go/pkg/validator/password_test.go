@@ -108,4 +108,3 @@ func TestNewPassword_WithSpecialCharacters_ReturnsPassword(t *testing.T) {
 	require.NoError(t, err, "Password with special characters should be valid if it meets requirements")
 	assert.Equal(t, Password(password), result, "Should return the password as Password type")
 }
-

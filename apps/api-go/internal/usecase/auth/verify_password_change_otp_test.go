@@ -311,4 +311,3 @@ func TestVerifyPasswordChangeOTPUseCase_Execute_InvalidOTP_IncrementsAttempts(t 
 	assert.Nil(t, output, "Output should be nil on error")
 	assert.Equal(t, 3, validOTP.AttemptCount, "Attempt count should be incremented")
 }
-
