@@ -219,6 +219,61 @@ export const handlers = [
     });
   }),
 
+  // Request password change OTP
+  http.post(`${API_BASE_URL}/auth/password/request-otp`, async ({ request }) => {
+    const body = await request.json() as { email: string };
+    
+    // Check for cooldown error (simulate by checking a header or query param)
+    const url = new URL(request.url);
+    if (url.searchParams.get('cooldown') === 'true') {
+      return HttpResponse.json(
+        { error: 'Please wait 30 seconds before requesting a new OTP' },
+        { status: 429 }
+      );
+    }
+
+    return HttpResponse.json({
+      message: 'If an account with that email exists, we\'ve sent a verification code.',
+    });
+  }),
+
+  // Verify password change OTP
+  http.post(`${API_BASE_URL}/auth/password/verify-otp`, async ({ request }) => {
+    const body = await request.json() as { otp: string; newPassword: string };
+    
+    if (body.otp === 'invalid-otp') {
+      return HttpResponse.json(
+        { error: 'Invalid OTP. 4 attempt(s) remaining.' },
+        { status: 401 }
+      );
+    }
+
+    if (body.otp === 'expired-otp') {
+      return HttpResponse.json(
+        { error: 'OTP has expired. Please request a new one.' },
+        { status: 401 }
+      );
+    }
+
+    if (body.otp === 'max-attempts-otp') {
+      return HttpResponse.json(
+        { error: 'Maximum attempts reached. Please request a new OTP.' },
+        { status: 401 }
+      );
+    }
+
+    if (body.newPassword.length < 8) {
+      return HttpResponse.json(
+        { error: 'Password must be at least 8 characters long' },
+        { status: 400 }
+      );
+    }
+
+    return HttpResponse.json({
+      message: 'Password updated successfully',
+    });
+  }),
+
   // Get all invitations
   http.get(`${API_BASE_URL}/invitations`, () => {
     return HttpResponse.json({

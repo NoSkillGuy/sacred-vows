@@ -218,6 +218,8 @@ When you edit files locally, Air in the container will detect changes and automa
 - `GET /api/auth/google` - Initiate Google OAuth
 - `GET /api/auth/google/callback` - Google OAuth callback
 - `POST /api/auth/google/verify` - Verify Google ID token
+- `POST /api/auth/password/request-otp` - Request password change OTP (authenticated)
+- `POST /api/auth/password/verify-otp` - Verify OTP and update password (authenticated)
 
 ### Invitations
 - `GET /api/invitations` - List user invitations

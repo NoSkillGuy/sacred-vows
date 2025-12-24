@@ -1,8 +1,10 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { register, login, logout, getCurrentUser, getAuthToken, isAuthenticated, refreshAccessToken, requestPasswordReset, resetPassword } from './authService';
+import { register, login, logout, getCurrentUser, getAuthToken, isAuthenticated, refreshAccessToken, requestPasswordReset, resetPassword, requestPasswordChangeOTP, verifyPasswordChangeOTP } from './authService';
 import { setAccessToken, getAccessToken, clearAccessToken, hasAccessToken } from './tokenStorage';
 import { server } from '../tests/mocks/server';
 import { http, HttpResponse } from 'msw';
+
+const API_BASE_URL = 'http://localhost:3000/api';
 
 // Mock tokenStorage to avoid side effects
 vi.mock('./tokenStorage', () => ({
@@ -177,6 +179,54 @@ describe('authService', () => {
 
     it('should throw error for invalid token', async () => {
       await expect(resetPassword('invalid-token', 'NewPassword123!')).rejects.toThrow();
+    });
+  });
+
+  describe('requestPasswordChangeOTP', () => {
+    it('should request password change OTP successfully', async () => {
+      const result = await requestPasswordChangeOTP('test@example.com');
+
+      expect(result).toBeDefined();
+      expect(result.message).toBeTruthy();
+    });
+
+    it('should handle cooldown error', async () => {
+      // Use MSW to simulate cooldown error
+      server.use(
+        http.post(`${API_BASE_URL}/auth/password/request-otp`, () => {
+          return HttpResponse.json(
+            { error: 'Please wait 30 seconds before requesting a new OTP' },
+            { status: 429 }
+          );
+        })
+      );
+
+      await expect(requestPasswordChangeOTP('test@example.com')).rejects.toThrow();
+    });
+  });
+
+  describe('verifyPasswordChangeOTP', () => {
+    it('should verify OTP and update password successfully', async () => {
+      const result = await verifyPasswordChangeOTP('123456', 'NewPassword123!');
+
+      expect(result).toBeDefined();
+      expect(result.message).toBeTruthy();
+    });
+
+    it('should throw error for invalid OTP', async () => {
+      await expect(verifyPasswordChangeOTP('invalid-otp', 'NewPassword123!')).rejects.toThrow();
+    });
+
+    it('should throw error for expired OTP', async () => {
+      await expect(verifyPasswordChangeOTP('expired-otp', 'NewPassword123!')).rejects.toThrow();
+    });
+
+    it('should throw error for max attempts reached', async () => {
+      await expect(verifyPasswordChangeOTP('max-attempts-otp', 'NewPassword123!')).rejects.toThrow();
+    });
+
+    it('should throw error for weak password', async () => {
+      await expect(verifyPasswordChangeOTP('123456', 'weak')).rejects.toThrow();
     });
   });
 });

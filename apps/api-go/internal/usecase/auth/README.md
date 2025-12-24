@@ -73,6 +73,61 @@ Handles Google OAuth authentication flow.
 
 **Note:** Token generation is handled by the HTTP handler after use case execution.
 
+### RequestPasswordChangeOTPUseCase (`request_password_change_otp.go`)
+
+Sends a 6-digit OTP to the user's email for password change verification.
+
+**Input:**
+- `UserID`: User ID from JWT token
+- `Email`: User email
+
+**Output:**
+- `Success`: Boolean indicating success
+
+**Process:**
+1. Find user by ID
+2. Check 30-second cooldown (prevents spam)
+3. Invalidate any existing OTPs for the user
+4. Generate 6-digit numeric OTP
+5. Hash OTP with SHA-256
+6. Create OTP entity (5-minute expiry)
+7. Send OTP email
+8. Return success
+
+**Security Features:**
+- 30-second cooldown between requests
+- OTP expires in 5 minutes
+- OTP is hashed before storage
+- Old OTPs are invalidated when new one is requested
+
+### VerifyPasswordChangeOTPUseCase (`verify_password_change_otp.go`)
+
+Verifies the OTP and updates the user's password.
+
+**Input:**
+- `UserID`: User ID from JWT token
+- `OTP`: 6-digit OTP code
+- `NewPassword`: New password
+
+**Output:**
+- `Success`: Boolean indicating success
+
+**Process:**
+1. Validate password strength
+2. Find OTP by user ID
+3. Check if OTP is expired
+4. Check if OTP is already used
+5. Check if max attempts (5) reached
+6. Hash provided OTP and compare with stored hash
+7. If match: mark OTP as used, update password (bcrypt), return success
+8. If mismatch: increment attempt count, return error
+
+**Security Features:**
+- Max 5 attempts per OTP
+- Single-use OTP (marked as used after successful verification)
+- OTP expiry enforced
+- Password validation
+
 ## DTOs (`dto.go`)
 
 - `UserDTO`: Public user representation (no password)

@@ -336,6 +336,112 @@ The application supports two Google OAuth flows:
 - Clears user data from localStorage
 - Redirects to login page
 
+### 7. Password Change with OTP Verification
+
+**Endpoints:**
+- `POST /api/auth/password/request-otp` - Request password change OTP
+- `POST /api/auth/password/verify-otp` - Verify OTP and update password
+
+**Authentication:** Both endpoints require valid JWT token
+
+#### Request Password Change OTP
+
+**Flow:**
+1. User navigates to profile page (authenticated)
+2. User enters new password
+3. Frontend calls `/api/auth/password/request-otp`
+4. Backend validates user exists
+5. Backend checks 30-second cooldown (prevents spam)
+6. Backend invalidates any existing OTPs for the user
+7. Backend generates 6-digit numeric OTP (000000-999999)
+8. Backend hashes OTP with SHA-256
+9. Backend creates OTP entity (5-minute expiry, 0 attempts)
+10. Backend sends OTP email to user
+11. Returns success message
+
+**Request:**
+```json
+{
+  "email": "user@example.com"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "If an account with that email exists, we've sent a verification code."
+}
+```
+
+**Error Responses:**
+- `400 Bad Request`: Missing email
+- `401 Unauthorized`: Authentication required
+- `429 Too Many Requests`: Cooldown not expired (30 seconds)
+- `500 Internal Server Error`: Server error
+
+**Security Features:**
+- 30-second cooldown between requests
+- OTP expires in 5 minutes
+- OTP is hashed (SHA-256) before storage
+- Old OTPs are invalidated when new one is requested
+- Always returns success (doesn't reveal if email exists)
+
+#### Verify Password Change OTP
+
+**Flow:**
+1. User receives 6-digit OTP via email
+2. User enters OTP and new password in profile page
+3. Frontend calls `/api/auth/password/verify-otp`
+4. Backend validates password strength
+5. Backend finds OTP by user ID
+6. Backend checks if OTP is expired
+7. Backend checks if OTP is already used
+8. Backend checks if max attempts (5) reached
+9. Backend hashes provided OTP and compares with stored hash
+10. If match:
+    - Mark OTP as used
+    - Hash new password with bcrypt
+    - Update user password
+    - Return success
+11. If mismatch:
+    - Increment attempt count
+    - Return error with remaining attempts
+
+**Request:**
+```json
+{
+  "otp": "123456",
+  "newPassword": "NewSecurePassword123"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "Password updated successfully"
+}
+```
+
+**Error Responses:**
+- `400 Bad Request`: Invalid password or missing fields
+- `401 Unauthorized`: Invalid/expired OTP, max attempts reached, or OTP already used
+- `500 Internal Server Error`: Server error
+
+**OTP Rules:**
+- **Format**: 6-digit numeric (000000-999999)
+- **Validity**: 5 minutes
+- **Attempts**: Maximum 5 attempts per OTP
+- **Single-use**: OTP is marked as used after successful verification
+- **Resend cooldown**: 30 seconds minimum between requests
+- **Storage**: OTP is hashed with SHA-256 (not plaintext)
+
+**Frontend Handling:**
+- Shows cooldown timer (30 seconds) for resend
+- Shows expiry countdown (5 minutes)
+- Shows attempt countdown (5 max)
+- Handles expired OTP gracefully
+- Handles max attempts reached scenario
+
 ## Middleware
 
 ### AuthenticateToken
@@ -619,6 +725,8 @@ See [Publishing Guide](../guides/publishing.md) for full publishing configuratio
 | GET | `/api/auth/google` | No | Initiate Google OAuth |
 | GET | `/api/auth/google/callback` | No | Google OAuth callback |
 | POST | `/api/auth/google/verify` | No | Verify Google ID token |
+| POST | `/api/auth/password/request-otp` | Yes | Request password change OTP |
+| POST | `/api/auth/password/verify-otp` | Yes | Verify OTP and update password |
 
 *Refresh endpoint requires refresh token in HttpOnly cookie
 
@@ -634,6 +742,8 @@ See [Publishing Guide](../guides/publishing.md) for full publishing configuratio
 - `isAuthenticated()` - Check if access token exists
 - `getAuthToken()` - Get access token
 - `refreshAccessToken()` - Refresh access token manually
+- `requestPasswordChangeOTP(email)` - Request password change OTP
+- `verifyPasswordChangeOTP(otp, newPassword)` - Verify OTP and update password
 
 ### tokenStorage.js
 

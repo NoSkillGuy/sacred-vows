@@ -100,9 +100,6 @@ func (s *mailjetService) SendPasswordResetEmail(ctx context.Context, toEmail str
 	return nil
 }
 
-	return nil
-}
-
 func (s *mailjetService) SendPasswordChangeOTPEmail(ctx context.Context, toEmail string, otp string) error {
 	// Prepare template data
 	templateData := struct {
