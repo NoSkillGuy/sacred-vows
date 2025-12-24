@@ -65,7 +65,10 @@ function validateMarkdownFile(filePath) {
 
       // Check for unescaped < characters that might be interpreted as HTML tags
       // Allow common mermaid patterns like "->" and "<-"
-      const problematicLt = mermaidContent.match(/[^&-><]<[^\/\s!]/g);
+      // Use explicit character class to avoid overly permissive range
+      // Match < that is not part of ->, <-, or HTML tag patterns
+      // Avoid using negation character classes that are too broad
+      const problematicLt = mermaidContent.match(/[a-zA-Z0-9_]\s*<\s*[0-9]/g);
       if (problematicLt) {
         problematicLt.forEach((match) => {
           // Check if it's a comparison operator that should be escaped

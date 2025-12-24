@@ -72,7 +72,7 @@ function Hero({ onRSVPClick, translations, currentLang, config = {} }) {
 
   const namesText =
     getTranslation("hero.names") || (brideName || groomName ? `${brideName} & ${groomName}` : "");
-  const heroNames = namesText ? namesText.replace("&", '<span class="hero-amp">&amp;</span>') : "";
+  const heroNames = namesText ? namesText.replace(/&/g, '<span class="hero-amp">&amp;</span>') : "";
 
   return (
     <section className="hero" id="top">

@@ -48,10 +48,14 @@ function isDefaultAsset(url) {
   try {
     const urlObj = new URL(url);
     // Check if URL contains /defaults/ path (R2 CDN) or matches CDN base URL pattern
+    const hostname = urlObj.hostname;
     return (
       urlObj.pathname.includes("/defaults/") ||
-      urlObj.hostname.includes("pub") ||
-      urlObj.hostname.includes("sacredvows.io")
+      hostname === "pub.sacredvows.io" ||
+      hostname === "dev-pub.sacredvows.io" ||
+      hostname.endsWith(".pub.sacredvows.io") ||
+      hostname === "sacredvows.io" ||
+      hostname.endsWith(".sacredvows.io")
     );
   } catch {
     // If URL parsing fails, check if it's a relative path to assets

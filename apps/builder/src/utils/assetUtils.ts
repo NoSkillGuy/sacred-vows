@@ -62,9 +62,19 @@ function isAssetURL(url: string): boolean {
     return true;
   }
 
-  // Check for signed URL patterns
-  if (url.includes("storage.googleapis.com") && url.includes("X-Goog-Signature=")) {
-    return true;
+  // Check for signed URL patterns - validate hostname properly
+  try {
+    const urlObj = new URL(url);
+    if (
+      urlObj.hostname === "storage.googleapis.com" ||
+      urlObj.hostname.endsWith(".storage.googleapis.com")
+    ) {
+      if (url.includes("X-Goog-Signature=")) {
+        return true;
+      }
+    }
+  } catch {
+    // If URL parsing fails, continue to other checks
   }
 
   // Check for local dev asset URLs

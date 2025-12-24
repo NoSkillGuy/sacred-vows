@@ -837,18 +837,33 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
     updateInvitationData: (path: string, value: unknown): void => {
       const { currentInvitation } = get();
 
+      // Guard against prototype pollution
+      const isPrototypePollutionKey = (key: string): boolean => {
+        return key === "__proto__" || key === "constructor" || key === "prototype";
+      };
+
       const newData = JSON.parse(JSON.stringify(currentInvitation.data)) as UniversalWeddingData;
       const keys = path.split(".");
       let current: Record<string, unknown> = newData as Record<string, unknown>;
 
       for (let i = 0; i < keys.length - 1; i++) {
-        if (!current[keys[i]]) {
-          current[keys[i]] = {};
+        const key = keys[i];
+        if (isPrototypePollutionKey(key)) {
+          console.warn(`Blocked prototype pollution attempt: ${key}`);
+          return;
         }
-        current = current[keys[i]] as Record<string, unknown>;
+        if (!current[key]) {
+          current[key] = {};
+        }
+        current = current[key] as Record<string, unknown>;
       }
 
-      current[keys[keys.length - 1]] = value;
+      const targetKey = keys[keys.length - 1];
+      if (isPrototypePollutionKey(targetKey)) {
+        console.warn(`Blocked prototype pollution attempt: ${targetKey}`);
+        return;
+      }
+      current[targetKey] = value;
 
       const updatedInvitation: InvitationData = {
         ...currentInvitation,
@@ -892,20 +907,39 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
       const newData = { ...currentInvitation.data } as Record<string, unknown>;
       const keys = path.split(".");
 
+      // Guard against prototype pollution
+      const isPrototypePollutionKey = (key: string): boolean => {
+        return key === "__proto__" || key === "constructor" || key === "prototype";
+      };
+
       if (keys.length === 1) {
-        const existing = (newData[keys[0]] || {}) as Record<string, unknown>;
-        newData[keys[0]] = deepMerge(existing, value);
+        const key = keys[0];
+        if (isPrototypePollutionKey(key)) {
+          console.warn(`Blocked prototype pollution attempt: ${key}`);
+          return;
+        }
+        const existing = (newData[key] || {}) as Record<string, unknown>;
+        newData[key] = deepMerge(existing, value);
       } else {
         let current = newData;
         for (let i = 0; i < keys.length - 1; i++) {
-          if (!current[keys[i]]) {
-            current[keys[i]] = {};
-          } else {
-            current[keys[i]] = { ...current[keys[i]] };
+          const key = keys[i];
+          if (isPrototypePollutionKey(key)) {
+            console.warn(`Blocked prototype pollution attempt: ${key}`);
+            return;
           }
-          current = current[keys[i]] as Record<string, unknown>;
+          if (!current[key]) {
+            current[key] = {};
+          } else {
+            current[key] = { ...current[key] };
+          }
+          current = current[key] as Record<string, unknown>;
         }
         const targetKey = keys[keys.length - 1];
+        if (isPrototypePollutionKey(targetKey)) {
+          console.warn(`Blocked prototype pollution attempt: ${targetKey}`);
+          return;
+        }
         const existing = (current[targetKey] || {}) as Record<string, unknown>;
         current[targetKey] = deepMerge(existing, value);
       }
