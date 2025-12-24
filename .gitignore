@@ -16,7 +16,9 @@ yarn-error.log*
 # Environment variables
 .env
 .env.local
+.env.docker
 .env.*.local
+.env.bak
 
 # Terraform
 *.tfvars

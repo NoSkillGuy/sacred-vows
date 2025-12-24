@@ -69,19 +69,32 @@ func main() {
 
 	// Initialize Firestore database
 	ctx := context.Background()
+	logger.GetLogger().Info("Initializing Firestore client...", 
+		zap.String("emulator_host", os.Getenv("FIRESTORE_EMULATOR_HOST")),
+		zap.String("project_id", cfg.Database.ProjectID),
+		zap.String("database_id", cfg.Database.DatabaseID))
 	firestoreClient, err := firestore.NewFromEnv(ctx)
 	if err != nil {
 		logger.GetLogger().Fatal("Failed to connect to Firestore", zap.Error(err))
 	}
 	defer firestoreClient.Close()
+	logger.GetLogger().Info("Firestore client initialized successfully")
 
 	logger.GetLogger().Info("Using Firestore database", zap.String("project_id", cfg.Database.ProjectID), zap.String("database_id", cfg.Database.DatabaseID))
 
-	// Run Firestore migrations
-	if err := firestoreClient.RunMigrations(ctx); err != nil {
+	// Run Firestore migrations with timeout
+	logger.GetLogger().Info("Starting Firestore migrations...")
+	migrationCtx, migrationCancel := context.WithTimeout(ctx, 30*time.Second)
+	defer migrationCancel()
+	if err := firestoreClient.RunMigrations(migrationCtx); err != nil {
 		logger.GetLogger().Error("Failed to run Firestore migrations", zap.Error(err))
+		// Log to stderr as well for visibility in Docker logs
+		fmt.Fprintf(os.Stderr, "[MIGRATIONS] ERROR: Failed to run Firestore migrations: %v\n", err)
 		// Continue anyway - migrations may have partially succeeded
 		// But data migrations (like loading layouts) may fail
+	} else {
+		logger.GetLogger().Info("Firestore migrations completed successfully")
+		fmt.Fprintf(os.Stderr, "[MIGRATIONS] Successfully completed all migrations\n")
 	}
 
 	// Initialize Firestore repositories

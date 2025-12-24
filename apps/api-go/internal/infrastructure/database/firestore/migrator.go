@@ -22,6 +22,7 @@ type Migration struct {
 // RunMigrations runs pending Firestore migrations
 func (c *Client) RunMigrations(ctx context.Context) error {
 	log := logger.GetLogger()
+	log.Info("Initializing migration process...")
 
 	// Create migrations collection if it doesn't exist
 	if err := c.createMigrationsCollection(ctx); err != nil {
@@ -29,13 +30,17 @@ func (c *Client) RunMigrations(ctx context.Context) error {
 	}
 
 	// Get applied migrations
+	log.Info("Fetching applied migrations from Firestore...")
 	applied, err := c.getAppliedMigrations(ctx)
 	if err != nil {
+		log.Error("Failed to get applied migrations", zap.Error(err))
 		return fmt.Errorf("failed to get applied migrations: %w", err)
 	}
+	log.Info("Retrieved applied migrations", zap.Int("count", len(applied)))
 
 	// Get all migrations from registry
 	migrations := getAllMigrations()
+	log.Info("Found migrations in registry", zap.Int("total", len(migrations)))
 
 	if len(migrations) == 0 {
 		return fmt.Errorf("no migrations found")
@@ -49,9 +54,12 @@ func (c *Client) RunMigrations(ctx context.Context) error {
 
 	// Run pending migrations
 	nextExpectedVersion := getNextExpectedVersion(applied)
+	ranCount := 0
+	skippedCount := 0
 	for _, migration := range migrations {
 		if applied[migration.Version] {
 			log.Info("Migration already applied", zap.Int("version", migration.Version), zap.String("name", migration.Name))
+			skippedCount++
 			continue
 		}
 
@@ -107,39 +115,59 @@ func (c *Client) RunMigrations(ctx context.Context) error {
 		// Update next expected version after successful migration
 		nextExpectedVersion = migration.Version + 1
 		applied[migration.Version] = true
+		ranCount++
 
 		log.Info("Migration completed", zap.Int("version", migration.Version), zap.String("name", migration.Name))
 	}
+
+	log.Info("Migration process completed",
+		zap.Int("total_migrations", len(migrations)),
+		zap.Int("ran", ranCount),
+		zap.Int("skipped", skippedCount))
 
 	return nil
 }
 
 func (c *Client) createMigrationsCollection(ctx context.Context) error {
+	log := logger.GetLogger()
+	log.Info("Checking if schema_migrations collection exists...")
+	
 	// Check if schema_migrations collection exists by trying to read a document
 	// If collection doesn't exist, this will just return empty, which is fine
 	// We'll create it implicitly when we write the first migration record
 	_, err := c.Collection("schema_migrations").Doc("_check").Get(ctx)
 	if err != nil {
+		log.Info("Collection doesn't exist yet, creating placeholder...")
 		// Collection doesn't exist yet, create a placeholder document
 		_, err = c.Collection("schema_migrations").Doc("_check").Set(ctx, map[string]interface{}{
 			"created": time.Now(),
 		})
 		if err != nil {
+			log.Error("Failed to create migrations collection", zap.Error(err))
 			return fmt.Errorf("failed to create migrations collection: %w", err)
 		}
+		log.Info("Placeholder created, deleting it...")
 		// Delete the placeholder
 		_, _ = c.Collection("schema_migrations").Doc("_check").Delete(ctx)
+		log.Info("Placeholder deleted")
+	} else {
+		log.Info("Collection already exists")
 	}
 	return nil
 }
 
 func (c *Client) getAppliedMigrations(ctx context.Context) (map[int]bool, error) {
+	log := logger.GetLogger()
+	log.Info("Querying schema_migrations collection...")
 	iter := c.Collection("schema_migrations").Documents(ctx)
+	log.Info("Got iterator, calling GetAll()...")
 	docs, err := iter.GetAll()
 	if err != nil {
+		log.Error("Error getting documents from schema_migrations", zap.Error(err))
 		// Collection might not exist yet, return empty map
 		return make(map[int]bool), nil
 	}
+	log.Info("Successfully retrieved documents", zap.Int("count", len(docs)))
 
 	applied := make(map[int]bool)
 	for _, doc := range docs {
