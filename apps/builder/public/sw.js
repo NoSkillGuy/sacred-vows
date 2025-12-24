@@ -135,7 +135,7 @@ self.addEventListener("fetch", (event) => {
 
             return networkResponse;
           })
-          .catch((error) => {
+          .catch((_error) => {
             // Network failed - that's okay, we'll use cache
             console.log("Background update failed (offline):", event.request.url);
           });

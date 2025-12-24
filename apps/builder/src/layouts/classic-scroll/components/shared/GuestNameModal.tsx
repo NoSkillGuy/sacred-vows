@@ -11,7 +11,7 @@ function GuestNameModal({ isOpen, onClose, translations, _currentLang }) {
     // Initialize state from localStorage - this is acceptable for initialization
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setName(storedName);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+
     setTitle(storedTitle);
   }, [isOpen]);
 

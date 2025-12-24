@@ -119,7 +119,7 @@ async function uploadFile(localPath, r2Key, contentType) {
       );
       console.log(`  ✓ Already exists: ${r2Key}`);
       return true;
-    } catch (err) {
+    } catch {
       // File doesn't exist, proceed with upload
     }
 
@@ -207,7 +207,7 @@ async function migrate() {
       console.log(`  Processing ${coupleDir}...`);
       manifest.defaults[coupleDir] = {};
       await processDirectory(couplePath, `defaults/${coupleDir}`, manifest.defaults[coupleDir]);
-    } catch (err) {
+    } catch {
       console.log(`  ⚠ Skipping ${coupleDir} (not found)`);
     }
   }
@@ -219,7 +219,7 @@ async function migrate() {
     await stat(layoutsDir);
     manifest.layouts = {};
     await processDirectory(layoutsDir, "defaults/layouts", manifest.layouts);
-  } catch (err) {
+  } catch {
     console.log("  ⚠ Skipping layouts (not found)");
   }
 
@@ -230,7 +230,7 @@ async function migrate() {
     await stat(musicDir);
     manifest.music = {};
     await processDirectory(musicDir, "defaults/music", manifest.music);
-  } catch (err) {
+  } catch {
     console.log("  ⚠ Skipping music (not found)");
   }
 
