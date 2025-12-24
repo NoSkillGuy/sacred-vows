@@ -283,4 +283,3 @@ func TestGenerateNumericOTP_InvalidLength_ReturnsError(t *testing.T) {
 	require.Error(t, err, "Invalid length should return error")
 	assert.Empty(t, otp, "OTP should be empty on error")
 }
-

@@ -46,5 +46,3 @@ func IsReservedSubdomain(subdomain string) bool {
 		return false
 	}
 }
-
-

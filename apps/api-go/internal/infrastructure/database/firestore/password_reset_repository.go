@@ -82,4 +82,3 @@ func (r *passwordResetRepository) docToPasswordResetToken(doc *firestore.Documen
 
 	return token, nil
 }
-

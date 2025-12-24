@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
-import { getInvitations } from '../../services/invitationService';
+import { useEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
+import { getInvitations } from "../../services/invitationService";
 
 /**
  * SmartRedirect Component
@@ -21,7 +21,7 @@ function SmartRedirect(): JSX.Element {
       const invitations = await getInvitations();
       setHasInvitations(invitations && invitations.length > 0);
     } catch (error) {
-      console.error('Failed to check user state:', error);
+      console.error("Failed to check user state:", error);
       // Default to layouts if we can't determine state
       setHasInvitations(false);
     } finally {
@@ -34,10 +34,18 @@ function SmartRedirect(): JSX.Element {
       <div className="auth-loading">
         <div className="auth-loading-spinner">
           <div className="spinner-ring"></div>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '2rem', height: '2rem', color: '#e8b4b8' }}>
-            <circle cx="8" cy="15" r="5"/>
-            <circle cx="16" cy="15" r="5"/>
-            <path d="M8 10a5 5 0 0 1 8 0"/>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ width: "2rem", height: "2rem", color: "#e8b4b8" }}
+          >
+            <circle cx="8" cy="15" r="5" />
+            <circle cx="16" cy="15" r="5" />
+            <path d="M8 10a5 5 0 0 1 8 0" />
           </svg>
         </div>
         <p>Preparing your workspace...</p>
@@ -82,8 +90,7 @@ function SmartRedirect(): JSX.Element {
   }
 
   // Redirect based on user state
-  return <Navigate to={hasInvitations ? '/dashboard' : '/layouts'} replace />;
+  return <Navigate to={hasInvitations ? "/dashboard" : "/layouts"} replace />;
 }
 
 export default SmartRedirect;
-

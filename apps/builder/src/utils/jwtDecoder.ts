@@ -14,13 +14,13 @@ interface JWTPayload {
  * @returns Decoded payload or null if invalid
  */
 export function decodeJWT(token: string): JWTPayload | null {
-  if (!token || typeof token !== 'string') {
+  if (!token || typeof token !== "string") {
     return null;
   }
 
   try {
     // JWT format: header.payload.signature
-    const parts = token.split('.');
+    const parts = token.split(".");
     if (parts.length !== 3) {
       return null;
     }
@@ -29,15 +29,15 @@ export function decodeJWT(token: string): JWTPayload | null {
     // Base64url uses - and _ instead of + and /, and no padding
     const payload = parts[1];
     // Replace base64url characters with base64 characters
-    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
     // Add padding if needed
-    const padded = base64 + '='.repeat((4 - (base64.length % 4)) % 4);
-    
+    const padded = base64 + "=".repeat((4 - (base64.length % 4)) % 4);
+
     // Decode and parse JSON
     const decoded = JSON.parse(atob(padded)) as JWTPayload;
     return decoded;
   } catch (error) {
-    console.error('Failed to decode JWT:', error);
+    console.error("Failed to decode JWT:", error);
     return null;
   }
 }
@@ -70,7 +70,7 @@ export function getTimeUntilExpiration(token: string): number | null {
 
   const now = Date.now();
   const timeUntilExpiration = expirationTime - now;
-  
+
   // Return null if already expired
   return timeUntilExpiration > 0 ? timeUntilExpiration : null;
 }
@@ -84,4 +84,3 @@ export function isTokenExpired(token: string): boolean {
   const timeUntilExpiration = getTimeUntilExpiration(token);
   return timeUntilExpiration === null;
 }
-

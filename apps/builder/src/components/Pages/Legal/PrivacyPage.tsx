@@ -1,26 +1,26 @@
-import PageLayout from '../PageLayout';
-import './LegalPage.css';
+import PageLayout from "../PageLayout";
+import "./LegalPage.css";
 
 function PrivacyPage(): JSX.Element {
   return (
     <PageLayout
       title="Privacy Policy"
       subtitle="Last updated: December 1, 2024"
-      breadcrumbs={[{ label: 'Legal' }, { label: 'Privacy Policy' }]}
+      breadcrumbs={[{ label: "Legal" }, { label: "Privacy Policy" }]}
     >
       <div className="legal-page">
         <div className="legal-content">
           <section className="legal-section">
             <h2>1. Introduction</h2>
             <p>
-              Sacred Vows ("we," "our," or "us") is committed to protecting your privacy. 
-              This Privacy Policy explains how we collect, use, disclose, and safeguard your 
-              information when you use our website and services.
+              Sacred Vows (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) is committed to
+              protecting your privacy. This Privacy Policy explains how we collect, use, disclose,
+              and safeguard your information when you use our website and services.
             </p>
             <p>
-              By using Sacred Vows, you agree to the collection and use of information in 
-              accordance with this policy. If you do not agree with our policies and practices, 
-              please do not use our services.
+              By using Sacred Vows, you agree to the collection and use of information in accordance
+              with this policy. If you do not agree with our policies and practices, please do not
+              use our services.
             </p>
           </section>
 
@@ -62,37 +62,55 @@ function PrivacyPage(): JSX.Element {
 
           <section className="legal-section">
             <h2>4. Information Sharing</h2>
-            <p>We do not sell your personal information. We may share your information only in the following circumstances:</p>
+            <p>
+              We do not sell your personal information. We may share your information only in the
+              following circumstances:
+            </p>
             <ul>
-              <li><strong>With your consent:</strong> We may share information when you direct us to do so.</li>
-              <li><strong>Service providers:</strong> We may share information with third-party vendors who perform services on our behalf (payment processing, hosting, analytics).</li>
-              <li><strong>Legal requirements:</strong> We may disclose information if required by law or in response to valid requests by public authorities.</li>
-              <li><strong>Business transfers:</strong> In connection with any merger, sale, or transfer of company assets.</li>
+              <li>
+                <strong>With your consent:</strong> We may share information when you direct us to
+                do so.
+              </li>
+              <li>
+                <strong>Service providers:</strong> We may share information with third-party
+                vendors who perform services on our behalf (payment processing, hosting, analytics).
+              </li>
+              <li>
+                <strong>Legal requirements:</strong> We may disclose information if required by law
+                or in response to valid requests by public authorities.
+              </li>
+              <li>
+                <strong>Business transfers:</strong> In connection with any merger, sale, or
+                transfer of company assets.
+              </li>
             </ul>
           </section>
 
           <section className="legal-section">
             <h2>5. Data Security</h2>
             <p>
-              We implement appropriate technical and organizational measures to protect your 
-              personal information against unauthorized access, alteration, disclosure, or 
-              destruction. However, no method of transmission over the Internet is 100% secure, 
-              and we cannot guarantee absolute security.
+              We implement appropriate technical and organizational measures to protect your
+              personal information against unauthorized access, alteration, disclosure, or
+              destruction. However, no method of transmission over the Internet is 100% secure, and
+              we cannot guarantee absolute security.
             </p>
           </section>
 
           <section className="legal-section">
             <h2>6. Data Retention</h2>
             <p>
-              We retain your personal information for as long as necessary to provide our 
-              services and fulfill the purposes described in this policy. We may retain 
-              certain information as required by law or for legitimate business purposes.
+              We retain your personal information for as long as necessary to provide our services
+              and fulfill the purposes described in this policy. We may retain certain information
+              as required by law or for legitimate business purposes.
             </p>
           </section>
 
           <section className="legal-section">
             <h2>7. Your Rights</h2>
-            <p>Depending on your location, you may have certain rights regarding your personal information:</p>
+            <p>
+              Depending on your location, you may have certain rights regarding your personal
+              information:
+            </p>
             <ul>
               <li>Access and receive a copy of your personal data</li>
               <li>Request correction of inaccurate data</li>
@@ -105,30 +123,30 @@ function PrivacyPage(): JSX.Element {
           </section>
 
           <section className="legal-section">
-            <h2>8. Children's Privacy</h2>
+            <h2>8. Children&apos;s Privacy</h2>
             <p>
-              Our services are not intended for children under 16 years of age. We do not 
-              knowingly collect personal information from children under 16. If you believe 
-              we have collected information from a child, please contact us immediately.
+              Our services are not intended for children under 16 years of age. We do not knowingly
+              collect personal information from children under 16. If you believe we have collected
+              information from a child, please contact us immediately.
             </p>
           </section>
 
           <section className="legal-section">
             <h2>9. International Transfers</h2>
             <p>
-              Your information may be transferred to and processed in countries other than 
-              your own. We ensure appropriate safeguards are in place to protect your 
-              information in accordance with this privacy policy.
+              Your information may be transferred to and processed in countries other than your own.
+              We ensure appropriate safeguards are in place to protect your information in
+              accordance with this privacy policy.
             </p>
           </section>
 
           <section className="legal-section">
             <h2>10. Changes to This Policy</h2>
             <p>
-              We may update this Privacy Policy from time to time. We will notify you of 
-              any changes by posting the new policy on this page and updating the "Last updated" 
-              date. Your continued use of our services after any changes indicates your 
-              acceptance of the updated policy.
+              We may update this Privacy Policy from time to time. We will notify you of any changes
+              by posting the new policy on this page and updating the &quot;Last updated&quot; date.
+              Your continued use of our services after any changes indicates your acceptance of the
+              updated policy.
             </p>
           </section>
 
@@ -136,8 +154,12 @@ function PrivacyPage(): JSX.Element {
             <h2>11. Contact Us</h2>
             <p>If you have any questions about this Privacy Policy, please contact us at:</p>
             <div className="contact-info">
-              <p><strong>Email:</strong> privacy@sacredvows.com</p>
-              <p><strong>Address:</strong> 123 Love Lane, Suite 100, San Francisco, CA 94102</p>
+              <p>
+                <strong>Email:</strong> privacy@sacredvows.com
+              </p>
+              <p>
+                <strong>Address:</strong> 123 Love Lane, Suite 100, San Francisco, CA 94102
+              </p>
             </div>
           </section>
         </div>
@@ -147,4 +169,3 @@ function PrivacyPage(): JSX.Element {
 }
 
 export default PrivacyPage;
-

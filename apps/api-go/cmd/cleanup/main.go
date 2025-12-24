@@ -59,7 +59,7 @@ func main() {
 	fmt.Printf("\n=== Cleanup Results ===\n")
 	fmt.Printf("Orphaned in DB: %d\n", len(output.OrphanedAssets.OrphanedInDB))
 	fmt.Printf("Orphaned in Storage: %d\n", len(output.OrphanedAssets.OrphanedInStorage))
-	
+
 	if *dryRun {
 		fmt.Printf("\n[DRY RUN] No files were deleted\n")
 	} else {
@@ -76,4 +76,3 @@ func main() {
 
 	logger.GetLogger().Info("Cleanup completed")
 }
-

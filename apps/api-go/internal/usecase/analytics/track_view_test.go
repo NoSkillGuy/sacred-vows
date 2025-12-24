@@ -39,4 +39,3 @@ func TestTrackViewUseCase_Execute_ValidView_TracksView(t *testing.T) {
 	// Assert
 	require.NoError(t, err, "Valid view tracking should not return error")
 }
-
