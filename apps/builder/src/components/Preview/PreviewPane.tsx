@@ -155,13 +155,7 @@ function PreviewPane({ editMode = true, deviceMode = "desktop" }) {
     }
 
     return sections;
-  }, [
-    currentInvitation.layoutConfig?.sections,
-    currentLayoutManifest,
-    layout,
-    getEnabledSections,
-    currentInvitation.layoutConfig,
-  ]);
+  }, [currentLayoutManifest, layout, getEnabledSections]);
 
   // Apply theme to CSS variables
   useEffect(() => {

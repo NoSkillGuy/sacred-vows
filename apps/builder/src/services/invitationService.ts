@@ -5,7 +5,6 @@
 
 import { apiRequest } from "./apiClient";
 import type {
-  InvitationData,
   // UniversalWeddingData removed - unused
   LayoutConfig,
 } from "@shared/types/wedding-data";

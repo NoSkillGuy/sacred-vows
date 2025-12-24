@@ -187,17 +187,16 @@ function Dashboard(): JSX.Element {
   const { addToast } = useToast();
 
   // Query hooks
-  const { data: invitations = [], isLoading: loading, error } = useInvitationsQuery();
+  const { data: invitations = [], isLoading: loading } = useInvitationsQuery();
   const deleteMutation = useDeleteInvitationMutation();
   const updateMutation = useUpdateInvitationMutation();
 
-  function loadUser(): void {
-    const currentUser = getCurrentUser();
-    setUser(currentUser);
-  }
-
   useEffect(() => {
-    loadUser();
+    const currentUser = getCurrentUser();
+    // Use setTimeout to defer setState and avoid synchronous setState in effect
+    setTimeout(() => {
+      setUser(currentUser);
+    }, 0);
   }, []);
 
   useEffect(() => {

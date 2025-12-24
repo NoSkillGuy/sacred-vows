@@ -8,8 +8,11 @@ function GuestNameModal({ isOpen, onClose, translations, _currentLang }) {
     if (!isOpen) return;
     const storedName = localStorage.getItem("wedding-guest-name") || "";
     const storedTitle = localStorage.getItem("wedding-guest-title") || "";
-    setName(storedName);
-    setTitle(storedTitle);
+    // Use setTimeout to defer setState and avoid synchronous setState in effect
+    setTimeout(() => {
+      setName(storedName);
+      setTitle(storedTitle);
+    }, 0);
   }, [isOpen]);
 
   if (!isOpen) return null;

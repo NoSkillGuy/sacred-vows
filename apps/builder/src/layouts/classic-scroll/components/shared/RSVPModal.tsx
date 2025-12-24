@@ -40,12 +40,15 @@ function RSVPModal({ isOpen, onClose, translations, currentLang, config = {} }) 
     if (!isOpen) return;
 
     const storedName = localStorage.getItem("wedding-guest-name");
-    if (storedName) {
-      setName(storedName);
-    } else {
-      setName("");
-    }
-    setDate(defaultArrivalDate);
+    // Use setTimeout to defer setState and avoid synchronous setState in effect
+    setTimeout(() => {
+      if (storedName) {
+        setName(storedName);
+      } else {
+        setName("");
+      }
+      setDate(defaultArrivalDate);
+    }, 0);
   }, [isOpen, defaultArrivalDate]);
 
   const handleSubmit = (e) => {

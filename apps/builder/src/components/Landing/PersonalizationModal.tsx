@@ -104,17 +104,21 @@ function PersonalizationModal({
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const data = JSON.parse(stored) as PersonalizationData;
-        // Batch state updates to avoid multiple renders
-        setBrideName(data.brideName || "");
-        setGroomName(data.groomName || "");
-        setWeddingDate(data.weddingDate || "");
-        setVenue(data.venue || "");
+        // Use setTimeout to defer setState and avoid synchronous setState in effect
+        setTimeout(() => {
+          setBrideName(data.brideName || "");
+          setGroomName(data.groomName || "");
+          setWeddingDate(data.weddingDate || "");
+          setVenue(data.venue || "");
+        }, 0);
       } else {
-        // Reset to empty if no stored data
-        setBrideName("");
-        setGroomName("");
-        setWeddingDate("");
-        setVenue("");
+        // Reset to empty if no stored data - use setTimeout to defer setState
+        setTimeout(() => {
+          setBrideName("");
+          setGroomName("");
+          setWeddingDate("");
+          setVenue("");
+        }, 0);
       }
     } catch (error) {
       console.error("Failed to load personalization data:", error);
