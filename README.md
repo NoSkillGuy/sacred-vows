@@ -1,16 +1,17 @@
-# Wedding Invitation - React Application
+# Sacred Vows
 
-A beautiful, modern wedding invitation PWA built with React and Vite.
+A modern wedding invitation builder platform that enables users to create, customize, and publish beautiful wedding invitations. Built as a monorepo with a React/Vite frontend, Go backend API, and Cloudflare Workers edge service.
 
 ## Features
 
-- 🎨 Modern, responsive design
-- 🌐 Multi-language support (English, Hindi, Telugu)
+- 🎨 Modern, responsive design system
+- 🏗️ Drag-and-drop invitation builder
+- 🌐 Multi-language support
 - 📱 Progressive Web App (PWA) with offline support
-- 🎵 Background music
-- 🎉 Celebration animations
-- 📧 RSVP via WhatsApp integration
-- 🗺️ Interactive venue map
+- 🔐 Secure authentication system
+- ☁️ Cloud-based asset storage and CDN delivery
+- 📊 Analytics and tracking
+- 🚀 Fast edge deployment via Cloudflare
 
 ## Development
 
@@ -69,27 +70,37 @@ npm run build
 
 ## Project Structure
 
+This is a monorepo containing multiple applications:
+
 ```
-wedding-invitation/
-├── public/           # Static assets and service worker
-├── src/
-│   ├── components/  # React components
-│   ├── hooks/       # Custom React hooks
-│   ├── styles/      # CSS styles
-│   └── utils/       # Utility functions
-├── .github/
-│   └── workflows/   # GitHub Actions workflows
-└── dist/            # Build output (generated)
+sacred-vows/
+├── apps/
+│   ├── builder/          # React/Vite frontend builder application
+│   ├── api-go/           # Go backend API server
+│   └── edge-worker/      # Cloudflare Workers edge service
+├── docs/                 # Comprehensive project documentation
+├── infra/                # Terraform infrastructure as code
+├── docker/               # Docker configurations
+└── scripts/              # Utility scripts
 ```
 
 ## Technologies
 
-- React 18
-- Vite
-- Vite PWA Plugin
-- CSS3 with CSS Variables
+- **Frontend**: React 18, TypeScript, Vite
+- **Backend**: Go (Golang)
+- **Edge**: Cloudflare Workers
+- **Infrastructure**: Terraform, Docker
+- **Storage**: Cloudflare R2, Firestore
+
+## Documentation
+
+Comprehensive documentation is available in the [`docs/`](./docs/) directory. Start with the [Getting Started Guide](./docs/getting-started/README.md).
+
+## Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
 
 ## License
 
-ISC
+ISC - See [LICENSE](./LICENSE) file for details.
 
