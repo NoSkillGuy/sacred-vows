@@ -12,10 +12,10 @@ import (
 )
 
 type mailgunService struct {
-	client              *mailgun.MailgunImpl
-	fromEmail           string
-	fromName            string
-	passwordResetTmpl   *template.Template
+	client                *mailgun.MailgunImpl
+	fromEmail             string
+	fromName              string
+	passwordResetTmpl     *template.Template
 	passwordChangeOTPTmpl *template.Template
 }
 
@@ -51,10 +51,10 @@ func NewMailgunService(cfg config.EmailVendorConfig) (emailInterface.EmailServic
 	}
 
 	return &mailgunService{
-		client:              mg,
-		fromEmail:           cfg.FromAddress,
-		fromName:            cfg.FromName,
-		passwordResetTmpl:   passwordResetTmpl,
+		client:                mg,
+		fromEmail:             cfg.FromAddress,
+		fromName:              cfg.FromName,
+		passwordResetTmpl:     passwordResetTmpl,
 		passwordChangeOTPTmpl: passwordChangeOTPTmpl,
 	}, nil
 }
@@ -126,4 +126,3 @@ func (s *mailgunService) SendPasswordChangeOTPEmail(ctx context.Context, toEmail
 
 	return nil
 }
-

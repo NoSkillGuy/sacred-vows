@@ -9,8 +9,8 @@ import (
 )
 
 type DeleteInvitationUseCase struct {
-	invitationRepo    repository.InvitationRepository
-	assetRepo         repository.AssetRepository
+	invitationRepo       repository.InvitationRepository
+	assetRepo            repository.AssetRepository
 	deleteAssetsByURLsUC *asset.DeleteAssetsByURLsUseCase
 }
 

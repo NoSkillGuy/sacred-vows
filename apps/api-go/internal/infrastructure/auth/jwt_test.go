@@ -72,4 +72,3 @@ func TestJWTService_GenerateRefreshToken_ValidInput_ReturnsToken(t *testing.T) {
 	assert.NotEmpty(t, tokenID, "Token ID should not be empty")
 	assert.NotEmpty(t, token, "Token should not be empty")
 }
-

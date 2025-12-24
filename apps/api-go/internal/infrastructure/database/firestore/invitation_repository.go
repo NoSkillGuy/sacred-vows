@@ -127,6 +127,3 @@ func (r *invitationRepository) docToInvitation(doc *firestore.DocumentSnapshot) 
 
 	return invitation, nil
 }
-
-
-

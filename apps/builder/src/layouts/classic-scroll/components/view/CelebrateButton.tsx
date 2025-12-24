@@ -19,4 +19,3 @@ function CelebrateButton() {
 }
 
 export default CelebrateButton;
-

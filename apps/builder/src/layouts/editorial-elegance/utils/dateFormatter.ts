@@ -9,27 +9,29 @@
  * @param locale - Locale for formatting (default: 'en-US')
  * @returns Formatted date string or fallback text
  */
-export function formatWeddingDate(dateStr: string | Date, locale: string = 'en-US'): string {
-  if (!dateStr || dateStr === 'Date TBD' || dateStr === '') {
-    return '';
+export function formatWeddingDate(dateStr: string | Date, locale: string = "en-US"): string {
+  if (!dateStr || dateStr === "Date TBD" || dateStr === "") {
+    return "";
   }
 
   try {
-    const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr;
-    
+    const date = typeof dateStr === "string" ? new Date(dateStr) : dateStr;
+
     // Check if date is valid
     if (isNaN(date.getTime())) {
-      return '';
+      return "";
     }
 
-    return date.toLocaleDateString(locale, {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    }).toUpperCase();
+    return date
+      .toLocaleDateString(locale, {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
+      .toUpperCase();
   } catch (error) {
-    console.warn('Date formatting error:', error, dateStr);
-    return '';
+    console.warn("Date formatting error:", error, dateStr);
+    return "";
   }
 }
 
@@ -39,7 +41,7 @@ export function formatWeddingDate(dateStr: string | Date, locale: string = 'en-U
  * @param locale - Locale for formatting (default: 'en-US')
  * @returns Formatted date string or fallback text
  */
-export function formatEventDate(dateStr: string | Date, locale: string = 'en-US'): string {
+export function formatEventDate(dateStr: string | Date, locale: string = "en-US"): string {
   return formatWeddingDate(dateStr, locale);
 }
 
@@ -50,12 +52,11 @@ export function formatEventDate(dateStr: string | Date, locale: string = 'en-US'
  */
 export function isValidDate(dateStr: string | Date | null | undefined): boolean {
   if (!dateStr) return false;
-  
+
   try {
-    const date = typeof dateStr === 'string' ? new Date(dateStr) : dateStr;
+    const date = typeof dateStr === "string" ? new Date(dateStr) : dateStr;
     return !isNaN(date.getTime());
   } catch {
     return false;
   }
 }
-

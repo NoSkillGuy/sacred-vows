@@ -22,7 +22,7 @@ type GetAssetsByURLsInput struct {
 }
 
 type GetAssetsByURLsOutput struct {
-	Count int
+	Count  int
 	Assets []*AssetDTO
 }
 
@@ -42,4 +42,3 @@ func (uc *GetAssetsByURLsUseCase) Execute(ctx context.Context, input GetAssetsBy
 		Assets: dtos,
 	}, nil
 }
-

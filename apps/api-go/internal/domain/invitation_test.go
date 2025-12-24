@@ -71,4 +71,3 @@ func TestNewInvitation_ValidData_ReturnsInvitation(t *testing.T) {
 	assert.Equal(t, userID, invitation.UserID, "User ID should match")
 	assert.Equal(t, data, invitation.Data, "Data should match")
 }
-

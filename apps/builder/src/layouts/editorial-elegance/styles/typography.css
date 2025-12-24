@@ -6,17 +6,17 @@
   --ee-text-subheading: clamp(20px, 2.8vw, 28px);
   --ee-text-body: 18px;
   --ee-text-meta: 13px;
-  
+
   /* Letter Spacing - Refined for elegance */
   --ee-spacing-meta: 0.12em; /* Uppercase dates/labels - slightly more generous */
   --ee-spacing-heading: -0.03em; /* Tighter for serifs */
   --ee-spacing-hero: -0.04em; /* Extra tight for hero names */
-  
+
   /* Line Height - Improved readability */
   --ee-line-editorial: 1.65; /* Body text - more breathing room */
   --ee-line-heading: 1.15; /* Headlines - tighter */
   --ee-line-hero: 1.1; /* Hero names - very tight */
-  
+
   /* Font Weights */
   --ee-weight-light: 300;
   --ee-weight-regular: 400;
@@ -26,7 +26,7 @@
 
 .editorial-elegance {
   /* Base body text */
-  font-family: var(--font-body, 'Inter', sans-serif);
+  font-family: var(--font-body, "Inter", sans-serif);
   font-size: var(--ee-text-body);
   line-height: var(--ee-line-editorial);
   font-weight: var(--ee-weight-regular);
@@ -35,16 +35,18 @@
 
 /* Heading Typography */
 .ee-hero-names {
-  font-family: var(--font-heading, 'Playfair Display', serif);
+  font-family: var(--font-heading, "Playfair Display", serif);
   font-size: var(--ee-text-hero);
   line-height: var(--ee-line-hero);
   letter-spacing: var(--ee-spacing-hero);
   font-weight: var(--ee-weight-regular);
-  font-feature-settings: "liga" 1, "kern" 1;
+  font-feature-settings:
+    "liga" 1,
+    "kern" 1;
 }
 
 .ee-section-heading {
-  font-family: var(--font-heading, 'Playfair Display', serif);
+  font-family: var(--font-heading, "Playfair Display", serif);
   font-size: var(--ee-text-section-heading);
   line-height: var(--ee-line-heading);
   letter-spacing: var(--ee-spacing-heading);
@@ -53,7 +55,7 @@
 
 /* Meta text (dates, labels) */
 .ee-meta-text {
-  font-family: var(--font-body, 'Inter', sans-serif);
+  font-family: var(--font-body, "Inter", sans-serif);
   font-size: var(--ee-text-meta);
   text-transform: uppercase;
   letter-spacing: var(--ee-spacing-meta);
@@ -64,7 +66,7 @@
 
 /* Editorial intro paragraph */
 .ee-editorial-intro {
-  font-family: var(--font-heading, 'Playfair Display', serif);
+  font-family: var(--font-heading, "Playfair Display", serif);
   font-size: var(--ee-text-subheading);
   line-height: 1.75;
   font-weight: var(--ee-weight-light);
@@ -85,4 +87,3 @@
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
-
