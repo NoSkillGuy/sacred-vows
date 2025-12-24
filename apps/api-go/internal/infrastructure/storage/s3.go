@@ -17,11 +17,11 @@ import (
 
 // S3Storage implements Storage and SignedURLStorage using S3-compatible storage (MinIO, R2, etc.)
 type S3Storage struct {
-	client         *s3.Client
-	presignClient  *s3.PresignClient // Separate client for presigned URLs with public endpoint
-	bucketName     string
-	maxFileSize    int64
-	allowedTypes   []string
+	client        *s3.Client
+	presignClient *s3.PresignClient // Separate client for presigned URLs with public endpoint
+	bucketName    string
+	maxFileSize   int64
+	allowedTypes  []string
 }
 
 type S3Config struct {
@@ -183,4 +183,3 @@ func (s *S3Storage) ValidateFile(mimeType string, size int64) error {
 
 	return nil
 }
-

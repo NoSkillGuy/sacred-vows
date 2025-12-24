@@ -8,19 +8,19 @@ import (
 
 	"github.com/sacred-vows/api-go/internal/domain"
 	"github.com/sacred-vows/api-go/internal/infrastructure/auth"
-	emailInterface "github.com/sacred-vows/api-go/internal/interfaces/email"
 	"github.com/sacred-vows/api-go/internal/interfaces/clock"
+	emailInterface "github.com/sacred-vows/api-go/internal/interfaces/email"
 	"github.com/sacred-vows/api-go/internal/interfaces/repository"
 	"github.com/sacred-vows/api-go/pkg/errors"
 	"github.com/segmentio/ksuid"
 )
 
 type RequestPasswordResetUseCase struct {
-	userRepo    repository.UserRepository
-	tokenRepo   repository.PasswordResetRepository
+	userRepo     repository.UserRepository
+	tokenRepo    repository.PasswordResetRepository
 	emailService emailInterface.EmailService
-	clock       clock.Clock
-	frontendURL string
+	clock        clock.Clock
+	frontendURL  string
 }
 
 func NewRequestPasswordResetUseCase(
@@ -106,4 +106,3 @@ func (uc *RequestPasswordResetUseCase) Execute(ctx context.Context, input Reques
 	// Always return success (security best practice - don't reveal if email exists)
 	return &RequestPasswordResetOutput{Success: true}, nil
 }
-

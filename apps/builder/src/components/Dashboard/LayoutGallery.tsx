@@ -1,56 +1,80 @@
-import { useState, useEffect, useRef, MouseEvent } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { getCurrentUser, logout, type User } from '../../services/authService';
-import type { LayoutManifest } from '@shared/types/layout';
-import LayoutCardUnified from '../Layouts/LayoutCardUnified';
-import { useLayoutsQuery } from '../../hooks/queries/useLayouts';
-import { useCreateInvitationMutation } from '../../hooks/queries/useInvitations';
-import './Dashboard.css';
+import { useState, useEffect, useRef, MouseEvent } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { getCurrentUser, logout, type User } from "../../services/authService";
+import type { LayoutManifest } from "@shared/types/layout";
+import LayoutCardUnified from "../Layouts/LayoutCardUnified";
+import { useLayoutsQuery } from "../../hooks/queries/useLayouts";
+import { useCreateInvitationMutation } from "../../hooks/queries/useInvitations";
+import "./Dashboard.css";
 
 // SVG Icons
 const RingsIcon = (): JSX.Element => (
   <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="20" cy="20" r="12" stroke="currentColor" strokeWidth="2.5" fill="none"/>
-    <circle cx="20" cy="8" r="3" fill="currentColor"/>
-    <path d="M17 8L20 3L23 8" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+    <circle cx="20" cy="20" r="12" stroke="currentColor" strokeWidth="2.5" fill="none" />
+    <circle cx="20" cy="8" r="3" fill="currentColor" />
+    <path d="M17 8L20 3L23 8" stroke="currentColor" strokeWidth="1.5" fill="none" />
   </svg>
 );
 
-const StarIcon = (): JSX.Element => (
-  <svg viewBox="0 0 24 24" fill="currentColor">
-    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-  </svg>
-);
+// StarIcon removed - unused
 
 const LayoutIcon = (): JSX.Element => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="3" width="18" height="18" rx="2"/>
-    <path d="M3 9h18"/>
-    <path d="M9 21V9"/>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="3" y="3" width="18" height="18" rx="2" />
+    <path d="M3 9h18" />
+    <path d="M9 21V9" />
   </svg>
 );
 
 const ProfileIcon = (): JSX.Element => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-    <circle cx="12" cy="7" r="4"/>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="7" r="4" />
   </svg>
 );
 
 const LogoutIcon = (): JSX.Element => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-    <polyline points="16 17 21 12 16 7"/>
-    <line x1="21" y1="12" x2="9" y2="12"/>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+    <polyline points="16 17 21 12 16 7" />
+    <line x1="21" y1="12" x2="9" y2="12" />
   </svg>
 );
 
 const DashboardIcon = (): JSX.Element => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="3" y="3" width="7" height="9"/>
-    <rect x="14" y="3" width="7" height="5"/>
-    <rect x="14" y="12" width="7" height="9"/>
-    <rect x="3" y="16" width="7" height="5"/>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="3" y="3" width="7" height="9" />
+    <rect x="14" y="3" width="7" height="5" />
+    <rect x="14" y="12" width="7" height="9" />
+    <rect x="3" y="16" width="7" height="5" />
   </svg>
 );
 
@@ -61,7 +85,7 @@ interface LayoutWithStatus extends LayoutManifest {
 
 function LayoutGallery(): JSX.Element {
   const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [creating, setCreating] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -74,13 +98,15 @@ function LayoutGallery(): JSX.Element {
     error: queryError,
     refetch,
   } = useLayoutsQuery({
-    category: selectedCategory !== 'all' ? selectedCategory : undefined,
+    category: selectedCategory !== "all" ? selectedCategory : undefined,
   });
   const createMutation = useCreateInvitationMutation();
 
   const layouts = layoutsData?.layouts || [];
-  const categories = layoutsData?.categories || ['all'];
-  const error = queryError ? (queryError as Error).message || 'Failed to load layouts. Please try again.' : null;
+  const categories = layoutsData?.categories || ["all"];
+  const error = queryError
+    ? (queryError as Error).message || "Failed to load layouts. Please try again."
+    : null;
 
   useEffect(() => {
     loadUser();
@@ -92,8 +118,8 @@ function LayoutGallery(): JSX.Element {
         setDropdownOpen(false);
       }
     }
-    document.addEventListener('mousedown', handleClickOutside as EventListener);
-    return () => document.removeEventListener('mousedown', handleClickOutside as EventListener);
+    document.addEventListener("mousedown", handleClickOutside as EventListener);
+    return () => document.removeEventListener("mousedown", handleClickOutside as EventListener);
   }, []);
 
   function loadUser(): void {
@@ -103,30 +129,31 @@ function LayoutGallery(): JSX.Element {
 
   async function handleSelectLayout(layout: LayoutWithStatus): Promise<void> {
     if (!layout.isAvailable) return;
-    
+
     try {
       setCreating(layout.id);
-      
+
       // Initialize data with layout-specific defaults if available
       let initialData: Record<string, unknown> = {};
-      if (layout.id === 'editorial-elegance') {
+      if (layout.id === "editorial-elegance") {
         try {
-          const { editorialEleganceDefaults } = await import('../../layouts/editorial-elegance/defaults');
+          const { editorialEleganceDefaults } =
+            await import("../../layouts/editorial-elegance/defaults");
           initialData = editorialEleganceDefaults as Record<string, unknown>;
         } catch (error) {
-          console.warn('Failed to load editorial-elegance defaults for new invitation:', error);
+          console.warn("Failed to load editorial-elegance defaults for new invitation:", error);
         }
       }
-      
+
       const invitation = await createMutation.mutateAsync({
         layoutId: layout.id,
-        title: 'My Wedding Invitation',
+        title: "My Wedding Invitation",
         data: initialData as never,
       });
       navigate(`/builder/${invitation.id}`);
     } catch (error) {
-      console.error('Failed to create invitation:', error);
-      alert('Failed to create invitation. Please try again.');
+      console.error("Failed to create invitation:", error);
+      alert("Failed to create invitation. Please try again.");
     } finally {
       setCreating(null);
     }
@@ -134,12 +161,17 @@ function LayoutGallery(): JSX.Element {
 
   function handleLogout(): void {
     logout();
-    navigate('/login');
+    navigate("/login");
   }
 
   function getInitials(name?: string): string {
-    if (!name) return '?';
-    return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    if (!name) return "?";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
   }
 
   if (loading) {
@@ -170,27 +202,28 @@ function LayoutGallery(): JSX.Element {
               <span className="header-logo-text">Sacred Vows</span>
             </Link>
           </div>
-          
+
           <div className="header-actions">
             <Link to="/dashboard" className="btn btn-secondary">
               <DashboardIcon />
               <span>My Invitations</span>
             </Link>
-            
+
             <div className="user-menu" ref={dropdownRef}>
-              <div 
-                className="user-avatar"
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-              >
+              <div className="user-avatar" onClick={() => setDropdownOpen(!dropdownOpen)}>
                 {getInitials(user?.name)}
               </div>
-              
-              <div className={`user-dropdown ${dropdownOpen ? 'open' : ''}`}>
+
+              <div className={`user-dropdown ${dropdownOpen ? "open" : ""}`}>
                 <div className="user-dropdown-header">
-                  <div className="user-dropdown-name">{user?.name || 'Guest'}</div>
-                  <div className="user-dropdown-email">{user?.email || ''}</div>
+                  <div className="user-dropdown-name">{user?.name || "Guest"}</div>
+                  <div className="user-dropdown-email">{user?.email || ""}</div>
                 </div>
-                <Link to="/profile" className="user-dropdown-item" onClick={() => setDropdownOpen(false)}>
+                <Link
+                  to="/profile"
+                  className="user-dropdown-item"
+                  onClick={() => setDropdownOpen(false)}
+                >
                   <ProfileIcon />
                   Profile
                 </Link>
@@ -207,8 +240,8 @@ function LayoutGallery(): JSX.Element {
         <div className="gallery-intro">
           <h2>Choose Your Perfect Layout</h2>
           <p>
-            Select from our beautifully crafted wedding invitation layouts. 
-            Each design is customizable to match your unique love story.
+            Select from our beautifully crafted wedding invitation layouts. Each design is
+            customizable to match your unique love story.
           </p>
         </div>
 
@@ -217,7 +250,7 @@ function LayoutGallery(): JSX.Element {
           {categories.map((category) => (
             <button
               key={category}
-              className={`category-tab ${selectedCategory === category ? 'active' : ''}`}
+              className={`category-tab ${selectedCategory === category ? "active" : ""}`}
               onClick={() => setSelectedCategory(category)}
             >
               {category}
@@ -253,13 +286,15 @@ function LayoutGallery(): JSX.Element {
           <div className="layout-grid">
             {layouts.map((layout) => {
               const isCreating = creating === layout.id;
-              const isReady = layout.status === 'ready' || layout.isAvailable;
+              const isReady = layout.status === "ready" || layout.isAvailable;
               return (
                 <LayoutCardUnified
                   key={layout.id}
                   layout={layout}
                   onPrimaryAction={handleSelectLayout}
-                  primaryLabel={isCreating ? 'Creating...' : isReady ? 'Select Layout' : 'Coming Soon'}
+                  primaryLabel={
+                    isCreating ? "Creating..." : isReady ? "Select Layout" : "Coming Soon"
+                  }
                   primaryDisabled={!isReady || isCreating}
                   primaryLoading={isCreating}
                 />
@@ -273,4 +308,3 @@ function LayoutGallery(): JSX.Element {
 }
 
 export default LayoutGallery;
-

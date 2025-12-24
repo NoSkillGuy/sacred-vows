@@ -106,4 +106,3 @@ func TestDeleteUserUseCase_Execute_DeleteError_ReturnsError(t *testing.T) {
 	// Assert
 	require.Error(t, err, "Repository error on Delete should return error")
 }
-

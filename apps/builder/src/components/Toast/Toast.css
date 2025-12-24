@@ -55,7 +55,7 @@
 }
 
 .toast-title {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-weight: 600;
   font-size: 1rem;
   line-height: 1.35;
@@ -63,7 +63,7 @@
 }
 
 .toast-description {
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   font-size: 0.9rem;
   line-height: 1.5;
   color: var(--text-muted);

@@ -1,6 +1,6 @@
-import { useMemo } from 'react';
+import { useMemo } from "react";
 
-const petalColors = ['#f5d0d3', '#e8b4b8', '#fce4e2', '#d4969c', '#c9a1a6'];
+const petalColors = ["#f5d0d3", "#e8b4b8", "#fce4e2", "#d4969c", "#c9a1a6"];
 
 interface Petal {
   id: number;
@@ -24,4 +24,3 @@ const generatePetals = (count: number = 10): Petal[] =>
 export function usePetals(count: number = 10): Petal[] {
   return useMemo(() => generatePetals(count), [count]);
 }
-

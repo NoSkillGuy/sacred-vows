@@ -152,4 +152,3 @@ func TestCreateInvitationUseCase_Execute_DefaultLayoutID(t *testing.T) {
 		t.Errorf("Expected LayoutID to default to 'classic-scroll', got '%s'", savedInvitation.LayoutID)
 	}
 }
-

@@ -1,17 +1,17 @@
-import { useEffect, useMemo, useState, ReactElement, KeyboardEvent } from 'react';
-import { Link } from 'react-router-dom';
-import ThemeModal from '../Toolbar/ThemeModal';
-import GalleryModal from '../Toolbar/GalleryModal';
-import LayoutSwitcher from '../Toolbar/LayoutSwitcher';
-import PublishModal from '../Export/ExportModal';
-import SectionManager from '../SectionManager/SectionManager';
-import { useBuilderStore } from '../../store/builderStore';
-import SidebarSection from './SidebarSection';
-import './BuilderSidebar.css';
+import { useEffect, useMemo, useState, ReactElement, KeyboardEvent } from "react";
+import { Link } from "react-router-dom";
+import ThemeModal from "../Toolbar/ThemeModal";
+import GalleryModal from "../Toolbar/GalleryModal";
+import LayoutSwitcher from "../Toolbar/LayoutSwitcher";
+import PublishModal from "../Export/ExportModal";
+import SectionManager from "../SectionManager/SectionManager";
+import { useBuilderStore } from "../../store/builderStore";
+import SidebarSection from "./SidebarSection";
+import "./BuilderSidebar.css";
 
-const STORAGE_KEY = 'builder.sidebarCollapsed';
+const STORAGE_KEY = "builder.sidebarCollapsed";
 
-type DeviceMode = 'desktop' | 'tablet' | 'mobile';
+type DeviceMode = "desktop" | "tablet" | "mobile";
 
 // Icons (copied from Toolbar for now; keeps the refactor low-risk)
 const RingsIcon = (): ReactElement => (
@@ -138,7 +138,14 @@ const RocketIcon = (): ReactElement => (
 );
 
 const BackIcon = (): ReactElement => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     <polyline points="15 18 9 12 15 6" />
   </svg>
 );
@@ -148,32 +155,50 @@ interface CollapseIconProps {
 }
 
 const CollapseIcon = ({ collapsed }: CollapseIconProps): ReactElement => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
     {collapsed ? <polyline points="9 18 15 12 9 6" /> : <polyline points="15 18 9 12 15 6" />}
   </svg>
 );
 
-type AutosaveStatusType = 'idle' | 'saving' | 'saved';
+type AutosaveStatusType = "idle" | "saving" | "saved";
 
 function AutosaveStatus(): ReactElement {
   const saving = useBuilderStore((state) => state.saving);
   const lastSavedAt = useBuilderStore((state) => state.lastSavedAt);
-  const [status, setStatus] = useState<AutosaveStatusType>('idle');
+  const [showSaved, setShowSaved] = useState(false);
 
+  // Derive status from props
+  const status = useMemo<AutosaveStatusType>(() => {
+    if (saving) return "saving";
+    if (lastSavedAt && showSaved) return "saved";
+    return "idle";
+  }, [saving, lastSavedAt, showSaved]);
+
+  // Show "saved" status for 2 seconds when lastSavedAt changes
   useEffect(() => {
-    if (saving) {
-      setStatus('saving');
-      return;
+    if (lastSavedAt && !saving) {
+      // Use setTimeout to defer setState and avoid synchronous setState in effect
+      const showTimer = setTimeout(() => {
+        setShowSaved(true);
+      }, 0);
+      const hideTimer = setTimeout(() => {
+        setShowSaved(false);
+      }, 2000);
+      return () => {
+        clearTimeout(showTimer);
+        clearTimeout(hideTimer);
+      };
     }
-    if (lastSavedAt) {
-      setStatus('saved');
-      const timer = setTimeout(() => setStatus('idle'), 2000);
-      return () => clearTimeout(timer);
-    }
-    setStatus('idle');
-  }, [saving, lastSavedAt]);
+  }, [lastSavedAt, saving]);
 
-  const label = status === 'saving' ? 'Saving…' : status === 'saved' ? 'Saved' : 'Auto-save';
+  const label = status === "saving" ? "Saving…" : status === "saved" ? "Saved" : "Auto-save";
 
   return (
     <div className={`autosave-status autosave-${status}`} title={label} aria-live="polite">
@@ -196,39 +221,83 @@ interface BuilderSidebarProps {
   onDeviceModeChange: (mode: DeviceMode) => void;
 }
 
-export default function BuilderSidebar({ editMode, onEditModeToggle, deviceMode, onDeviceModeChange }: BuilderSidebarProps): ReactElement {
+// DrawerControls component - moved outside render to avoid recreation
+interface DrawerControlsProps {
+  onClose: () => void;
+}
+
+const DrawerControls = ({ onClose }: DrawerControlsProps): ReactElement => (
+  <div className="sidebar-drawer-controls">
+    <button
+      type="button"
+      className="sidebar-icon-btn"
+      onClick={onClose}
+      title="Close sidebar"
+      aria-label="Close sidebar"
+    >
+      <BackIcon />
+    </button>
+    <div className="sidebar-brand" title="Sacred Vows">
+      <span className="brand-icon" aria-hidden="true">
+        <RingsIcon />
+      </span>
+      <span className="brand-text">Sacred Vows</span>
+    </div>
+    <div className="sidebar-spacer" />
+  </div>
+);
+
+export default function BuilderSidebar({
+  editMode,
+  onEditModeToggle,
+  deviceMode,
+  onDeviceModeChange,
+}: BuilderSidebarProps): ReactElement {
   const [showThemeModal, setShowThemeModal] = useState<boolean>(false);
   const [showGalleryModal, setShowGalleryModal] = useState<boolean>(false);
   const [showPublishModal, setShowPublishModal] = useState<boolean>(false);
   const [showSectionManager, setShowSectionManager] = useState<boolean>(false);
   const [showLayoutSwitcher, setShowLayoutSwitcher] = useState<boolean>(false);
 
-  const [collapsed, setCollapsed] = useState<boolean>(false);
+  const [collapsed, setCollapsed] = useState<boolean>(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw === "true";
+    } catch {
+      return false;
+    }
+  });
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
-  const [openKey, setOpenKey] = useState<string>('configure');
+  const [openKey, setOpenKey] = useState<string>("configure");
 
   useEffect(() => {
-    const mq = window.matchMedia?.('(max-width: 768px)');
+    const mq = window.matchMedia?.("(max-width: 768px)");
     if (!mq) return;
     const apply = () => setIsMobile(Boolean(mq.matches));
     apply();
-    mq.addEventListener?.('change', apply);
-    return () => mq.removeEventListener?.('change', apply);
+    mq.addEventListener?.("change", apply);
+    return () => mq.removeEventListener?.("change", apply);
   }, []);
 
+  // Close drawer when exiting mobile mode
   useEffect(() => {
-    // If we exit mobile, ensure drawer is closed.
-    if (!isMobile) setDrawerOpen(false);
-  }, [isMobile]);
+    if (!isMobile && drawerOpen) {
+      // Use setTimeout to defer setState and avoid synchronous setState in effect
+      const timer = setTimeout(() => {
+        setDrawerOpen(false);
+      }, 0);
+      return () => clearTimeout(timer);
+    }
+  }, [isMobile, drawerOpen]);
 
   useEffect(() => {
     if (!drawerOpen) return;
     const onKeyDown = (e: KeyboardEvent): void => {
-      if (e.key === 'Escape') setDrawerOpen(false);
+      if (e.key === "Escape") setDrawerOpen(false);
     };
-    window.addEventListener('keydown', onKeyDown as EventListener);
-    return () => window.removeEventListener('keydown', onKeyDown as EventListener);
+    window.addEventListener("keydown", onKeyDown as EventListener);
+    return () => window.removeEventListener("keydown", onKeyDown as EventListener);
   }, [drawerOpen]);
 
   useEffect(() => {
@@ -236,25 +305,18 @@ export default function BuilderSidebar({ editMode, onEditModeToggle, deviceMode,
     if (!isMobile) return;
     if (!drawerOpen) return;
     const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = previousOverflow;
     };
   }, [drawerOpen, isMobile]);
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw === 'true') setCollapsed(true);
-    } catch {
-      // ignore
-    }
-  }, []);
+  // Collapsed state is initialized from localStorage in useState initializer above
 
   useEffect(() => {
     try {
       // Don't persist the forced mobile collapse; only persist the user's desktop preference.
-      if (!isMobile) localStorage.setItem(STORAGE_KEY, collapsed ? 'true' : 'false');
+      if (!isMobile) localStorage.setItem(STORAGE_KEY, collapsed ? "true" : "false");
     } catch {
       // ignore
     }
@@ -262,46 +324,65 @@ export default function BuilderSidebar({ editMode, onEditModeToggle, deviceMode,
 
   const sections = useMemo<Section[]>(
     () => [
-      { key: 'mode', title: 'Mode', icon: <span className="icon-wrap"><EditIcon /></span> },
-      { key: 'device', title: 'Device', icon: <span className="icon-wrap"><DesktopIcon /></span> },
-      { key: 'configure', title: 'Configure', icon: <span className="icon-wrap"><LayoutIcon /></span> },
-      { key: 'publish', title: 'Publish', icon: <span className="icon-wrap"><RocketIcon /></span> },
+      {
+        key: "mode",
+        title: "Mode",
+        icon: (
+          <span className="icon-wrap">
+            <EditIcon />
+          </span>
+        ),
+      },
+      {
+        key: "device",
+        title: "Device",
+        icon: (
+          <span className="icon-wrap">
+            <DesktopIcon />
+          </span>
+        ),
+      },
+      {
+        key: "configure",
+        title: "Configure",
+        icon: (
+          <span className="icon-wrap">
+            <LayoutIcon />
+          </span>
+        ),
+      },
+      {
+        key: "publish",
+        title: "Publish",
+        icon: (
+          <span className="icon-wrap">
+            <RocketIcon />
+          </span>
+        ),
+      },
     ],
-    [],
+    []
   );
 
   const toggleSection = (key: string): void => {
-    setOpenKey((prev) => (prev === key ? '' : key));
+    setOpenKey((prev) => (prev === key ? "" : key));
   };
 
   const effectiveCollapsed = collapsed || isMobile;
 
-  const DrawerControls = (): ReactElement => (
-    <div className="sidebar-drawer-controls">
-      <button
-        type="button"
-        className="sidebar-icon-btn"
-        onClick={() => setDrawerOpen(false)}
-        title="Close sidebar"
-        aria-label="Close sidebar"
-      >
-        <BackIcon />
-      </button>
-      <div className="sidebar-brand" title="Sacred Vows">
-        <span className="brand-icon" aria-hidden="true">
-          <RingsIcon />
-        </span>
-        <span className="brand-text">Sacred Vows</span>
-      </div>
-      <div className="sidebar-spacer" />
-    </div>
-  );
-
   return (
     <>
-      <aside className={`builder-sidebar ${effectiveCollapsed ? 'is-collapsed' : ''}`} aria-label="Builder sidebar">
+      <aside
+        className={`builder-sidebar ${effectiveCollapsed ? "is-collapsed" : ""}`}
+        aria-label="Builder sidebar"
+      >
         <div className="sidebar-top">
-          <Link to="/dashboard" className="sidebar-icon-btn" title="Back to Dashboard" aria-label="Back to Dashboard">
+          <Link
+            to="/dashboard"
+            className="sidebar-icon-btn"
+            title="Back to Dashboard"
+            aria-label="Back to Dashboard"
+          >
             <BackIcon />
           </Link>
 
@@ -326,8 +407,12 @@ export default function BuilderSidebar({ editMode, onEditModeToggle, deviceMode,
               }
               setCollapsed((v) => !v);
             }}
-            title={isMobile ? 'Open sidebar' : effectiveCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            aria-label={isMobile ? 'Open sidebar' : effectiveCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            title={
+              isMobile ? "Open sidebar" : effectiveCollapsed ? "Expand sidebar" : "Collapse sidebar"
+            }
+            aria-label={
+              isMobile ? "Open sidebar" : effectiveCollapsed ? "Expand sidebar" : "Collapse sidebar"
+            }
           >
             <CollapseIcon collapsed={effectiveCollapsed} />
           </button>
@@ -347,29 +432,29 @@ export default function BuilderSidebar({ editMode, onEditModeToggle, deviceMode,
               onToggle={() => toggleSection(s.key)}
               collapsed={effectiveCollapsed}
             >
-              {s.key === 'mode' && (
+              {s.key === "mode" && (
                 <div className="sidebar-actions">
                   <button
                     type="button"
-                    className={`sidebar-btn ${editMode ? 'active' : ''}`}
+                    className={`sidebar-btn ${editMode ? "active" : ""}`}
                     onClick={onEditModeToggle}
-                    title={editMode ? 'Switch to Preview Mode' : 'Switch to Edit Mode'}
+                    title={editMode ? "Switch to Preview Mode" : "Switch to Edit Mode"}
                   >
                     <span className="btn-icon" aria-hidden="true">
                       {editMode ? <EditIcon /> : <EyeIcon />}
                     </span>
-                    <span className="btn-label">{editMode ? 'Editing' : 'Preview'}</span>
+                    <span className="btn-label">{editMode ? "Editing" : "Preview"}</span>
                   </button>
                 </div>
               )}
 
-              {s.key === 'device' && (
+              {s.key === "device" && (
                 <div className="sidebar-actions">
                   <div className="sidebar-segmented" role="group" aria-label="Device preview">
                     <button
                       type="button"
-                      className={`seg-btn ${deviceMode === 'desktop' ? 'active' : ''}`}
-                      onClick={() => onDeviceModeChange('desktop')}
+                      className={`seg-btn ${deviceMode === "desktop" ? "active" : ""}`}
+                      onClick={() => onDeviceModeChange("desktop")}
                       title="Desktop Preview"
                       aria-label="Desktop Preview"
                     >
@@ -377,8 +462,8 @@ export default function BuilderSidebar({ editMode, onEditModeToggle, deviceMode,
                     </button>
                     <button
                       type="button"
-                      className={`seg-btn ${deviceMode === 'tablet' ? 'active' : ''}`}
-                      onClick={() => onDeviceModeChange('tablet')}
+                      className={`seg-btn ${deviceMode === "tablet" ? "active" : ""}`}
+                      onClick={() => onDeviceModeChange("tablet")}
                       title="Tablet Preview"
                       aria-label="Tablet Preview"
                     >
@@ -386,8 +471,8 @@ export default function BuilderSidebar({ editMode, onEditModeToggle, deviceMode,
                     </button>
                     <button
                       type="button"
-                      className={`seg-btn ${deviceMode === 'mobile' ? 'active' : ''}`}
-                      onClick={() => onDeviceModeChange('mobile')}
+                      className={`seg-btn ${deviceMode === "mobile" ? "active" : ""}`}
+                      onClick={() => onDeviceModeChange("mobile")}
                       title="Mobile Preview"
                       aria-label="Mobile Preview"
                     >
@@ -397,27 +482,43 @@ export default function BuilderSidebar({ editMode, onEditModeToggle, deviceMode,
                 </div>
               )}
 
-              {s.key === 'configure' && (
+              {s.key === "configure" && (
                 <div className="sidebar-actions">
-                  <button type="button" className="sidebar-btn" onClick={() => setShowLayoutSwitcher(true)}>
+                  <button
+                    type="button"
+                    className="sidebar-btn"
+                    onClick={() => setShowLayoutSwitcher(true)}
+                  >
                     <span className="btn-icon" aria-hidden="true">
                       <LayoutIcon />
                     </span>
                     <span className="btn-label">Layout</span>
                   </button>
-                  <button type="button" className="sidebar-btn" onClick={() => setShowSectionManager(true)}>
+                  <button
+                    type="button"
+                    className="sidebar-btn"
+                    onClick={() => setShowSectionManager(true)}
+                  >
                     <span className="btn-icon" aria-hidden="true">
                       <SectionsIcon />
                     </span>
                     <span className="btn-label">Sections</span>
                   </button>
-                  <button type="button" className="sidebar-btn" onClick={() => setShowThemeModal(true)}>
+                  <button
+                    type="button"
+                    className="sidebar-btn"
+                    onClick={() => setShowThemeModal(true)}
+                  >
                     <span className="btn-icon" aria-hidden="true">
                       <PaletteIcon />
                     </span>
                     <span className="btn-label">Theme</span>
                   </button>
-                  <button type="button" className="sidebar-btn" onClick={() => setShowGalleryModal(true)}>
+                  <button
+                    type="button"
+                    className="sidebar-btn"
+                    onClick={() => setShowGalleryModal(true)}
+                  >
                     <span className="btn-icon" aria-hidden="true">
                       <GalleryIcon />
                     </span>
@@ -426,9 +527,13 @@ export default function BuilderSidebar({ editMode, onEditModeToggle, deviceMode,
                 </div>
               )}
 
-              {s.key === 'publish' && (
+              {s.key === "publish" && (
                 <div className="sidebar-actions">
-                  <button type="button" className="sidebar-btn primary" onClick={() => setShowPublishModal(true)}>
+                  <button
+                    type="button"
+                    className="sidebar-btn primary"
+                    onClick={() => setShowPublishModal(true)}
+                  >
                     <span className="btn-icon" aria-hidden="true">
                       <RocketIcon />
                     </span>
@@ -443,10 +548,10 @@ export default function BuilderSidebar({ editMode, onEditModeToggle, deviceMode,
             <div className="sidebar-rail">
               <button
                 type="button"
-                className={`rail-btn ${editMode ? 'active' : ''}`}
+                className={`rail-btn ${editMode ? "active" : ""}`}
                 onClick={onEditModeToggle}
-                title={editMode ? 'Editing (toggle)' : 'Preview (toggle)'}
-                aria-label={editMode ? 'Editing (toggle)' : 'Preview (toggle)'}
+                title={editMode ? "Editing (toggle)" : "Preview (toggle)"}
+                aria-label={editMode ? "Editing (toggle)" : "Preview (toggle)"}
               >
                 {editMode ? <EditIcon /> : <EyeIcon />}
               </button>
@@ -454,8 +559,8 @@ export default function BuilderSidebar({ editMode, onEditModeToggle, deviceMode,
               <div className="rail-group" aria-label="Device preview">
                 <button
                   type="button"
-                  className={`rail-btn ${deviceMode === 'desktop' ? 'active' : ''}`}
-                  onClick={() => onDeviceModeChange('desktop')}
+                  className={`rail-btn ${deviceMode === "desktop" ? "active" : ""}`}
+                  onClick={() => onDeviceModeChange("desktop")}
                   title="Desktop"
                   aria-label="Desktop"
                 >
@@ -463,8 +568,8 @@ export default function BuilderSidebar({ editMode, onEditModeToggle, deviceMode,
                 </button>
                 <button
                   type="button"
-                  className={`rail-btn ${deviceMode === 'tablet' ? 'active' : ''}`}
-                  onClick={() => onDeviceModeChange('tablet')}
+                  className={`rail-btn ${deviceMode === "tablet" ? "active" : ""}`}
+                  onClick={() => onDeviceModeChange("tablet")}
                   title="Tablet"
                   aria-label="Tablet"
                 >
@@ -472,8 +577,8 @@ export default function BuilderSidebar({ editMode, onEditModeToggle, deviceMode,
                 </button>
                 <button
                   type="button"
-                  className={`rail-btn ${deviceMode === 'mobile' ? 'active' : ''}`}
-                  onClick={() => onDeviceModeChange('mobile')}
+                  className={`rail-btn ${deviceMode === "mobile" ? "active" : ""}`}
+                  onClick={() => onDeviceModeChange("mobile")}
                   title="Mobile"
                   aria-label="Mobile"
                 >
@@ -481,19 +586,49 @@ export default function BuilderSidebar({ editMode, onEditModeToggle, deviceMode,
                 </button>
               </div>
 
-              <button type="button" className="rail-btn" onClick={() => setShowLayoutSwitcher(true)} title="Layout" aria-label="Layout">
+              <button
+                type="button"
+                className="rail-btn"
+                onClick={() => setShowLayoutSwitcher(true)}
+                title="Layout"
+                aria-label="Layout"
+              >
                 <LayoutIcon />
               </button>
-              <button type="button" className="rail-btn" onClick={() => setShowSectionManager(true)} title="Sections" aria-label="Sections">
+              <button
+                type="button"
+                className="rail-btn"
+                onClick={() => setShowSectionManager(true)}
+                title="Sections"
+                aria-label="Sections"
+              >
                 <SectionsIcon />
               </button>
-              <button type="button" className="rail-btn" onClick={() => setShowThemeModal(true)} title="Theme" aria-label="Theme">
+              <button
+                type="button"
+                className="rail-btn"
+                onClick={() => setShowThemeModal(true)}
+                title="Theme"
+                aria-label="Theme"
+              >
                 <PaletteIcon />
               </button>
-              <button type="button" className="rail-btn" onClick={() => setShowGalleryModal(true)} title="Gallery" aria-label="Gallery">
+              <button
+                type="button"
+                className="rail-btn"
+                onClick={() => setShowGalleryModal(true)}
+                title="Gallery"
+                aria-label="Gallery"
+              >
                 <GalleryIcon />
               </button>
-              <button type="button" className="rail-btn rail-primary" onClick={() => setShowPublishModal(true)} title="Publish" aria-label="Publish">
+              <button
+                type="button"
+                className="rail-btn rail-primary"
+                onClick={() => setShowPublishModal(true)}
+                title="Publish"
+                aria-label="Publish"
+              >
                 <RocketIcon />
               </button>
             </div>
@@ -510,7 +645,7 @@ export default function BuilderSidebar({ editMode, onEditModeToggle, deviceMode,
             onClick={() => setDrawerOpen(false)}
           />
           <aside className="sidebar-drawer" aria-label="Builder sidebar drawer">
-            <DrawerControls />
+            <DrawerControls onClose={() => setDrawerOpen(false)} />
             <div className="sidebar-status">
               <AutosaveStatus />
             </div>
@@ -524,31 +659,31 @@ export default function BuilderSidebar({ editMode, onEditModeToggle, deviceMode,
                   onToggle={() => toggleSection(s.key)}
                   collapsed={false}
                 >
-                  {s.key === 'mode' && (
+                  {s.key === "mode" && (
                     <div className="sidebar-actions">
                       <button
                         type="button"
-                        className={`sidebar-btn ${editMode ? 'active' : ''}`}
+                        className={`sidebar-btn ${editMode ? "active" : ""}`}
                         onClick={() => {
                           onEditModeToggle();
                         }}
-                        title={editMode ? 'Switch to Preview Mode' : 'Switch to Edit Mode'}
+                        title={editMode ? "Switch to Preview Mode" : "Switch to Edit Mode"}
                       >
                         <span className="btn-icon" aria-hidden="true">
                           {editMode ? <EditIcon /> : <EyeIcon />}
                         </span>
-                        <span className="btn-label">{editMode ? 'Editing' : 'Preview'}</span>
+                        <span className="btn-label">{editMode ? "Editing" : "Preview"}</span>
                       </button>
                     </div>
                   )}
 
-                  {s.key === 'device' && (
+                  {s.key === "device" && (
                     <div className="sidebar-actions">
                       <div className="sidebar-segmented" role="group" aria-label="Device preview">
                         <button
                           type="button"
-                          className={`seg-btn ${deviceMode === 'desktop' ? 'active' : ''}`}
-                          onClick={() => onDeviceModeChange('desktop')}
+                          className={`seg-btn ${deviceMode === "desktop" ? "active" : ""}`}
+                          onClick={() => onDeviceModeChange("desktop")}
                           title="Desktop Preview"
                           aria-label="Desktop Preview"
                         >
@@ -556,8 +691,8 @@ export default function BuilderSidebar({ editMode, onEditModeToggle, deviceMode,
                         </button>
                         <button
                           type="button"
-                          className={`seg-btn ${deviceMode === 'tablet' ? 'active' : ''}`}
-                          onClick={() => onDeviceModeChange('tablet')}
+                          className={`seg-btn ${deviceMode === "tablet" ? "active" : ""}`}
+                          onClick={() => onDeviceModeChange("tablet")}
                           title="Tablet Preview"
                           aria-label="Tablet Preview"
                         >
@@ -565,8 +700,8 @@ export default function BuilderSidebar({ editMode, onEditModeToggle, deviceMode,
                         </button>
                         <button
                           type="button"
-                          className={`seg-btn ${deviceMode === 'mobile' ? 'active' : ''}`}
-                          onClick={() => onDeviceModeChange('mobile')}
+                          className={`seg-btn ${deviceMode === "mobile" ? "active" : ""}`}
+                          onClick={() => onDeviceModeChange("mobile")}
                           title="Mobile Preview"
                           aria-label="Mobile Preview"
                         >
@@ -576,7 +711,7 @@ export default function BuilderSidebar({ editMode, onEditModeToggle, deviceMode,
                     </div>
                   )}
 
-                  {s.key === 'configure' && (
+                  {s.key === "configure" && (
                     <div className="sidebar-actions">
                       <button
                         type="button"
@@ -633,7 +768,7 @@ export default function BuilderSidebar({ editMode, onEditModeToggle, deviceMode,
                     </div>
                   )}
 
-                  {s.key === 'publish' && (
+                  {s.key === "publish" && (
                     <div className="sidebar-actions">
                       <button
                         type="button"
@@ -665,4 +800,3 @@ export default function BuilderSidebar({ editMode, onEditModeToggle, deviceMode,
     </>
   );
 }
-

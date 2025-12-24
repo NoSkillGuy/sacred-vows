@@ -31,5 +31,3 @@ func TestComputeRefreshTokenFingerprint_Deterministic(t *testing.T) {
 		t.Fatalf("expected sha256 length 32, got %d", len(fp1))
 	}
 }
-
-

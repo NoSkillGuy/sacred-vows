@@ -36,7 +36,7 @@
   padding: 1.1rem 1.25rem 1.1rem 3.25rem;
   border: 2px solid var(--builder-border);
   border-radius: 100px;
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   font-size: 1rem;
   color: var(--text-dark);
   background: var(--white);
@@ -134,7 +134,7 @@
 }
 
 .panel-header h2 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -165,7 +165,7 @@
   border: none;
   cursor: pointer;
   text-align: left;
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   font-size: 1rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -192,7 +192,9 @@
 .faq-answer {
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.4s var(--ease-out-expo), padding 0.3s ease;
+  transition:
+    max-height 0.4s var(--ease-out-expo),
+    padding 0.3s ease;
 }
 
 .faq-item.expanded .faq-answer {
@@ -221,7 +223,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -264,7 +266,7 @@
 }
 
 .faqs-help h2 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 2rem;
   font-weight: 500;
   color: var(--text-dark);
@@ -347,4 +349,3 @@
     font-size: 1.5rem;
   }
 }
-

@@ -55,7 +55,7 @@
 }
 
 .value-item h3 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.15rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -108,7 +108,7 @@
 }
 
 .benefit-card h3 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -161,7 +161,7 @@
 }
 
 .job-header h3 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.35rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -183,7 +183,7 @@
   border: none;
   padding: 0.7rem 1.5rem;
   border-radius: 100px;
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -235,7 +235,7 @@
 }
 
 .careers-cta h2 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 2rem;
   font-weight: 500;
   color: var(--text-dark);
@@ -299,4 +299,3 @@
     grid-template-columns: 1fr;
   }
 }
-

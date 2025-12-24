@@ -31,7 +31,7 @@ func (r *rsvpRepository) Create(ctx context.Context, rsvp *domain.RSVPResponse) 
 		"email":         rsvp.Email,
 		"phone":         rsvp.Phone,
 		"message":       rsvp.Message,
-		"submitted_at":   rsvp.SubmittedAt,
+		"submitted_at":  rsvp.SubmittedAt,
 	}
 
 	_, err := r.client.Collection("rsvp_responses").Doc(rsvp.ID).Set(ctx, data)
@@ -85,7 +85,3 @@ func (r *rsvpRepository) docToRSVP(doc *firestore.DocumentSnapshot) *domain.RSVP
 
 	return rsvp
 }
-
-
-
-

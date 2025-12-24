@@ -26,7 +26,7 @@
 }
 
 .press-stats .stat-number {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 2.5rem;
   font-weight: 700;
   background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
@@ -60,7 +60,7 @@
 }
 
 .about-content h2 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.75rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -114,7 +114,7 @@
 }
 
 .kit-info h3 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -134,7 +134,7 @@
   border: 1px solid var(--builder-border);
   padding: 0.6rem 1rem;
   border-radius: var(--radius-md);
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -194,7 +194,7 @@
 }
 
 .release-card h3 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.35rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -258,7 +258,7 @@
 }
 
 .coverage-card h3 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.15rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -283,7 +283,7 @@
 }
 
 .press-contact h2 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 2rem;
   font-weight: 500;
   color: var(--text-dark);
@@ -346,4 +346,3 @@
     padding: 2.5rem 1.5rem;
   }
 }
-

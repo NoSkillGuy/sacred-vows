@@ -1,12 +1,12 @@
 /* Editorial Elegance - Strict Color Palette */
 :root {
   /* Base Colors - STRICT (DO NOT add more) */
-  --ee-color-bg: #FAF9F7; /* Ivory off-white */
-  --ee-color-text: #1C1C1C; /* Near black */
-  --ee-color-secondary: #6B6B6B; /* Soft grey */
-  --ee-color-accent: #C6A15B; /* Champagne gold - SUBTLE USE ONLY */
-  --ee-color-divider: #E6E6E6; /* Divider lines */
-  
+  --ee-color-bg: #faf9f7; /* Ivory off-white */
+  --ee-color-text: #1c1c1c; /* Near black */
+  --ee-color-secondary: #6b6b6b; /* Soft grey */
+  --ee-color-accent: #c6a15b; /* Champagne gold - SUBTLE USE ONLY */
+  --ee-color-divider: #e6e6e6; /* Divider lines */
+
   /* Spacing Scale - Magazine Breathing Room */
   --ee-space-xs: 12px;
   --ee-space-sm: 24px;
@@ -14,11 +14,11 @@
   --ee-space-lg: 80px;
   --ee-space-xl: 120px;
   --ee-space-section: clamp(80px, 10vh, 160px);
-  
+
   /* Layout Constraints */
   --ee-max-width-text: 680px; /* Editorial text width */
   --ee-max-width-card: 1200px; /* Event cards, etc */
-  
+
   /* Accent Usage - MINIMAL */
   --ee-accent-line: 1px solid var(--ee-color-accent);
   --ee-accent-hover: var(--ee-color-accent);
@@ -106,8 +106,13 @@
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
 }
 
 /* Mobile header adjustment */
@@ -116,14 +121,13 @@
     top: var(--ee-space-sm);
     right: var(--ee-space-sm);
   }
-  
+
   .ee-music-toggle {
     width: 44px;
     height: 44px;
   }
-  
+
   .ee-music-icon {
     font-size: 14px;
   }
 }
-

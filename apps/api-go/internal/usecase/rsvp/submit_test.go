@@ -48,4 +48,3 @@ func TestSubmitRSVPUseCase_Execute_ValidRSVP_ReturnsRSVP(t *testing.T) {
 	assert.Equal(t, date, output.RSVP.Date, "Date should match")
 	assert.NotEmpty(t, output.RSVP.ID, "RSVP ID should be generated")
 }
-
