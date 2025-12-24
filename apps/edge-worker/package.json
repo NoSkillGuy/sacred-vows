@@ -10,7 +10,7 @@
     "lint:fix": "eslint . --ext .ts --fix"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20251217.0",
+    "@cloudflare/workers-types": "^4.20251224.0",
     "typescript": "^5.7.2",
     "wrangler": "^3.100.0"
   }
