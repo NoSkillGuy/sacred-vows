@@ -1,0 +1,58 @@
+version: 2
+updates:
+  # Go dependencies for API
+  - package-ecosystem: "gomod"
+    directory: "/apps/api-go"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "maclaren"
+    labels:
+      - "dependencies"
+      - "go"
+      - "api-go"
+
+  # npm dependencies for root
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "maclaren"
+    labels:
+      - "dependencies"
+      - "npm"
+      - "root"
+
+  # npm dependencies for builder app
+  - package-ecosystem: "npm"
+    directory: "/apps/builder"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "maclaren"
+    labels:
+      - "dependencies"
+      - "npm"
+      - "builder"
+
+  # npm dependencies for edge-worker app
+  - package-ecosystem: "npm"
+    directory: "/apps/edge-worker"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "maclaren"
+    labels:
+      - "dependencies"
+      - "npm"
+      - "edge-worker"
+
