@@ -214,7 +214,7 @@ describe('builderStore', () => {
 
   it('should update nested data using dot notation path', () => {
     const store = useBuilderStore.getState();
-    
+
     store.updateInvitationData('couple.bride.name', 'Emma');
 
     expect(store.currentInvitation.data.couple.bride.name).toBe('Emma');
@@ -425,13 +425,13 @@ import { test, expect } from '@playwright/test';
 test.describe('Auth Flow', () => {
   test('should register a new user', async ({ page }) => {
     await page.goto('/signup');
-    
+
     await page.fill('input[name="name"]', 'Test User');
     await page.fill('input[name="email"]', `test-${Date.now()}@example.com`);
     await page.fill('input[name="password"]', 'SecurePassword123!');
-    
+
     await page.click('button[type="submit"]');
-    
+
     await expect(page).toHaveURL(/.*app|.*dashboard/);
   });
 });
@@ -607,17 +607,17 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '18'
-      
+          node-version: '20.19.0'
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Run unit/integration tests
         run: npm test -- --run
-      
+
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
-      
+
       - name: Run E2E tests
         run: npm run test:e2e
         env:

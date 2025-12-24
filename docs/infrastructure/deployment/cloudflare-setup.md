@@ -162,7 +162,7 @@ curl -I https://api.dev.sacredvows.io/health
 
 1. **Cloudflare Account** (already set up from domain configuration)
 2. **GitHub Repository** (your code should be in GitHub)
-3. **Node.js 18+** (for local testing)
+3. **Node.js 20.19.0+** (for local testing; required by vite 7.3.0 and vitest 4.0.16)
 
 ### Step 1: Prepare Builder App for Production
 
@@ -178,7 +178,7 @@ curl -I https://api.dev.sacredvows.io/health
    npm install
    npm run build
    ```
-   
+
    This should create a `dist` folder with the production build.
 
 3. **Verify Environment Variables**
@@ -220,7 +220,7 @@ curl -I https://api.dev.sacredvows.io/health
      - `VITE_API_URL`: `https://api.sacredvows.io/api` (for prod)
      - `VITE_PUBLIC_ASSETS_CDN_URL`: `https://dev-pub.sacredvows.io` (for dev)
      - `VITE_PUBLIC_ASSETS_CDN_URL`: `https://pub.sacredvows.io` (for prod)
-   
+
    **Note**: Vite requires `VITE_` prefix for environment variables to be exposed to the client.
 
 5. **Click "Save and Deploy"**
@@ -263,14 +263,14 @@ If you need custom build settings, create a `wrangler.toml` or use Cloudflare Pa
 Root directory: (leave empty)
 Build command: cd apps/builder && npm ci && npm run build
 Build output directory: apps/builder/dist
-Node version: 18
+Node version: 20.19.0
 ```
 
 **Environment Variables:**
 ```
 VITE_API_URL=https://api.dev.sacredvows.io/api
 VITE_PUBLIC_ASSETS_CDN_URL=https://dev-pub.sacredvows.io
-NODE_VERSION=18
+NODE_VERSION=20.19.0
 ```
 
 ---
@@ -293,7 +293,7 @@ VITE_API_URL=https://api.sacredvows.io/api
 VITE_PUBLIC_ASSETS_CDN_URL=https://pub.sacredvows.io
 ```
 
-**Note**: 
+**Note**:
 - Vite requires `VITE_` prefix for client-side variables
 - These are baked into the build at build time
 - Update and redeploy when changing environment variables
@@ -402,14 +402,14 @@ openssl s_client -connect dev.sacredvows.io:443 -servername dev.sacredvows.io
   - Missing dependencies
 
 **Problem**: App not loading
-- **Solution**: 
+- **Solution**:
   - Check build output directory is correct
   - Verify `index.html` exists in output directory
   - Check browser console for errors
   - Verify environment variables are set correctly
 
 **Problem**: API calls failing (CORS)
-- **Solution**: 
+- **Solution**:
   - Ensure API CORS settings allow `dev.sacredvows.io` origin
   - Check API environment variables are correct
   - Verify `VITE_API_URL` is set correctly in Pages
@@ -417,7 +417,7 @@ openssl s_client -connect dev.sacredvows.io:443 -servername dev.sacredvows.io
 ### Performance Issues
 
 **Problem**: Slow page loads
-- **Solution**: 
+- **Solution**:
   - Enable Cloudflare caching
   - Check Cloudflare Analytics for insights
   - Optimize images and assets
