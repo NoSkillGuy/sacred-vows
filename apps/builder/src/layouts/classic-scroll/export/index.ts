@@ -1,12 +1,12 @@
 /**
  * Classic Scroll Layout Export
- * 
+ *
  * Export functionality for generating static HTML/CSS from classic-scroll layout
  */
 
-import type { InvitationData } from '@shared/types/wedding-data';
-import { generateHTML } from './template';
-import { generateCSS } from './styles';
+import type { InvitationData } from "@shared/types/wedding-data";
+import { generateHTML } from "./template";
+import { generateCSS } from "./styles";
 
 /**
  * Export the invitation as a complete static site
@@ -20,7 +20,7 @@ export async function exportInvitation(
 ): Promise<{ html: string; css: string; assets: unknown[] }> {
   const html = await generateHTML(invitation, translations);
   const css = await generateCSS(invitation);
-  
+
   return {
     html,
     css,
@@ -35,4 +35,3 @@ export default {
   generateCSS,
   exportInvitation,
 };
-

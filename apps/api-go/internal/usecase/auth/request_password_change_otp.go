@@ -8,8 +8,8 @@ import (
 
 	"github.com/sacred-vows/api-go/internal/domain"
 	"github.com/sacred-vows/api-go/internal/infrastructure/auth"
-	emailInterface "github.com/sacred-vows/api-go/internal/interfaces/email"
 	"github.com/sacred-vows/api-go/internal/interfaces/clock"
+	emailInterface "github.com/sacred-vows/api-go/internal/interfaces/email"
 	"github.com/sacred-vows/api-go/internal/interfaces/repository"
 	"github.com/sacred-vows/api-go/pkg/errors"
 	"github.com/segmentio/ksuid"
@@ -20,10 +20,10 @@ const (
 )
 
 type RequestPasswordChangeOTPUseCase struct {
-	userRepo    repository.UserRepository
-	otpRepo     repository.PasswordChangeOTPRepository
+	userRepo     repository.UserRepository
+	otpRepo      repository.PasswordChangeOTPRepository
 	emailService emailInterface.EmailService
-	clock       clock.Clock
+	clock        clock.Clock
 }
 
 func NewRequestPasswordChangeOTPUseCase(
@@ -34,9 +34,9 @@ func NewRequestPasswordChangeOTPUseCase(
 ) *RequestPasswordChangeOTPUseCase {
 	return &RequestPasswordChangeOTPUseCase{
 		userRepo:     userRepo,
-		otpRepo:       otpRepo,
+		otpRepo:      otpRepo,
 		emailService: emailService,
-		clock:         clk,
+		clock:        clk,
 	}
 }
 
@@ -142,4 +142,3 @@ func generateNumericOTP(length int) (string, error) {
 
 	return string(otp), nil
 }
-

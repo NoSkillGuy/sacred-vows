@@ -28,7 +28,7 @@
   background: var(--white);
   border: 2px solid var(--builder-border);
   border-radius: 100px;
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   font-size: 0.9rem;
   font-weight: 500;
   color: var(--text-medium);
@@ -167,7 +167,7 @@
 }
 
 .layouts-gallery-page .layout-names {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.35rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -175,7 +175,7 @@
 }
 
 .layouts-gallery-page .layout-date {
-  font-family: 'Great Vibes', cursive;
+  font-family: "Great Vibes", cursive;
   font-size: 1.1rem;
 }
 
@@ -201,7 +201,7 @@
   border: none;
   padding: 0.9rem 1.75rem;
   border-radius: 100px;
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -242,7 +242,7 @@
 }
 
 .layouts-gallery-page .layout-info h3 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.2rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -297,7 +297,7 @@
 
 .layouts-gallery-page .gallery-empty h3,
 .layouts-gallery-page .gallery-error h3 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.75rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -326,7 +326,7 @@
 }
 
 .layouts-gallery-page .layouts-cta::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.1) 0%, transparent 60%);
@@ -334,7 +334,7 @@
 }
 
 .layouts-gallery-page .layouts-cta h2 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 2.25rem;
   font-weight: 500;
   color: var(--white);
@@ -405,4 +405,3 @@
     display: none;
   }
 }
-

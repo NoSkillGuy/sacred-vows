@@ -76,4 +76,3 @@ func TestValidateSubdomainUseCase_Execute_TakenSubdomain_ReturnsNotAvailable(t *
 	assert.False(t, available, "Subdomain should not be available")
 	assert.Equal(t, "taken", reason, "Reason should be 'taken'")
 }
-

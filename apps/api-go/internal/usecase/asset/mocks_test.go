@@ -8,17 +8,17 @@ import (
 
 // MockAssetRepository is a hand-written mock implementation of AssetRepository
 type MockAssetRepository struct {
-	CreateFn              func(ctx context.Context, asset *domain.Asset) error
-	FindByIDFn            func(ctx context.Context, id string) (*domain.Asset, error)
-	FindByUserIDFn        func(ctx context.Context, userID string) ([]*domain.Asset, error)
-	FindByURLFn           func(ctx context.Context, url string) (*domain.Asset, error)
-	FindByURLsFn          func(ctx context.Context, urls []string) ([]*domain.Asset, error)
-	DeleteFn              func(ctx context.Context, id string) error
-	DeleteByURLFn         func(ctx context.Context, url string) error
+	CreateFn                func(ctx context.Context, asset *domain.Asset) error
+	FindByIDFn              func(ctx context.Context, id string) (*domain.Asset, error)
+	FindByUserIDFn          func(ctx context.Context, userID string) ([]*domain.Asset, error)
+	FindByURLFn             func(ctx context.Context, url string) (*domain.Asset, error)
+	FindByURLsFn            func(ctx context.Context, urls []string) ([]*domain.Asset, error)
+	DeleteFn                func(ctx context.Context, id string) error
+	DeleteByURLFn           func(ctx context.Context, url string) error
 	FindUsedInInvitationsFn func(ctx context.Context, assetID string) ([]string, error)
-	TrackUsageFn          func(ctx context.Context, assetID, invitationID string) error
-	UntrackUsageFn        func(ctx context.Context, assetID, invitationID string) error
-	UntrackAllUsageFn     func(ctx context.Context, invitationID string) error
+	TrackUsageFn            func(ctx context.Context, assetID, invitationID string) error
+	UntrackUsageFn          func(ctx context.Context, assetID, invitationID string) error
+	UntrackAllUsageFn       func(ctx context.Context, invitationID string) error
 }
 
 func (m *MockAssetRepository) Create(ctx context.Context, asset *domain.Asset) error {
@@ -97,4 +97,3 @@ func (m *MockAssetRepository) UntrackAllUsage(ctx context.Context, invitationID 
 	}
 	return nil
 }
-

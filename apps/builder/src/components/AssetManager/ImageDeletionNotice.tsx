@@ -1,8 +1,8 @@
-import { ReactElement } from 'react';
-import './ImageDeletionNotice.css';
+import { ReactElement } from "react";
+import "./ImageDeletionNotice.css";
 
 interface ImageDeletionNoticeProps {
-  variant?: 'default' | 'compact' | 'warning';
+  variant?: "default" | "compact" | "warning";
 }
 
 /**
@@ -10,14 +10,14 @@ interface ImageDeletionNoticeProps {
  * Displays clear messaging that uploaded images are deleted after 90 days,
  * while published sites preserve images permanently.
  */
-function ImageDeletionNotice({ variant = 'default' }: ImageDeletionNoticeProps): ReactElement {
+function ImageDeletionNotice({ variant = "default" }: ImageDeletionNoticeProps): ReactElement {
   return (
     <div className={`image-deletion-notice ${variant}`}>
       <div className="notice-icon">ℹ️</div>
       <div className="notice-content">
         <p className="notice-text">
-          <strong>Note:</strong> Uploaded images are automatically deleted after 90 days. 
-          Published sites preserve images permanently.
+          <strong>Note:</strong> Uploaded images are automatically deleted after 90 days. Published
+          sites preserve images permanently.
         </p>
       </div>
     </div>
@@ -25,4 +25,3 @@ function ImageDeletionNotice({ variant = 'default' }: ImageDeletionNoticeProps):
 }
 
 export default ImageDeletionNotice;
-

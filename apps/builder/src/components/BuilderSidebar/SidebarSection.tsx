@@ -1,5 +1,5 @@
-import { ReactNode, ReactElement } from 'react';
-import { useId } from 'react';
+import { ReactNode, ReactElement } from "react";
+import { useId } from "react";
 
 interface SidebarSectionProps {
   title: string;
@@ -24,7 +24,7 @@ export default function SidebarSection({
   const contentId = useId();
 
   return (
-    <section className={`sidebar-section ${isOpen ? 'open' : ''} ${collapsed ? 'collapsed' : ''}`}>
+    <section className={`sidebar-section ${isOpen ? "open" : ""} ${collapsed ? "collapsed" : ""}`}>
       <button
         type="button"
         className="sidebar-section-header"
@@ -37,7 +37,11 @@ export default function SidebarSection({
           {icon}
         </span>
         {!collapsed && <span className="sidebar-section-title">{title}</span>}
-        {!collapsed && <span className="sidebar-section-chevron" aria-hidden="true">▾</span>}
+        {!collapsed && (
+          <span className="sidebar-section-chevron" aria-hidden="true">
+            ▾
+          </span>
+        )}
       </button>
 
       {!collapsed && (
@@ -48,4 +52,3 @@ export default function SidebarSection({
     </section>
   );
 }
-

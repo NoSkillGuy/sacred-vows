@@ -58,4 +58,3 @@ func (m *MockClock) Now() time.Time {
 
 // Ensure MockClock implements clock.Clock interface
 var _ clock.Clock = (*MockClock)(nil)
-

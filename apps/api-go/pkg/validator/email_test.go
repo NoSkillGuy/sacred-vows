@@ -107,4 +107,3 @@ func TestNewEmail_WithSubdomain_ReturnsEmail(t *testing.T) {
 	require.NoError(t, err, "Email with subdomain should be valid")
 	assert.Equal(t, Email(email), result, "Should return the email as Email type")
 }
-

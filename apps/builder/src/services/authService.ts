@@ -3,12 +3,12 @@
  * Handles user authentication and token management
  */
 
-import { setAccessToken, getAccessToken, clearAccessToken, hasAccessToken } from './tokenStorage';
-import { apiRequest } from './apiClient';
+import { setAccessToken, getAccessToken, clearAccessToken, hasAccessToken } from "./tokenStorage";
+import { apiRequest } from "./apiClient";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
-const USER_KEY = 'user';
+const USER_KEY = "user";
 
 export interface User {
   id: string;
@@ -38,10 +38,14 @@ interface SuccessResponse {
  * @param timeoutMs - Timeout in milliseconds (default: 8000)
  * @returns Fetch response
  */
-async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs: number = 8000): Promise<Response> {
+async function fetchWithTimeout(
+  url: string,
+  options: RequestInit = {},
+  timeoutMs: number = 8000
+): Promise<Response> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
-  
+
   try {
     const response = await fetch(url, {
       ...options,
@@ -51,8 +55,8 @@ async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutM
     return response;
   } catch (error) {
     clearTimeout(timeoutId);
-    if ((error as Error).name === 'AbortError') {
-      throw new Error('Request timeout - server may be unavailable');
+    if ((error as Error).name === "AbortError") {
+      throw new Error("Request timeout - server may be unavailable");
     }
     throw error;
   }
@@ -73,26 +77,26 @@ export interface RegisterData {
 export async function register(userData: RegisterData): Promise<AuthResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}/auth/register`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(userData),
-      credentials: 'include', // Include cookies for refresh token
+      credentials: "include", // Include cookies for refresh token
     });
 
     if (!response.ok) {
-      const error = await response.json() as ErrorResponse;
-      throw new Error(error.error || 'Registration failed');
+      const error = (await response.json()) as ErrorResponse;
+      throw new Error(error.error || "Registration failed");
     }
 
-    const data = await response.json() as AuthResponse;
-    
+    const data = (await response.json()) as AuthResponse;
+
     // Store access token in memory (not localStorage)
     if (data.accessToken) {
       setAccessToken(data.accessToken);
     }
-    
+
     // Store user in localStorage (for display purposes)
     if (data.user) {
       localStorage.setItem(USER_KEY, JSON.stringify(data.user));
@@ -100,7 +104,7 @@ export async function register(userData: RegisterData): Promise<AuthResponse> {
 
     return data;
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error("Registration error:", error);
     throw error;
   }
 }
@@ -114,26 +118,26 @@ export async function register(userData: RegisterData): Promise<AuthResponse> {
 export async function login(email: string, password: string): Promise<AuthResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ email, password }),
-      credentials: 'include', // Include cookies for refresh token
+      credentials: "include", // Include cookies for refresh token
     });
 
     if (!response.ok) {
-      const error = await response.json() as ErrorResponse;
-      throw new Error(error.error || 'Login failed');
+      const error = (await response.json()) as ErrorResponse;
+      throw new Error(error.error || "Login failed");
     }
 
-    const data = await response.json() as AuthResponse;
-    
+    const data = (await response.json()) as AuthResponse;
+
     // Store access token in memory (not localStorage)
     if (data.accessToken) {
       setAccessToken(data.accessToken);
     }
-    
+
     // Store user in localStorage (for display purposes)
     if (data.user) {
       localStorage.setItem(USER_KEY, JSON.stringify(data.user));
@@ -141,7 +145,7 @@ export async function login(email: string, password: string): Promise<AuthRespon
 
     return data;
   } catch (error) {
-    console.error('Login error:', error);
+    console.error("Login error:", error);
     throw error;
   }
 }
@@ -157,12 +161,12 @@ export async function logout(): Promise<void> {
     const token = getAccessToken();
     if (token) {
       await apiRequest(`${API_BASE_URL}/auth/logout`, {
-        method: 'POST',
+        method: "POST",
       });
     }
   } catch (error) {
     // Even if API call fails, clear local state
-    console.error('Logout API error:', error);
+    console.error("Logout API error:", error);
   } finally {
     // Clear access token from memory
     clearAccessToken();
@@ -178,7 +182,7 @@ export async function logout(): Promise<void> {
 export function getCurrentUser(): User | null {
   const userStr = localStorage.getItem(USER_KEY);
   if (!userStr) return null;
-  
+
   try {
     return JSON.parse(userStr) as User;
   } catch {
@@ -208,23 +212,29 @@ export function isAuthenticated(): boolean {
  */
 export async function refreshAccessToken(): Promise<string> {
   try {
-    const response = await fetchWithTimeout(`${API_BASE_URL}/auth/refresh`, {
-      method: 'POST',
-      credentials: 'include', // Include cookies (refresh token)
-      headers: {
-        'Content-Type': 'application/json',
+    const response = await fetchWithTimeout(
+      `${API_BASE_URL}/auth/refresh`,
+      {
+        method: "POST",
+        credentials: "include", // Include cookies (refresh token)
+        headers: {
+          "Content-Type": "application/json",
+        },
       },
-    }, 8000); // 8 second timeout
+      8000
+    ); // 8 second timeout
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: 'Refresh failed' })) as ErrorResponse;
-      throw new Error(error.error || 'Failed to refresh token');
+      const error = (await response
+        .json()
+        .catch(() => ({ error: "Refresh failed" }))) as ErrorResponse;
+      throw new Error(error.error || "Failed to refresh token");
     }
 
-    const data = await response.json() as { accessToken: string };
-    
+    const data = (await response.json()) as { accessToken: string };
+
     if (!data.accessToken) {
-      throw new Error('No access token in refresh response');
+      throw new Error("No access token in refresh response");
     }
 
     // Store new access token in memory
@@ -246,15 +256,15 @@ export async function refreshAccessToken(): Promise<string> {
 export async function getCurrentUserFromAPI(): Promise<User> {
   try {
     const response = await apiRequest(`${API_BASE_URL}/auth/me`, {
-      method: 'GET',
+      method: "GET",
     });
 
     if (!response.ok) {
-      throw new Error('Failed to get user');
+      throw new Error("Failed to get user");
     }
 
-    const data = await response.json() as { user: User };
-    
+    const data = (await response.json()) as { user: User };
+
     // Update stored user
     if (data.user) {
       localStorage.setItem(USER_KEY, JSON.stringify(data.user));
@@ -262,7 +272,7 @@ export async function getCurrentUserFromAPI(): Promise<User> {
 
     return data.user;
   } catch (error) {
-    console.error('Get user error:', error);
+    console.error("Get user error:", error);
     throw error;
   }
 }
@@ -275,22 +285,22 @@ export async function getCurrentUserFromAPI(): Promise<User> {
 export async function requestPasswordReset(email: string): Promise<SuccessResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ email }),
     });
 
     if (!response.ok) {
-      const error = await response.json() as ErrorResponse;
-      throw new Error(error.error || 'Failed to send password reset email');
+      const error = (await response.json()) as ErrorResponse;
+      throw new Error(error.error || "Failed to send password reset email");
     }
 
-    const data = await response.json() as SuccessResponse;
+    const data = (await response.json()) as SuccessResponse;
     return data;
   } catch (error) {
-    console.error('Password reset request error:', error);
+    console.error("Password reset request error:", error);
     throw error;
   }
 }
@@ -304,22 +314,22 @@ export async function requestPasswordReset(email: string): Promise<SuccessRespon
 export async function resetPassword(token: string, password: string): Promise<SuccessResponse> {
   try {
     const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ token, password }),
     });
 
     if (!response.ok) {
-      const error = await response.json() as ErrorResponse;
-      throw new Error(error.error || 'Failed to reset password');
+      const error = (await response.json()) as ErrorResponse;
+      throw new Error(error.error || "Failed to reset password");
     }
 
-    const data = await response.json() as SuccessResponse;
+    const data = (await response.json()) as SuccessResponse;
     return data;
   } catch (error) {
-    console.error('Password reset error:', error);
+    console.error("Password reset error:", error);
     throw error;
   }
 }
@@ -332,22 +342,22 @@ export async function resetPassword(token: string, password: string): Promise<Su
 export async function requestPasswordChangeOTP(email: string): Promise<SuccessResponse> {
   try {
     const response = await apiRequest(`${API_BASE_URL}/auth/password/request-otp`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ email }),
     });
 
     if (!response.ok) {
-      const error = await response.json() as ErrorResponse;
-      throw new Error(error.error || 'Failed to send OTP');
+      const error = (await response.json()) as ErrorResponse;
+      throw new Error(error.error || "Failed to send OTP");
     }
 
-    const data = await response.json() as SuccessResponse;
+    const data = (await response.json()) as SuccessResponse;
     return data;
   } catch (error) {
-    console.error('Password change OTP request error:', error);
+    console.error("Password change OTP request error:", error);
     throw error;
   }
 }
@@ -358,26 +368,28 @@ export async function requestPasswordChangeOTP(email: string): Promise<SuccessRe
  * @param newPassword - New password
  * @returns Success response
  */
-export async function verifyPasswordChangeOTP(otp: string, newPassword: string): Promise<SuccessResponse> {
+export async function verifyPasswordChangeOTP(
+  otp: string,
+  newPassword: string
+): Promise<SuccessResponse> {
   try {
     const response = await apiRequest(`${API_BASE_URL}/auth/password/verify-otp`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ otp, newPassword }),
     });
 
     if (!response.ok) {
-      const error = await response.json() as ErrorResponse;
-      throw new Error(error.error || 'Failed to verify OTP');
+      const error = (await response.json()) as ErrorResponse;
+      throw new Error(error.error || "Failed to verify OTP");
     }
 
-    const data = await response.json() as SuccessResponse;
+    const data = (await response.json()) as SuccessResponse;
     return data;
   } catch (error) {
-    console.error('Password change OTP verification error:', error);
+    console.error("Password change OTP verification error:", error);
     throw error;
   }
 }
-
