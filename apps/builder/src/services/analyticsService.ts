@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'sv_analytics_events';
+const STORAGE_KEY = "sv_analytics_events";
 const MAX_EVENTS = 100;
 
 export interface AnalyticsEvent {
@@ -13,22 +13,22 @@ export interface AnalyticsEvent {
 type EventStore = AnalyticsEvent[];
 
 const getStore = (): EventStore => {
-  if (typeof localStorage === 'undefined') return [];
+  if (typeof localStorage === "undefined") return [];
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) as EventStore : [];
+    return raw ? (JSON.parse(raw) as EventStore) : [];
   } catch (err) {
-    console.warn('Analytics read failed', err);
+    console.warn("Analytics read failed", err);
     return [];
   }
 };
 
 const setStore = (events: EventStore): void => {
-  if (typeof localStorage === 'undefined') return;
+  if (typeof localStorage === "undefined") return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(events.slice(-MAX_EVENTS)));
   } catch (err) {
-    console.warn('Analytics write failed', err);
+    console.warn("Analytics write failed", err);
   }
 };
 
@@ -36,7 +36,7 @@ const persist = (event: AnalyticsEvent): void => {
   const events = getStore();
   events.push(event);
   setStore(events);
-  if (typeof window !== 'undefined') {
+  if (typeof window !== "undefined") {
     (window as { __svAnalytics?: EventStore }).__svAnalytics = events;
   }
 };
@@ -46,28 +46,28 @@ export const trackEvent = (name: string, payload: Record<string, unknown> = {}):
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     name,
     payload,
-    path: typeof window !== 'undefined' ? window.location.pathname : undefined,
+    path: typeof window !== "undefined" ? window.location.pathname : undefined,
     ts: Date.now(),
-    userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
+    userAgent: typeof navigator !== "undefined" ? navigator.userAgent : undefined,
   };
 
   persist(event);
 
   // Only send to API if this is an invitation view event with invitationId
   // The /api/analytics/view endpoint is specifically for tracking published invitation views
-  if (name === 'page_view' && payload.invitationId && typeof payload.invitationId === 'string') {
+  if (name === "page_view" && payload.invitationId && typeof payload.invitationId === "string") {
     // Send to API in the format it expects (fire-and-forget, no error logging)
-    if (typeof fetch !== 'undefined') {
+    if (typeof fetch !== "undefined") {
       const apiPayload = {
         invitationId: payload.invitationId,
-        referrer: typeof document !== 'undefined' ? document.referrer || undefined : undefined,
+        referrer: typeof document !== "undefined" ? document.referrer || undefined : undefined,
         userAgent: event.userAgent,
       };
       // Use fetch with keepalive for reliability, but don't await or log errors
-      fetch('/api/analytics/view', {
-        method: 'POST',
+      fetch("/api/analytics/view", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(apiPayload),
         keepalive: true, // Ensures request completes even if page unloads
@@ -80,16 +80,26 @@ export const trackEvent = (name: string, payload: Record<string, unknown> = {}):
   return event;
 };
 
-export const trackPageView = (meta: Record<string, unknown> = {}): AnalyticsEvent => trackEvent('page_view', meta);
-export const trackCTA = (label: string, meta: Record<string, unknown> = {}): AnalyticsEvent => trackEvent('cta_click', { label, ...meta });
-export const trackLayoutView = (layoutId: string, meta: Record<string, unknown> = {}): AnalyticsEvent =>
-  trackEvent('layout_view', { layoutId, ...meta });
-export const trackLayoutDemo = (layoutId: string, meta: Record<string, unknown> = {}): AnalyticsEvent =>
-  trackEvent('layout_demo', { layoutId, ...meta });
-export const trackSectionViewed = (sectionId: string, meta: Record<string, unknown> = {}): AnalyticsEvent =>
-  trackEvent('section_view', { sectionId, ...meta });
-export const trackExperiment = (name: string, variant: string, meta: Record<string, unknown> = {}): AnalyticsEvent =>
-  trackEvent('experiment', { name, variant, ...meta });
+export const trackPageView = (meta: Record<string, unknown> = {}): AnalyticsEvent =>
+  trackEvent("page_view", meta);
+export const trackCTA = (label: string, meta: Record<string, unknown> = {}): AnalyticsEvent =>
+  trackEvent("cta_click", { label, ...meta });
+export const trackLayoutView = (
+  layoutId: string,
+  meta: Record<string, unknown> = {}
+): AnalyticsEvent => trackEvent("layout_view", { layoutId, ...meta });
+export const trackLayoutDemo = (
+  layoutId: string,
+  meta: Record<string, unknown> = {}
+): AnalyticsEvent => trackEvent("layout_demo", { layoutId, ...meta });
+export const trackSectionViewed = (
+  sectionId: string,
+  meta: Record<string, unknown> = {}
+): AnalyticsEvent => trackEvent("section_view", { sectionId, ...meta });
+export const trackExperiment = (
+  name: string,
+  variant: string,
+  meta: Record<string, unknown> = {}
+): AnalyticsEvent => trackEvent("experiment", { name, variant, ...meta });
 
 export const getRecentEvents = (): EventStore => getStore();
-

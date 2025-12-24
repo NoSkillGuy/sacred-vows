@@ -19,10 +19,10 @@ func TestDeleteInvitationUseCase_Execute_InvitationExists_DeletesInvitation(t *t
 	data := json.RawMessage(`{"title": "My Wedding"}`)
 
 	invitation := &domain.Invitation{
-		ID:       invitationID,
-		UserID:   userID,
-		LayoutID: layoutID,
-		Data:     data,
+		ID:        invitationID,
+		UserID:    userID,
+		LayoutID:  layoutID,
+		Data:      data,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -74,4 +74,3 @@ func TestDeleteInvitationUseCase_Execute_InvitationNotFound_ReturnsError(t *test
 	require.Error(t, err, "Invitation not found should return error")
 	assert.Nil(t, output, "Output should be nil on error")
 }
-

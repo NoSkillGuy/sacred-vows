@@ -3,16 +3,16 @@
  * Initializes tracing for the frontend application
  */
 
-import { WebTracerProvider, BatchSpanProcessor } from '@opentelemetry/sdk-trace-web';
-import { Resource } from '@opentelemetry/resources';
-import { SemanticResourceAttributes } from '@opentelemetry/semantic-conventions';
-import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { ZoneContextManager } from '@opentelemetry/context-zone-peer-dep';
-import { registerInstrumentations } from '@opentelemetry/instrumentation';
-import { DocumentLoadInstrumentation } from '@opentelemetry/instrumentation-document-load';
-import { FetchInstrumentation } from '@opentelemetry/instrumentation-fetch';
-import { UserInteractionInstrumentation } from '@opentelemetry/instrumentation-user-interaction';
-import { TraceIdRatioBasedSampler } from '@opentelemetry/sdk-trace-base';
+import { WebTracerProvider, BatchSpanProcessor } from "@opentelemetry/sdk-trace-web";
+import { Resource } from "@opentelemetry/resources";
+import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
+import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
+import { ZoneContextManager } from "@opentelemetry/context-zone-peer-dep";
+import { registerInstrumentations } from "@opentelemetry/instrumentation";
+import { DocumentLoadInstrumentation } from "@opentelemetry/instrumentation-document-load";
+import { FetchInstrumentation } from "@opentelemetry/instrumentation-fetch";
+import { UserInteractionInstrumentation } from "@opentelemetry/instrumentation-user-interaction";
+import { TraceIdRatioBasedSampler } from "@opentelemetry/sdk-trace-base";
 
 let tracerProvider: WebTracerProvider | null = null;
 
@@ -29,20 +29,20 @@ export function generateRequestId(): string {
  */
 export function initObservability(): void {
   // Check if observability is enabled
-  const enabled = import.meta.env.VITE_OTEL_ENABLED !== 'false';
+  const enabled = import.meta.env.VITE_OTEL_ENABLED !== "false";
   if (!enabled) {
-    console.log('[Observability] Disabled via VITE_OTEL_ENABLED=false');
+    console.log("[Observability] Disabled via VITE_OTEL_ENABLED=false");
     return;
   }
 
-  const endpoint = import.meta.env.VITE_OTEL_EXPORTER_OTLP_ENDPOINT || 'http://localhost:4318';
-  const serviceName = import.meta.env.VITE_OTEL_SERVICE_NAME || 'sacred-vows-web';
-  const serviceVersion = import.meta.env.VITE_OTEL_SERVICE_VERSION || 'unknown';
-  const deploymentEnvironment = import.meta.env.VITE_OTEL_DEPLOYMENT_ENVIRONMENT || 
-                                 import.meta.env.MODE || 'development';
-  const samplingRatio = parseFloat(import.meta.env.VITE_OTEL_TRACES_SAMPLER_RATIO || '0.01');
+  const endpoint = import.meta.env.VITE_OTEL_EXPORTER_OTLP_ENDPOINT || "http://localhost:4318";
+  const serviceName = import.meta.env.VITE_OTEL_SERVICE_NAME || "sacred-vows-web";
+  const serviceVersion = import.meta.env.VITE_OTEL_SERVICE_VERSION || "unknown";
+  const deploymentEnvironment =
+    import.meta.env.VITE_OTEL_DEPLOYMENT_ENVIRONMENT || import.meta.env.MODE || "development";
+  const samplingRatio = parseFloat(import.meta.env.VITE_OTEL_TRACES_SAMPLER_RATIO || "0.01");
 
-  console.log('[Observability] Initializing...', {
+  console.log("[Observability] Initializing...", {
     endpoint,
     serviceName,
     serviceVersion,
@@ -60,7 +60,7 @@ export function initObservability(): void {
     const resource = new Resource({
       [SemanticResourceAttributes.SERVICE_NAME]: serviceName,
       [SemanticResourceAttributes.SERVICE_VERSION]: serviceVersion,
-      'deployment.environment': deploymentEnvironment,
+      "deployment.environment": deploymentEnvironment,
     });
 
     // Create tracer provider with sampling
@@ -70,9 +70,7 @@ export function initObservability(): void {
     });
 
     // Add OTLP exporter
-    tracerProvider.addSpanProcessor(
-      new BatchSpanProcessor(exporter)
-    );
+    tracerProvider.addSpanProcessor(new BatchSpanProcessor(exporter));
 
     // Register instrumentations
     registerInstrumentations({
@@ -83,7 +81,7 @@ export function initObservability(): void {
           propagateTraceHeaderCorsUrls: [
             /^https?:\/\/localhost/,
             /^https?:\/\/.*\.localhost/,
-            new RegExp(import.meta.env.VITE_API_URL || 'http://localhost:3000'),
+            new RegExp(import.meta.env.VITE_API_URL || "http://localhost:3000"),
           ],
         }),
         new UserInteractionInstrumentation(),
@@ -95,9 +93,9 @@ export function initObservability(): void {
       contextManager: new ZoneContextManager(),
     });
 
-    console.log('[Observability] Initialized successfully');
+    console.log("[Observability] Initialized successfully");
   } catch (error) {
-    console.error('[Observability] Failed to initialize:', error);
+    console.error("[Observability] Failed to initialize:", error);
   }
 }
 
@@ -110,4 +108,3 @@ export function shutdownObservability(): Promise<void> {
   }
   return Promise.resolve();
 }
-

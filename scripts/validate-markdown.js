@@ -4,19 +4,19 @@
  * Validates that all markdown files can be rendered properly
  */
 
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+const fs = require("fs");
+const path = require("path");
+const { execSync } = require("child_process");
 
 // Colors for output
-const RED = '\x1b[31m';
-const YELLOW = '\x1b[33m';
-const GREEN = '\x1b[32m';
-const RESET = '\x1b[0m';
+const RED = "\x1b[31m";
+const YELLOW = "\x1b[33m";
+const GREEN = "\x1b[32m";
+const RESET = "\x1b[0m";
 
 let marked;
 try {
-  marked = require('marked');
+  marked = require("marked");
 } catch (e) {
   console.error(`${RED}Error: marked package not found${RESET}`);
   console.error(`${YELLOW}Please run: npm install${RESET}`);
@@ -30,7 +30,7 @@ marked.setOptions({
   pedantic: false,
   sanitize: false,
   smartLists: true,
-  smartypants: false
+  smartypants: false,
 });
 
 /**
@@ -38,20 +38,20 @@ marked.setOptions({
  */
 function validateMarkdownFile(filePath) {
   const issues = [];
-  const content = fs.readFileSync(filePath, 'utf-8');
+  const content = fs.readFileSync(filePath, "utf-8");
   const relativePath = path.relative(process.cwd(), filePath);
 
   // Check 1: Unclosed code blocks
   const codeBlockMatches = content.match(/```/g);
   if (codeBlockMatches && codeBlockMatches.length % 2 !== 0) {
-    issues.push('Unclosed code block');
+    issues.push("Unclosed code block");
   }
 
   // Check 2: Try to parse with marked
   try {
     const html = marked.parse(content);
     if (!html || html.trim().length === 0) {
-      issues.push('Rendered HTML is empty');
+      issues.push("Rendered HTML is empty");
     }
   } catch (e) {
     issues.push(`Markdown parse/render error: ${e.message}`);
@@ -61,13 +61,16 @@ function validateMarkdownFile(filePath) {
   const mermaidBlocks = content.match(/```mermaid\n([\s\S]*?)```/g);
   if (mermaidBlocks) {
     mermaidBlocks.forEach((block, idx) => {
-      const mermaidContent = block.replace(/```mermaid\n/, '').replace(/```$/, '');
+      const mermaidContent = block.replace(/```mermaid\n/, "").replace(/```$/, "");
 
       // Check for unescaped < characters that might be interpreted as HTML tags
       // Allow common mermaid patterns like "->" and "<-"
-      const problematicLt = mermaidContent.match(/[^&-><]<[^\/\s!]/g);
+      // Use explicit character class to avoid overly permissive range
+      // Match < that is not part of ->, <-, or HTML tag patterns
+      // Avoid using negation character classes that are too broad
+      const problematicLt = mermaidContent.match(/[a-zA-Z0-9_]\s*<\s*[0-9]/g);
       if (problematicLt) {
-        problematicLt.forEach(match => {
+        problematicLt.forEach((match) => {
           // Check if it's a comparison operator that should be escaped
           if (match.match(/[^&]<[0-9]/)) {
             issues.push(
@@ -80,12 +83,12 @@ function validateMarkdownFile(filePath) {
   }
 
   // Check 4: Check for malformed links
-  const lines = content.split('\n');
+  const lines = content.split("\n");
   lines.forEach((line, idx) => {
     // Check for malformed markdown links
     const linkMatches = line.match(/\[([^\]]*)\]\(([^)]*)\)/g);
     if (linkMatches) {
-      linkMatches.forEach(link => {
+      linkMatches.forEach((link) => {
         // Basic validation - link should have both text and URL
         if (!link.match(/\[([^\]]+)\]\(([^)]+)\)/)) {
           issues.push(`Malformed link at line ${idx + 1}: ${link.substring(0, 50)}`);
@@ -104,12 +107,12 @@ function main() {
   // Get staged markdown files from git
   let stagedFiles = [];
   try {
-    const gitOutput = execSync('git diff --cached --name-only --diff-filter=ACM', {
-      encoding: 'utf-8',
+    const gitOutput = execSync("git diff --cached --name-only --diff-filter=ACM", {
+      encoding: "utf-8",
     });
     stagedFiles = gitOutput
-      .split('\n')
-      .filter((file) => file.trim() && file.endsWith('.md'))
+      .split("\n")
+      .filter((file) => file.trim() && file.endsWith(".md"))
       .map((file) => path.resolve(process.cwd(), file))
       .filter((file) => fs.existsSync(file));
   } catch (e) {
@@ -140,7 +143,7 @@ function main() {
   });
 
   if (filesWithIssues.length > 0) {
-    console.log('');
+    console.log("");
     filesWithIssues.forEach(({ file, issues }) => {
       console.log(`${RED}✗${RESET} ${file}`);
       issues.forEach((issue) => {
@@ -150,15 +153,13 @@ function main() {
   }
 
   // Summary
-  console.log('\n' + '='.repeat(60));
+  console.log("\n" + "=".repeat(60));
   console.log(`✓ Files without issues: ${filesWithoutIssues.length}`);
   console.log(`✗ Files with issues: ${filesWithIssues.length}`);
 
   if (filesWithIssues.length > 0) {
     console.log(`\n${RED}❌ Markdown validation failed${RESET}`);
-    console.log(
-      `${YELLOW}Please fix the issues above before committing.${RESET}\n`
-    );
+    console.log(`${YELLOW}Please fix the issues above before committing.${RESET}\n`);
     process.exit(1);
   } else {
     console.log(`\n${GREEN}✅ All markdown files are valid${RESET}\n`);
@@ -172,4 +173,3 @@ if (require.main === module) {
 }
 
 module.exports = { validateMarkdownFile };
-

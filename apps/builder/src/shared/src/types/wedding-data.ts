@@ -1,7 +1,7 @@
 /**
  * Wedding Data Schema
  * Defines the structure for wedding invitation data
- * 
+ *
  * This schema separates:
  * 1. Universal Content Data - Shared across all layouts (couple, events, venue, etc.)
  * 2. Layout Configuration - Per-layout settings (sections, themes)
@@ -117,11 +117,11 @@ export interface VideoConfig {
 export interface EditorialIntroConfig {
   text: string;
   image: string;
-  alignment: 'left' | 'right';
+  alignment: "left" | "right";
 }
 
 export interface ImageFilterConfig {
-  filter: 'none' | 'bw' | 'sepia' | 'desaturated';
+  filter: "none" | "bw" | "sepia" | "desaturated";
   intensity: number;
 }
 
@@ -204,18 +204,18 @@ export interface InvitationData {
 // ============================================================================
 
 export const SECTION_TYPES = {
-  HEADER: 'header',
-  HERO: 'hero',
-  COUPLE: 'couple',
-  FATHERS_LETTER: 'fathers-letter',
-  GALLERY: 'gallery',
-  EVENTS: 'events',
-  VENUE: 'venue',
-  RSVP: 'rsvp',
-  FOOTER: 'footer',
+  HEADER: "header",
+  HERO: "hero",
+  COUPLE: "couple",
+  FATHERS_LETTER: "fathers-letter",
+  GALLERY: "gallery",
+  EVENTS: "events",
+  VENUE: "venue",
+  RSVP: "rsvp",
+  FOOTER: "footer",
 } as const;
 
-export type SectionType = typeof SECTION_TYPES[keyof typeof SECTION_TYPES];
+export type SectionType = (typeof SECTION_TYPES)[keyof typeof SECTION_TYPES];
 
 export interface SectionMetadata {
   id: string;
@@ -228,65 +228,65 @@ export interface SectionMetadata {
 export const SECTION_METADATA: Record<SectionType, SectionMetadata> = {
   [SECTION_TYPES.HEADER]: {
     id: SECTION_TYPES.HEADER,
-    name: 'Header',
-    description: 'Navigation and branding header',
-    icon: '📌',
+    name: "Header",
+    description: "Navigation and branding header",
+    icon: "📌",
     required: true,
   },
   [SECTION_TYPES.HERO]: {
     id: SECTION_TYPES.HERO,
-    name: 'Hero Banner',
-    description: 'Main hero section with couple photo and countdown',
-    icon: '🖼️',
+    name: "Hero Banner",
+    description: "Main hero section with couple photo and countdown",
+    icon: "🖼️",
     required: false,
   },
   [SECTION_TYPES.COUPLE]: {
     id: SECTION_TYPES.COUPLE,
-    name: 'Couple Profile',
-    description: 'Bride and groom information with photos',
-    icon: '💑',
+    name: "Couple Profile",
+    description: "Bride and groom information with photos",
+    icon: "💑",
     required: false,
   },
   [SECTION_TYPES.FATHERS_LETTER]: {
     id: SECTION_TYPES.FATHERS_LETTER,
     name: "Father's Letter",
-    description: 'Heartfelt letter from the father',
-    icon: '✉️',
+    description: "Heartfelt letter from the father",
+    icon: "✉️",
     required: false,
   },
   [SECTION_TYPES.GALLERY]: {
     id: SECTION_TYPES.GALLERY,
-    name: 'Photo Gallery',
-    description: 'Photo gallery with lightbox',
-    icon: '📷',
+    name: "Photo Gallery",
+    description: "Photo gallery with lightbox",
+    icon: "📷",
     required: false,
   },
   [SECTION_TYPES.EVENTS]: {
     id: SECTION_TYPES.EVENTS,
-    name: 'Events Timeline',
-    description: 'Wedding events schedule',
-    icon: '📅',
+    name: "Events Timeline",
+    description: "Wedding events schedule",
+    icon: "📅",
     required: false,
   },
   [SECTION_TYPES.VENUE]: {
     id: SECTION_TYPES.VENUE,
-    name: 'Venue Details',
-    description: 'Venue location with map',
-    icon: '📍',
+    name: "Venue Details",
+    description: "Venue location with map",
+    icon: "📍",
     required: false,
   },
   [SECTION_TYPES.RSVP]: {
     id: SECTION_TYPES.RSVP,
-    name: 'RSVP Section',
-    description: 'Guest RSVP form and contacts',
-    icon: '💌',
+    name: "RSVP Section",
+    description: "Guest RSVP form and contacts",
+    icon: "💌",
     required: false,
   },
   [SECTION_TYPES.FOOTER]: {
     id: SECTION_TYPES.FOOTER,
-    name: 'Footer',
-    description: 'Closing message and credits',
-    icon: '🎀',
+    name: "Footer",
+    description: "Closing message and credits",
+    icon: "🎀",
     required: true,
   },
 };
@@ -303,7 +303,9 @@ export const DEFAULT_SECTION_ORDER: SectionType[] = [
   SECTION_TYPES.FOOTER,
 ];
 
-export function createDefaultSections(sectionOrder: SectionType[] = DEFAULT_SECTION_ORDER): SectionConfig[] {
+export function createDefaultSections(
+  sectionOrder: SectionType[] = DEFAULT_SECTION_ORDER
+): SectionConfig[] {
   return sectionOrder.map((id, index) => ({
     id,
     enabled: true,
@@ -312,22 +314,22 @@ export function createDefaultSections(sectionOrder: SectionType[] = DEFAULT_SECT
 }
 
 export const DEFAULT_THEME: ThemeConfig = {
-  preset: 'custom',
+  preset: "custom",
   colors: {
-    primary: '#d4af37',
-    secondary: '#8b6914',
-    background: '#fff8f0',
-    text: '#2c2c2c',
-    accent: '#c9a227',
+    primary: "#d4af37",
+    secondary: "#8b6914",
+    background: "#fff8f0",
+    text: "#2c2c2c",
+    accent: "#c9a227",
   },
   fonts: {
-    heading: 'Playfair Display',
-    body: 'Poppins',
-    script: 'Great Vibes',
+    heading: "Playfair Display",
+    body: "Poppins",
+    script: "Great Vibes",
   },
 };
 
-export function createDefaultLayoutConfig(layoutId: string = 'classic-scroll'): LayoutConfig {
+export function createDefaultLayoutConfig(_layoutId: string = "classic-scroll"): LayoutConfig {
   return {
     sections: createDefaultSections(),
     theme: { ...DEFAULT_THEME },
@@ -343,4 +345,3 @@ export const WeddingDataSchema = {
   createDefaultSections,
   createDefaultLayoutConfig,
 };
-
