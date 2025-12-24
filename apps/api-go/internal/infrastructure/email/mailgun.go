@@ -12,10 +12,11 @@ import (
 )
 
 type mailgunService struct {
-	client    *mailgun.MailgunImpl
-	fromEmail string
-	fromName  string
-	template  *template.Template
+	client              *mailgun.MailgunImpl
+	fromEmail           string
+	fromName            string
+	passwordResetTmpl   *template.Template
+	passwordChangeOTPTmpl *template.Template
 }
 
 // NewMailgunService creates a new Mailgun email service implementation
@@ -35,18 +36,26 @@ func NewMailgunService(cfg config.EmailVendorConfig) (emailInterface.EmailServic
 
 	mg := mailgun.NewMailgun(domain, cfg.APIKey)
 
-	// Load email template
-	templatePath := getTemplatePath()
-	tmpl, err := template.ParseFiles(templatePath)
+	// Load password reset email template
+	passwordResetTemplatePath := getTemplatePath("password_reset.html")
+	passwordResetTmpl, err := template.ParseFiles(passwordResetTemplatePath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to load email template: %w", err)
+		return nil, fmt.Errorf("failed to load password reset email template: %w", err)
+	}
+
+	// Load password change OTP email template
+	passwordChangeOTPTemplatePath := getTemplatePath("password_change_otp.html")
+	passwordChangeOTPTmpl, err := template.ParseFiles(passwordChangeOTPTemplatePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load password change OTP email template: %w", err)
 	}
 
 	return &mailgunService{
-		client:    mg,
-		fromEmail: cfg.FromAddress,
-		fromName:  cfg.FromName,
-		template:  tmpl,
+		client:              mg,
+		fromEmail:           cfg.FromAddress,
+		fromName:            cfg.FromName,
+		passwordResetTmpl:   passwordResetTmpl,
+		passwordChangeOTPTmpl: passwordChangeOTPTmpl,
 	}, nil
 }
 
@@ -62,7 +71,7 @@ func (s *mailgunService) SendPasswordResetEmail(ctx context.Context, toEmail str
 
 	// Render HTML template
 	var htmlBody bytes.Buffer
-	if err := s.template.Execute(&htmlBody, templateData); err != nil {
+	if err := s.passwordResetTmpl.Execute(&htmlBody, templateData); err != nil {
 		return fmt.Errorf("failed to render email template: %w", err)
 	}
 
@@ -70,6 +79,40 @@ func (s *mailgunService) SendPasswordResetEmail(ctx context.Context, toEmail str
 	message := s.client.NewMessage(
 		fmt.Sprintf("%s <%s>", s.fromName, s.fromEmail),
 		"Reset your Sacred Vows password",
+		"", // text part - empty, we're using HTML
+		toEmail,
+	)
+	message.SetHtml(htmlBody.String())
+
+	// Send email via Mailgun API
+	_, _, err := s.client.Send(ctx, message)
+	if err != nil {
+		return fmt.Errorf("failed to send email via Mailgun: %w", err)
+	}
+
+	return nil
+}
+
+func (s *mailgunService) SendPasswordChangeOTPEmail(ctx context.Context, toEmail string, otp string) error {
+	// Prepare template data
+	templateData := struct {
+		OTP   string
+		Email string
+	}{
+		OTP:   otp,
+		Email: toEmail,
+	}
+
+	// Render HTML template
+	var htmlBody bytes.Buffer
+	if err := s.passwordChangeOTPTmpl.Execute(&htmlBody, templateData); err != nil {
+		return fmt.Errorf("failed to render email template: %w", err)
+	}
+
+	// Create message
+	message := s.client.NewMessage(
+		fmt.Sprintf("%s <%s>", s.fromName, s.fromEmail),
+		"Your password update code (valid for 5 minutes)",
 		"", // text part - empty, we're using HTML
 		toEmail,
 	)

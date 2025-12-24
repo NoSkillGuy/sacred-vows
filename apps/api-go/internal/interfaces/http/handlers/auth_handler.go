@@ -15,19 +15,21 @@ import (
 )
 
 type AuthHandler struct {
-	registerUC             *authuc.RegisterUseCase
-	loginUC                *authuc.LoginUseCase
-	getCurrentUserUC       *authuc.GetCurrentUserUseCase
-	deleteUserUC           *authuc.DeleteUserUseCase
-	googleOAuthUC          *authuc.GoogleOAuthUseCase
-	refreshTokenUC         *authuc.RefreshTokenUseCase
-	requestPasswordResetUC *authuc.RequestPasswordResetUseCase
-	resetPasswordUC        *authuc.ResetPasswordUseCase
-	refreshTokenRepo       repository.RefreshTokenRepository
-	jwtService             *authinfra.JWTService
-	googleOAuth            *authinfra.GoogleOAuthService
-	hmacKeys               []authinfra.RefreshTokenHMACKey
-	activeHMACKeyID        int16
+	registerUC                *authuc.RegisterUseCase
+	loginUC                   *authuc.LoginUseCase
+	getCurrentUserUC          *authuc.GetCurrentUserUseCase
+	deleteUserUC              *authuc.DeleteUserUseCase
+	googleOAuthUC             *authuc.GoogleOAuthUseCase
+	refreshTokenUC            *authuc.RefreshTokenUseCase
+	requestPasswordResetUC    *authuc.RequestPasswordResetUseCase
+	resetPasswordUC           *authuc.ResetPasswordUseCase
+	requestPasswordChangeOTPUC *authuc.RequestPasswordChangeOTPUseCase
+	verifyPasswordChangeOTPUC *authuc.VerifyPasswordChangeOTPUseCase
+	refreshTokenRepo          repository.RefreshTokenRepository
+	jwtService                *authinfra.JWTService
+	googleOAuth               *authinfra.GoogleOAuthService
+	hmacKeys                  []authinfra.RefreshTokenHMACKey
+	activeHMACKeyID           int16
 }
 
 func NewAuthHandler(
@@ -39,6 +41,8 @@ func NewAuthHandler(
 	refreshTokenUC *authuc.RefreshTokenUseCase,
 	requestPasswordResetUC *authuc.RequestPasswordResetUseCase,
 	resetPasswordUC *authuc.ResetPasswordUseCase,
+	requestPasswordChangeOTPUC *authuc.RequestPasswordChangeOTPUseCase,
+	verifyPasswordChangeOTPUC *authuc.VerifyPasswordChangeOTPUseCase,
 	refreshTokenRepo repository.RefreshTokenRepository,
 	jwtService *authinfra.JWTService,
 	googleOAuth *authinfra.GoogleOAuthService,
@@ -46,19 +50,21 @@ func NewAuthHandler(
 	activeHMACKeyID int16,
 ) *AuthHandler {
 	return &AuthHandler{
-		registerUC:             registerUC,
-		loginUC:                loginUC,
-		getCurrentUserUC:       getCurrentUserUC,
-		deleteUserUC:           deleteUserUC,
-		googleOAuthUC:          googleOAuthUC,
-		refreshTokenUC:         refreshTokenUC,
-		requestPasswordResetUC: requestPasswordResetUC,
-		resetPasswordUC:        resetPasswordUC,
-		refreshTokenRepo:       refreshTokenRepo,
-		jwtService:             jwtService,
-		googleOAuth:            googleOAuth,
-		hmacKeys:               hmacKeys,
-		activeHMACKeyID:        activeHMACKeyID,
+		registerUC:                registerUC,
+		loginUC:                   loginUC,
+		getCurrentUserUC:          getCurrentUserUC,
+		deleteUserUC:              deleteUserUC,
+		googleOAuthUC:             googleOAuthUC,
+		refreshTokenUC:            refreshTokenUC,
+		requestPasswordResetUC:    requestPasswordResetUC,
+		resetPasswordUC:           resetPasswordUC,
+		requestPasswordChangeOTPUC: requestPasswordChangeOTPUC,
+		verifyPasswordChangeOTPUC: verifyPasswordChangeOTPUC,
+		refreshTokenRepo:          refreshTokenRepo,
+		jwtService:                jwtService,
+		googleOAuth:               googleOAuth,
+		hmacKeys:                  hmacKeys,
+		activeHMACKeyID:           activeHMACKeyID,
 	}
 }
 
@@ -581,6 +587,15 @@ type ResetPasswordRequest struct {
 	Password string `json:"password" binding:"required" example:"newSecurePassword123"`
 }
 
+type RequestPasswordChangeOTPRequest struct {
+	Email string `json:"email" binding:"required" example:"user@example.com"`
+}
+
+type VerifyPasswordChangeOTPRequest struct {
+	OTP         string `json:"otp" binding:"required" example:"123456"`
+	NewPassword string `json:"newPassword" binding:"required" example:"newSecurePassword123"`
+}
+
 // ForgotPassword handles password reset requests
 // @Summary      Request password reset
 // @Description  Sends a password reset email to the user if an account with that email exists. Always returns success for security reasons.
@@ -665,5 +680,112 @@ func (h *AuthHandler) ResetPassword(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Password reset successfully",
+	})
+}
+
+// RequestPasswordChangeOTP handles password change OTP requests
+// @Summary      Request password change OTP
+// @Description  Sends a 6-digit OTP to the user's email for password change verification. Requires authentication.
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request  body      RequestPasswordChangeOTPRequest  true  "Password change OTP request"
+// @Success      200      {object}  MessageResponse                  "OTP sent successfully"
+// @Failure      400      {object}  ErrorResponse                   "Invalid request"
+// @Failure      401      {object}  ErrorResponse                   "Authentication required"
+// @Failure      429      {object}  ErrorResponse                   "Too many requests (cooldown)"
+// @Failure      500      {object}  ErrorResponse                   "Internal server error"
+// @Router       /auth/password/request-otp [post]
+func (h *AuthHandler) RequestPasswordChangeOTP(c *gin.Context) {
+	if h.requestPasswordChangeOTPUC == nil {
+		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "Email service is not configured. Password change is currently unavailable."})
+		return
+	}
+
+	// Get user ID from JWT token (set by AuthenticateToken middleware)
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+		return
+	}
+
+	var req RequestPasswordChangeOTPRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email is required"})
+		return
+	}
+
+	_, err := h.requestPasswordChangeOTPUC.Execute(c.Request.Context(), authuc.RequestPasswordChangeOTPInput{
+		UserID: userID.(string),
+		Email:  req.Email,
+	})
+
+	if err != nil {
+		appErr, ok := err.(*errors.AppError)
+		if ok {
+			c.JSON(appErr.Code, appErr.ToResponse())
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to send OTP"})
+		return
+	}
+
+	// Always return success (security best practice - don't reveal if email exists)
+	c.JSON(http.StatusOK, gin.H{
+		"message": "If an account with that email exists, we've sent a verification code.",
+	})
+}
+
+// VerifyPasswordChangeOTP handles password change with OTP verification
+// @Summary      Verify password change OTP
+// @Description  Verifies the OTP and updates the user's password. Requires authentication.
+// @Tags         auth
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request  body      VerifyPasswordChangeOTPRequest  true  "Password change OTP verification"
+// @Success      200      {object}  MessageResponse                "Password updated successfully"
+// @Failure      400      {object}  ErrorResponse                  "Invalid request"
+// @Failure      401      {object}  ErrorResponse                  "Invalid or expired OTP"
+// @Failure      500      {object}  ErrorResponse                  "Internal server error"
+// @Router       /auth/password/verify-otp [post]
+func (h *AuthHandler) VerifyPasswordChangeOTP(c *gin.Context) {
+	if h.verifyPasswordChangeOTPUC == nil {
+		c.JSON(http.StatusServiceUnavailable, gin.H{"error": "Password change service is not configured. Please contact support."})
+		return
+	}
+
+	// Get user ID from JWT token (set by AuthenticateToken middleware)
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+		return
+	}
+
+	var req VerifyPasswordChangeOTPRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "OTP and new password are required"})
+		return
+	}
+
+	_, err := h.verifyPasswordChangeOTPUC.Execute(c.Request.Context(), authuc.VerifyPasswordChangeOTPInput{
+		UserID:      userID.(string),
+		OTP:         req.OTP,
+		NewPassword: req.NewPassword,
+	})
+
+	if err != nil {
+		appErr, ok := err.(*errors.AppError)
+		if ok {
+			c.JSON(appErr.Code, appErr.ToResponse())
+			return
+		}
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Failed to verify OTP"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Password updated successfully",
 	})
 }

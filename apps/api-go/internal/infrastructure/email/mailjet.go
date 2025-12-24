@@ -14,10 +14,11 @@ import (
 )
 
 type mailjetService struct {
-	client    *mailjet.Client
-	fromEmail string
-	fromName  string
-	template  *template.Template
+	client              *mailjet.Client
+	fromEmail           string
+	fromName            string
+	passwordResetTmpl   *template.Template
+	passwordChangeOTPTmpl *template.Template
 }
 
 // NewMailjetService creates a new Mailjet email service implementation
@@ -32,18 +33,26 @@ func NewMailjetService(cfg config.EmailVendorConfig) (emailInterface.EmailServic
 
 	client := mailjet.NewMailjetClient(cfg.APIKey, cfg.SecretKey)
 
-	// Load email template
-	templatePath := getTemplatePath()
-	tmpl, err := template.ParseFiles(templatePath)
+	// Load password reset email template
+	passwordResetTemplatePath := getTemplatePath("password_reset.html")
+	passwordResetTmpl, err := template.ParseFiles(passwordResetTemplatePath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to load email template: %w", err)
+		return nil, fmt.Errorf("failed to load password reset email template: %w", err)
+	}
+
+	// Load password change OTP email template
+	passwordChangeOTPTemplatePath := getTemplatePath("password_change_otp.html")
+	passwordChangeOTPTmpl, err := template.ParseFiles(passwordChangeOTPTemplatePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load password change OTP email template: %w", err)
 	}
 
 	return &mailjetService{
-		client:    client,
-		fromEmail: cfg.FromAddress,
-		fromName:  cfg.FromName,
-		template:  tmpl,
+		client:              client,
+		fromEmail:           cfg.FromAddress,
+		fromName:            cfg.FromName,
+		passwordResetTmpl:   passwordResetTmpl,
+		passwordChangeOTPTmpl: passwordChangeOTPTmpl,
 	}, nil
 }
 
@@ -59,7 +68,7 @@ func (s *mailjetService) SendPasswordResetEmail(ctx context.Context, toEmail str
 
 	// Render HTML template
 	var htmlBody bytes.Buffer
-	if err := s.template.Execute(&htmlBody, templateData); err != nil {
+	if err := s.passwordResetTmpl.Execute(&htmlBody, templateData); err != nil {
 		return fmt.Errorf("failed to render email template: %w", err)
 	}
 
@@ -91,21 +100,68 @@ func (s *mailjetService) SendPasswordResetEmail(ctx context.Context, toEmail str
 	return nil
 }
 
+	return nil
+}
+
+func (s *mailjetService) SendPasswordChangeOTPEmail(ctx context.Context, toEmail string, otp string) error {
+	// Prepare template data
+	templateData := struct {
+		OTP   string
+		Email string
+	}{
+		OTP:   otp,
+		Email: toEmail,
+	}
+
+	// Render HTML template
+	var htmlBody bytes.Buffer
+	if err := s.passwordChangeOTPTmpl.Execute(&htmlBody, templateData); err != nil {
+		return fmt.Errorf("failed to render email template: %w", err)
+	}
+
+	// Build Mailjet message
+	messagesInfo := []mailjet.InfoMessagesV31{
+		{
+			From: &mailjet.RecipientV31{
+				Email: s.fromEmail,
+				Name:  s.fromName,
+			},
+			To: &mailjet.RecipientsV31{
+				mailjet.RecipientV31{
+					Email: toEmail,
+				},
+			},
+			Subject:  "Your password update code (valid for 5 minutes)",
+			HTMLPart: htmlBody.String(),
+		},
+	}
+
+	messages := mailjet.MessagesV31{Info: messagesInfo}
+
+	// Send email via Mailjet API
+	_, err := s.client.SendMailV31(&messages)
+	if err != nil {
+		return fmt.Errorf("failed to send email via Mailjet: %w", err)
+	}
+
+	return nil
+}
+
 // getTemplatePath returns the path to the email template
 // It tries multiple locations to find the template file
-func getTemplatePath() string {
+func getTemplatePath(filename string) string {
 	// Try common paths relative to the executable
 	candidates := []string{
-		"./internal/infrastructure/email/templates/password_reset.html",
-		"internal/infrastructure/email/templates/password_reset.html",
-		filepath.Join(".", "internal", "infrastructure", "email", "templates", "password_reset.html"),
+		fmt.Sprintf("./internal/infrastructure/email/templates/%s", filename),
+		fmt.Sprintf("internal/infrastructure/email/templates/%s", filename),
+		filepath.Join(".", "internal", "infrastructure", "email", "templates", filename),
 	}
 
 	// Also try relative to current working directory
 	if cwd, err := os.Getwd(); err == nil {
 		candidates = append(candidates,
-			filepath.Join(cwd, "internal", "infrastructure", "email", "templates", "password_reset.html"),
-			filepath.Join(cwd, "apps", "api-go", "internal", "infrastructure", "email", "templates", "password_reset.html"),
+			filepath.Join(cwd, "internal", "infrastructure", "email", "templates", filename),
+			filepath.Join(cwd, "apps", "api-go", "internal", "infrastructure", "email", "templates", filename),
 		)
 	}
 

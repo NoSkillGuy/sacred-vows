@@ -9,6 +9,7 @@ import ProtectedRoute from './components/Auth/ProtectedRoute';
 import SmartRedirect from './components/Auth/SmartRedirect';
 import Dashboard from './components/Dashboard/Dashboard';
 import LayoutGallery from './components/Dashboard/LayoutGallery';
+import ProfilePage from './components/Profile/ProfilePage';
 
 // Static Pages
 import PricingPage from './components/Pages/Support/PricingPage';
@@ -80,6 +81,16 @@ function App(): JSX.Element {
           element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          } 
+        />
+        
+        {/* Profile - user profile and settings */}
+        <Route 
+          path="/profile" 
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
             </ProtectedRoute>
           } 
         />

@@ -324,3 +324,60 @@ export async function resetPassword(token: string, password: string): Promise<Su
   }
 }
 
+/**
+ * Request password change OTP
+ * @param email - User email
+ * @returns Success response
+ */
+export async function requestPasswordChangeOTP(email: string): Promise<SuccessResponse> {
+  try {
+    const response = await apiRequest(`${API_BASE_URL}/auth/password/request-otp`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json() as ErrorResponse;
+      throw new Error(error.error || 'Failed to send OTP');
+    }
+
+    const data = await response.json() as SuccessResponse;
+    return data;
+  } catch (error) {
+    console.error('Password change OTP request error:', error);
+    throw error;
+  }
+}
+
+/**
+ * Verify password change OTP and update password
+ * @param otp - 6-digit OTP code
+ * @param newPassword - New password
+ * @returns Success response
+ */
+export async function verifyPasswordChangeOTP(otp: string, newPassword: string): Promise<SuccessResponse> {
+  try {
+    const response = await apiRequest(`${API_BASE_URL}/auth/password/verify-otp`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ otp, newPassword }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json() as ErrorResponse;
+      throw new Error(error.error || 'Failed to verify OTP');
+    }
+
+    const data = await response.json() as SuccessResponse;
+    return data;
+  } catch (error) {
+    console.error('Password change OTP verification error:', error);
+    throw error;
+  }
+}
+

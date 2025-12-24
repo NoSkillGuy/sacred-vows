@@ -106,6 +106,7 @@ func main() {
 	var analyticsRepo repository.AnalyticsRepository
 	var refreshTokenRepo repository.RefreshTokenRepository
 	var passwordResetRepo repository.PasswordResetRepository
+	var passwordChangeOTPRepo repository.PasswordChangeOTPRepository
 	var publishedSiteRepo repository.PublishedSiteRepository
 	var emailUsageRepo repository.EmailUsageRepository
 
@@ -117,6 +118,7 @@ func main() {
 	analyticsRepo = firestore.NewAnalyticsRepository(firestoreClient)
 	refreshTokenRepo = firestore.NewRefreshTokenRepository(firestoreClient)
 	passwordResetRepo = firestore.NewPasswordResetRepository(firestoreClient)
+	passwordChangeOTPRepo = firestore.NewPasswordChangeOTPRepository(firestoreClient)
 	publishedSiteRepo = firestore.NewPublishedSiteRepository(firestoreClient)
 	emailUsageRepo = firestore.NewEmailUsageRepository(firestoreClient)
 
@@ -201,9 +203,13 @@ func main() {
 	// Password reset use cases (only if email service is configured)
 	var requestPasswordResetUC *authUC.RequestPasswordResetUseCase
 	var resetPasswordUC *authUC.ResetPasswordUseCase
+	var requestPasswordChangeOTPUC *authUC.RequestPasswordChangeOTPUseCase
+	var verifyPasswordChangeOTPUC *authUC.VerifyPasswordChangeOTPUseCase
 	if emailService != nil {
 		requestPasswordResetUC = authUC.NewRequestPasswordResetUseCase(userRepo, passwordResetRepo, emailService, clk, cfg.Google.FrontendURL)
 		resetPasswordUC = authUC.NewResetPasswordUseCase(passwordResetRepo, userRepo)
+		requestPasswordChangeOTPUC = authUC.NewRequestPasswordChangeOTPUseCase(userRepo, passwordChangeOTPRepo, emailService, clk)
+		verifyPasswordChangeOTPUC = authUC.NewVerifyPasswordChangeOTPUseCase(userRepo, passwordChangeOTPRepo)
 	}
 
 	createInvitationUC := invitation.NewCreateInvitationUseCase(invitationRepo, assetRepo)
@@ -278,7 +284,7 @@ func main() {
 	rollbackUC := publishUC.NewRollbackPublishedSiteUseCase(publishedSiteRepo, artifactStore)
 
 	// Initialize handlers
-	authHandler := handlers.NewAuthHandler(registerUC, loginUC, getCurrentUserUC, deleteUserUC, googleOAuthUC, refreshTokenUC, requestPasswordResetUC, resetPasswordUC, refreshTokenRepo, jwtService, googleOAuthService, hmacKeys, cfg.Auth.RefreshTokenHMACActiveKeyID)
+	authHandler := handlers.NewAuthHandler(registerUC, loginUC, getCurrentUserUC, deleteUserUC, googleOAuthUC, refreshTokenUC, requestPasswordResetUC, resetPasswordUC, requestPasswordChangeOTPUC, verifyPasswordChangeOTPUC, refreshTokenRepo, jwtService, googleOAuthService, hmacKeys, cfg.Auth.RefreshTokenHMACActiveKeyID)
 	invitationHandler := handlers.NewInvitationHandler(createInvitationUC, getInvitationByIDUC, getAllInvitationsUC, getInvitationPreviewUC, updateInvitationUC, deleteInvitationUC, migrateInvitationsUC, fileStorage)
 	layoutHandler := handlers.NewLayoutHandler(getAllLayoutsUC, getLayoutByIDUC, getLayoutManifestUC, getManifestsUC)
 	assetHandler := handlers.NewAssetHandler(uploadAssetUC, getAllAssetsUC, deleteAssetUC, deleteAssetsByURLsUC, getAssetsByURLsUC, fileStorage, gcsStorage, cfg.Storage.SignedURLExpiration, imageProcessor)

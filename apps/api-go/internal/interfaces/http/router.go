@@ -97,6 +97,8 @@ func (r *Router) Setup() *gin.Engine {
 			auth.POST("/google/verify", r.authHandler.GoogleVerify)
 			auth.POST("/forgot-password", r.authHandler.ForgotPassword)
 			auth.POST("/reset-password", r.authHandler.ResetPassword)
+			auth.POST("/password/request-otp", middleware.RateLimit(1, 0.033), middleware.AuthenticateToken(r.jwtService), r.authHandler.RequestPasswordChangeOTP)
+			auth.POST("/password/verify-otp", middleware.AuthenticateToken(r.jwtService), r.authHandler.VerifyPasswordChangeOTP)
 
 			// Test-only endpoint: Delete user (only enabled in local/test environments)
 			appEnv := os.Getenv("APP_ENV")

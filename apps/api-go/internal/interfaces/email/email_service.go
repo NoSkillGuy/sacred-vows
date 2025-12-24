@@ -9,6 +9,9 @@ type EmailService interface {
 	// SendPasswordResetEmail sends a password reset email to the specified address
 	// with the provided reset link
 	SendPasswordResetEmail(ctx context.Context, toEmail string, resetLink string) error
+	// SendPasswordChangeOTPEmail sends a password change OTP email to the specified address
+	// with the provided 6-digit OTP code
+	SendPasswordChangeOTPEmail(ctx context.Context, toEmail string, otp string) error
 }
 
 

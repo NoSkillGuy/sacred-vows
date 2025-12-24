@@ -69,6 +69,13 @@ const CalendarIcon = (): JSX.Element => (
   </svg>
 );
 
+const ProfileIcon = (): JSX.Element => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+    <circle cx="12" cy="7" r="4"/>
+  </svg>
+);
+
 const LogoutIcon = (): JSX.Element => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
@@ -334,6 +341,10 @@ function Dashboard(): JSX.Element {
                   <div className="user-dropdown-name">{user?.name || 'Guest'}</div>
                   <div className="user-dropdown-email">{user?.email || ''}</div>
                 </div>
+                <Link to="/profile" className="user-dropdown-item" onClick={() => setDropdownOpen(false)}>
+                  <ProfileIcon />
+                  Profile
+                </Link>
                 <button className="user-dropdown-item logout" onClick={handleLogout}>
                   <LogoutIcon />
                   Sign Out

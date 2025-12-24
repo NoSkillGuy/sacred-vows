@@ -48,6 +48,7 @@ var (
 	ErrForbidden           = New(http.StatusForbidden, "Invalid or expired token")
 	ErrInternalServerError = New(http.StatusInternalServerError, "Internal server error")
 	ErrConflict            = New(http.StatusConflict, "Resource already exists")
+	ErrTooManyRequests     = New(http.StatusTooManyRequests, "Too many requests")
 )
 
 // ErrorResponse represents an error response
