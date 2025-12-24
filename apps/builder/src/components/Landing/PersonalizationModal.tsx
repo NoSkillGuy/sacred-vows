@@ -95,38 +95,46 @@ function PersonalizationModal({
     }
   };
 
+  // Load data when modal opens
   useEffect(() => {
-    if (isOpen) {
-      // Load existing data if any
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-          const data = JSON.parse(stored) as PersonalizationData;
-          setBrideName(data.brideName || "");
-          setGroomName(data.groomName || "");
-          setWeddingDate(data.weddingDate || "");
-          setVenue(data.venue || "");
-        }
-      } catch (error) {
-        console.error("Failed to load personalization data:", error);
+    if (!isOpen) return;
+
+    // Load existing data if any
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const data = JSON.parse(stored) as PersonalizationData;
+        // Batch state updates to avoid multiple renders
+        setBrideName(data.brideName || "");
+        setGroomName(data.groomName || "");
+        setWeddingDate(data.weddingDate || "");
+        setVenue(data.venue || "");
+      } else {
+        // Reset to empty if no stored data
+        setBrideName("");
+        setGroomName("");
+        setWeddingDate("");
+        setVenue("");
       }
-
-      // Handle ESC key to close modal
-      const handleEscape = (e: KeyboardEvent): void => {
-        if (e.key === "Escape") {
-          onClose();
-        }
-      };
-
-      document.addEventListener("keydown", handleEscape as EventListener);
-      // Prevent body scroll when modal is open
-      document.body.style.overflow = "hidden";
-
-      return () => {
-        document.removeEventListener("keydown", handleEscape as EventListener);
-        document.body.style.overflow = "";
-      };
+    } catch (error) {
+      console.error("Failed to load personalization data:", error);
     }
+
+    // Handle ESC key to close modal
+    const handleEscape = (e: KeyboardEvent): void => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape as EventListener);
+    // Prevent body scroll when modal is open
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape as EventListener);
+      document.body.style.overflow = "";
+    };
   }, [isOpen, onClose]);
 
   // Get display values with fallbacks for preview
@@ -162,14 +170,14 @@ function PersonalizationModal({
             {/* Form Section */}
             <div className="personalization-form-section">
               <p className="personalization-explanation">
-                We'd love to personalize your preview! Share your details below to see them update
-                in real-time.
+                We&apos;d love to personalize your preview! Share your details below to see them
+                update in real-time.
               </p>
 
               <form onSubmit={handleSave}>
                 <div className="form-group">
                   <label htmlFor="bride-name" className="form-label">
-                    Bride's Name
+                    Bride&apos;s Name
                   </label>
                   <input
                     type="text"
@@ -184,7 +192,7 @@ function PersonalizationModal({
 
                 <div className="form-group">
                   <label htmlFor="groom-name" className="form-label">
-                    Groom's Name
+                    Groom&apos;s Name
                   </label>
                   <input
                     type="text"

@@ -32,7 +32,8 @@ function LayoutCardUnified({
     return null;
   }
 
-  const { primary, background, accent, text } = colors;
+  // Colors destructured but unused - keeping for potential future use
+  // const { primary, background, accent, text } = colors;
 
   const baseTags = [...(layout.tags || []), layout.isFeatured ? "featured" : null].filter(Boolean);
 

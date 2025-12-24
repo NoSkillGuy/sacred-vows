@@ -158,7 +158,7 @@ function LayoutSwitcher({ isOpen, onClose }) {
               <h4>Switch to {selectedLayout.name}?</h4>
               <p>
                 Your content (names, dates, photos, etc.) will be preserved. However, the section
-                order and theme will reset to the new layout's defaults.
+                order and theme will reset to the new layout&apos;s defaults.
               </p>
               <div className="confirm-actions">
                 <button

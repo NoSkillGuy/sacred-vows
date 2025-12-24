@@ -172,20 +172,23 @@ type AutosaveStatusType = "idle" | "saving" | "saved";
 function AutosaveStatus(): ReactElement {
   const saving = useBuilderStore((state) => state.saving);
   const lastSavedAt = useBuilderStore((state) => state.lastSavedAt);
-  const [status, setStatus] = useState<AutosaveStatusType>("idle");
+  const [showSaved, setShowSaved] = useState(false);
 
+  // Derive status from props
+  const status = useMemo<AutosaveStatusType>(() => {
+    if (saving) return "saving";
+    if (lastSavedAt && showSaved) return "saved";
+    return "idle";
+  }, [saving, lastSavedAt, showSaved]);
+
+  // Show "saved" status for 2 seconds when lastSavedAt changes
   useEffect(() => {
-    if (saving) {
-      setStatus("saving");
-      return;
-    }
-    if (lastSavedAt) {
-      setStatus("saved");
-      const timer = setTimeout(() => setStatus("idle"), 2000);
+    if (lastSavedAt && !saving) {
+      setShowSaved(true);
+      const timer = setTimeout(() => setShowSaved(false), 2000);
       return () => clearTimeout(timer);
     }
-    setStatus("idle");
-  }, [saving, lastSavedAt]);
+  }, [lastSavedAt, saving]);
 
   const label = status === "saving" ? "Saving…" : status === "saved" ? "Saved" : "Auto-save";
 
@@ -210,6 +213,32 @@ interface BuilderSidebarProps {
   onDeviceModeChange: (mode: DeviceMode) => void;
 }
 
+// DrawerControls component - moved outside render to avoid recreation
+interface DrawerControlsProps {
+  onClose: () => void;
+}
+
+const DrawerControls = ({ onClose }: DrawerControlsProps): ReactElement => (
+  <div className="sidebar-drawer-controls">
+    <button
+      type="button"
+      className="sidebar-icon-btn"
+      onClick={onClose}
+      title="Close sidebar"
+      aria-label="Close sidebar"
+    >
+      <BackIcon />
+    </button>
+    <div className="sidebar-brand" title="Sacred Vows">
+      <span className="brand-icon" aria-hidden="true">
+        <RingsIcon />
+      </span>
+      <span className="brand-text">Sacred Vows</span>
+    </div>
+    <div className="sidebar-spacer" />
+  </div>
+);
+
 export default function BuilderSidebar({
   editMode,
   onEditModeToggle,
@@ -222,7 +251,14 @@ export default function BuilderSidebar({
   const [showSectionManager, setShowSectionManager] = useState<boolean>(false);
   const [showLayoutSwitcher, setShowLayoutSwitcher] = useState<boolean>(false);
 
-  const [collapsed, setCollapsed] = useState<boolean>(false);
+  const [collapsed, setCollapsed] = useState<boolean>(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw === "true";
+    } catch {
+      return false;
+    }
+  });
   const [isMobile, setIsMobile] = useState<boolean>(false);
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const [openKey, setOpenKey] = useState<string>("configure");
@@ -236,10 +272,12 @@ export default function BuilderSidebar({
     return () => mq.removeEventListener?.("change", apply);
   }, []);
 
+  // Close drawer when exiting mobile mode
   useEffect(() => {
-    // If we exit mobile, ensure drawer is closed.
-    if (!isMobile) setDrawerOpen(false);
-  }, [isMobile]);
+    if (!isMobile && drawerOpen) {
+      setDrawerOpen(false);
+    }
+  }, [isMobile, drawerOpen]);
 
   useEffect(() => {
     if (!drawerOpen) return;
@@ -261,14 +299,7 @@ export default function BuilderSidebar({
     };
   }, [drawerOpen, isMobile]);
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw === "true") setCollapsed(true);
-    } catch {
-      // ignore
-    }
-  }, []);
+  // Collapsed state is initialized from localStorage in useState initializer above
 
   useEffect(() => {
     try {
@@ -326,27 +357,6 @@ export default function BuilderSidebar({
   };
 
   const effectiveCollapsed = collapsed || isMobile;
-
-  const DrawerControls = (): ReactElement => (
-    <div className="sidebar-drawer-controls">
-      <button
-        type="button"
-        className="sidebar-icon-btn"
-        onClick={() => setDrawerOpen(false)}
-        title="Close sidebar"
-        aria-label="Close sidebar"
-      >
-        <BackIcon />
-      </button>
-      <div className="sidebar-brand" title="Sacred Vows">
-        <span className="brand-icon" aria-hidden="true">
-          <RingsIcon />
-        </span>
-        <span className="brand-text">Sacred Vows</span>
-      </div>
-      <div className="sidebar-spacer" />
-    </div>
-  );
 
   return (
     <>
@@ -623,7 +633,7 @@ export default function BuilderSidebar({
             onClick={() => setDrawerOpen(false)}
           />
           <aside className="sidebar-drawer" aria-label="Builder sidebar drawer">
-            <DrawerControls />
+            <DrawerControls onClose={() => setDrawerOpen(false)} />
             <div className="sidebar-status">
               <AutosaveStatus />
             </div>

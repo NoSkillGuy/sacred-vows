@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { useBuilderStore } from "./builderStore";
 import { defaultWeddingConfig, defaultLayoutConfig } from "../config/wedding-config";
-import type { InvitationData, SectionConfig, ThemeConfig } from "@shared/types/wedding-data";
+import type { InvitationData, ThemeConfig } from "@shared/types/wedding-data";
 import type { LayoutManifest } from "@shared/types/layout";
 
 // Mock services
@@ -148,7 +148,7 @@ describe("builderStore", () => {
         layoutConfig: defaultLayoutConfig,
       });
 
-      const initialSavedAt = store.lastSavedAt;
+      // initialSavedAt removed - unused
 
       // Wait a bit for autosave
       store.updateInvitationData("couple.bride.name", "Updated Name");

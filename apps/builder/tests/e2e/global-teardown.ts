@@ -63,16 +63,19 @@ async function globalTeardown(config: FullConfig) {
               );
               console.log("⚠ Test user will remain in database");
             }
-          } catch (deleteError: any) {
-            console.log("⚠ Error deleting test user:", deleteError.message);
+          } catch (deleteError: unknown) {
+            const errorMessage =
+              deleteError instanceof Error ? deleteError.message : String(deleteError);
+            console.log("⚠ Error deleting test user:", errorMessage);
             console.log("⚠ Test user will remain in database");
           }
         } else {
           console.log("⚠ No access token received, skipping user deletion");
         }
       }
-    } catch (error: any) {
-      console.log("⚠ Could not clean up test user:", error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.log("⚠ Could not clean up test user:", errorMessage);
       console.log("⚠ Test user will remain in database");
     }
 
@@ -81,8 +84,9 @@ async function globalTeardown(config: FullConfig) {
     try {
       await clearTestBuckets();
       console.log("✓ Test storage buckets cleared");
-    } catch (error: any) {
-      console.error("⚠ Error clearing test buckets:", error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error("⚠ Error clearing test buckets:", errorMessage);
       console.log("⚠ Test data will remain in storage");
     }
 
@@ -93,8 +97,9 @@ async function globalTeardown(config: FullConfig) {
     // 4. The test database can be reset by restarting the Firestore emulator with a fresh volume
 
     console.log("\n=== Teardown Complete ===\n");
-  } catch (error: any) {
-    console.error("\n✗ Global teardown failed:", error.message);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("\n✗ Global teardown failed:", errorMessage);
     // Don't throw - teardown failures shouldn't fail the test run
   }
 }

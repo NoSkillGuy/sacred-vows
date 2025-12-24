@@ -5,7 +5,7 @@ import PreviewPane from "../Preview/PreviewPane";
 import { useBuilderStore } from "../../store/builderStore";
 import { useInvitationQuery } from "../../hooks/queries/useInvitations";
 import { useLayoutManifestQuery } from "../../hooks/queries/useLayouts";
-import type { Invitation } from "../../services/invitationService";
+// Invitation type removed - unused
 import "./BuilderLayout.css";
 
 type DeviceMode = "desktop" | "tablet" | "mobile";

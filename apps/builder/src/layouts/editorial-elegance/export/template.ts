@@ -107,7 +107,7 @@ function generateFontImports(fonts: { heading?: string; body?: string; script?: 
  */
 function generateBodyHTML(
   invitation: InvitationData,
-  translations?: Record<string, unknown>
+  _translations?: Record<string, unknown>
 ): string {
   const { data } = invitation;
   const couple = data?.couple || {};
@@ -149,7 +149,7 @@ function generateBodyHTML(
           year: "numeric",
         })
         .toUpperCase();
-    } catch (error) {
+    } catch (_error) {
       return "";
     }
   };

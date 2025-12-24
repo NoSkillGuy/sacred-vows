@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 
-function GuestNameModal({ isOpen, onClose, translations, currentLang }) {
+function GuestNameModal({ isOpen, onClose, translations, _currentLang }) {
   const [name, setName] = useState("");
   const [title, setTitle] = useState("");
-
-  if (!isOpen) return null;
 
   useEffect(() => {
     if (!isOpen) return;
@@ -13,6 +11,8 @@ function GuestNameModal({ isOpen, onClose, translations, currentLang }) {
     setName(storedName);
     setTitle(storedTitle);
   }, [isOpen]);
+
+  if (!isOpen) return null;
 
   const handleSubmit = (e) => {
     e.preventDefault();

@@ -7,7 +7,7 @@ import { getDefaultAssetUrl } from "../../../../services/defaultAssetService";
  * EditableHeroSection - WYSIWYG editable version of Hero section
  * Allows direct editing of hero content in the preview
  */
-function EditableHeroSection({ onRSVPClick, translations, currentLang, config = {}, onUpdate }) {
+function EditableHeroSection({ onRSVPClick, translations, _currentLang, config = {}, onUpdate }) {
   const [countdown, setCountdown] = useState("Loading...");
 
   const wedding = config.wedding || {};

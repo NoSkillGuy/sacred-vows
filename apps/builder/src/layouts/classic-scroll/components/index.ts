@@ -43,7 +43,7 @@ import LanguageModal from "./shared/LanguageModal";
 import GuestNameModal from "./shared/GuestNameModal";
 
 // View components mapped by section ID
-export const viewComponents: Record<string, ComponentType<any>> = {
+export const viewComponents: Record<string, ComponentType<Record<string, unknown>>> = {
   header: Header,
   hero: Hero,
   couple: Couple,
@@ -59,7 +59,7 @@ export const viewComponents: Record<string, ComponentType<any>> = {
 };
 
 // Editable components mapped by section ID
-export const editableComponents: Record<string, ComponentType<any>> = {
+export const editableComponents: Record<string, ComponentType<Record<string, unknown>>> = {
   hero: EditableHeroSection,
   couple: EditableCoupleSection,
   "fathers-letter": EditableFathersLetterSection,
@@ -71,7 +71,7 @@ export const editableComponents: Record<string, ComponentType<any>> = {
 };
 
 // Shared components
-export const sharedComponents: Record<string, ComponentType<any>> = {
+export const sharedComponents: Record<string, ComponentType<Record<string, unknown>>> = {
   EditableText,
   EditableImage,
   EditableWrapper,

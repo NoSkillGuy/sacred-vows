@@ -181,7 +181,7 @@ function ContactPage(): ReactElement {
                 <div className="form-success">
                   <div className="success-icon">✓</div>
                   <h3>Thank You!</h3>
-                  <p>We've received your message and will get back to you within 24 hours.</p>
+                  <p>We&apos;ve received your message and will get back to you within 24 hours.</p>
                   <button
                     className="page-btn page-btn-secondary"
                     onClick={() => setSubmitted(false)}

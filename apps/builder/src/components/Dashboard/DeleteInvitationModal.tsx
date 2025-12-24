@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getAssetCountByUrls } from "../../services/assetService";
 import { extractAssetURLs } from "../../utils/assetUtils";
 import "./DeleteInvitationModal.css";
@@ -20,9 +20,11 @@ function DeleteInvitationModal({ isOpen, invitation, onConfirm, onCancel }) {
       setConfirmText("");
       setError(null);
     }
-  }, [isOpen, invitation]);
+  }, [isOpen, invitation, loadAssetCount]);
 
-  async function loadAssetCount() {
+  const loadAssetCount = useCallback(async () => {
+    if (!invitation?.data) return;
+
     try {
       setLoading(true);
       setError(null);
@@ -46,7 +48,7 @@ function DeleteInvitationModal({ isOpen, invitation, onConfirm, onCancel }) {
     } finally {
       setLoading(false);
     }
-  }
+  }, [invitation?.data]);
 
   function handleConfirm() {
     if (confirmText.toLowerCase() !== requiresConfirmText) {
@@ -70,7 +72,7 @@ function DeleteInvitationModal({ isOpen, invitation, onConfirm, onCancel }) {
           <div className="delete-modal-warning">
             <div className="warning-icon">⚠️</div>
             <p className="warning-text">
-              You are about to delete <strong>"{invitationTitle}"</strong>.
+              You are about to delete <strong>&quot;{invitationTitle}&quot;</strong>.
             </p>
             {loading ? (
               <p className="asset-count-loading">Loading asset information...</p>
@@ -92,7 +94,7 @@ function DeleteInvitationModal({ isOpen, invitation, onConfirm, onCancel }) {
 
           <div className="delete-modal-confirm">
             <label htmlFor="confirm-text">
-              Type <strong>"{invitationTitle}"</strong> to confirm:
+              Type <strong>&quot;{invitationTitle}&quot;</strong> to confirm:
             </label>
             <input
               id="confirm-text"

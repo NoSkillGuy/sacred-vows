@@ -4,7 +4,7 @@
  */
 import { getDefaultAssetUrl } from "../../../../services/defaultAssetService";
 
-function EditorialIntro({ translations, currentLang, config = {} }) {
+function EditorialIntro({ _translations, _currentLang, config = {} }) {
   const editorialIntro = config.editorialIntro || {};
   const introText =
     editorialIntro.text ||

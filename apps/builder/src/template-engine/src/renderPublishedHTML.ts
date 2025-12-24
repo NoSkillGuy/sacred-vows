@@ -127,7 +127,7 @@ async function bundleLocalAssets(html: string): Promise<BundleResult> {
   }
 
   const assets: unknown[] = [];
-  let rewrittenHTML = html;
+  const rewrittenHTML = html;
 
   // Note: We no longer read from filesystem. All default assets should be:
   // 1. Already converted to CDN URLs by getLayoutAssetUrl() in defaults.js

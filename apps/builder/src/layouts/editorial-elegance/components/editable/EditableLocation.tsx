@@ -3,7 +3,7 @@ import EditableText from "../shared/EditableText";
 /**
  * EditableLocation - WYSIWYG editable Location
  */
-function EditableLocation({ translations, currentLang, config = {}, onUpdate }) {
+function EditableLocation({ _translations, _currentLang, config = {}, onUpdate }) {
   const wedding = config.wedding || {};
   const venue = wedding.venue || {};
   const mapStyle = config.location?.mapStyle || "desaturated";

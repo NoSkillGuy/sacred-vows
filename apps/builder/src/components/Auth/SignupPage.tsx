@@ -1,4 +1,4 @@
-import { useState, ChangeEvent, FormEvent, FocusEvent } from "react";
+import { useState, ChangeEvent, FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import zxcvbn from "zxcvbn";
 import { register } from "../../services/authService";

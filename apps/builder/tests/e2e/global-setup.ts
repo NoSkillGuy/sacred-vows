@@ -89,15 +89,17 @@ async function globalSetup(config: FullConfig) {
         console.warn(`⚠ Failed to create test user (status ${response.status}): ${error}`);
         console.warn("⚠ Tests may fail if test user does not exist");
       }
-    } catch (error: any) {
-      console.error("✗ Error creating test user:", error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error("✗ Error creating test user:", errorMessage);
       console.error("✗ Make sure the backend server is running on http://localhost:3100");
       // Don't throw - let tests run and fail with clear error messages
     }
 
     console.log("\n=== Setup Complete ===\n");
-  } catch (error: any) {
-    console.error("\n✗ Global setup failed:", error.message);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("\n✗ Global setup failed:", errorMessage);
     throw error;
   }
 }

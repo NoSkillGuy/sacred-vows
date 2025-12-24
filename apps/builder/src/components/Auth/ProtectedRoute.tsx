@@ -63,7 +63,7 @@ function ProtectedRoute({ children }: ProtectedRouteProps): JSX.Element {
       if (!authenticated) {
         try {
           await refreshAccessToken();
-        } catch (refreshError) {
+        } catch (_refreshError) {
           if (isMountedRef.current) {
             setIsValid(false);
             setIsChecking(false);
@@ -79,7 +79,7 @@ function ProtectedRoute({ children }: ProtectedRouteProps): JSX.Element {
         if (isMountedRef.current) {
           setIsValid(true);
         }
-      } catch (error) {
+      } catch (_error) {
         if (isMountedRef.current) {
           setIsValid(false);
         }

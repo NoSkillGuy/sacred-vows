@@ -255,7 +255,7 @@ function LoginPage(): JSX.Element {
           </button>
 
           <p className="auth-switch">
-            Don't have an account? <Link to="/signup">Create one for free</Link>
+            Don&apos;t have an account? <Link to="/signup">Create one for free</Link>
           </p>
         </div>
 

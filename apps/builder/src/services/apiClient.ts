@@ -118,12 +118,7 @@ export async function apiRequest(url: string, options: RequestOptions = {}): Pro
   // Handle 401 Unauthorized - token expired or invalid
   if (response.status === 401) {
     // Check if this is a token expiry error
-    let errorData: { error?: string } = {};
-    try {
-      errorData = (await response.clone().json()) as { error?: string };
-    } catch {
-      errorData = {};
-    }
+    // errorData removed - unused
 
     // Try to refresh token (unless this is already a refresh request)
     if (!fullUrl.includes("/auth/refresh") && !fullUrl.includes("/auth/logout")) {
@@ -150,7 +145,7 @@ export async function apiRequest(url: string, options: RequestOptions = {}): Pro
           }
           throw new Error("Session expired. Please login again.");
         }
-      } catch (refreshError) {
+      } catch (_refreshError) {
         // Refresh failed, clear auth and redirect to login
         clearAccessToken();
         if (typeof window !== "undefined") {

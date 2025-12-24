@@ -1,4 +1,4 @@
-import { createElement } from "react";
+// createElement removed - unused
 import EditableText from "./EditableText";
 import EditableImage from "./EditableImage";
 import { useEditable } from "../../hooks/useEditable";

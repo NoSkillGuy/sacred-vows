@@ -145,9 +145,9 @@ function CareersPage(): ReactElement {
             <span className="section-label">Our Culture</span>
             <h2 className="section-title">Why Work at Sacred Vows?</h2>
             <p>
-              We're a small, passionate team on a mission to make wedding invitations beautiful,
-              accessible, and meaningful. Every day, we get to be a part of the most important day
-              in people's lives—and that's incredibly rewarding.
+              We&apos;re a small, passionate team on a mission to make wedding invitations
+              beautiful, accessible, and meaningful. Every day, we get to be a part of the most
+              important day in people&apos;s lives—and that&apos;s incredibly rewarding.
             </p>
             <p>
               We believe in work-life balance, continuous learning, and creating an inclusive
@@ -187,8 +187,8 @@ function CareersPage(): ReactElement {
             <span className="section-label">Open Positions</span>
             <h2 className="section-title">Join Our Growing Team</h2>
             <p className="section-subtitle">
-              We're always looking for talented individuals. Don't see a perfect fit? Send us your
-              resume anyway!
+              We&apos;re always looking for talented individuals. Don&apos;t see a perfect fit? Send
+              us your resume anyway!
             </p>
           </div>
           <div className="jobs-list">
@@ -219,10 +219,10 @@ function CareersPage(): ReactElement {
 
         {/* CTA */}
         <section className="careers-cta">
-          <h2>Don't See the Right Role?</h2>
+          <h2>Don&apos;t See the Right Role?</h2>
           <p>
-            We're always interested in meeting talented people. Send us your resume and tell us how
-            you'd like to contribute.
+            We&apos;re always interested in meeting talented people. Send us your resume and tell us
+            how you&apos;d like to contribute.
           </p>
           <Link to="/contact" className="page-btn page-btn-primary">
             Get in Touch

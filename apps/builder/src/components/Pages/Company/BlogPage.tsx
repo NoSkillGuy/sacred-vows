@@ -1,5 +1,4 @@
 import { ReactElement, FormEvent } from "react";
-import { Link } from "react-router-dom";
 import PageLayout from "../PageLayout";
 import "./BlogPage.css";
 
@@ -129,7 +128,7 @@ function BlogPage(): ReactElement {
         <section className="featured-posts">
           <div className="section-header">
             <span className="section-label">Featured</span>
-            <h2 className="section-title">Editor's Picks</h2>
+            <h2 className="section-title">Editor&apos;s Picks</h2>
           </div>
           <div className="featured-grid">
             {featuredPosts.map((post) => (

@@ -301,15 +301,17 @@ function HeroSection({ onSectionView }: HeroSectionProps): ReactElement {
     ? personalizationData.venue.toUpperCase()
     : DEFAULT_VENUE;
 
-  // Generate petals with random properties
-  const petals: Petal[] = [...Array(15)].map((_, i) => ({
-    id: i,
-    left: `${Math.random() * 100}%`,
-    delay: `${Math.random() * 8}s`,
-    duration: `${12 + Math.random() * 8}s`,
-    size: 16 + Math.random() * 12,
-    color: petalColors[Math.floor(Math.random() * petalColors.length)],
-  }));
+  // Generate petals with random properties - use useState initializer to avoid calling Math.random during render
+  const [petals] = useState<Petal[]>(() =>
+    [...Array(15)].map((_, i) => ({
+      id: i,
+      left: `${Math.random() * 100}%`,
+      delay: `${Math.random() * 8}s`,
+      duration: `${12 + Math.random() * 8}s`,
+      size: 16 + Math.random() * 12,
+      color: petalColors[Math.floor(Math.random() * petalColors.length)],
+    }))
+  );
 
   const scrollToLayouts = (): void => {
     document.getElementById("layouts")?.scrollIntoView({ behavior: "smooth" });
@@ -489,7 +491,7 @@ function HeroSection({ onSectionView }: HeroSectionProps): ReactElement {
           <p className="hero-subtitle">
             Create stunning, personalized digital wedding invitations that capture the magic of your
             special day. Share your joy with loved ones through beautiful, interactive designs
-            they'll treasure forever.
+            they&apos;ll treasure forever.
           </p>
           <div className="hero-cta">
             <button

@@ -11,6 +11,7 @@
  */
 
 import type { LayoutManifest } from "@shared/types/layout";
+import type { UniversalWeddingData, LayoutConfig } from "@shared/types/wedding-data";
 import type { ComponentType } from "react";
 
 // Registry storage
@@ -20,26 +21,34 @@ const layouts = new Map<string, RegisteredLayout>();
  * Layout component mappings
  */
 export interface LayoutComponents {
-  view: Record<string, ComponentType<any>>;
-  editable: Record<string, ComponentType<any>>;
-  shared?: Record<string, ComponentType<any>>;
+  view: Record<string, ComponentType<Record<string, unknown>>>;
+  editable: Record<string, ComponentType<Record<string, unknown>>>;
+  shared?: Record<string, ComponentType<Record<string, unknown>>>;
 }
 
 /**
  * Layout export functions
  */
 export interface LayoutExport {
-  generateHTML: (data: any, config: any, translations?: Record<string, any>) => string;
-  generateCSS?: (data: any, config: any) => string;
-  exportInvitation?: (data: any, config: any, translations?: Record<string, any>) => Promise<Blob>;
-  [key: string]: any;
+  generateHTML: (
+    data: UniversalWeddingData,
+    config: LayoutConfig,
+    translations?: Record<string, unknown>
+  ) => string;
+  generateCSS?: (data: UniversalWeddingData, config: LayoutConfig) => string;
+  exportInvitation?: (
+    data: UniversalWeddingData,
+    config: LayoutConfig,
+    translations?: Record<string, unknown>
+  ) => Promise<Blob>;
+  [key: string]: unknown;
 }
 
 /**
  * Layout hooks
  */
 export interface LayoutHooks {
-  [key: string]: (...args: any[]) => any;
+  [key: string]: (...args: unknown[]) => unknown;
 }
 
 /**
@@ -172,7 +181,9 @@ export function hasLayout(layoutId: string): boolean {
  * @returns View components by section ID
  * @throws {Error} If layout not found
  */
-export function getViewComponents(layoutId: string): Record<string, ComponentType<any>> {
+export function getViewComponents(
+  layoutId: string
+): Record<string, ComponentType<Record<string, unknown>>> {
   const layout = getLayout(layoutId);
   if (!layout) {
     throw new Error(`Layout '${layoutId}' not found in registry`);
@@ -186,7 +197,9 @@ export function getViewComponents(layoutId: string): Record<string, ComponentTyp
  * @returns Editable components by section ID
  * @throws {Error} If layout not found
  */
-export function getEditableComponents(layoutId: string): Record<string, ComponentType<any>> {
+export function getEditableComponents(
+  layoutId: string
+): Record<string, ComponentType<Record<string, unknown>>> {
   const layout = getLayout(layoutId);
   if (!layout) {
     throw new Error(`Layout '${layoutId}' not found in registry`);
@@ -200,7 +213,9 @@ export function getEditableComponents(layoutId: string): Record<string, Componen
  * @returns Shared components
  * @throws {Error} If layout not found
  */
-export function getSharedComponents(layoutId: string): Record<string, ComponentType<any>> {
+export function getSharedComponents(
+  layoutId: string
+): Record<string, ComponentType<Record<string, unknown>>> {
   const layout = getLayout(layoutId);
   if (!layout) {
     throw new Error(`Layout '${layoutId}' not found in registry`);
@@ -217,7 +232,7 @@ export function getSharedComponents(layoutId: string): Record<string, ComponentT
 export function getComponentRegistry(
   layoutId: string,
   editMode = false
-): Record<string, ComponentType<any>> {
+): Record<string, ComponentType<Record<string, unknown>>> {
   const components = editMode ? getEditableComponents(layoutId) : getViewComponents(layoutId);
 
   return components;

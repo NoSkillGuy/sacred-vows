@@ -3,7 +3,7 @@ import EditableText from "../shared/EditableText";
 /**
  * EditableRSVPSection - WYSIWYG editable version of RSVP section
  */
-function EditableRSVPSection({ onRSVPClick, translations, currentLang, config = {}, onUpdate }) {
+function EditableRSVPSection({ onRSVPClick, translations, _currentLang, config = {}, onUpdate }) {
   const rsvp = config.rsvp || {};
   const contacts = rsvp.contacts || [
     { badge: "RSVP", name: "Anil Kumar Singh" },

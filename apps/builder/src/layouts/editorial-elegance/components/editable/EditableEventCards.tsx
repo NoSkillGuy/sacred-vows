@@ -4,7 +4,7 @@ import { formatEventDate } from "../../utils/dateFormatter";
 /**
  * EditableEventCards - WYSIWYG editable Event Cards
  */
-function EditableEventCards({ translations, currentLang, config = {}, onUpdate }) {
+function EditableEventCards({ _translations, _currentLang, config = {}, onUpdate }) {
   const events = config.events || {};
   const eventList = events.events || [];
 

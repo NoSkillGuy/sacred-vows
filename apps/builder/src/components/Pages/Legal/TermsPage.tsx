@@ -13,9 +13,9 @@ function TermsPage(): JSX.Element {
           <section className="legal-section">
             <h2>1. Agreement to Terms</h2>
             <p>
-              By accessing or using Sacred Vows ("the Service"), you agree to be bound by these
-              Terms of Service ("Terms"). If you disagree with any part of these terms, you may not
-              access the Service.
+              By accessing or using Sacred Vows (&quot;the Service&quot;), you agree to be bound by
+              these Terms of Service (&quot;Terms&quot;). If you disagree with any part of these
+              terms, you may not access the Service.
             </p>
           </section>
 
@@ -54,9 +54,9 @@ function TermsPage(): JSX.Element {
             <h3>Your Content</h3>
             <p>
               You retain ownership of any content you create, upload, or share through the Service
-              ("User Content"). By using our Service, you grant us a non-exclusive, royalty-free
-              license to use, display, and distribute your User Content solely for the purpose of
-              providing the Service.
+              (&quot;User Content&quot;). By using our Service, you grant us a non-exclusive,
+              royalty-free license to use, display, and distribute your User Content solely for the
+              purpose of providing the Service.
             </p>
             <h3>Content Guidelines</h3>
             <p>You agree not to upload or share content that:</p>

@@ -1,7 +1,7 @@
 /**
  * EditorialFooter - Minimal footer with couple names
  */
-function EditorialFooter({ translations, currentLang, config = {} }) {
+function EditorialFooter({ _translations, _currentLang, config = {} }) {
   const couple = config.couple || {};
   const bride = couple.bride || {};
   const groom = couple.groom || {};

@@ -1,4 +1,4 @@
-function Footer({ translations, currentLang, config = {} }) {
+function Footer({ translations, _currentLang, config = {} }) {
   // Get custom translations - handle nested paths
   const getTranslation = (key) => {
     let customValue = null;

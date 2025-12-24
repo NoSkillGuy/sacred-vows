@@ -1,4 +1,4 @@
-function RSVP({ onRSVPClick, translations, currentLang, config = {} }) {
+function RSVP({ onRSVPClick, translations, _currentLang, config = {} }) {
   const rsvp = config.rsvp || {};
   const contacts = rsvp.contacts || [
     { badge: "RSVP", name: "Anil Kumar Singh" },

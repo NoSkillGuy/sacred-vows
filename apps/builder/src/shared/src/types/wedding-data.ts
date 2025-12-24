@@ -329,7 +329,7 @@ export const DEFAULT_THEME: ThemeConfig = {
   },
 };
 
-export function createDefaultLayoutConfig(layoutId: string = "classic-scroll"): LayoutConfig {
+export function createDefaultLayoutConfig(_layoutId: string = "classic-scroll"): LayoutConfig {
   return {
     sections: createDefaultSections(),
     theme: { ...DEFAULT_THEME },

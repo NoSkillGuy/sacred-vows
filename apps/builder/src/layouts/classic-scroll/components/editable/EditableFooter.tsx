@@ -3,7 +3,7 @@ import EditableText from "../shared/EditableText";
 /**
  * EditableFooter - WYSIWYG editable version of Footer
  */
-function EditableFooter({ translations, currentLang, config = {}, onUpdate }) {
+function EditableFooter({ translations, _currentLang, config = {}, onUpdate }) {
   // Get custom translations - handle nested paths
   const getTranslation = (key) => {
     let customValue = null;

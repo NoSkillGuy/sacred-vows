@@ -4,7 +4,7 @@
  */
 import { getDefaultAssetUrl } from "../../../../services/defaultAssetService";
 
-function EditorialGallery({ translations, currentLang, config = {} }) {
+function EditorialGallery({ _translations, _currentLang, config = {} }) {
   const gallery = config.gallery || {};
   const galleryConfig = config.galleryConfig || {};
   const layout = galleryConfig.layout || "masonry"; // 'masonry' | 'single-column'

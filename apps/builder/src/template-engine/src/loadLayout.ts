@@ -4,7 +4,7 @@
  */
 
 import type { LayoutManifest } from "@shared/types/layout";
-import type { UniversalWeddingData } from "@shared/types/wedding-data";
+// UniversalWeddingData removed - unused
 
 interface LayoutConfig {
   id: string;

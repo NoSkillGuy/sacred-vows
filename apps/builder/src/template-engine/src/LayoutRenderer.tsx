@@ -145,50 +145,72 @@ export function LayoutRenderer({
 
   // Dynamically import layout components
   const LayoutComponents = React.lazy(() =>
-    import("../../../src/components").then((components) => ({
-      default: () => (
-        <main className="page-shell">
-          {(() => {
-            const registry = {
-              header: components.Header || require("../../../src/components/Header").default,
-              hero: components.Hero || require("../../../src/components/Hero").default,
-              couple: components.Couple || require("../../../src/components/Couple").default,
-              "fathers-letter":
-                components.FathersLetter ||
-                require("../../../src/components/FathersLetter").default,
-              gallery: components.Gallery || require("../../../src/components/Gallery").default,
-              events: components.Events || require("../../../src/components/Events").default,
-              venue: components.Venue || require("../../../src/components/Venue").default,
-              rsvp: components.RSVP || require("../../../src/components/RSVP").default,
-              footer: components.Footer || require("../../../src/components/Footer").default,
-            };
+    Promise.all([
+      import("../../../src/components"),
+      import("../../../src/components/Header").catch(() => ({ default: null })),
+      import("../../../src/components/Hero").catch(() => ({ default: null })),
+      import("../../../src/components/Couple").catch(() => ({ default: null })),
+      import("../../../src/components/FathersLetter").catch(() => ({ default: null })),
+      import("../../../src/components/Gallery").catch(() => ({ default: null })),
+      import("../../../src/components/Events").catch(() => ({ default: null })),
+      import("../../../src/components/Venue").catch(() => ({ default: null })),
+      import("../../../src/components/RSVP").catch(() => ({ default: null })),
+      import("../../../src/components/Footer").catch(() => ({ default: null })),
+    ]).then(
+      ([
+        components,
+        HeaderModule,
+        HeroModule,
+        CoupleModule,
+        FathersLetterModule,
+        GalleryModule,
+        EventsModule,
+        VenueModule,
+        RSVPModule,
+        FooterModule,
+      ]) => ({
+        default: () => (
+          <main className="page-shell">
+            {(() => {
+              const registry = {
+                header: components.Header || HeaderModule.default,
+                hero: components.Hero || HeroModule.default,
+                couple: components.Couple || CoupleModule.default,
+                "fathers-letter": components.FathersLetter || FathersLetterModule.default,
+                gallery: components.Gallery || GalleryModule.default,
+                events: components.Events || EventsModule.default,
+                venue: components.Venue || VenueModule.default,
+                rsvp: components.RSVP || RSVPModule.default,
+                footer: components.Footer || FooterModule.default,
+              };
 
-            const commonProps = {
-              translations,
-              currentLang,
-              config: mergedConfig,
-              onRSVPClick,
-              onLanguageClick,
-            };
+              const commonProps = {
+                translations,
+                currentLang,
+                config: mergedConfig,
+                onRSVPClick,
+                onLanguageClick,
+              };
 
-            const sectionsToRender = mergedConfig.sections || [];
+              const sectionsToRender = mergedConfig.sections || [];
 
-            return sectionsToRender.map((section) => {
-              const SectionComponent = registry[section.id];
+              return sectionsToRender.map((section) => {
+                const SectionComponent = registry[section.id];
 
-              if (!SectionComponent) {
-                console.warn(`Section component not found for id: ${section.id}`);
-                return null;
-              }
+                if (!SectionComponent) {
+                  console.warn(`Section component not found for id: ${section.id}`);
+                  return null;
+                }
 
-              const sectionProps = getSectionProps(section.id, commonProps);
+                const sectionProps = getSectionProps(section.id, commonProps);
 
-              return <SectionComponent key={section.id} {...sectionProps} />;
-            });
-          })()}
-        </main>
-      ),
-    }))
+                return <SectionComponent key={section.id} {...sectionProps} />;
+              });
+            })()}
+          </main>
+        ),
+      })
+    )
   );
 
   return (

@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useBuilderStore, SECTION_TYPES } from "../../store/builderStore";
+import { useState, useEffect, useMemo } from "react";
+import { useBuilderStore } from "../../store/builderStore";
 import { SECTION_METADATA } from "@shared/types/wedding-data";
 import "./SectionManager.css";
 
@@ -108,15 +108,12 @@ function SectionManager({ isOpen, onClose }) {
   const { getAllSections, toggleSection, reorderSections, currentLayoutManifest } =
     useBuilderStore();
 
-  const [sections, setSections] = useState([]);
   const [draggedItem, setDraggedItem] = useState(null);
   const [dragOverItem, setDragOverItem] = useState(null);
 
-  // Load sections when component mounts or store changes
-  // Include currentLayoutManifest in dependencies to re-render when layout changes
-  useEffect(() => {
-    const allSections = getAllSections();
-    setSections(allSections);
+  // Derive sections from store - no need for state
+  const sections = useMemo(() => {
+    return getAllSections();
   }, [getAllSections, currentLayoutManifest]);
 
   // Get section metadata (name, icon, description)

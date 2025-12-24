@@ -33,7 +33,7 @@ global.IntersectionObserver = class IntersectionObserver {
     return [];
   }
   unobserve() {}
-} as any;
+} as IntersectionObserver;
 
 // Mock window.matchMedia for components that use media queries
 Object.defineProperty(window, "matchMedia", {

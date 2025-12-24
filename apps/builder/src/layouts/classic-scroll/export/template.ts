@@ -15,7 +15,7 @@ import type { InvitationData } from "@shared/types/wedding-data";
  */
 export async function generateHTML(
   invitation: InvitationData,
-  translations?: Record<string, unknown>
+  _translations?: Record<string, unknown>
 ): Promise<string> {
   const { data, layoutConfig } = invitation;
   const couple = data?.couple || {};

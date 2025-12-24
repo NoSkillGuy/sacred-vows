@@ -20,7 +20,7 @@ function PublishModal({ isOpen, onClose }) {
   const [publishedUrl, setPublishedUrl] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [versions, setVersions] = useState([]);
-  const [loadingVersions, setLoadingVersions] = useState(false);
+  const [, setLoadingVersions] = useState(false);
   const [rollingBack, setRollingBack] = useState(false);
   const [rollbackTarget, setRollbackTarget] = useState(null);
   const validateReqIdRef = useRef(0);
@@ -57,7 +57,7 @@ function PublishModal({ isOpen, onClose }) {
       try {
         const res = await listVersions(normalized);
         setVersions(res.versions || []);
-      } catch (e) {
+      } catch (_e) {
         // Silently fail - versions might not exist yet
         setVersions([]);
       } finally {
@@ -87,7 +87,7 @@ function PublishModal({ isOpen, onClose }) {
         setAvailable(!!res.available);
         setReason(res.reason || "");
         setErrorMsg("");
-      } catch (e) {
+      } catch (_e) {
         if (!isOpen || reqId !== validateReqIdRef.current) return;
         setAvailable(false);
         setReason("error");
@@ -118,7 +118,7 @@ function PublishModal({ isOpen, onClose }) {
         try {
           const versionsRes = await listVersions(normalized);
           setVersions(versionsRes.versions || []);
-        } catch (e) {
+        } catch (_e) {
           // Ignore version fetch errors
         }
       }
@@ -223,6 +223,7 @@ function PublishModal({ isOpen, onClose }) {
                         className="btn btn-primary"
                         href={publishedUrl}
                         target="_blank"
+                        rel="noreferrer"
                         rel="noopener"
                       >
                         Open

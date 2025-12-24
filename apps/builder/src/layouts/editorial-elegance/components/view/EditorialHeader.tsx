@@ -5,7 +5,7 @@ import { getDefaultAssetUrl } from "../../../../services/defaultAssetService";
  * EditorialHeader - Minimal floating music control
  * Matches editorial elegance aesthetic with subtle design
  */
-function EditorialHeader({ translations, currentLang, config = {} }) {
+function EditorialHeader({ _translations, _currentLang, config = {} }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef(null);
 

@@ -1,4 +1,4 @@
-function Venue({ translations, currentLang, config = {} }) {
+function Venue({ translations, _currentLang, config = {} }) {
   const wedding = config.wedding || {};
   const venue = wedding.venue || {};
 

@@ -4,7 +4,7 @@ import { formatEventDate } from "../../utils/dateFormatter";
  * EventCards - Horizontal card-based event schedule
  * Minimal design with thin borders, no icons
  */
-function EventCards({ translations, currentLang, config = {} }) {
+function EventCards({ _translations, _currentLang, config = {} }) {
   const events = config.events || {};
   const eventList = events.events || [];
 

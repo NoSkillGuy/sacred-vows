@@ -35,7 +35,7 @@ import EditableImage from "./shared/EditableImage";
  * IMPORTANT: Keys in these maps MUST match section IDs from the manifest.
  * Preview and editor look up components by section.id (e.g. 'hero', 'editorial-intro').
  */
-export const view: Record<string, ComponentType<any>> = {
+export const view: Record<string, ComponentType<Record<string, unknown>>> = {
   hero: EditorialHero,
   "editorial-intro": EditorialIntro,
   events: EventCards,
@@ -46,7 +46,7 @@ export const view: Record<string, ComponentType<any>> = {
   footer: EditorialFooter,
 };
 
-export const editable: Record<string, ComponentType<any>> = {
+export const editable: Record<string, ComponentType<Record<string, unknown>>> = {
   hero: EditableEditorialHero,
   "editorial-intro": EditableEditorialIntro,
   events: EditableEventCards,
@@ -57,7 +57,7 @@ export const editable: Record<string, ComponentType<any>> = {
   footer: EditableEditorialFooter,
 };
 
-export const shared: Record<string, ComponentType<any>> = {
+export const shared: Record<string, ComponentType<Record<string, unknown>>> = {
   Header: EditorialHeader,
   ScrollAnimationsInit,
   EditableText,

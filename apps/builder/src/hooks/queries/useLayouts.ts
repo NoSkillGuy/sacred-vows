@@ -11,7 +11,6 @@ import {
   getAllLayoutManifests,
   type LayoutOptions,
 } from "../../services/layoutService";
-import type { LayoutManifest } from "@shared/types/layout";
 
 // Query keys for consistent cache management
 export const layoutKeys = {

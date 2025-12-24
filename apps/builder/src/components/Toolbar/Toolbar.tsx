@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import ThemeModal from "./ThemeModal";
 import GalleryModal from "./GalleryModal";
@@ -287,20 +287,23 @@ export default Toolbar;
 function AutosaveStatus() {
   const saving = useBuilderStore((state) => state.saving);
   const lastSavedAt = useBuilderStore((state) => state.lastSavedAt);
-  const [status, setStatus] = useState("idle");
+  const [showSaved, setShowSaved] = useState(false);
 
+  // Derive status from props
+  const status = useMemo(() => {
+    if (saving) return "saving";
+    if (lastSavedAt && showSaved) return "saved";
+    return "idle";
+  }, [saving, lastSavedAt, showSaved]);
+
+  // Show "saved" status for 2 seconds when lastSavedAt changes
   useEffect(() => {
-    if (saving) {
-      setStatus("saving");
-      return;
-    }
-    if (lastSavedAt) {
-      setStatus("saved");
-      const timer = setTimeout(() => setStatus("idle"), 2000);
+    if (lastSavedAt && !saving) {
+      setShowSaved(true);
+      const timer = setTimeout(() => setShowSaved(false), 2000);
       return () => clearTimeout(timer);
     }
-    setStatus("idle");
-  }, [saving, lastSavedAt]);
+  }, [lastSavedAt, saving]);
 
   const label = status === "saving" ? "Saving…" : status === "saved" ? "Saved" : "Auto-save";
 

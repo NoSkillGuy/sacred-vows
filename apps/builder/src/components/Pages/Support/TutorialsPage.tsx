@@ -213,7 +213,7 @@ function TutorialsPage() {
                 <p>{tutorial.description}</p>
 
                 <div className="tutorial-steps">
-                  <strong>What you'll learn:</strong>
+                  <strong>What you&apos;ll learn:</strong>
                   <ul>
                     {tutorial.steps.slice(0, 3).map((step, index) => (
                       <li key={index}>{step}</li>
@@ -232,7 +232,7 @@ function TutorialsPage() {
 
         {/* Help Section */}
         <section className="tutorials-help">
-          <h2>Can't Find What You're Looking For?</h2>
+          <h2>Can&apos;t Find What You&apos;re Looking For?</h2>
           <p>Browse our FAQ or contact support for personalized help.</p>
           <div className="help-buttons">
             <Link to="/faqs" className="page-btn page-btn-primary">

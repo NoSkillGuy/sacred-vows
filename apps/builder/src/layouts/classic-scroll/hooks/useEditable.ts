@@ -5,7 +5,7 @@ import { useBuilderStore } from "../../../store/builderStore";
  * Provides update function that connects to the store
  */
 export function useEditable() {
-  const { updateInvitationData, updateNestedData } = useBuilderStore();
+  const { updateInvitationData } = useBuilderStore();
 
   const handleUpdate = (path: string, value: unknown): void => {
     // Handle translation paths differently

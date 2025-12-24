@@ -5,7 +5,7 @@ import { getDefaultAssetUrl } from "../../../../services/defaultAssetService";
 /**
  * EditableCoupleSection - WYSIWYG editable version of Couple section
  */
-function EditableCoupleSection({ translations, currentLang, config = {}, onUpdate }) {
+function EditableCoupleSection({ translations, _currentLang, config = {}, onUpdate }) {
   const couple = config.couple || {};
   const bride = couple.bride || {};
   const groom = couple.groom || {};

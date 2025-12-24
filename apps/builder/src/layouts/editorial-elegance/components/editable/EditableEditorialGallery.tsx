@@ -3,7 +3,7 @@ import EditableImage from "../shared/EditableImage";
 /**
  * EditableEditorialGallery - WYSIWYG editable Gallery
  */
-function EditableEditorialGallery({ translations, currentLang, config = {}, onUpdate }) {
+function EditableEditorialGallery({ _translations, _currentLang, config = {}, onUpdate }) {
   const gallery = config.gallery || {};
   const galleryConfig = config.galleryConfig || {};
   const layout = galleryConfig.layout || "masonry";

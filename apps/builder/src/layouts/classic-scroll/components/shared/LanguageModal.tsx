@@ -1,4 +1,4 @@
-function LanguageModal({ isOpen, onClose, onSelect, currentLang, translations }) {
+function LanguageModal({ isOpen, _onClose, onSelect, currentLang, translations }) {
   if (!isOpen) return null;
 
   const languages = [

@@ -1,6 +1,6 @@
 import { getDefaultAssetUrl } from "../../../../services/defaultAssetService";
 
-function Gallery({ translations, currentLang, config = {} }) {
+function Gallery({ translations, _currentLang, config = {} }) {
   const gallery = config.gallery || {};
   const galleryImages = gallery.images || [
     {

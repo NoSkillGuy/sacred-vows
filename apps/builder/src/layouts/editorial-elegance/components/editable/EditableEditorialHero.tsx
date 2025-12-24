@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+// useState, useEffect removed - unused
 import EditableText from "../shared/EditableText";
 import EditableImage from "../shared/EditableImage";
 import { formatWeddingDate } from "../../utils/dateFormatter";
@@ -7,7 +7,7 @@ import { formatWeddingDate } from "../../utils/dateFormatter";
  * EditableEditorialHero - WYSIWYG editable version of Editorial Hero
  * Supports image or video background editing
  */
-function EditableEditorialHero({ translations, currentLang, config = {}, onUpdate }) {
+function EditableEditorialHero({ _translations, _currentLang, config = {}, onUpdate }) {
   const couple = config.couple || {};
   const bride = couple.bride || {};
   const groom = couple.groom || {};

@@ -118,7 +118,7 @@ function HowItWorks({ onSectionView }: HowItWorksProps): ReactElement {
     if (target?.startsWith("#")) {
       document.querySelector(target)?.scrollIntoView({ behavior: "smooth" });
     } else if (target) {
-      window.location.href = target;
+      window.location.assign(target);
     }
   };
 

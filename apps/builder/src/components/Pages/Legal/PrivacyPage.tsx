@@ -13,9 +13,9 @@ function PrivacyPage(): JSX.Element {
           <section className="legal-section">
             <h2>1. Introduction</h2>
             <p>
-              Sacred Vows ("we," "our," or "us") is committed to protecting your privacy. This
-              Privacy Policy explains how we collect, use, disclose, and safeguard your information
-              when you use our website and services.
+              Sacred Vows (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) is committed to
+              protecting your privacy. This Privacy Policy explains how we collect, use, disclose,
+              and safeguard your information when you use our website and services.
             </p>
             <p>
               By using Sacred Vows, you agree to the collection and use of information in accordance
@@ -123,7 +123,7 @@ function PrivacyPage(): JSX.Element {
           </section>
 
           <section className="legal-section">
-            <h2>8. Children's Privacy</h2>
+            <h2>8. Children&apos;s Privacy</h2>
             <p>
               Our services are not intended for children under 16 years of age. We do not knowingly
               collect personal information from children under 16. If you believe we have collected
@@ -144,8 +144,8 @@ function PrivacyPage(): JSX.Element {
             <h2>10. Changes to This Policy</h2>
             <p>
               We may update this Privacy Policy from time to time. We will notify you of any changes
-              by posting the new policy on this page and updating the "Last updated" date. Your
-              continued use of our services after any changes indicates your acceptance of the
+              by posting the new policy on this page and updating the &quot;Last updated&quot; date.
+              Your continued use of our services after any changes indicates your acceptance of the
               updated policy.
             </p>
           </section>

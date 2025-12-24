@@ -161,7 +161,6 @@ function PreviewPane({ editMode = true, deviceMode = "desktop" }) {
     layout,
     getEnabledSections,
     currentInvitation.layoutConfig,
-    layoutId,
   ]);
 
   // Apply theme to CSS variables
@@ -194,7 +193,7 @@ function PreviewPane({ editMode = true, deviceMode = "desktop" }) {
     if (fonts.body) root.style.setProperty("--font-body", fonts.body);
     if (fonts.script) root.style.setProperty("--font-script", fonts.script);
     if (fonts.body) document.body.style.setProperty("font-family", fonts.body);
-  }, [currentInvitation?.layoutConfig?.theme]);
+  }, [currentInvitation?.layoutConfig?.theme, currentInvitation?.data?.theme]);
 
   const handleRSVPClick = () => {
     setShowRSVPModal(true);
@@ -291,7 +290,7 @@ function PreviewPane({ editMode = true, deviceMode = "desktop" }) {
       <div className="preview-pane">
         <div className="preview-error">
           <h2>Layout not found</h2>
-          <p>Layout "{layoutId}" is not registered in the registry.</p>
+          <p>Layout &quot;{layoutId}&quot; is not registered in the registry.</p>
         </div>
       </div>
     );

@@ -3,7 +3,7 @@ import EditableText from "../shared/EditableText";
 /**
  * EditableVenueSection - WYSIWYG editable version of Venue section
  */
-function EditableVenueSection({ translations, currentLang, config = {}, onUpdate }) {
+function EditableVenueSection({ translations, _currentLang, config = {}, onUpdate }) {
   const wedding = config.wedding || {};
   const venue = wedding.venue || {};
 

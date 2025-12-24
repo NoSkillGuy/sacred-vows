@@ -4,7 +4,7 @@ import EditableImage from "../shared/EditableImage";
 /**
  * EditableEditorialIntro - WYSIWYG editable Editorial Intro
  */
-function EditableEditorialIntro({ translations, currentLang, config = {}, onUpdate }) {
+function EditableEditorialIntro({ _translations, _currentLang, config = {}, onUpdate }) {
   const editorialIntro = config.editorialIntro || {};
   const introText =
     editorialIntro.text ||

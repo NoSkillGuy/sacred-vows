@@ -45,8 +45,9 @@ async function bucketExists(client: S3Client, bucketName: string): Promise<boole
   try {
     await client.send(new HeadBucketCommand({ Bucket: bucketName }));
     return true;
-  } catch (error: any) {
-    if (error.name === "NotFound" || error.$metadata?.httpStatusCode === 404) {
+  } catch (error: unknown) {
+    const err = error as { name?: string; $metadata?: { httpStatusCode?: number } };
+    if (err.name === "NotFound" || err.$metadata?.httpStatusCode === 404) {
       return false;
     }
     throw error;
@@ -68,12 +69,13 @@ export async function ensureBucketExists(bucketName: string): Promise<void> {
   try {
     await client.send(new CreateBucketCommand({ Bucket: bucketName }));
     console.log(`✓ Created bucket: ${bucketName}`);
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Bucket might have been created by another process
-    if (error.name === "BucketAlreadyExists" || error.name === "BucketAlreadyOwnedByYou") {
+    const err = error as { name?: string; message?: string };
+    if (err.name === "BucketAlreadyExists" || err.name === "BucketAlreadyOwnedByYou") {
       console.log(`✓ Bucket ${bucketName} already exists (created by another process)`);
     } else {
-      throw new Error(`Failed to create bucket ${bucketName}: ${error.message}`);
+      throw new Error(`Failed to create bucket ${bucketName}: ${err.message || String(error)}`);
     }
   }
 }
@@ -105,11 +107,12 @@ export async function verifyFirestoreEmulator(): Promise<void> {
       return;
     }
     console.log("✓ Firestore emulator appears to be running");
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     throw new Error(
       `Firestore emulator is not accessible at ${url}. ` +
         `Please ensure it's running (e.g., via docker-compose up -d firestore-emulator). ` +
-        `Error: ${error.message}`
+        `Error: ${errorMessage}`
     );
   }
 }
@@ -124,10 +127,11 @@ export async function verifyMinIO(): Promise<void> {
     // We use a non-existent bucket to test connectivity
     try {
       await client.send(new HeadBucketCommand({ Bucket: "test-connection" }));
-    } catch (error: any) {
+    } catch (error: unknown) {
       // We expect this to fail (bucket doesn't exist), but if we get here,
       // it means MinIO is accessible (connection succeeded, bucket doesn't exist)
-      if (error.name === "NotFound" || error.$metadata?.httpStatusCode === 404) {
+      const err = error as { name?: string; $metadata?: { httpStatusCode?: number } };
+      if (err.name === "NotFound" || err.$metadata?.httpStatusCode === 404) {
         // This is expected - bucket doesn't exist, but MinIO is accessible
         console.log("✓ MinIO is accessible");
         return;
@@ -136,11 +140,12 @@ export async function verifyMinIO(): Promise<void> {
       throw error;
     }
     console.log("✓ MinIO is accessible");
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     throw new Error(
       `MinIO is not accessible at ${MINIO_ENDPOINT}. ` +
         `Please ensure it's running (e.g., via docker-compose up -d minio). ` +
-        `Error: ${error.message}`
+        `Error: ${errorMessage}`
     );
   }
 }
@@ -186,12 +191,14 @@ export async function clearBucket(bucketName: string): Promise<void> {
     } else {
       console.log(`✓ Bucket ${bucketName} is already empty`);
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
     // Bucket might not exist, which is fine
-    if (error.name === "NoSuchBucket") {
+    const err = error as { name?: string };
+    if (err.name === "NoSuchBucket") {
       console.log(`⚠ Bucket ${bucketName} does not exist (skipping cleanup)`);
     } else {
-      throw new Error(`Failed to clear bucket ${bucketName}: ${error.message}`);
+      throw new Error(`Failed to clear bucket ${bucketName}: ${errorMessage}`);
     }
   }
 }

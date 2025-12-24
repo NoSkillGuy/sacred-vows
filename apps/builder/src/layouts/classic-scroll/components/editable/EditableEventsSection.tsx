@@ -4,7 +4,7 @@ import { getDefaultAssetUrl } from "../../../../services/defaultAssetService";
 /**
  * EditableEventsSection - WYSIWYG editable version of Events section
  */
-function EditableEventsSection({ translations, currentLang, config = {}, onUpdate }) {
+function EditableEventsSection({ translations, _currentLang, config = {}, onUpdate }) {
   const events = config.events || {};
   const day1Config = events.day1 || {};
   const day2Config = events.day2 || {};

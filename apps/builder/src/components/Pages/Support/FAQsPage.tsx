@@ -284,7 +284,7 @@ function FAQsPage(): ReactElement {
               ))
             ) : (
               <div className="no-results">
-                <p>No results found for "{searchQuery}"</p>
+                <p>No results found for &quot;{searchQuery}&quot;</p>
                 <button className="page-btn page-btn-ghost" onClick={() => setSearchQuery("")}>
                   Clear Search
                 </button>

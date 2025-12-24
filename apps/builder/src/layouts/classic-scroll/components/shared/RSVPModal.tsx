@@ -35,14 +35,17 @@ function RSVPModal({ isOpen, onClose, translations, currentLang, config = {} }) 
 
   const [date, setDate] = useState("");
 
+  // Load stored name when modal opens
   useEffect(() => {
-    if (isOpen) {
-      const storedName = localStorage.getItem("wedding-guest-name");
-      if (storedName) {
-        setName(storedName);
-      }
-      setDate(defaultArrivalDate);
+    if (!isOpen) return;
+
+    const storedName = localStorage.getItem("wedding-guest-name");
+    if (storedName) {
+      setName(storedName);
+    } else {
+      setName("");
     }
+    setDate(defaultArrivalDate);
   }, [isOpen, defaultArrivalDate]);
 
   const handleSubmit = (e) => {

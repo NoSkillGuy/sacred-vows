@@ -886,7 +886,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
       ): Record<string, unknown> => {
         const output = { ...target };
         for (const key in source) {
-          if (source.hasOwnProperty(key)) {
+          if (Object.prototype.hasOwnProperty.call(source, key)) {
             if (
               typeof source[key] === "object" &&
               source[key] !== null &&

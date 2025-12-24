@@ -163,19 +163,19 @@ function AboutPage(): ReactElement {
             </p>
             <p>
               What started as a passion project has grown into a platform trusted by over 50,000
-              couples worldwide. Every day, we're honored to be a small part of the most important
-              day in people's lives.
+              couples worldwide. Every day, we&apos;re honored to be a small part of the most
+              important day in people&apos;s lives.
             </p>
             <p>
-              Today, Sacred Vows is more than a product—it's a celebration of love in the digital
-              age. We combine timeless elegance with modern technology to create invitations that
-              your guests will treasure forever.
+              Today, Sacred Vows is more than a product—it&apos;s a celebration of love in the
+              digital age. We combine timeless elegance with modern technology to create invitations
+              that your guests will treasure forever.
             </p>
           </div>
           <div className="story-visual">
             <div className="story-card">
               <div className="story-quote">
-                "Every love story is unique. Every invitation should be too."
+                &quot;Every love story is unique. Every invitation should be too.&quot;
               </div>
               <div className="story-author">
                 <span className="author-avatar">PS</span>

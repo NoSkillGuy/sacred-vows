@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-function Hero({ onRSVPClick, translations, currentLang, config = {} }) {
+function Hero({ onRSVPClick, translations, _currentLang, config = {} }) {
   const [countdown, setCountdown] = useState("");
 
   // Read values directly from config without layout defaults
@@ -35,15 +35,16 @@ function Hero({ onRSVPClick, translations, currentLang, config = {} }) {
     return customValue || defaultValue;
   };
 
+  // Calculate and update countdown
   useEffect(() => {
     if (!countdownTarget) {
-      setCountdown("");
+      // No target, countdown stays as initial empty string
       return;
     }
 
     const target = new Date(countdownTarget);
     if (Number.isNaN(target.getTime())) {
-      setCountdown("");
+      // Invalid date, countdown stays as initial empty string
       return;
     }
 

@@ -5,7 +5,7 @@
  */
 
 const CACHE_NAME = "default-assets-v1";
-const CACHE_VERSION = "1.0.0";
+// CACHE_VERSION removed - unused
 
 // Get CDN base URL from environment variable
 const CDN_BASE_URL = import.meta.env.VITE_PUBLIC_ASSETS_CDN_URL || "";
@@ -216,7 +216,7 @@ export function getLayoutAssetUrl(layoutId: string, assetPath: string): string {
       // Handle case where there's only category, no subcategory
       // e.g., /assets/photos/couple2/1.jpeg
       const [category, ...filenameParts] = pathParts;
-      const filename = filenameParts.join("/") || pathParts[0];
+      const _filename = filenameParts.join("/") || pathParts[0];
       // Try to extract filename from the last part
       const lastPart = pathParts[pathParts.length - 1];
       if (lastPart.includes(".")) {

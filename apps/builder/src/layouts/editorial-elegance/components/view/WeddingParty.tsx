@@ -4,7 +4,7 @@
  */
 import { getDefaultAssetUrl } from "../../../../services/defaultAssetService";
 
-function WeddingParty({ translations, currentLang, config = {} }) {
+function WeddingParty({ _translations, _currentLang, config = {} }) {
   const weddingParty = config.weddingParty || {};
   const couple = config.couple || {};
   const bride = weddingParty.bride ||

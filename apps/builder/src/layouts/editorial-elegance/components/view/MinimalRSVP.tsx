@@ -4,7 +4,7 @@ import { useState } from "react";
  * MinimalRSVP - Ultra-minimal centered RSVP form
  * Thin underline inputs, text-only submit button
  */
-function MinimalRSVP({ translations, currentLang, config = {} }) {
+function MinimalRSVP({ _translations, _currentLang, _config = {} }) {
   const [formData, setFormData] = useState({
     name: "",
     attendance: "",
@@ -46,7 +46,7 @@ function MinimalRSVP({ translations, currentLang, config = {} }) {
               className="ee-input"
             >
               <option value="">Will you attend?</option>
-              <option value="yes">Yes, I'll be there</option>
+              <option value="yes">Yes, I&apos;ll be there</option>
               <option value="no">Regretfully, I cannot attend</option>
             </select>
           </div>

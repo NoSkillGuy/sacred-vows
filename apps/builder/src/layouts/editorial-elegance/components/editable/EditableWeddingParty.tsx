@@ -4,7 +4,7 @@ import EditableImage from "../shared/EditableImage";
 /**
  * EditableWeddingParty - WYSIWYG editable Wedding Party
  */
-function EditableWeddingParty({ translations, currentLang, config = {}, onUpdate }) {
+function EditableWeddingParty({ _translations, _currentLang, config = {}, onUpdate }) {
   const weddingParty = config.weddingParty || {};
   const bride = weddingParty.bride || config.couple?.bride;
   const groom = weddingParty.groom || config.couple?.groom;

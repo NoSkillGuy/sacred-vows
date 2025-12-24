@@ -165,7 +165,10 @@ function LayoutShowcase({ onSectionView }: LayoutShowcaseProps): ReactElement {
       const Ornament = ornamentByCategory[category] || OrnamentSun;
       const defaultTheme = layout.themes?.find((theme) => theme.isDefault) || layout.themes?.[0];
       const colors = defaultTheme?.colors || {};
-      const accent = (colors as any).accent || (colors as any).primary || defaultColors.accent;
+      const accent =
+        (colors as Record<string, string>).accent ||
+        (colors as Record<string, string>).primary ||
+        defaultColors.accent;
       const tags = [
         ...(layout.metadata?.tags || []),
         layout.metadata?.featured ? "popular" : null,
@@ -176,11 +179,16 @@ function LayoutShowcase({ onSectionView }: LayoutShowcaseProps): ReactElement {
         ...layout,
         Ornament,
         ornamentColor: accent,
-        names: (layout as any).names || layout.name,
-        date: (layout as any).date || null,
-        className: (layout as any).className || `layout-${layout.id}`,
+        names: (layout as LayoutManifest & { names?: string }).names || layout.name,
+        date: (layout as LayoutManifest & { date?: string | null }).date || null,
+        className:
+          (layout as LayoutManifest & { className?: string }).className || `layout-${layout.id}`,
         tags: tagsSlice,
-        isReady: (layout as any).status === "ready" || (layout as any).isAvailable || true,
+        isReady:
+          (layout as LayoutManifest & { status?: string; isAvailable?: boolean }).status ===
+            "ready" ||
+          (layout as LayoutManifest & { status?: string; isAvailable?: boolean }).isAvailable ||
+          true,
       };
     });
   }, [layouts]);

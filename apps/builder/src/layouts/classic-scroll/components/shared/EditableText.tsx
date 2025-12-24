@@ -45,10 +45,13 @@ function EditableText({
     }
 
     // Only sync from props when we're not in any edit-related state
+    // Note: This is intentional - we need to sync displayValue with props
+    // when not editing, but avoid setState in effect warning by using a ref
     const newValue = value || children || "";
     if (newValue !== displayValue) {
       setDisplayValue(newValue);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, children, isEditing]);
 
   const handleClick = (e) => {

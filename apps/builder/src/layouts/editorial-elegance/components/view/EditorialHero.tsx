@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+// useState, useEffect removed - unused
 import { formatWeddingDate } from "../../utils/dateFormatter";
 import { useParallax } from "../../hooks/useScrollAnimations";
 import { getDefaultAssetUrl } from "../../../../services/defaultAssetService";
@@ -7,7 +7,7 @@ import { getDefaultAssetUrl } from "../../../../services/defaultAssetService";
  * EditorialHero - Magazine cover style hero section
  * Supports image or muted video background
  */
-function EditorialHero({ translations, currentLang, config = {} }) {
+function EditorialHero({ _translations, _currentLang, config = {} }) {
   const heroRef = useParallax();
   const couple = config.couple || {};
   const bride = couple.bride || {};

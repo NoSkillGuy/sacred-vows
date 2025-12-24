@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-function Header({ onLanguageClick, translations, currentLang, config = {} }) {
+function Header({ onLanguageClick, translations, _currentLang, config = {} }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef(null);
 
@@ -37,7 +37,7 @@ function Header({ onLanguageClick, translations, currentLang, config = {} }) {
       audio.removeEventListener("play", handlePlay);
       audio.removeEventListener("pause", handlePause);
     };
-  }, [musicVolume]);
+  }, [musicVolume, musicFile]);
 
   const toggleMusic = () => {
     const audio = audioRef.current;

@@ -144,7 +144,7 @@ function PressPage(): ReactElement {
             <p>
               Trusted by over 50,000 couples worldwide, Sacred Vows has helped share millions of
               love stories with friends and family around the globe. Our team is passionate about
-              being a part of the most important day in people's lives.
+              being a part of the most important day in people&apos;s lives.
             </p>
           </div>
         </section>

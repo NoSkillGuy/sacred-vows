@@ -459,11 +459,14 @@ function mergeDeep(
 
   Object.entries(override || {}).forEach(([key, value]) => {
     if (Array.isArray(value)) {
-      (result as any)[key] = value.slice();
+      (result as Record<string, unknown>)[key] = value.slice();
     } else if (isObject(value)) {
-      (result as any)[key] = mergeDeep((base as any)[key] || {}, value);
+      (result as Record<string, unknown>)[key] = mergeDeep(
+        (base as Record<string, unknown>)[key] || {},
+        value
+      );
     } else if (value !== undefined) {
-      (result as any)[key] = value;
+      (result as Record<string, unknown>)[key] = value;
     }
   });
 

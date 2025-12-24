@@ -1,6 +1,6 @@
 import { getDefaultAssetUrl } from "../../../../services/defaultAssetService";
 
-function Events({ translations, currentLang, config = {} }) {
+function Events({ translations, _currentLang, config = {} }) {
   const events = config.events || {};
   const day1Config = events.day1 || {};
   const day2Config = events.day2 || {};

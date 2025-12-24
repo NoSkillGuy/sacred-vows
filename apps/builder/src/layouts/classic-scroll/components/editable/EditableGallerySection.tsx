@@ -5,7 +5,7 @@ import { getDefaultAssetUrl } from "../../../../services/defaultAssetService";
 /**
  * EditableGallerySection - WYSIWYG editable version of Gallery section
  */
-function EditableGallerySection({ translations, currentLang, config = {}, onUpdate }) {
+function EditableGallerySection({ translations, _currentLang, config = {}, onUpdate }) {
   const gallery = config.gallery || {};
   const galleryImages = gallery.images || [
     { src: getDefaultAssetUrl("couple1", "couple", "21.jpeg"), alt: "Couple photo 1" },

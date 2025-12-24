@@ -1,7 +1,7 @@
 /**
  * Location - Venue details with desaturated embedded map
  */
-function Location({ translations, currentLang, config = {} }) {
+function Location({ _translations, _currentLang, config = {} }) {
   const wedding = config.wedding || {};
   const venue = wedding.venue || {};
   const mapStyle = config.location?.mapStyle || "desaturated";

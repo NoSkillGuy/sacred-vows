@@ -1,4 +1,4 @@
-import { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import { useState, useEffect, useCallback, ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   getCurrentUserFromAPI,
@@ -25,9 +25,21 @@ function ProfilePage(): JSX.Element {
   const [expirySeconds, setExpirySeconds] = useState(0);
   const [attemptsRemaining, setAttemptsRemaining] = useState(5);
 
+  const loadUser = useCallback(async (): Promise<void> => {
+    try {
+      const userData = await getCurrentUserFromAPI();
+      setUser(userData);
+    } catch (err) {
+      console.error("Failed to load user:", err);
+      navigate("/login");
+    } finally {
+      setLoading(false);
+    }
+  }, [navigate]);
+
   useEffect(() => {
     loadUser();
-  }, []);
+  }, [loadUser]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -64,18 +76,6 @@ function ProfilePage(): JSX.Element {
       if (interval) clearInterval(interval);
     };
   }, [expirySeconds, passwordChangeState]);
-
-  const loadUser = async (): Promise<void> => {
-    try {
-      const userData = await getCurrentUserFromAPI();
-      setUser(userData);
-    } catch (err) {
-      console.error("Failed to load user:", err);
-      navigate("/login");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setFormData({
@@ -285,8 +285,8 @@ function ProfilePage(): JSX.Element {
               <div className="otp-section">
                 <div className="otp-info">
                   <p className="otp-message">
-                    We've sent a 6-digit verification code to <strong>{user?.email}</strong>. Please
-                    check your email and enter the code below.
+                    We&apos;ve sent a 6-digit verification code to <strong>{user?.email}</strong>.
+                    Please check your email and enter the code below.
                   </p>
                   {expirySeconds > 0 && (
                     <p className="expiry-info">

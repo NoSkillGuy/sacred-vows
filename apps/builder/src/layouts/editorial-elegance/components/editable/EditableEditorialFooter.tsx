@@ -3,7 +3,7 @@ import EditableText from "../shared/EditableText";
 /**
  * EditableEditorialFooter - WYSIWYG editable Footer
  */
-function EditableEditorialFooter({ translations, currentLang, config = {}, onUpdate }) {
+function EditableEditorialFooter({ _translations, _currentLang, config = {}, onUpdate }) {
   const couple = config.couple || {};
   const bride = couple.bride || {};
   const groom = couple.groom || {};

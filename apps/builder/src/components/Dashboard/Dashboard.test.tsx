@@ -238,7 +238,7 @@ describe("Dashboard", () => {
         data: undefined,
         isLoading: true,
         error: null,
-      } as any);
+      } as unknown as ReturnType<typeof useInvitationsModule.useInvitationsQuery>);
 
       renderDashboard();
 
@@ -254,7 +254,7 @@ describe("Dashboard", () => {
         data: [],
         isLoading: false,
         error: null,
-      } as any);
+      } as unknown as ReturnType<typeof useInvitationsModule.useInvitationsQuery>);
 
       renderDashboard();
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useBuilderStore } from "../../store/builderStore";
 import "./ThemeModal.css";
 
@@ -43,23 +43,12 @@ function ThemeModal({ isOpen, onClose }) {
       ? currentLayoutManifest.themes
       : currentInvitation?.layoutConfig?.themes) || [];
 
-  const [formData, setFormData] = useState({
-    primaryColor: colors.primary || "#000000",
-    secondaryColor: colors.secondary || "#000000",
-    backgroundColor: colors.background || "#ffffff",
-    textColor: colors.text || "#000000",
-    headingFont: fonts.heading || "",
-    bodyFont: fonts.body || "",
-    scriptFont: fonts.script || "",
-  });
-
-  // Update local state when store changes
-  useEffect(() => {
+  // Derive default formData from theme using useMemo
+  const defaultFormData = useMemo(() => {
     const currentTheme = getTheme();
     const themeColors = currentTheme.colors || {};
     const themeFonts = currentTheme.fonts || {};
-
-    setFormData({
+    return {
       primaryColor: themeColors.primary || "#000000",
       secondaryColor: themeColors.secondary || "#000000",
       backgroundColor: themeColors.background || "#ffffff",
@@ -67,8 +56,19 @@ function ThemeModal({ isOpen, onClose }) {
       headingFont: themeFonts.heading || "",
       bodyFont: themeFonts.body || "",
       scriptFont: themeFonts.script || "",
-    });
-  }, [currentInvitation.layoutConfig?.theme]);
+    };
+  }, [getTheme, currentInvitation.layoutConfig?.theme]);
+
+  const [formData, setFormData] = useState(defaultFormData);
+  const prevThemeRef = useRef(currentInvitation.layoutConfig?.theme);
+
+  // Update formData when theme changes externally
+  useEffect(() => {
+    if (prevThemeRef.current !== currentInvitation.layoutConfig?.theme) {
+      setFormData(defaultFormData);
+      prevThemeRef.current = currentInvitation.layoutConfig?.theme;
+    }
+  }, [defaultFormData, currentInvitation.layoutConfig?.theme, getTheme]);
 
   const handleColorChange = (field, value) => {
     const colorMap = {
