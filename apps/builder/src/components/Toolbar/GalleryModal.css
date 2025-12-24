@@ -38,7 +38,7 @@
 
 .gallery-modal-header h3 {
   margin: 0;
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.35rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -86,7 +86,7 @@
   padding: 0.875rem 1.25rem;
   border: none;
   background: none;
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--text-light);
@@ -104,7 +104,7 @@
 }
 
 .tab-btn.active::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -1px;
   left: 0;
@@ -190,7 +190,7 @@
   padding: 0.5rem 0.75rem;
   border: 1px solid var(--builder-border);
   border-radius: var(--radius-sm);
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   font-size: 0.8rem;
   background: var(--white);
   cursor: pointer;
@@ -258,7 +258,7 @@
   border: 1px solid var(--builder-border);
   background: var(--white);
   border-radius: var(--radius-full);
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--text-light);
@@ -375,7 +375,7 @@
   padding: 0.625rem 0.875rem;
   border: 1px solid var(--builder-border);
   border-radius: var(--radius-md);
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   font-size: 0.875rem;
   transition: border-color 0.2s ease;
 }

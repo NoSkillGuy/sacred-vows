@@ -1,36 +1,36 @@
-import EditableText from '../shared/EditableText';
+import EditableText from "../shared/EditableText";
 
 /**
  * EditableRSVPSection - WYSIWYG editable version of RSVP section
  */
-function EditableRSVPSection({ onRSVPClick, translations, currentLang, config = {}, onUpdate }) {
+function EditableRSVPSection({ onRSVPClick, translations, _currentLang, config = {}, onUpdate }) {
   const rsvp = config.rsvp || {};
   const contacts = rsvp.contacts || [
-    { badge: 'RSVP', name: 'Anil Kumar Singh' },
-    { badge: 'RSVP', name: 'Arun Kumar Singh' },
-    { badge: 'RSVP', name: 'Ashok Kumar Singh' },
-    { badge: 'RSVP', name: 'Arvind Kumar Singh' },
-    { badge: 'Host', name: 'Siva Praveen Rayapudi' },
-    { badge: 'Host', name: 'Pooja Singh' }
+    { badge: "RSVP", name: "Anil Kumar Singh" },
+    { badge: "RSVP", name: "Arun Kumar Singh" },
+    { badge: "RSVP", name: "Ashok Kumar Singh" },
+    { badge: "RSVP", name: "Arvind Kumar Singh" },
+    { badge: "Host", name: "Siva Praveen Rayapudi" },
+    { badge: "Host", name: "Pooja Singh" },
   ];
-  
+
   const couple = config.couple || {};
   const wedding = config.wedding || {};
-  const brideName = couple.bride?.name || 'Capt (Dr) Priya Singh';
-  const groomName = couple.groom?.name || 'Dr Saurabh Singh';
-  const dates = wedding.dates || ['2026-01-22', '2026-01-23'];
+  const brideName = couple.bride?.name || "Capt (Dr) Priya Singh";
+  const groomName = couple.groom?.name || "Dr Saurabh Singh";
+  const dates = wedding.dates || ["2026-01-22", "2026-01-23"];
   const venue = wedding.venue || {};
-  const venueName = venue.name || 'Royal Lotus View Resotel';
-  const venueCity = venue.city || 'Bengaluru';
+  const venueName = venue.name || "Royal Lotus View Resotel";
+  const venueCity = venue.city || "Bengaluru";
 
   // Get custom translations - handle nested paths
   const getTranslation = (key) => {
     let customValue = null;
     if (config?.customTranslations) {
-      const keys = key.split('.');
+      const keys = key.split(".");
       let current = config.customTranslations;
       for (const k of keys) {
-        if (current && typeof current === 'object' && k in current) {
+        if (current && typeof current === "object" && k in current) {
           current = current[k];
         } else {
           current = null;
@@ -39,46 +39,59 @@ function EditableRSVPSection({ onRSVPClick, translations, currentLang, config = 
       }
       customValue = current || null;
     }
-    return customValue || translations[key] || '';
+    return customValue || translations[key] || "";
   };
-  
+
   const formatDates = (dates) => {
     if (dates.length === 1) {
-      return new Date(dates[0]).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+      return new Date(dates[0]).toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
     }
-    return dates.map(d => new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'long' })).join(' and ') + ' ' + new Date(dates[0]).getFullYear();
+    return (
+      dates
+        .map((d) => new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "long" }))
+        .join(" and ") +
+      " " +
+      new Date(dates[0]).getFullYear()
+    );
   };
-  
+
   const handleWhatsAppShare = (e) => {
     e.preventDefault();
     const pageUrl = window.location.href;
     const formattedDates = formatDates(dates);
     const defaultMessage = `You are warmly invited to the wedding of ${brideName} and ${groomName} on ${formattedDates} at ${venueName}, ${venueCity}.\n\nPlease tap the link to view the full invitation:\n`;
     const message = encodeURIComponent(
-      (getTranslation('rsvp.whatsapp_share') || defaultMessage) + pageUrl
+      (getTranslation("rsvp.whatsapp_share") || defaultMessage) + pageUrl
     );
-    window.open(`https://wa.me/?text=${message}`, '_blank');
+    window.open(`https://wa.me/?text=${message}`, "_blank");
   };
 
   return (
     <section id="rsvp">
       <div className="section-header">
         <EditableText
-          value={getTranslation('rsvp.eyebrow') || 'RSVP'}
+          value={getTranslation("rsvp.eyebrow") || "RSVP"}
           onUpdate={onUpdate}
           path="customTranslations.rsvp.eyebrow"
           className="section-eyebrow"
           tag="div"
         />
         <EditableText
-          value={getTranslation('rsvp.title') || 'With Warm Regards'}
+          value={getTranslation("rsvp.title") || "With Warm Regards"}
           onUpdate={onUpdate}
           path="customTranslations.rsvp.title"
           className="section-title"
           tag="div"
         />
         <EditableText
-          value={getTranslation('rsvp.subtitle') || 'Kindly confirm your presence and feel free to reach out for any assistance.'}
+          value={
+            getTranslation("rsvp.subtitle") ||
+            "Kindly confirm your presence and feel free to reach out for any assistance."
+          }
           onUpdate={onUpdate}
           path="customTranslations.rsvp.subtitle"
           className="section-subtitle"
@@ -90,7 +103,10 @@ function EditableRSVPSection({ onRSVPClick, translations, currentLang, config = 
       <div className="card">
         <div className="card-inner">
           <EditableText
-            value={getTranslation('rsvp.text') || 'On behalf of both families, you may contact the following for confirmations, travel details, or any other queries:'}
+            value={
+              getTranslation("rsvp.text") ||
+              "On behalf of both families, you may contact the following for confirmations, travel details, or any other queries:"
+            }
             onUpdate={onUpdate}
             path="customTranslations.rsvp.text"
             className="rsvp-text"
@@ -118,9 +134,17 @@ function EditableRSVPSection({ onRSVPClick, translations, currentLang, config = 
             ))}
           </div>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center', marginBottom: '8px' }}>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "10px",
+              alignItems: "center",
+              marginBottom: "8px",
+            }}
+          >
             <button className="btn btn-primary" id="rsvpButton" onClick={onRSVPClick}>
-              {getTranslation('hero.actions.rsvp') || 'RSVP Now'}
+              {getTranslation("hero.actions.rsvp") || "RSVP Now"}
               <span className="btn-icon">✓</span>
             </button>
             <a
@@ -130,10 +154,13 @@ function EditableRSVPSection({ onRSVPClick, translations, currentLang, config = 
               target="_blank"
               rel="noopener noreferrer"
             >
-              {getTranslation('rsvp.share.button') || 'Share Invitation on WhatsApp'}
+              {getTranslation("rsvp.share.button") || "Share Invitation on WhatsApp"}
             </a>
             <EditableText
-              value={getTranslation('rsvp.share.note') || 'You may share this link with friends and family whom you wish to invite.'}
+              value={
+                getTranslation("rsvp.share.note") ||
+                "You may share this link with friends and family whom you wish to invite."
+              }
               onUpdate={onUpdate}
               path="customTranslations.rsvp.share.note"
               className="small-note"
@@ -147,5 +174,3 @@ function EditableRSVPSection({ onRSVPClick, translations, currentLang, config = 
 }
 
 export default EditableRSVPSection;
-
-

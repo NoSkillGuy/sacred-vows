@@ -24,8 +24,8 @@ func NewListPublishedVersionsUseCase(
 
 // VersionInfo represents information about a published version
 type VersionInfo struct {
-	Version      int  `json:"version"`
-	IsCurrent    bool `json:"isCurrent"`
+	Version   int  `json:"version"`
+	IsCurrent bool `json:"isCurrent"`
 }
 
 // Execute lists all available versions for a published site.
@@ -62,7 +62,3 @@ func (uc *ListPublishedVersionsUseCase) Execute(ctx context.Context, subdomain s
 
 	return versionInfos, nil
 }
-
-
-
-

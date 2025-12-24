@@ -15,7 +15,7 @@ type AssetRepository interface {
 	FindByURLs(ctx context.Context, urls []string) ([]*domain.Asset, error)
 	Delete(ctx context.Context, id string) error
 	DeleteByURL(ctx context.Context, url string) error
-	
+
 	// Usage tracking methods
 	FindUsedInInvitations(ctx context.Context, assetID string) ([]string, error) // Returns invitation IDs
 	TrackUsage(ctx context.Context, assetID, invitationID string) error

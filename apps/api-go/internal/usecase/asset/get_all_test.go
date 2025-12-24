@@ -57,4 +57,3 @@ func TestGetAllAssetsUseCase_Execute_UserHasAssets_ReturnsAssets(t *testing.T) {
 	assert.Equal(t, "asset-1", output.Assets[0].ID, "First asset ID should match")
 	assert.Equal(t, "asset-2", output.Assets[1].ID, "Second asset ID should match")
 }
-

@@ -15,4 +15,3 @@ type PasswordChangeOTPRepository interface {
 	IncrementAttempts(ctx context.Context, otpID string) error
 	MarkAsUsed(ctx context.Context, otpID string) error
 }
-

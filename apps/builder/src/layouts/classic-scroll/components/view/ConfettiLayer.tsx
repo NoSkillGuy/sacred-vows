@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
 function ConfettiLayer() {
   useEffect(() => {
@@ -23,7 +23,7 @@ function ConfettiLayer() {
       const maxDuration = 4800; // allow each burst to finish independently
 
       const { startTop, fallDistance } = (() => {
-        const previewContainer = layer.closest('[data-preview-scroll-container]');
+        const previewContainer = layer.closest("[data-preview-scroll-container]");
         if (previewContainer) {
           const containerRect = previewContainer.getBoundingClientRect();
           const layerRect = layer.getBoundingClientRect();
@@ -63,13 +63,17 @@ function ConfettiLayer() {
           "data-end-time",
           (Date.now() + (animDuration + delay) * 1000).toString()
         );
-        
-        piece.addEventListener('animationend', () => {
-          if (piece.parentNode) {
-            piece.remove();
-          }
-        }, { once: true });
-        
+
+        piece.addEventListener(
+          "animationend",
+          () => {
+            if (piece.parentNode) {
+              piece.remove();
+            }
+          },
+          { once: true }
+        );
+
         burstLayer.appendChild(piece);
       }
 
@@ -88,17 +92,18 @@ function ConfettiLayer() {
         const fDelay = Math.random() * 0.4;
         flower.style.animationDuration = fDuration + "s";
         flower.style.animationDelay = fDelay + "s";
-        flower.setAttribute(
-          "data-end-time",
-          (Date.now() + (fDuration + fDelay) * 1000).toString()
+        flower.setAttribute("data-end-time", (Date.now() + (fDuration + fDelay) * 1000).toString());
+
+        flower.addEventListener(
+          "animationend",
+          () => {
+            if (flower.parentNode) {
+              flower.remove();
+            }
+          },
+          { once: true }
         );
-        
-        flower.addEventListener('animationend', () => {
-          if (flower.parentNode) {
-            flower.remove();
-          }
-        }, { once: true });
-        
+
         burstLayer.appendChild(flower);
       }
 
@@ -140,4 +145,3 @@ function ConfettiLayer() {
 }
 
 export default ConfettiLayer;
-

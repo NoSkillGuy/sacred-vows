@@ -17,7 +17,7 @@ import (
 func TestAuthHandler_Register_InvalidRequest_ReturnsBadRequest(t *testing.T) {
 	// Arrange
 	gin.SetMode(gin.TestMode)
-	
+
 	reqBody := RegisterRequest{
 		Email:    "", // Missing email
 		Password: "ValidPass123",
@@ -28,13 +28,13 @@ func TestAuthHandler_Register_InvalidRequest_ReturnsBadRequest(t *testing.T) {
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	
+
 	// Create a minimal handler (we're just testing request validation)
 	handler := &AuthHandler{}
-	
+
 	// Act
 	handler.Register(c)
-	
+
 	// Assert
 	assert.Equal(t, http.StatusBadRequest, w.Code, "Should return 400 status for invalid request")
 }
@@ -42,7 +42,7 @@ func TestAuthHandler_Register_InvalidRequest_ReturnsBadRequest(t *testing.T) {
 func TestAuthHandler_Login_InvalidRequest_ReturnsBadRequest(t *testing.T) {
 	// Arrange
 	gin.SetMode(gin.TestMode)
-	
+
 	reqBody := LoginRequest{
 		Email:    "", // Missing email
 		Password: "ValidPass123",
@@ -53,12 +53,12 @@ func TestAuthHandler_Login_InvalidRequest_ReturnsBadRequest(t *testing.T) {
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
-	
+
 	handler := &AuthHandler{}
-	
+
 	// Act
 	handler.Login(c)
-	
+
 	// Assert
 	assert.Equal(t, http.StatusBadRequest, w.Code, "Should return 400 status for invalid request")
 }
@@ -66,19 +66,18 @@ func TestAuthHandler_Login_InvalidRequest_ReturnsBadRequest(t *testing.T) {
 func TestAuthHandler_GetCurrentUser_NoUserID_ReturnsUnauthorized(t *testing.T) {
 	// Arrange
 	gin.SetMode(gin.TestMode)
-	
+
 	req := httptest.NewRequest(http.MethodGet, "/auth/me", nil)
 	w := httptest.NewRecorder()
 	c, _ := gin.CreateTestContext(w)
 	c.Request = req
 	// Note: userID is not set in context (simulating missing auth)
-	
+
 	handler := &AuthHandler{}
-	
+
 	// Act
 	handler.GetCurrentUser(c)
-	
+
 	// Assert
 	assert.Equal(t, http.StatusUnauthorized, w.Code, "Should return 401 status when userID not in context")
 }
-
