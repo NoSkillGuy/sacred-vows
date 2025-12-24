@@ -1,29 +1,29 @@
-import { useState, useEffect } from 'react';
-import { useBuilderStore } from '../../store/builderStore';
-import './ThemeModal.css';
+import { useState, useEffect, useMemo, useRef } from "react";
+import { useBuilderStore } from "../../store/builderStore";
+import "./ThemeModal.css";
 
 // All available font options
 const fontOptions = [
-  { value: 'Playfair Display', label: 'Playfair Display', style: 'serif' },
-  { value: 'Cormorant Garamond', label: 'Cormorant Garamond', style: 'serif' },
-  { value: 'Libre Baskerville', label: 'Libre Baskerville', style: 'serif' },
-  { value: 'Crimson Text', label: 'Crimson Text', style: 'serif' },
-  { value: 'EB Garamond', label: 'EB Garamond', style: 'serif' },
-  { value: 'Poppins', label: 'Poppins', style: 'sans-serif' },
-  { value: 'Inter', label: 'Inter', style: 'sans-serif' },
-  { value: 'Lato', label: 'Lato', style: 'sans-serif' },
-  { value: 'Montserrat', label: 'Montserrat', style: 'sans-serif' },
-  { value: 'Quicksand', label: 'Quicksand', style: 'sans-serif' },
-  { value: 'Great Vibes', label: 'Great Vibes', style: 'script' },
-  { value: 'Dancing Script', label: 'Dancing Script', style: 'script' },
-  { value: 'Tangerine', label: 'Tangerine', style: 'script' },
-  { value: 'Alex Brush', label: 'Alex Brush', style: 'script' },
-  { value: 'Parisienne', label: 'Parisienne', style: 'script' },
+  { value: "Playfair Display", label: "Playfair Display", style: "serif" },
+  { value: "Cormorant Garamond", label: "Cormorant Garamond", style: "serif" },
+  { value: "Libre Baskerville", label: "Libre Baskerville", style: "serif" },
+  { value: "Crimson Text", label: "Crimson Text", style: "serif" },
+  { value: "EB Garamond", label: "EB Garamond", style: "serif" },
+  { value: "Poppins", label: "Poppins", style: "sans-serif" },
+  { value: "Inter", label: "Inter", style: "sans-serif" },
+  { value: "Lato", label: "Lato", style: "sans-serif" },
+  { value: "Montserrat", label: "Montserrat", style: "sans-serif" },
+  { value: "Quicksand", label: "Quicksand", style: "sans-serif" },
+  { value: "Great Vibes", label: "Great Vibes", style: "script" },
+  { value: "Dancing Script", label: "Dancing Script", style: "script" },
+  { value: "Tangerine", label: "Tangerine", style: "script" },
+  { value: "Alex Brush", label: "Alex Brush", style: "script" },
+  { value: "Parisienne", label: "Parisienne", style: "script" },
 ];
 
 function ThemeModal({ isOpen, onClose }) {
-  const { 
-    currentInvitation, 
+  const {
+    currentInvitation,
     currentLayoutManifest,
     applyThemePreset,
     updateThemeColors,
@@ -33,66 +33,70 @@ function ThemeModal({ isOpen, onClose }) {
 
   // Get current theme
   const theme = getTheme();
-  const colors = theme.colors || {};
-  const fonts = theme.fonts || {};
-  const currentPreset = theme.preset || 'custom';
+  const currentPreset = theme.preset || "custom";
 
   // Get theme presets from manifest; if manifest has none, fall back to layout config
-  const themePresets = (currentLayoutManifest?.themes?.length ? currentLayoutManifest.themes : currentInvitation?.layoutConfig?.themes) || [];
+  const themePresets =
+    (currentLayoutManifest?.themes?.length
+      ? currentLayoutManifest.themes
+      : currentInvitation?.layoutConfig?.themes) || [];
 
-  const [formData, setFormData] = useState({
-    primaryColor: colors.primary || '#000000',
-    secondaryColor: colors.secondary || '#000000',
-    backgroundColor: colors.background || '#ffffff',
-    textColor: colors.text || '#000000',
-    headingFont: fonts.heading || '',
-    bodyFont: fonts.body || '',
-    scriptFont: fonts.script || '',
-  });
-
-  // Update local state when store changes
-  useEffect(() => {
+  // Derive default formData from theme using useMemo
+  const defaultFormData = useMemo(() => {
     const currentTheme = getTheme();
     const themeColors = currentTheme.colors || {};
     const themeFonts = currentTheme.fonts || {};
-    
-    setFormData({
-      primaryColor: themeColors.primary || '#000000',
-      secondaryColor: themeColors.secondary || '#000000',
-      backgroundColor: themeColors.background || '#ffffff',
-      textColor: themeColors.text || '#000000',
-      headingFont: themeFonts.heading || '',
-      bodyFont: themeFonts.body || '',
-      scriptFont: themeFonts.script || '',
-    });
-  }, [currentInvitation.layoutConfig?.theme]);
+    return {
+      primaryColor: themeColors.primary || "#000000",
+      secondaryColor: themeColors.secondary || "#000000",
+      backgroundColor: themeColors.background || "#ffffff",
+      textColor: themeColors.text || "#000000",
+      headingFont: themeFonts.heading || "",
+      bodyFont: themeFonts.body || "",
+      scriptFont: themeFonts.script || "",
+    };
+  }, [getTheme]);
+
+  const [formData, setFormData] = useState(defaultFormData);
+  const prevThemeRef = useRef(currentInvitation.layoutConfig?.theme);
+
+  // Update formData when theme changes externally
+  useEffect(() => {
+    if (prevThemeRef.current !== currentInvitation.layoutConfig?.theme) {
+      // Use setTimeout to defer setState and avoid synchronous setState in effect
+      setTimeout(() => {
+        setFormData(defaultFormData);
+      }, 0);
+      prevThemeRef.current = currentInvitation.layoutConfig?.theme;
+    }
+  }, [defaultFormData, currentInvitation.layoutConfig?.theme, getTheme]);
 
   const handleColorChange = (field, value) => {
     const colorMap = {
-      primaryColor: 'primary',
-      secondaryColor: 'secondary',
-      backgroundColor: 'background',
-      textColor: 'text',
+      primaryColor: "primary",
+      secondaryColor: "secondary",
+      backgroundColor: "background",
+      textColor: "text",
     };
-    
-    setFormData(prev => ({ ...prev, [field]: value }));
+
+    setFormData((prev) => ({ ...prev, [field]: value }));
     updateThemeColors({ [colorMap[field]]: value });
   };
 
   const handleFontChange = (field, value) => {
     const fontMap = {
-      headingFont: 'heading',
-      bodyFont: 'body',
-      scriptFont: 'script',
+      headingFont: "heading",
+      bodyFont: "body",
+      scriptFont: "script",
     };
-    
-    setFormData(prev => ({ ...prev, [field]: value }));
+
+    setFormData((prev) => ({ ...prev, [field]: value }));
     updateThemeFonts({ [fontMap[field]]: value });
   };
 
   const handleApplyPreset = (preset) => {
     applyThemePreset(preset.id);
-    
+
     // Update local form data
     setFormData({
       primaryColor: preset.colors.primary,
@@ -112,7 +116,9 @@ function ThemeModal({ isOpen, onClose }) {
       <div className="theme-modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="theme-modal-header">
           <h3>🎨 Theme Settings</h3>
-          <button className="theme-modal-close" onClick={onClose}>×</button>
+          <button className="theme-modal-close" onClick={onClose}>
+            ×
+          </button>
         </div>
 
         <div className="theme-modal-body">
@@ -121,9 +127,7 @@ function ThemeModal({ isOpen, onClose }) {
             <h4 className="theme-section-title">
               Theme Presets
               {currentLayoutManifest && (
-                <span className="theme-section-subtitle">
-                  for {currentLayoutManifest.name}
-                </span>
+                <span className="theme-section-subtitle">for {currentLayoutManifest.name}</span>
               )}
             </h4>
             {themePresets.length === 0 ? (
@@ -133,19 +137,19 @@ function ThemeModal({ isOpen, onClose }) {
                 {themePresets.map((preset) => (
                   <button
                     key={preset.id}
-                    className={`theme-preset-card ${currentPreset === preset.id ? 'active' : ''}`}
+                    className={`theme-preset-card ${currentPreset === preset.id ? "active" : ""}`}
                     onClick={() => handleApplyPreset(preset)}
                   >
                     <div className="preset-color-preview">
-                      <div 
+                      <div
                         className="preset-color-bg"
                         style={{ background: preset.colors.background }}
                       >
-                        <span 
+                        <span
                           className="preset-color-primary"
                           style={{ background: preset.colors.primary }}
                         />
-                        <span 
+                        <span
                           className="preset-color-secondary"
                           style={{ background: preset.colors.secondary }}
                         />
@@ -153,9 +157,7 @@ function ThemeModal({ isOpen, onClose }) {
                     </div>
                     <div className="preset-info">
                       <span className="preset-name">{preset.name}</span>
-                      {preset.isDefault && (
-                        <span className="preset-default-badge">Default</span>
-                      )}
+                      {preset.isDefault && <span className="preset-default-badge">Default</span>}
                     </div>
                     {currentPreset === preset.id && (
                       <div className="preset-active-indicator">✓</div>
@@ -170,32 +172,30 @@ function ThemeModal({ isOpen, onClose }) {
           <div className="theme-section">
             <h4 className="theme-section-title">
               Custom Colors
-              {currentPreset !== 'custom' && (
-                <span className="theme-section-hint">
-                  (changes will switch to custom theme)
-                </span>
+              {currentPreset !== "custom" && (
+                <span className="theme-section-hint">(changes will switch to custom theme)</span>
               )}
             </h4>
             <div className="color-grid">
               <ColorPicker
                 label="Primary"
                 value={formData.primaryColor}
-                onChange={(v) => handleColorChange('primaryColor', v)}
+                onChange={(v) => handleColorChange("primaryColor", v)}
               />
               <ColorPicker
                 label="Secondary"
                 value={formData.secondaryColor}
-                onChange={(v) => handleColorChange('secondaryColor', v)}
+                onChange={(v) => handleColorChange("secondaryColor", v)}
               />
               <ColorPicker
                 label="Background"
                 value={formData.backgroundColor}
-                onChange={(v) => handleColorChange('backgroundColor', v)}
+                onChange={(v) => handleColorChange("backgroundColor", v)}
               />
               <ColorPicker
                 label="Text"
                 value={formData.textColor}
-                onChange={(v) => handleColorChange('textColor', v)}
+                onChange={(v) => handleColorChange("textColor", v)}
               />
             </div>
           </div>
@@ -207,20 +207,20 @@ function ThemeModal({ isOpen, onClose }) {
               <FontPicker
                 label="Headings"
                 value={formData.headingFont}
-                options={fontOptions.filter(f => f.style === 'serif')}
-                onChange={(v) => handleFontChange('headingFont', v)}
+                options={fontOptions.filter((f) => f.style === "serif")}
+                onChange={(v) => handleFontChange("headingFont", v)}
               />
               <FontPicker
                 label="Body Text"
                 value={formData.bodyFont}
-                options={fontOptions.filter(f => f.style === 'sans-serif')}
-                onChange={(v) => handleFontChange('bodyFont', v)}
+                options={fontOptions.filter((f) => f.style === "sans-serif")}
+                onChange={(v) => handleFontChange("bodyFont", v)}
               />
               <FontPicker
                 label="Script/Accent"
                 value={formData.scriptFont}
-                options={fontOptions.filter(f => f.style === 'script')}
-                onChange={(v) => handleFontChange('scriptFont', v)}
+                options={fontOptions.filter((f) => f.style === "script")}
+                onChange={(v) => handleFontChange("scriptFont", v)}
               />
             </div>
           </div>
@@ -228,33 +228,39 @@ function ThemeModal({ isOpen, onClose }) {
           {/* Preview */}
           <div className="theme-section">
             <h4 className="theme-section-title">Preview</h4>
-            <div 
+            <div
               className="theme-preview"
-              style={{ 
+              style={{
                 background: formData.backgroundColor,
                 color: formData.textColor,
               }}
             >
-              <h2 style={{ 
-                fontFamily: formData.headingFont, 
-                color: formData.primaryColor,
-                margin: '0 0 8px'
-              }}>
+              <h2
+                style={{
+                  fontFamily: formData.headingFont,
+                  color: formData.primaryColor,
+                  margin: "0 0 8px",
+                }}
+              >
                 Wedding Day
               </h2>
-              <p style={{ 
-                fontFamily: formData.scriptFont, 
-                color: formData.secondaryColor,
-                fontSize: '18px',
-                margin: '0 0 12px'
-              }}>
+              <p
+                style={{
+                  fontFamily: formData.scriptFont,
+                  color: formData.secondaryColor,
+                  fontSize: "18px",
+                  margin: "0 0 12px",
+                }}
+              >
                 Together Forever
               </p>
-              <p style={{ 
-                fontFamily: formData.bodyFont,
-                fontSize: '14px',
-                margin: 0
-              }}>
+              <p
+                style={{
+                  fontFamily: formData.bodyFont,
+                  fontSize: "14px",
+                  margin: 0,
+                }}
+              >
                 Join us for the celebration of love
               </p>
             </div>

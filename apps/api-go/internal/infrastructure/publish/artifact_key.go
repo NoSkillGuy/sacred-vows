@@ -28,5 +28,3 @@ func validateArtifactKey(key string) error {
 	}
 	return nil
 }
-
-

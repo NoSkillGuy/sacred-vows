@@ -1,4 +1,4 @@
-import { useScrollAnimations } from '../../hooks/useScrollAnimations';
+import { useScrollAnimations } from "../../hooks/useScrollAnimations";
 
 /**
  * ScrollAnimationsInit - Component that initializes scroll animations
@@ -10,4 +10,3 @@ function ScrollAnimationsInit() {
 }
 
 export default ScrollAnimationsInit;
-

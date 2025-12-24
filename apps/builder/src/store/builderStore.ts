@@ -1,24 +1,36 @@
-import { create } from 'zustand';
-import { defaultWeddingConfig, defaultLayoutConfig, SECTION_TYPES } from '../config/wedding-config';
-import { updateInvitation } from '../services/invitationService';
-import { getLayoutManifest as getLayoutManifestFromAPI } from '../services/layoutService';
-import { getLayout, getLayoutManifest as getLayoutManifestFromRegistry, hasLayout } from '../layouts/registry';
-import { parseInvitationData, calculateSectionEnabled } from '../layouts/editorial-elegance/utils/dataHelpers';
-import type { InvitationData, SectionConfig, ThemeConfig, UniversalWeddingData } from '@shared/types/wedding-data';
-import type { LayoutManifest } from '@shared/types/layout';
+import { create } from "zustand";
+import { defaultWeddingConfig, defaultLayoutConfig, SECTION_TYPES } from "../config/wedding-config";
+import { updateInvitation } from "../services/invitationService";
+import { getLayoutManifest as getLayoutManifestFromAPI } from "../services/layoutService";
+import {
+  getLayout,
+  getLayoutManifest as getLayoutManifestFromRegistry,
+  hasLayout,
+} from "../layouts/registry";
+import {
+  parseInvitationData,
+  calculateSectionEnabled,
+} from "../layouts/editorial-elegance/utils/dataHelpers";
+import type {
+  InvitationData,
+  SectionConfig,
+  ThemeConfig,
+  UniversalWeddingData,
+} from "@shared/types/wedding-data";
+import type { LayoutManifest } from "@shared/types/layout";
 // Import layouts to ensure they're registered
-import '../layouts/classic-scroll';
-import '../layouts/editorial-elegance';
+import "../layouts/classic-scroll";
+import "../layouts/editorial-elegance";
 
 /**
  * Builder Store
  * Manages state for the wedding invitation builder
- * 
+ *
  * Data Structure:
  * - currentInvitation.data: Universal content data (preserved across layouts)
  * - currentInvitation.layoutConfig: Layout-specific config (sections, theme)
  */
-const STORAGE_KEY = 'wedding-builder-autosave';
+const STORAGE_KEY = "wedding-builder-autosave";
 
 // Load from localStorage on initialization
 function loadFromStorage(): InvitationData {
@@ -30,36 +42,38 @@ function loadFromStorage(): InvitationData {
       if (!parsed.layoutConfig) {
         parsed.layoutConfig = { ...defaultLayoutConfig };
       }
-      
+
       // Ensure data is an object, not an array or string
       parsed.data = parseInvitationData(parsed.data, { ...defaultWeddingConfig });
-      
+
       // If layout is editorial-elegance and data is minimal, merge defaults
-      if (parsed.layoutId === 'editorial-elegance' && Object.keys(parsed.data).length < 5) {
+      if (parsed.layoutId === "editorial-elegance" && Object.keys(parsed.data).length < 5) {
         // Note: We can't do async import here, so we'll rely on setCurrentInvitation to merge
         // But we can at least ensure it's an object
       }
-      
+
       // Fallback for unsupported layouts
       if (parsed.layoutId && !hasLayout(parsed.layoutId)) {
-        console.warn(`Layout '${parsed.layoutId}' is not available. Falling back to 'classic-scroll'.`);
-        parsed.layoutId = 'classic-scroll';
+        console.warn(
+          `Layout '${parsed.layoutId}' is not available. Falling back to 'classic-scroll'.`
+        );
+        parsed.layoutId = "classic-scroll";
       }
-      
+
       return {
         id: parsed.id ?? null,
-        layoutId: parsed.layoutId ?? 'classic-scroll',
+        layoutId: parsed.layoutId ?? "classic-scroll",
         data: parsed.data ?? defaultWeddingConfig,
         layoutConfig: parsed.layoutConfig ?? { ...defaultLayoutConfig },
         translations: parsed.translations ?? null,
       };
     }
   } catch (error) {
-    console.error('Failed to load from storage:', error);
+    console.error("Failed to load from storage:", error);
   }
   return {
     id: null,
-    layoutId: 'classic-scroll',
+    layoutId: "classic-scroll",
     data: defaultWeddingConfig,
     layoutConfig: { ...defaultLayoutConfig },
     translations: null,
@@ -71,7 +85,7 @@ function saveToStorage(invitation: InvitationData): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(invitation));
   } catch (error) {
-    console.error('Failed to save to storage:', error);
+    console.error("Failed to save to storage:", error);
   }
 }
 
@@ -108,8 +122,8 @@ interface BuilderStoreActions {
   // Theme Management
   getTheme: () => ThemeConfig;
   applyThemePreset: (presetId: string) => void;
-  updateThemeColors: (colors: Partial<ThemeConfig['colors']>) => void;
-  updateThemeFonts: (fonts: Partial<ThemeConfig['fonts']>) => void;
+  updateThemeColors: (colors: Partial<ThemeConfig["colors"]>) => void;
+  updateThemeFonts: (fonts: Partial<ThemeConfig["fonts"]>) => void;
   updateTheme: (theme: ThemeConfig) => void;
 
   // Layout Switching
@@ -129,7 +143,7 @@ type BuilderStore = BuilderStoreState & BuilderStoreActions;
 
 export const useBuilderStore = create<BuilderStore>((set, get) => {
   let autoSaveTimer: ReturnType<typeof setTimeout> | null = null;
-  
+
   // Initialize from localStorage
   const initialInvitation = loadFromStorage();
 
@@ -137,7 +151,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
   const triggerAutosave = (updatedInvitation: InvitationData): void => {
     saveToStorage(updatedInvitation);
     set({ lastSavedAt: Date.now() });
-    
+
     if (updatedInvitation.id) {
       if (autoSaveTimer) {
         clearTimeout(autoSaveTimer);
@@ -151,7 +165,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
           });
           set({ saving: false });
         } catch (error) {
-          console.error('Auto-save error:', error);
+          console.error("Auto-save error:", error);
           set({ saving: false });
         }
       }, 2000);
@@ -179,11 +193,11 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
      */
     loadLayoutManifest: async (): Promise<LayoutManifest | null> => {
       const { currentInvitation } = get();
-      const layoutId = currentInvitation.layoutId || 'classic-scroll';
-      
+      const layoutId = currentInvitation.layoutId || "classic-scroll";
+
       try {
         let manifest: LayoutManifest | null = null;
-        
+
         // First, try to get manifest from registry (local)
         if (hasLayout(layoutId)) {
           manifest = getLayoutManifestFromRegistry(layoutId) as LayoutManifest;
@@ -193,33 +207,38 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
           console.log(`Layout ${layoutId} not in registry, fetching from API`);
           manifest = await getLayoutManifestFromAPI(layoutId);
         }
-        
+
         if (!manifest) {
           console.error(`Failed to load manifest for layout: ${layoutId}`);
           return null;
         }
-        
+
         // Set manifest first so validation can access it
         set({ currentLayoutManifest: manifest });
-        
+
         // Validate and sync sections against manifest
         const { validateSectionsAgainstManifest } = get();
-        const validatedSections = validateSectionsAgainstManifest(manifest);
-        
+        validateSectionsAgainstManifest(manifest);
+
         // Get updated invitation after section validation
         const { currentInvitation: updatedInvitationAfterValidation } = get();
-        
+
         // If manifest has theme presets, sync them into layoutConfig for use in UI
         if (manifest?.themes && manifest.themes.length > 0) {
-          const defaultTheme = manifest.themes.find(t => t.isDefault) || manifest.themes[0];
-          const existingTheme = updatedInvitationAfterValidation.layoutConfig?.theme || {} as ThemeConfig;
+          const defaultTheme = manifest.themes.find((t) => t.isDefault) || manifest.themes[0];
+          const existingTheme =
+            updatedInvitationAfterValidation.layoutConfig?.theme || ({} as ThemeConfig);
           const hasPreset = Boolean(existingTheme.preset);
 
-          const themeWithPreset: ThemeConfig = hasPreset || !defaultTheme ? existingTheme : {
-            preset: defaultTheme.id,
-            colors: existingTheme.colors || { ...defaultTheme.colors },
-            fonts: existingTheme.fonts || defaultTheme.fonts || { heading: '', body: '', script: '' },
-          };
+          const themeWithPreset: ThemeConfig =
+            hasPreset || !defaultTheme
+              ? existingTheme
+              : {
+                  preset: defaultTheme.id,
+                  colors: existingTheme.colors || { ...defaultTheme.colors },
+                  fonts: existingTheme.fonts ||
+                    defaultTheme.fonts || { heading: "", body: "", script: "" },
+                };
 
           const updatedInvitation: InvitationData = {
             ...updatedInvitationAfterValidation,
@@ -238,11 +257,11 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
 
         return manifest;
       } catch (error) {
-        console.error('Failed to load layout manifest:', error);
+        console.error("Failed to load layout manifest:", error);
         return null;
       }
     },
-    
+
     /**
      * Get layout from registry
      * @param layoutId - Layout identifier
@@ -259,26 +278,30 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
     setCurrentInvitation: async (invitation: Partial<InvitationData>): Promise<void> => {
       // Support migration from layoutConfig to layoutConfig
       const layoutConfig = invitation.layoutConfig || {};
-      const layoutId = invitation.layoutId || 'classic-scroll';
-      
+      const layoutId = invitation.layoutId || "classic-scroll";
+
       // Parse data if it's a string
       let invitationData = parseInvitationData(invitation.data || {}, {}) as UniversalWeddingData;
-      
+
       // Merge editorial-elegance defaults if needed (always merge for empty or minimal data)
-      if (layoutId === 'editorial-elegance') {
+      if (layoutId === "editorial-elegance") {
         const dataKeys = Object.keys(invitationData).length;
-        const shouldMerge = dataKeys === 0 || dataKeys < 5 || !invitationData.couple || !invitationData.wedding;
-        
+        const shouldMerge =
+          dataKeys === 0 || dataKeys < 5 || !invitationData.couple || !invitationData.wedding;
+
         if (shouldMerge) {
           try {
-            const { mergeWithDefaults } = await import('../layouts/editorial-elegance/defaults');
+            const { mergeWithDefaults } = await import("../layouts/editorial-elegance/defaults");
             invitationData = mergeWithDefaults(invitationData) as UniversalWeddingData;
           } catch (error) {
-            console.warn('Failed to load editorial-elegance defaults in setCurrentInvitation:', error);
+            console.warn(
+              "Failed to load editorial-elegance defaults in setCurrentInvitation:",
+              error
+            );
           }
         }
       }
-      
+
       const invitationWithConfig: InvitationData = {
         id: invitation.id ?? null,
         layoutId,
@@ -289,7 +312,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
         },
         translations: invitation.translations ?? null,
       };
-      
+
       set({ currentInvitation: invitationWithConfig });
       saveToStorage(invitationWithConfig);
     },
@@ -313,25 +336,24 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
      */
     validateSectionsAgainstManifest: (manifest: LayoutManifest): SectionConfig[] => {
       const { currentInvitation } = get();
-      
+
       if (!manifest || !manifest.sections || !Array.isArray(manifest.sections)) {
         // If no manifest or invalid manifest, return current sections (backward compatibility)
         return currentInvitation.layoutConfig?.sections || [];
       }
 
       const currentSections = currentInvitation.layoutConfig?.sections || [];
-      const manifestSectionIds = manifest.sections.map(s => s.id);
-      
+
       // Create a map of current sections by ID for quick lookup
       const currentSectionsMap = new Map<string, SectionConfig>();
-      currentSections.forEach(section => {
+      currentSections.forEach((section) => {
         currentSectionsMap.set(section.id, section);
       });
 
       // Build validated sections array based on manifest order
       const validatedSections = manifest.sections.map((manifestSection, index) => {
         const existingSection = currentSectionsMap.get(manifestSection.id);
-        
+
         if (existingSection) {
           // Preserve user's enabled/disabled state, but ensure order matches manifest
           return {
@@ -349,10 +371,22 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
       });
 
       // Update invitation if sections changed
-      const currentIds = currentSections.map(s => s.id).sort().join(',');
-      const validatedIds = validatedSections.map(s => s.id).sort().join(',');
-      const currentOrders = currentSections.map(s => `${s.id}:${s.order}`).sort().join(',');
-      const validatedOrders = validatedSections.map(s => `${s.id}:${s.order}`).sort().join(',');
+      const currentIds = currentSections
+        .map((s) => s.id)
+        .sort()
+        .join(",");
+      const validatedIds = validatedSections
+        .map((s) => s.id)
+        .sort()
+        .join(",");
+      const currentOrders = currentSections
+        .map((s) => `${s.id}:${s.order}`)
+        .sort()
+        .join(",");
+      const validatedOrders = validatedSections
+        .map((s) => `${s.id}:${s.order}`)
+        .sort()
+        .join(",");
 
       if (currentIds !== validatedIds || currentOrders !== validatedOrders) {
         const updatedInvitation: InvitationData = {
@@ -376,16 +410,16 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
     getEnabledSections: (): SectionConfig[] => {
       const { currentInvitation, currentLayoutManifest } = get();
       let sections = currentInvitation.layoutConfig?.sections || [];
-      
+
       // Filter by manifest if available
       if (currentLayoutManifest?.sections && Array.isArray(currentLayoutManifest.sections)) {
-        const manifestSectionIds = new Set(currentLayoutManifest.sections.map(s => s.id));
-        sections = sections.filter(s => manifestSectionIds.has(s.id));
+        const manifestSectionIds = new Set(currentLayoutManifest.sections.map((s) => s.id));
+        sections = sections.filter((s) => manifestSectionIds.has(s.id));
       }
-      
-      const enabledSections = sections.filter(s => s.enabled);
+
+      const enabledSections = sections.filter((s) => s.enabled);
       const result = enabledSections.sort((a, b) => a.order - b.order);
-      
+
       return result;
     },
 
@@ -396,18 +430,18 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
     getAllSections: (): SectionConfig[] => {
       const { currentInvitation, currentLayoutManifest } = get();
       let sections = currentInvitation.layoutConfig?.sections || [];
-      
+
       // Filter by manifest if available
       if (currentLayoutManifest?.sections && Array.isArray(currentLayoutManifest.sections)) {
-        const manifestSectionIds = new Set(currentLayoutManifest.sections.map(s => s.id));
-        sections = sections.filter(s => manifestSectionIds.has(s.id));
-        
+        const manifestSectionIds = new Set(currentLayoutManifest.sections.map((s) => s.id));
+        sections = sections.filter((s) => manifestSectionIds.has(s.id));
+
         // Use order property first (respects user reordering), fallback to manifest order
         const manifestOrder = new Map<string, number>();
         currentLayoutManifest.sections.forEach((s, index) => {
           manifestOrder.set(s.id, index);
         });
-        
+
         sections = sections.sort((a, b) => {
           // Prioritize order property over manifest order to respect user reordering
           const orderA = a.order ?? manifestOrder.get(a.id) ?? 0;
@@ -418,7 +452,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
         // Fallback to current behavior if manifest not loaded
         sections = sections.slice().sort((a, b) => a.order - b.order);
       }
-      
+
       return sections;
     },
 
@@ -429,9 +463,9 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
     reorderSections: (newOrder: string[]): void => {
       const { currentInvitation } = get();
       const sections = [...(currentInvitation.layoutConfig?.sections || [])];
-      
+
       // Update order for each section based on new order array
-      const updatedSections = sections.map(section => ({
+      const updatedSections = sections.map((section) => ({
         ...section,
         order: newOrder.indexOf(section.id),
       }));
@@ -455,12 +489,12 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
     toggleSection: (sectionId: string): void => {
       const { currentInvitation, currentLayoutManifest } = get();
       const sections = [...(currentInvitation.layoutConfig?.sections || [])];
-      
-      const sectionIndex = sections.findIndex(s => s.id === sectionId);
+
+      const sectionIndex = sections.findIndex((s) => s.id === sectionId);
       if (sectionIndex === -1) return;
 
       // Check if section is required (can't disable required sections)
-      const manifestSection = currentLayoutManifest?.sections?.find(s => s.id === sectionId);
+      const manifestSection = currentLayoutManifest?.sections?.find((s) => s.id === sectionId);
       if (manifestSection?.required && sections[sectionIndex].enabled) {
         console.warn(`Cannot disable required section: ${sectionId}`);
         return;
@@ -490,8 +524,8 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
     enableSection: (sectionId: string): void => {
       const { currentInvitation } = get();
       const sections = [...(currentInvitation.layoutConfig?.sections || [])];
-      
-      const sectionIndex = sections.findIndex(s => s.id === sectionId);
+
+      const sectionIndex = sections.findIndex((s) => s.id === sectionId);
       if (sectionIndex !== -1) {
         // Section exists, just enable it
         sections[sectionIndex] = {
@@ -500,7 +534,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
         };
       } else {
         // Section doesn't exist, add it at the end
-        const maxOrder = Math.max(...sections.map(s => s.order), -1);
+        const maxOrder = Math.max(...sections.map((s) => s.order), -1);
         sections.push({
           id: sectionId,
           enabled: true,
@@ -527,15 +561,15 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
     disableSection: (sectionId: string): void => {
       const { currentInvitation, currentLayoutManifest } = get();
       const sections = [...(currentInvitation.layoutConfig?.sections || [])];
-      
+
       // Check if section is required
-      const manifestSection = currentLayoutManifest?.sections?.find(s => s.id === sectionId);
+      const manifestSection = currentLayoutManifest?.sections?.find((s) => s.id === sectionId);
       if (manifestSection?.required) {
         console.warn(`Cannot disable required section: ${sectionId}`);
         return;
       }
 
-      const sectionIndex = sections.findIndex(s => s.id === sectionId);
+      const sectionIndex = sections.findIndex((s) => s.id === sectionId);
       if (sectionIndex !== -1) {
         sections[sectionIndex] = {
           ...sections[sectionIndex],
@@ -564,7 +598,11 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
      */
     getTheme: (): ThemeConfig => {
       const { currentInvitation } = get();
-      return currentInvitation.layoutConfig?.theme || currentInvitation.data?.theme || {} as ThemeConfig;
+      return (
+        currentInvitation.layoutConfig?.theme ||
+        currentInvitation.data?.theme ||
+        ({} as ThemeConfig)
+      );
     },
 
     /**
@@ -573,9 +611,10 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
      */
     applyThemePreset: (presetId: string): void => {
       const { currentInvitation, currentLayoutManifest } = get();
-      
-      const preset = currentLayoutManifest?.themes?.find(t => t.id === presetId)
-        || currentInvitation?.layoutConfig?.themes?.find(t => t.id === presetId);
+
+      const preset =
+        currentLayoutManifest?.themes?.find((t) => t.id === presetId) ||
+        currentInvitation?.layoutConfig?.themes?.find((t) => t.id === presetId);
       if (!preset) {
         console.warn(`Theme preset not found: ${presetId}`);
         return;
@@ -588,7 +627,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
           theme: {
             preset: presetId,
             colors: { ...preset.colors },
-            fonts: preset.fonts || { heading: '', body: '', script: '' },
+            fonts: preset.fonts || { heading: "", body: "", script: "" },
           },
         },
         // Also update data.theme for backward compatibility
@@ -597,7 +636,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
           theme: {
             preset: presetId,
             colors: { ...preset.colors },
-            fonts: preset.fonts || { heading: '', body: '', script: '' },
+            fonts: preset.fonts || { heading: "", body: "", script: "" },
           },
         },
       };
@@ -610,13 +649,13 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
      * Update theme colors
      * @param colors - Color values to update
      */
-    updateThemeColors: (colors: Partial<ThemeConfig['colors']>): void => {
+    updateThemeColors: (colors: Partial<ThemeConfig["colors"]>): void => {
       const { currentInvitation } = get();
-      const currentTheme = currentInvitation.layoutConfig?.theme || {} as ThemeConfig;
+      const currentTheme = currentInvitation.layoutConfig?.theme || ({} as ThemeConfig);
 
       const updatedTheme: ThemeConfig = {
         ...currentTheme,
-        preset: 'custom',
+        preset: "custom",
         colors: {
           ...currentTheme.colors,
           ...colors,
@@ -643,13 +682,13 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
      * Update theme fonts
      * @param fonts - Font values to update
      */
-    updateThemeFonts: (fonts: Partial<ThemeConfig['fonts']>): void => {
+    updateThemeFonts: (fonts: Partial<ThemeConfig["fonts"]>): void => {
       const { currentInvitation } = get();
-      const currentTheme = currentInvitation.layoutConfig?.theme || {} as ThemeConfig;
+      const currentTheme = currentInvitation.layoutConfig?.theme || ({} as ThemeConfig);
 
       const updatedTheme: ThemeConfig = {
         ...currentTheme,
-        preset: 'custom',
+        preset: "custom",
         fonts: {
           ...currentTheme.fonts,
           ...fonts,
@@ -707,10 +746,11 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
      */
     switchLayout: async (newLayoutId: string, newManifest: LayoutManifest): Promise<void> => {
       const { currentInvitation } = get();
-      
+
       // Get default theme from new layout
-      const defaultTheme = newManifest?.themes?.find(t => t.isDefault) || newManifest?.themes?.[0];
-      
+      const defaultTheme =
+        newManifest?.themes?.find((t) => t.isDefault) || newManifest?.themes?.[0];
+
       // Get default sections from new layout manifest
       // Use manifest.sections array directly, maintaining their order
       let defaultSections: SectionConfig[] = [];
@@ -720,10 +760,13 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
           enabled: calculateSectionEnabled(sectionDef),
           order: sectionDef.order !== undefined ? sectionDef.order : index,
         }));
-      } else if (newManifest?.defaultSectionOrder && Array.isArray(newManifest.defaultSectionOrder)) {
+      } else if (
+        newManifest?.defaultSectionOrder &&
+        Array.isArray(newManifest.defaultSectionOrder)
+      ) {
         // Fallback to defaultSectionOrder if sections array not available
         defaultSections = newManifest.defaultSectionOrder.map((id, index) => {
-          const sectionDef = newManifest?.sections?.find(s => s.id === id);
+          const sectionDef = newManifest?.sections?.find((s) => s.id === id);
           return {
             id,
             enabled: sectionDef ? calculateSectionEnabled(sectionDef) : true,
@@ -736,14 +779,14 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
       // Ensure data is an object, not an array, string, or undefined
       const existingData = parseInvitationData(currentInvitation.data, {}) as UniversalWeddingData;
       let mergedData = { ...existingData };
-      
+
       // For editorial-elegance layout, merge defaults
-      if (newLayoutId === 'editorial-elegance') {
+      if (newLayoutId === "editorial-elegance") {
         try {
-          const { mergeWithDefaults } = await import('../layouts/editorial-elegance/defaults');
+          const { mergeWithDefaults } = await import("../layouts/editorial-elegance/defaults");
           mergedData = mergeWithDefaults(existingData) as UniversalWeddingData;
         } catch (error) {
-          console.warn('Failed to load editorial-elegance defaults:', error);
+          console.warn("Failed to load editorial-elegance defaults:", error);
         }
       }
 
@@ -754,25 +797,29 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
         data: {
           ...mergedData,
           // Update theme in data for backward compatibility
-          theme: defaultTheme ? {
-            preset: defaultTheme.id || 'default',
-            colors: { ...defaultTheme.colors },
-            fonts: defaultTheme.fonts || { heading: '', body: '', script: '' },
-          } : currentInvitation.data.theme,
+          theme: defaultTheme
+            ? {
+                preset: defaultTheme.id || "default",
+                colors: { ...defaultTheme.colors },
+                fonts: defaultTheme.fonts || { heading: "", body: "", script: "" },
+              }
+            : currentInvitation.data.theme,
         },
         // Reset layout config to new layout defaults
         layoutConfig: {
           sections: defaultSections,
           themes: newManifest?.themes || currentInvitation.layoutConfig?.themes,
-          theme: defaultTheme ? {
-            preset: defaultTheme.id || 'default',
-            colors: { ...defaultTheme.colors },
-            fonts: defaultTheme.fonts || { heading: '', body: '', script: '' },
-          } : currentInvitation.layoutConfig?.theme,
+          theme: defaultTheme
+            ? {
+                preset: defaultTheme.id || "default",
+                colors: { ...defaultTheme.colors },
+                fonts: defaultTheme.fonts || { heading: "", body: "", script: "" },
+              }
+            : currentInvitation.layoutConfig?.theme,
         },
       };
 
-      set({ 
+      set({
         currentInvitation: updatedInvitation,
         currentLayoutManifest: newManifest,
       });
@@ -788,25 +835,40 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
      */
     updateInvitationData: (path: string, value: unknown): void => {
       const { currentInvitation } = get();
-      
+
+      // Guard against prototype pollution
+      const isPrototypePollutionKey = (key: string): boolean => {
+        return key === "__proto__" || key === "constructor" || key === "prototype";
+      };
+
       const newData = JSON.parse(JSON.stringify(currentInvitation.data)) as UniversalWeddingData;
-      const keys = path.split('.');
+      const keys = path.split(".");
       let current: Record<string, unknown> = newData as Record<string, unknown>;
-      
+
       for (let i = 0; i < keys.length - 1; i++) {
-        if (!current[keys[i]]) {
-          current[keys[i]] = {};
+        const key = keys[i];
+        if (isPrototypePollutionKey(key)) {
+          console.warn(`Blocked prototype pollution attempt: ${key}`);
+          return;
         }
-        current = current[keys[i]] as Record<string, unknown>;
+        if (!current[key]) {
+          current[key] = {};
+        }
+        current = current[key] as Record<string, unknown>;
       }
-      
-      current[keys[keys.length - 1]] = value;
-      
+
+      const targetKey = keys[keys.length - 1];
+      if (isPrototypePollutionKey(targetKey)) {
+        console.warn(`Blocked prototype pollution attempt: ${targetKey}`);
+        return;
+      }
+      current[targetKey] = value;
+
       const updatedInvitation: InvitationData = {
         ...currentInvitation,
         data: newData,
       };
-      
+
       set({ currentInvitation: updatedInvitation });
       triggerAutosave(updatedInvitation);
     },
@@ -816,13 +878,23 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
      */
     updateNestedData: (path: string, value: Record<string, unknown>): void => {
       const { currentInvitation } = get();
-      
-      const deepMerge = (target: Record<string, unknown>, source: Record<string, unknown>): Record<string, unknown> => {
+
+      const deepMerge = (
+        target: Record<string, unknown>,
+        source: Record<string, unknown>
+      ): Record<string, unknown> => {
         const output = { ...target };
         for (const key in source) {
-          if (source.hasOwnProperty(key)) {
-            if (typeof source[key] === 'object' && source[key] !== null && !Array.isArray(source[key])) {
-              output[key] = deepMerge((target[key] || {}) as Record<string, unknown>, source[key] as Record<string, unknown>);
+          if (Object.prototype.hasOwnProperty.call(source, key)) {
+            if (
+              typeof source[key] === "object" &&
+              source[key] !== null &&
+              !Array.isArray(source[key])
+            ) {
+              output[key] = deepMerge(
+                (target[key] || {}) as Record<string, unknown>,
+                source[key] as Record<string, unknown>
+              );
             } else {
               output[key] = source[key];
             }
@@ -830,33 +902,52 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
         }
         return output;
       };
-      
+
       const newData = { ...currentInvitation.data } as Record<string, unknown>;
-      const keys = path.split('.');
-      
+      const keys = path.split(".");
+
+      // Guard against prototype pollution
+      const isPrototypePollutionKey = (key: string): boolean => {
+        return key === "__proto__" || key === "constructor" || key === "prototype";
+      };
+
       if (keys.length === 1) {
-        const existing = (newData[keys[0]] || {}) as Record<string, unknown>;
-        newData[keys[0]] = deepMerge(existing, value);
+        const key = keys[0];
+        if (isPrototypePollutionKey(key)) {
+          console.warn(`Blocked prototype pollution attempt: ${key}`);
+          return;
+        }
+        const existing = (newData[key] || {}) as Record<string, unknown>;
+        newData[key] = deepMerge(existing, value);
       } else {
         let current = newData;
         for (let i = 0; i < keys.length - 1; i++) {
-          if (!current[keys[i]]) {
-            current[keys[i]] = {};
-          } else {
-            current[keys[i]] = { ...current[keys[i]] };
+          const key = keys[i];
+          if (isPrototypePollutionKey(key)) {
+            console.warn(`Blocked prototype pollution attempt: ${key}`);
+            return;
           }
-          current = current[keys[i]] as Record<string, unknown>;
+          if (!current[key]) {
+            current[key] = {};
+          } else {
+            current[key] = { ...current[key] };
+          }
+          current = current[key] as Record<string, unknown>;
         }
         const targetKey = keys[keys.length - 1];
+        if (isPrototypePollutionKey(targetKey)) {
+          console.warn(`Blocked prototype pollution attempt: ${targetKey}`);
+          return;
+        }
         const existing = (current[targetKey] || {}) as Record<string, unknown>;
         current[targetKey] = deepMerge(existing, value);
       }
-      
+
       const updatedInvitation: InvitationData = {
         ...currentInvitation,
         data: newData as UniversalWeddingData,
       };
-      
+
       set({ currentInvitation: updatedInvitation });
       triggerAutosave(updatedInvitation);
     },
@@ -867,35 +958,36 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
     setInvitation: async (invitation: Partial<InvitationData>): Promise<void> => {
       // Ensure layoutConfig exists
       const layoutConfig = invitation.layoutConfig || {};
-      let layoutId = invitation.layoutId || 'classic-scroll';
-      
+      let layoutId = invitation.layoutId || "classic-scroll";
+
       // Fallback for unsupported layouts
       if (!hasLayout(layoutId)) {
         console.warn(`Layout '${layoutId}' is not available. Falling back to 'classic-scroll'.`);
-        layoutId = 'classic-scroll';
+        layoutId = "classic-scroll";
       }
-      
+
       // Parse data if it's a string
-      let invitationData: UniversalWeddingData = invitation.data as UniversalWeddingData || {} as UniversalWeddingData;
-      if (typeof invitationData === 'string') {
+      let invitationData: UniversalWeddingData =
+        (invitation.data as UniversalWeddingData) || ({} as UniversalWeddingData);
+      if (typeof invitationData === "string") {
         try {
           invitationData = JSON.parse(invitationData) as UniversalWeddingData;
         } catch (e) {
-          console.warn('Failed to parse data as JSON in setInvitation:', e);
+          console.warn("Failed to parse data as JSON in setInvitation:", e);
           invitationData = {} as UniversalWeddingData;
         }
       }
-      
+
       // Merge editorial-elegance defaults if needed
-      if (layoutId === 'editorial-elegance') {
+      if (layoutId === "editorial-elegance") {
         try {
-          const { mergeWithDefaults } = await import('../layouts/editorial-elegance/defaults');
+          const { mergeWithDefaults } = await import("../layouts/editorial-elegance/defaults");
           invitationData = mergeWithDefaults(invitationData) as UniversalWeddingData;
         } catch (error) {
-          console.warn('Failed to load editorial-elegance defaults in setInvitation:', error);
+          console.warn("Failed to load editorial-elegance defaults in setInvitation:", error);
         }
       }
-      
+
       const invitationWithConfig: InvitationData = {
         id: invitation.id ?? null,
         layoutId,
@@ -906,7 +998,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
       set({ currentInvitation: invitationWithConfig });
       saveToStorage(invitationWithConfig);
     },
-    
+
     /**
      * Clear autosave data
      */
@@ -923,7 +1015,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
       }
       const defaultInvitation: InvitationData = {
         id: null,
-        layoutId: 'classic-scroll',
+        layoutId: "classic-scroll",
         data: defaultWeddingConfig,
         layoutConfig: { ...defaultLayoutConfig },
         translations: null,
@@ -935,10 +1027,8 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
       });
       saveToStorage(defaultInvitation);
     },
-
   };
 });
 
 // Export section types for convenience
 export { SECTION_TYPES };
-

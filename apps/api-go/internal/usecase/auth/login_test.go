@@ -145,4 +145,3 @@ func TestLoginUseCase_Execute(t *testing.T) {
 func stringPtr(s string) *string {
 	return &s
 }
-

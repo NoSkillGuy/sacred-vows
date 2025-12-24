@@ -280,9 +280,9 @@ func (h *AssetHandler) Delete(c *gin.Context) {
 }
 
 type GenerateSignedURLRequest struct {
-	Filename  string `json:"filename" binding:"required" example:"abc123.jpg"`
-	MimeType  string `json:"mimeType" binding:"required" example:"image/jpeg"`
-	Size      int64  `json:"size" binding:"required" example:"1024000"`
+	Filename string `json:"filename" binding:"required" example:"abc123.jpg"`
+	MimeType string `json:"mimeType" binding:"required" example:"image/jpeg"`
+	Size     int64  `json:"size" binding:"required" example:"1024000"`
 }
 
 type GenerateSignedURLResponse struct {

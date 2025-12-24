@@ -9,7 +9,7 @@ import (
 func CORS(frontendURL string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		origin := c.Request.Header.Get("Origin")
-		
+
 		// Determine allowed origin
 		allowedOrigin := ""
 		if origin != "" {
