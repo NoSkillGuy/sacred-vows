@@ -18,13 +18,23 @@ func NewPublishedResolveAPIHandler(publishedRepo repository.PublishedSiteReposit
 }
 
 type resolveResponse struct {
-	Subdomain       string `json:"subdomain"`
-	Published       bool   `json:"published"`
-	CurrentVersion  int    `json:"currentVersion"`
+	Subdomain      string `json:"subdomain"`
+	Published      bool   `json:"published"`
+	CurrentVersion int    `json:"currentVersion"`
 }
 
-// Resolve resolves a host or subdomain to the current published version.
-// GET /api/published/resolve?host=<host> or ?subdomain=<subdomain>
+// Resolve resolves a host or subdomain to the current published version
+// @Summary      Resolve published site
+// @Description  Resolve a host or subdomain to the current published version information. This endpoint is used by edge workers to determine the published state and version of a site. No authentication required.
+// @Tags         publish
+// @Accept       json
+// @Produce      json
+// @Param        subdomain  query     string  false  "Subdomain to resolve"
+// @Param        host       query     string  false  "Host to resolve (will extract subdomain from host)"
+// @Success      200        {object}  resolveResponse  "Published site information"
+// @Failure      400        {object}  ErrorResponse    "Invalid request (subdomain or host required)"
+// @Failure      404        {object}  ErrorResponse    "Published site not found"
+// @Router       /published/resolve [get]
 func (h *PublishedResolveAPIHandler) Resolve(c *gin.Context) {
 	subdomain := strings.TrimSpace(c.Query("subdomain"))
 	host := strings.TrimSpace(c.Query("host"))
@@ -60,5 +70,3 @@ func (h *PublishedResolveAPIHandler) Resolve(c *gin.Context) {
 		CurrentVersion: site.CurrentVersion,
 	})
 }
-
-

@@ -52,15 +52,16 @@ type validateSubdomainResponse struct {
 	Reason              string `json:"reason,omitempty"`
 }
 
-// ValidateSubdomain godoc
-// @Summary Validate subdomain availability for publishing
-// @Tags publish
-// @Accept json
-// @Produce json
-// @Param request body validateSubdomainRequest true "Validate request"
-// @Success 200 {object} validateSubdomainResponse
-// @Failure 400 {object} ErrorResponse
-// @Router /publish/validate [post]
+// ValidateSubdomain validates subdomain availability for publishing
+// @Summary      Validate subdomain availability
+// @Description  Check if a subdomain is available for publishing. Returns availability status, normalized subdomain, and reason if unavailable. No authentication required.
+// @Tags         publish
+// @Accept       json
+// @Produce      json
+// @Param        request  body      validateSubdomainRequest  true  "Subdomain validation request"
+// @Success      200      {object}  validateSubdomainResponse "Subdomain availability information"
+// @Failure      400      {object}  ErrorResponse            "Invalid request"
+// @Router       /publish/validate [post]
 func (h *PublishHandler) ValidateSubdomain(c *gin.Context) {
 	var req validateSubdomainRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -91,18 +92,20 @@ type publishResponse struct {
 	Version   int    `json:"version"`
 }
 
-// Publish godoc
-// @Summary Publish an invitation to a subdomain
-// @Tags publish
-// @Accept json
-// @Produce json
-// @Security BearerAuth
-// @Param request body publishRequest true "Publish request"
-// @Success 200 {object} publishResponse
-// @Failure 400 {object} ErrorResponse
-// @Failure 401 {object} ErrorResponse
-// @Failure 403 {object} ErrorResponse
-// @Router /publish [post]
+// Publish publishes an invitation to a subdomain
+// @Summary      Publish invitation
+// @Description  Publish a wedding invitation to a subdomain. Creates a new published version of the invitation that will be accessible at the subdomain URL. Authentication is required.
+// @Tags         publish
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request  body      publishRequest  true  "Publish request"
+// @Success      200      {object}  publishResponse "Invitation published successfully"
+// @Failure      400      {object}  ErrorResponse   "Invalid request"
+// @Failure      401      {object}  ErrorResponse   "Authentication required"
+// @Failure      403      {object}  ErrorResponse   "Forbidden"
+// @Failure      500      {object}  ErrorResponse   "Internal server error"
+// @Router       /publish [post]
 func (h *PublishHandler) Publish(c *gin.Context) {
 	var req publishRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -197,18 +200,20 @@ type listVersionsResponse struct {
 	Versions []publish.VersionInfo `json:"versions"`
 }
 
-// ListVersions godoc
-// @Summary List available versions for a published site
-// @Tags publish
-// @Accept json
-// @Produce json
-// @Security BearerAuth
-// @Param subdomain query string true "Subdomain"
-// @Success 200 {object} listVersionsResponse
-// @Failure 400 {object} ErrorResponse
-// @Failure 401 {object} ErrorResponse
-// @Failure 403 {object} ErrorResponse
-// @Router /published/versions [get]
+// ListVersions lists available versions for a published site
+// @Summary      List published versions
+// @Description  Get a list of all available versions for a published site by subdomain. Authentication is required.
+// @Tags         publish
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        subdomain  query     string  true  "Subdomain of the published site"
+// @Success      200        {object}  listVersionsResponse  "List of available versions"
+// @Failure      400        {object}  ErrorResponse         "Invalid request"
+// @Failure      401        {object}  ErrorResponse         "Authentication required"
+// @Failure      403        {object}  ErrorResponse         "Forbidden"
+// @Failure      500        {object}  ErrorResponse         "Internal server error"
+// @Router       /published/versions [get]
 func (h *PublishHandler) ListVersions(c *gin.Context) {
 	subdomain := c.Query("subdomain")
 	if subdomain == "" {
@@ -248,18 +253,20 @@ type rollbackResponse struct {
 	Message string `json:"message"`
 }
 
-// Rollback godoc
-// @Summary Rollback a published site to a previous version
-// @Tags publish
-// @Accept json
-// @Produce json
-// @Security BearerAuth
-// @Param request body rollbackRequest true "Rollback request"
-// @Success 200 {object} rollbackResponse
-// @Failure 400 {object} ErrorResponse
-// @Failure 401 {object} ErrorResponse
-// @Failure 403 {object} ErrorResponse
-// @Router /published/rollback [post]
+// Rollback rolls back a published site to a previous version
+// @Summary      Rollback published site
+// @Description  Rollback a published site to a previous version by subdomain and version number. Authentication is required.
+// @Tags         publish
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request  body      rollbackRequest  true  "Rollback request"
+// @Success      200      {object}  rollbackResponse "Rollback successful"
+// @Failure      400      {object}  ErrorResponse    "Invalid request"
+// @Failure      401      {object}  ErrorResponse    "Authentication required"
+// @Failure      403      {object}  ErrorResponse    "Forbidden"
+// @Failure      500      {object}  ErrorResponse    "Internal server error"
+// @Router       /published/rollback [post]
 func (h *PublishHandler) Rollback(c *gin.Context) {
 	var req rollbackRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
