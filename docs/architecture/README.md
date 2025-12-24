@@ -7,7 +7,7 @@ This section covers the system architecture, design decisions, and technical ove
 - [System Overview](./system-overview.md) - High-level architecture and component diagram
 - [Project Goals](./goal.md) - Vision, objectives, and success metrics
 - [Publishing Process](./publishing-process.md) - End-to-end publishing flow and architecture
-- [Authentication](./authentication.md) - Authentication system design and implementation
+- [Authentication](./authentication/) - Authentication system design and API documentation
 - [Builder Asset Architecture](./builder-asset-architecture.md) - Asset management and storage architecture
 
 ## System Components
