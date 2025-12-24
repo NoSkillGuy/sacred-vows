@@ -3,7 +3,7 @@
  * Handles fetching, creating, updating, and deleting invitations
  */
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getInvitations,
   getInvitation,
@@ -11,15 +11,15 @@ import {
   updateInvitation,
   deleteInvitation,
   type Invitation,
-} from '../../services/invitationService';
-import type { UniversalWeddingData, LayoutConfig } from '@shared/types/wedding-data';
+} from "../../services/invitationService";
+import type { UniversalWeddingData, LayoutConfig } from "@shared/types/wedding-data";
 
 // Query keys for consistent cache management
 export const invitationKeys = {
-  all: ['invitations'] as const,
-  lists: () => [...invitationKeys.all, 'list'] as const,
+  all: ["invitations"] as const,
+  lists: () => [...invitationKeys.all, "list"] as const,
   list: (filters?: Record<string, unknown>) => [...invitationKeys.lists(), filters] as const,
-  details: () => [...invitationKeys.all, 'detail'] as const,
+  details: () => [...invitationKeys.all, "detail"] as const,
   detail: (id: string) => [...invitationKeys.details(), id] as const,
 };
 
@@ -109,9 +109,7 @@ export function useUpdateInvitationMutation() {
       if (previousInvitations) {
         queryClient.setQueryData<Invitation[]>(
           invitationKeys.lists(),
-          previousInvitations.map((inv) =>
-            inv.id === id ? { ...inv, ...updates } : inv
-          )
+          previousInvitations.map((inv) => (inv.id === id ? { ...inv, ...updates } : inv))
         );
       }
 
@@ -177,4 +175,3 @@ export function useDeleteInvitationMutation() {
     },
   });
 }
-

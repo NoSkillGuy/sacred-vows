@@ -66,4 +66,3 @@ func TestDeleteAssetUseCase_Execute_AssetNotFound_ReturnsError(t *testing.T) {
 	require.Error(t, err, "Asset not found should return error")
 	assert.Nil(t, result, "Result should be nil on error")
 }
-

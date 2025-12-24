@@ -23,7 +23,7 @@ type DeleteAssetsByURLsInput struct {
 
 type DeleteAssetsByURLsOutput struct {
 	Deleted []*AssetDTO // Assets that were successfully deleted
-	Failed  []string     // URLs that failed to delete
+	Failed  []string    // URLs that failed to delete
 }
 
 func (uc *DeleteAssetsByURLsUseCase) Execute(ctx context.Context, input DeleteAssetsByURLsInput) (*DeleteAssetsByURLsOutput, error) {
@@ -61,4 +61,3 @@ func (uc *DeleteAssetsByURLsUseCase) Execute(ctx context.Context, input DeleteAs
 
 	return output, nil
 }
-

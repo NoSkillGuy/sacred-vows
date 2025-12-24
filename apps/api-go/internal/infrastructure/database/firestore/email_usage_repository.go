@@ -27,7 +27,7 @@ func (r *emailUsageRepository) IncrementUsage(ctx context.Context, vendor, date,
 		// Increment daily count
 		dailyDocID := fmt.Sprintf("%s_%s", vendor, date)
 		dailyRef := r.client.Collection("email_usage_daily").Doc(dailyDocID)
-		
+
 		// Get current daily count or create new
 		dailyDoc, err := tx.Get(dailyRef)
 		var dailyCount int
@@ -38,20 +38,20 @@ func (r *emailUsageRepository) IncrementUsage(ctx context.Context, vendor, date,
 			data := dailyDoc.Data()
 			dailyCount = getInt(data, "count")
 		}
-		
+
 		// Increment and update
 		dailyCount++
 		tx.Set(dailyRef, map[string]interface{}{
-			"vendor":    vendor,
-			"date":      date,
-			"count":     dailyCount,
+			"vendor":     vendor,
+			"date":       date,
+			"count":      dailyCount,
 			"updated_at": time.Now(),
 		}, firestore.MergeAll)
 
 		// Increment monthly count
 		monthlyDocID := fmt.Sprintf("%s_%s", vendor, month)
 		monthlyRef := r.client.Collection("email_usage_monthly").Doc(monthlyDocID)
-		
+
 		// Get current monthly count or create new
 		monthlyDoc, err := tx.Get(monthlyRef)
 		var monthlyCount int
@@ -62,13 +62,13 @@ func (r *emailUsageRepository) IncrementUsage(ctx context.Context, vendor, date,
 			data := monthlyDoc.Data()
 			monthlyCount = getInt(data, "count")
 		}
-		
+
 		// Increment and update
 		monthlyCount++
 		tx.Set(monthlyRef, map[string]interface{}{
-			"vendor":    vendor,
-			"month":     month,
-			"count":     monthlyCount,
+			"vendor":     vendor,
+			"month":      month,
+			"count":      monthlyCount,
 			"updated_at": time.Now(),
 		}, firestore.MergeAll)
 
@@ -114,4 +114,3 @@ func (r *emailUsageRepository) ResetDailyCount(ctx context.Context, vendor, date
 	_, err := r.client.Collection("email_usage_daily").Doc(docID).Delete(ctx)
 	return err
 }
-

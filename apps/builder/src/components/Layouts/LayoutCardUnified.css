@@ -17,13 +17,15 @@
 }
 
 .layout-card-unified::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   border-radius: 20px;
   padding: 2px;
   background: linear-gradient(135deg, transparent 0%, var(--gold-light) 50%, transparent 100%);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   opacity: 0;
@@ -128,7 +130,7 @@
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--text-dark);
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
 }
 
@@ -137,7 +139,7 @@
   font-size: 0.85rem;
   color: var(--text-medium);
   line-height: 1.5;
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
   max-width: 90%;
 }
@@ -223,7 +225,7 @@
 .unified-editorial-grid {
   position: absolute;
   inset: 0;
-  background-image: 
+  background-image:
     linear-gradient(to right, rgba(200, 200, 200, 0.25) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(200, 200, 200, 0.25) 1px, transparent 1px);
   background-size: 40px 40px;
@@ -369,7 +371,7 @@
   border: none;
   padding: 0.9rem 1.75rem;
   border-radius: 100px;
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
@@ -480,19 +482,19 @@
   .layout-card-unified {
     max-width: 100%;
   }
-  
+
   .unified-preview-pane {
     aspect-ratio: 3/4;
   }
-  
+
   .unified-overlay {
     padding: 1.25rem;
   }
-  
+
   .unified-actions {
     flex-direction: column;
   }
-  
+
   .unified-btn {
     width: 100%;
   }
@@ -502,103 +504,102 @@
   .unified-info {
     padding: 1rem 1.25rem 1.25rem;
   }
-  
+
   .unified-meta {
     gap: 0.25rem;
   }
-  
+
   .unified-tag {
     font-size: 0.7rem;
     padding: 0.25rem 0.625rem;
   }
-  
+
   .unified-preview-pane {
     border-radius: 12px;
   }
-  
+
   .unified-overlay {
     padding: 1rem;
   }
-  
+
   .unified-preview-header {
     padding: 1rem;
   }
-  
+
   .unified-preview-title {
     font-size: 0.95rem;
   }
-  
+
   .unified-preview-description {
     font-size: 0.75rem;
     max-width: 95%;
     margin-bottom: 0.5rem;
   }
-  
+
   .unified-preview-meta {
     gap: 0.25rem;
     margin-top: 0.35rem;
   }
-  
+
   .unified-preview-tag {
     font-size: 0.65rem;
     padding: 0.25rem 0.625rem;
   }
-  
+
   .unified-scroll-preview {
     padding: 1.25rem;
   }
-  
+
   .unified-scroll-line {
     height: 8px;
   }
-  
+
   .unified-scroll-divider {
     width: 50px;
     margin: 0.5rem 0;
   }
-  
+
   .unified-editorial-preview {
     padding: 1.25rem; /* Match Classic Scroll responsive padding */
   }
-  
+
   .unified-editorial-hero-box {
     width: 90%;
     height: 80px;
   }
-  
+
   .unified-editorial-spacer {
     height: 1.25rem;
   }
-  
+
   .unified-editorial-spacer.large {
     height: 1.5rem;
   }
-  
+
   .unified-editorial-images {
     padding: 0 0.5rem;
     gap: 0.75rem;
   }
-  
+
   .unified-editorial-image-box {
     width: 45%;
     height: 120px; /* Double the previous height for mobile */
   }
-  
+
   .unified-editorial-text-lines {
     width: 45%;
     gap: 0.3rem;
   }
-  
+
   .unified-editorial-line {
     height: 8px; /* Match Classic Scroll responsive height */
   }
-  
+
   .unified-editorial-line.heading {
     width: 70%;
   }
-  
+
   .unified-editorial-line.heading.short {
     width: 50%;
   }
 }
-

@@ -13,11 +13,11 @@ import (
 )
 
 type PublishInvitationUseCase struct {
-	invitationRepo      repository.InvitationRepository
-	publishedRepo       repository.PublishedSiteRepository
-	snapshotGen         SnapshotGenerator
-	artifactStore       ArtifactStorage
-	clock               clock.Clock
+	invitationRepo        repository.InvitationRepository
+	publishedRepo         repository.PublishedSiteRepository
+	snapshotGen           SnapshotGenerator
+	artifactStore         ArtifactStorage
+	clock                 clock.Clock
 	versionRetentionCount int
 }
 
@@ -30,11 +30,11 @@ func NewPublishInvitationUseCase(
 	versionRetentionCount int,
 ) *PublishInvitationUseCase {
 	return &PublishInvitationUseCase{
-		invitationRepo:       invitationRepo,
-		publishedRepo:        publishedRepo,
+		invitationRepo:        invitationRepo,
+		publishedRepo:         publishedRepo,
 		snapshotGen:           snapshotGen,
 		artifactStore:         artifactStore,
-		clock:                clk,
+		clock:                 clk,
 		versionRetentionCount: versionRetentionCount,
 	}
 }
@@ -199,5 +199,3 @@ func (uc *PublishInvitationUseCase) cleanupOldVersions(ctx context.Context, subd
 		}
 	}
 }
-
-

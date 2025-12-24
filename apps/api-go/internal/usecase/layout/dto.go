@@ -15,8 +15,3 @@ type LayoutSummaryDTO struct {
 	IsFeatured   *bool         `json:"isFeatured,omitempty"`
 	Themes       []interface{} `json:"themes,omitempty"`
 }
-
-
-
-
-
