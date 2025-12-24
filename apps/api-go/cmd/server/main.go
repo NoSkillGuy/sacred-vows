@@ -69,7 +69,7 @@ func main() {
 
 	// Initialize Firestore database
 	ctx := context.Background()
-	logger.GetLogger().Info("Initializing Firestore client...", 
+	logger.GetLogger().Info("Initializing Firestore client...",
 		zap.String("emulator_host", os.Getenv("FIRESTORE_EMULATOR_HOST")),
 		zap.String("project_id", cfg.Database.ProjectID),
 		zap.String("database_id", cfg.Database.DatabaseID))
@@ -308,7 +308,7 @@ func main() {
 			DeploymentEnvironment: cfg.Observability.DeploymentEnvironment,
 		}
 		if err := observability.Init(ctx, tracerCfg, meterCfg); err != nil {
-			logger.GetLogger().Warn("Failed to initialize observability", zap.Error(err))
+			logger.GetLogger().Error("Failed to initialize observability", zap.Error(err))
 		} else {
 			// Initialize metrics
 			meter := observability.Meter("sacred-vows-api")

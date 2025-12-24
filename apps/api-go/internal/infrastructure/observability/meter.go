@@ -6,9 +6,9 @@ import (
 	"strings"
 
 	"go.opentelemetry.io/otel"
-	otelmetric "go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp"
+	otelmetric "go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/sdk/metric"
 )
 
@@ -30,10 +30,12 @@ func InitMeter(ctx context.Context, cfg MeterConfig) error {
 	var err error
 
 	protocol := strings.ToLower(cfg.Protocol)
+	endpoint := normalizeEndpoint(cfg.Endpoint, protocol)
+
 	if protocol == "http" || protocol == "http/protobuf" {
 		exp, err := otlpmetrichttp.New(
 			ctx,
-			otlpmetrichttp.WithEndpoint(cfg.Endpoint),
+			otlpmetrichttp.WithEndpoint(endpoint),
 			otlpmetrichttp.WithInsecure(), // Use insecure for local development
 		)
 		if err != nil {
@@ -41,10 +43,10 @@ func InitMeter(ctx context.Context, cfg MeterConfig) error {
 		}
 		exporter = metric.NewPeriodicReader(exp)
 	} else {
-		// Default to gRPC
+		// Default to gRPC - gRPC expects host:port format, not URL
 		exp, err := otlpmetricgrpc.New(
 			ctx,
-			otlpmetricgrpc.WithEndpoint(cfg.Endpoint),
+			otlpmetricgrpc.WithEndpoint(endpoint),
 			otlpmetricgrpc.WithInsecure(), // Use insecure for local development
 		)
 		if err != nil {
@@ -83,11 +85,10 @@ func Meter(name string) otelmetric.Meter {
 
 // MeterConfig holds configuration for meter initialization
 type MeterConfig struct {
-	Enabled              bool
-	Endpoint             string
-	Protocol             string // "grpc" or "http"
-	ServiceName          string
-	ServiceVersion       string
+	Enabled               bool
+	Endpoint              string
+	Protocol              string // "grpc" or "http"
+	ServiceName           string
+	ServiceVersion        string
 	DeploymentEnvironment string
 }
-
