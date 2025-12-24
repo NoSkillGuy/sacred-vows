@@ -44,17 +44,21 @@ jobs:
           go fmt ./...
           go vet ./...
 
+      - name: Install Builder dependencies
+        working-directory: ./apps/builder
+        run: npm ci --legacy-peer-deps
+
       - name: Lint Builder
         working-directory: ./apps/builder
-        run: |
-          npm ci --legacy-peer-deps
-          npm run lint
+        run: npm run lint
+
+      - name: Install Edge Worker dependencies
+        working-directory: ./apps/edge-worker
+        run: npm ci --legacy-peer-deps
 
       - name: Lint Edge Worker
         working-directory: ./apps/edge-worker
-        run: |
-          npm ci --legacy-peer-deps
-          npm run lint
+        run: npm run lint
 
   format-check:
     name: Format Check
