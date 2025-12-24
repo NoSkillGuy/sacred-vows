@@ -11,35 +11,51 @@ When the user invokes `/fix-pr`, fetch the GitHub PR, read all PR comments, chec
 
 2. **Repository information**:
    - Repository: `NoSkillGuy/sacred-vows` (from git remote)
-   - Use `gh` CLI for all GitHub operations
+   - **Use GitHub MCP server for all GitHub operations** (not `gh` CLI)
+   - Owner: `NoSkillGuy`
+   - Repo: `sacred-vows`
 
 3. **Current branch**: Ensure you're on the PR branch before making fixes
+
+## GitHub MCP Functions to Use
+
+All GitHub operations should use these MCP functions:
+
+- **Get PR details**: `mcp_github_pull_request_read` with method `get`
+- **Get PR comments**: `mcp_github_pull_request_read` with method `get_comments`
+- **Get review comments**: `mcp_github_pull_request_read` with method `get_review_comments`
+- **Get reviews**: `mcp_github_pull_request_read` with method `get_reviews`
+- **Get PR files**: `mcp_github_pull_request_read` with method `get_files`
+- **Get CI status**: `mcp_github_pull_request_read` with method `get_status`
+- **Get commit details**: `mcp_github_get_commit`
+- **Add PR comment**: `mcp_github_add_issue_comment` (use PR number as issue number)
+- **Add review comment**: `mcp_github_add_comment_to_pending_review`
+- **Create/update review**: `mcp_github_pull_request_review_write`
 
 ## Fix Process
 
 ### Step 1: Fetch PR Information
 
 1. **Get PR number**:
-   ```bash
-   # If user provided PR number, use it
-   # Otherwise, try to detect from current branch
-   PR_NUMBER=$(gh pr view --json number --jq '.number' 2>/dev/null || echo "")
+   - If user provided PR number: use it directly
+   - Otherwise: try to detect from current branch using git
+   - If still not found: ask user for PR number
 
-   # If still not found, ask user or use provided number
-   ```
-
-2. **Get PR details**:
-   ```bash
-   gh pr view <PR_NUMBER> --json number,title,body,author,state,baseRefName,headRefName,files,commits,headRefOid
-   ```
+2. **Get PR details** using GitHub MCP:
+   - Use `mcp_github_pull_request_read` with method `get`
+   - Repository: `NoSkillGuy/sacred-vows`
+   - Extract: number, title, body, author, state, baseRefName, headRefName, headRefOid
+   - Get files using method `get_files`
+   - Get commits from the PR data
 
 3. **Checkout PR branch** (if not already on it):
-   ```bash
-   BRANCH_NAME=$(gh pr view <PR_NUMBER> --json headRefName --jq '.headRefName')
-   BASE_BRANCH=$(gh pr view <PR_NUMBER> --json baseRefName --jq '.baseRefName')
-   git checkout $BRANCH_NAME
-   git pull origin $BRANCH_NAME
-   ```
+   - Extract `headRefName` from PR data (this is the branch name)
+   - Extract `baseRefName` from PR data (this is the base branch)
+   - Use git commands:
+     ```bash
+     git checkout $BRANCH_NAME
+     git pull origin $BRANCH_NAME
+     ```
 
 4. **Check for merge conflicts**:
    ```bash
@@ -58,33 +74,38 @@ When the user invokes `/fix-pr`, fetch the GitHub PR, read all PR comments, chec
 
 ### Step 2: Fetch PR Comments
 
+Use GitHub MCP server to fetch all comments:
+
 1. **Get all PR comments** (general comments):
-   ```bash
-   gh pr view <PR_NUMBER> --comments --json comments --jq '.comments[] | {body: .body, author: .author.login, createdAt: .createdAt}'
-   ```
+   - Use `mcp_github_pull_request_read` with method `get_comments`
+   - Repository: `NoSkillGuy/sacred-vows`
+   - Extract: body, author, createdAt for each comment
 
-2. **Get all review comments** (inline comments):
-   ```bash
-   gh api repos/NoSkillGuy/sacred-vows/pulls/<PR_NUMBER>/comments --jq '.[] | {body: .body, path: .path, line: .line, author: .user.login}'
-   ```
+2. **Get all review comments** (inline comments and review threads):
+   - Use `mcp_github_pull_request_read` with method `get_review_comments`
+   - Repository: `NoSkillGuy/sacred-vows`
+   - Extract: body, path, line, author, thread information
 
-3. **Get all review threads**:
-   ```bash
-   gh api repos/NoSkillGuy/sacred-vows/pulls/<PR_NUMBER>/reviews --jq '.[] | {body: .body, state: .state, author: .user.login, comments: .comments}'
-   ```
+3. **Get all reviews**:
+   - Use `mcp_github_pull_request_read` with method `get_reviews`
+   - Repository: `NoSkillGuy/sacred-vows`
+   - Extract: body, state, author, comments for each review
 
 ### Step 3: Check CI Status
 
-1. **Get CI check status**:
-   ```bash
-   gh pr checks <PR_NUMBER> --json name,conclusion,status,detailsUrl
-   ```
+Use GitHub MCP server to check CI status:
 
-2. **Get detailed check runs**:
-   ```bash
-   gh api repos/NoSkillGuy/sacred-vows/commits/$(gh pr view <PR_NUMBER> --json headRefOid --jq '.headRefOid')/check-runs \
-     --jq '.check_runs[] | {name: .name, conclusion: .conclusion, status: .status, output: .output.title, details_url: .html_url}'
-   ```
+1. **Get CI check status**:
+   - Use `mcp_github_pull_request_read` with method `get_status`
+   - Repository: `NoSkillGuy/sacred-vows`
+   - This returns the status of the head commit in the PR
+   - Extract: check run names, conclusions, status, details URLs
+
+2. **Get detailed check runs** (if needed):
+   - Get the head commit SHA from PR data (`headRefOid`)
+   - Use `mcp_github_get_commit` with `include_diff: false`
+   - Repository: `NoSkillGuy/sacred-vows`
+   - The commit data includes check run information
 
 3. **Identify failing checks**:
    - `Lint` - Go and TypeScript linting failures
@@ -387,51 +408,42 @@ For each actionable review comment, track what needs to be fixed:
 
 ### Step 7: Address Review Comments
 
-After all fixes are complete and tests pass, respond to review comments explaining how issues were fixed:
+After all fixes are complete and tests pass, respond to review comments explaining how issues were fixed using GitHub MCP:
 
-1. **For each review comment that was addressed**:
-   ```bash
-   # Get comment details
-   COMMENT_ID=<comment_id>
-   COMMENT_BODY="Fixed! I've [description of fix]. The changes address your feedback by [explanation]."
+1. **For inline review comments** (comments on specific lines):
+   - Use `mcp_github_add_comment_to_pending_review` to add replies to review comments
+   - Repository: `NoSkillGuy/sacred-vows`
+   - Provide: PR number, file path, line number, comment body explaining the fix
+   - Example body: "✅ Fixed! I've [description of fix]. The changes address your feedback by [explanation]."
 
-   # For inline comments, reply to the comment thread
-   gh api repos/NoSkillGuy/sacred-vows/pulls/<PR_NUMBER>/comments/$COMMENT_ID/replies \
-     -X POST \
-     -f body="$COMMENT_BODY"
-   ```
+2. **For general PR comments**:
+   - Use `mcp_github_add_issue_comment` (PRs are issues in GitHub)
+   - Repository: `NoSkillGuy/sacred-vows`
+   - Issue number: PR number
+   - Body: "✅ Fixed! [Description of how the comment was addressed]"
 
-2. **For general review comments**:
-   ```bash
-   # Reply to the review comment
-   gh pr comment <PR_NUMBER> --body "✅ Fixed! $COMMENT_BODY"
-   ```
-
-3. **For review threads**:
-   ```bash
-   # Get review ID and reply
-   REVIEW_ID=$(gh api repos/NoSkillGuy/sacred-vows/pulls/<PR_NUMBER>/reviews --jq '.[] | select(.state == "CHANGES_REQUESTED" or .state == "COMMENTED") | .id' | head -1)
-
-   # Reply to the review
-   gh api repos/NoSkillGuy/sacred-vows/pulls/<PR_NUMBER>/reviews/$REVIEW_ID/events \
-     -X POST \
-     -f body="✅ All requested changes have been addressed:
-
-   $COMMENT_BODY_LIST"
-   ```
+3. **For review threads** (if you have a pending review):
+   - Use `mcp_github_pull_request_review_write` with method `create`
+   - Repository: `NoSkillGuy/sacred-vows`
+   - Event: `COMMENT` or `APPROVE` (if all changes addressed)
+   - Body: Summary of all fixes addressing the review feedback
 
 4. **Create summary comment** (if multiple comments addressed):
-   ```bash
-   gh pr comment <PR_NUMBER> --body "## ✅ Review Comments Addressed
+   - Use `mcp_github_add_issue_comment`
+   - Repository: `NoSkillGuy/sacred-vows`
+   - Issue number: PR number
+   - Body:
+     ```
+     ## ✅ Review Comments Addressed
 
-   I've addressed all review comments:
+     I've addressed all review comments:
 
-   - **Comment 1**: [How it was fixed]
-   - **Comment 2**: [How it was fixed]
-   - **Comment 3**: [How it was fixed]
+     - **Comment 1**: [How it was fixed]
+     - **Comment 2**: [How it was fixed]
+     - **Comment 3**: [How it was fixed]
 
-   All CI checks are now passing and the test suite runs successfully."
-   ```
+     All CI checks are now passing and the test suite runs successfully.
+     ```
 
 ### Step 8: Commit Fixes
 
@@ -486,28 +498,23 @@ After all fixes are complete and tests pass, respond to review comments explaini
 ## Implementation Steps
 
 1. **Parse PR number**:
-   ```bash
-   if [ -n "$1" ]; then
-     PR_NUMBER=$1
-   else
-     PR_NUMBER=$(gh pr view --json number --jq '.number' 2>/dev/null)
-     if [ -z "$PR_NUMBER" ]; then
-       echo "Error: Could not detect PR number. Please provide: /fix-pr <PR_NUMBER>"
-       exit 1
-     fi
-   fi
-   ```
+   - If user provided PR number: use it directly
+   - Otherwise: try to detect from current git branch
+   - If still not found: ask user for PR number
+   - Repository: `NoSkillGuy/sacred-vows` (from git remote)
 
 2. **Check for merge conflicts**:
    - Fetch base branch
    - Attempt merge
    - Identify conflicts if any
 
-3. **Fetch all information**:
-   - PR details
-   - PR comments
-   - Review comments
-   - CI check status
+3. **Fetch all information using GitHub MCP**:
+   - PR details: `mcp_github_pull_request_read` with method `get`
+   - PR comments: `mcp_github_pull_request_read` with method `get_comments`
+   - Review comments: `mcp_github_pull_request_read` with method `get_review_comments`
+   - Reviews: `mcp_github_pull_request_read` with method `get_reviews`
+   - CI check status: `mcp_github_pull_request_read` with method `get_status`
+   - PR files: `mcp_github_pull_request_read` with method `get_files`
 
 4. **Resolve merge conflicts** (if any):
    - Identify conflicted files
@@ -532,8 +539,10 @@ After all fixes are complete and tests pass, respond to review comments explaini
    - Verify no regressions
    - Do NOT commit until all tests pass
 
-8. **Address review comments**:
-   - Reply to each addressed comment
+8. **Address review comments using GitHub MCP**:
+   - For inline comments: `mcp_github_add_comment_to_pending_review`
+   - For general comments: `mcp_github_add_issue_comment` (PR number as issue number)
+   - For review responses: `mcp_github_pull_request_review_write`
    - Explain how the fix addresses the feedback
    - Create summary if multiple comments
 
@@ -641,4 +650,7 @@ npm run format
 - After pushing, CI will automatically re-run
 - Monitor CI status after pushing fixes
 - Reply to review comments to show that feedback was addressed
+- **Use GitHub MCP server for all GitHub operations** - do not use `gh` CLI
+- Repository: `NoSkillGuy/sacred-vows`
+- All GitHub API calls should use MCP functions, not shell commands
 
