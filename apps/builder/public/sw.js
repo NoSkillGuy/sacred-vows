@@ -1,38 +1,39 @@
 // Service Worker for Wedding Invitation PWA
-const CACHE_NAME = 'wedding-invitation-v1';
-const DEFAULT_ASSETS_CACHE = 'default-assets-v1';
+const CACHE_NAME = "wedding-invitation-v1";
+const DEFAULT_ASSETS_CACHE = "default-assets-v1";
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
+  "/",
+  "/index.html",
+  "/manifest.json",
   // Icons are optional - browsers will handle missing icons gracefully
   // '/icon-192.png',
   // '/icon-512.png'
 ];
 
 // Install event - cache resources
-self.addEventListener('install', (event) => {
+self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
+    caches
+      .open(CACHE_NAME)
       .then((cache) => {
-        console.log('Opened cache');
+        console.log("Opened cache");
         return cache.addAll(urlsToCache);
       })
       .catch((error) => {
-        console.log('Cache failed:', error);
+        console.log("Cache failed:", error);
       })
   );
   self.skipWaiting();
 });
 
 // Activate event - clean up old caches
-self.addEventListener('activate', (event) => {
+self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (cacheName !== CACHE_NAME && cacheName !== DEFAULT_ASSETS_CACHE) {
-            console.log('Deleting old cache:', cacheName);
+            console.log("Deleting old cache:", cacheName);
             return caches.delete(cacheName);
           }
         })
@@ -47,21 +48,23 @@ function isDefaultAsset(url) {
   try {
     const urlObj = new URL(url);
     // Check if URL contains /defaults/ path (R2 CDN) or matches CDN base URL pattern
-    return urlObj.pathname.includes('/defaults/') || 
-           urlObj.hostname.includes('pub') || 
-           urlObj.hostname.includes('sacredvows.io');
+    return (
+      urlObj.pathname.includes("/defaults/") ||
+      urlObj.hostname.includes("pub") ||
+      urlObj.hostname.includes("sacredvows.io")
+    );
   } catch {
     // If URL parsing fails, check if it's a relative path to assets
-    return url.startsWith('/assets/') || url.startsWith('/layouts/');
+    return url.startsWith("/assets/") || url.startsWith("/layouts/");
   }
 }
 
 // Fetch event - Different strategies for different resource types
 // Default assets: Cache First (immutable, long TTL)
 // App resources: Stale-while-revalidate (fast, fresh)
-self.addEventListener('fetch', (event) => {
+self.addEventListener("fetch", (event) => {
   // Skip non-GET requests
-  if (event.request.method !== 'GET') {
+  if (event.request.method !== "GET") {
     return;
   }
 
@@ -79,19 +82,24 @@ self.addEventListener('fetch', (event) => {
           }
 
           // Cache miss - fetch from network
-          return fetch(event.request).then((networkResponse) => {
-            // Cache successful responses
-            if (networkResponse && networkResponse.status === 200) {
-              cache.put(event.request, networkResponse.clone());
-            }
-            return networkResponse;
-          }).catch(() => {
-            // Network failed - return cached version if available, or error
-            return cachedResponse || new Response('Asset not available offline', {
-              status: 503,
-              statusText: 'Service Unavailable'
+          return fetch(event.request)
+            .then((networkResponse) => {
+              // Cache successful responses
+              if (networkResponse && networkResponse.status === 200) {
+                cache.put(event.request, networkResponse.clone());
+              }
+              return networkResponse;
+            })
+            .catch(() => {
+              // Network failed - return cached version if available, or error
+              return (
+                cachedResponse ||
+                new Response("Asset not available offline", {
+                  status: 503,
+                  statusText: "Service Unavailable",
+                })
+              );
             });
-          });
         });
       })
     );
@@ -104,7 +112,11 @@ self.addEventListener('fetch', (event) => {
         const fetchPromise = fetch(event.request)
           .then((networkResponse) => {
             // Check if valid response
-            if (!networkResponse || networkResponse.status !== 200 || networkResponse.type === 'error') {
+            if (
+              !networkResponse ||
+              networkResponse.status !== 200 ||
+              networkResponse.type === "error"
+            ) {
               return networkResponse;
             }
 
@@ -114,14 +126,14 @@ self.addEventListener('fetch', (event) => {
             // Update cache with latest version
             caches.open(CACHE_NAME).then((cache) => {
               cache.put(event.request, responseToCache);
-              console.log('Cache updated with latest version:', event.request.url);
+              console.log("Cache updated with latest version:", event.request.url);
             });
 
             return networkResponse;
           })
           .catch((error) => {
             // Network failed - that's okay, we'll use cache
-            console.log('Background update failed (offline):', event.request.url);
+            console.log("Background update failed (offline):", event.request.url);
           });
 
         // If we have cached version, return it immediately
@@ -135,24 +147,26 @@ self.addEventListener('fetch', (event) => {
           if (networkResponse) {
             return networkResponse;
           }
-          
+
           // Network failed and no cache - return offline fallback for HTML pages
-          if (event.request.destination === 'document' || 
-              (event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html'))) {
-            return caches.match('/index.html');
+          if (
+            event.request.destination === "document" ||
+            (event.request.headers.get("accept") &&
+              event.request.headers.get("accept").includes("text/html"))
+          ) {
+            return caches.match("/index.html");
           }
-          
+
           // For other resources, return a basic error response
-          return new Response('Offline - Resource not available', {
+          return new Response("Offline - Resource not available", {
             status: 503,
-            statusText: 'Service Unavailable',
+            statusText: "Service Unavailable",
             headers: new Headers({
-              'Content-Type': 'text/plain'
-            })
+              "Content-Type": "text/plain",
+            }),
           });
         });
       })
     );
   }
 });
-

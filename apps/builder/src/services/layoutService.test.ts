@@ -1,29 +1,29 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { getLayouts, getLayout, getLayoutManifest, getAllLayoutManifests } from './layoutService';
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { getLayouts, getLayout, getLayoutManifest, getAllLayoutManifests } from "./layoutService";
 
 // Mock apiClient
-vi.mock('./apiClient', () => ({
+vi.mock("./apiClient", () => ({
   apiRequest: vi.fn(),
 }));
 
-describe('layoutService', () => {
+describe("layoutService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe('getLayouts', () => {
-    it('should fetch all layouts successfully', async () => {
-      const { apiRequest } = await import('./apiClient');
+  describe("getLayouts", () => {
+    it("should fetch all layouts successfully", async () => {
+      const { apiRequest } = await import("./apiClient");
       const mockManifests = [
         {
-          id: 'classic-scroll',
-          name: 'Classic Scroll',
-          metadata: { tags: ['classic'], isFeatured: true },
+          id: "classic-scroll",
+          name: "Classic Scroll",
+          metadata: { tags: ["classic"], isFeatured: true },
         },
         {
-          id: 'editorial-elegance',
-          name: 'Editorial Elegance',
-          metadata: { tags: ['modern'], isFeatured: false },
+          id: "editorial-elegance",
+          name: "Editorial Elegance",
+          metadata: { tags: ["modern"], isFeatured: false },
         },
       ];
 
@@ -36,23 +36,23 @@ describe('layoutService', () => {
       const result = await getLayouts();
 
       expect(result.layouts).toEqual(mockManifests);
-      expect(result.categories).toContain('all');
-      expect(result.categories).toContain('classic');
-      expect(result.categories).toContain('modern');
+      expect(result.categories).toContain("all");
+      expect(result.categories).toContain("classic");
+      expect(result.categories).toContain("modern");
     });
 
-    it('should filter layouts by category', async () => {
-      const { apiRequest } = await import('./apiClient');
+    it("should filter layouts by category", async () => {
+      const { apiRequest } = await import("./apiClient");
       const mockManifests = [
         {
-          id: 'classic-scroll',
-          name: 'Classic Scroll',
-          metadata: { tags: ['classic'], isFeatured: true },
+          id: "classic-scroll",
+          name: "Classic Scroll",
+          metadata: { tags: ["classic"], isFeatured: true },
         },
         {
-          id: 'editorial-elegance',
-          name: 'Editorial Elegance',
-          metadata: { tags: ['modern'], isFeatured: false },
+          id: "editorial-elegance",
+          name: "Editorial Elegance",
+          metadata: { tags: ["modern"], isFeatured: false },
         },
       ];
 
@@ -62,24 +62,24 @@ describe('layoutService', () => {
         json: async () => ({ manifests: mockManifests }),
       } as Response);
 
-      const result = await getLayouts({ category: 'classic' });
+      const result = await getLayouts({ category: "classic" });
 
       expect(result.layouts).toHaveLength(1);
-      expect(result.layouts[0].id).toBe('classic-scroll');
+      expect(result.layouts[0].id).toBe("classic-scroll");
     });
 
-    it('should filter layouts by featured flag', async () => {
-      const { apiRequest } = await import('./apiClient');
+    it("should filter layouts by featured flag", async () => {
+      const { apiRequest } = await import("./apiClient");
       const mockManifests = [
         {
-          id: 'classic-scroll',
-          name: 'Classic Scroll',
-          metadata: { tags: ['classic'], isFeatured: true },
+          id: "classic-scroll",
+          name: "Classic Scroll",
+          metadata: { tags: ["classic"], isFeatured: true },
         },
         {
-          id: 'editorial-elegance',
-          name: 'Editorial Elegance',
-          metadata: { tags: ['modern'], isFeatured: false },
+          id: "editorial-elegance",
+          name: "Editorial Elegance",
+          metadata: { tags: ["modern"], isFeatured: false },
         },
       ];
 
@@ -92,17 +92,17 @@ describe('layoutService', () => {
       const result = await getLayouts({ featured: true });
 
       expect(result.layouts).toHaveLength(1);
-      expect(result.layouts[0].id).toBe('classic-scroll');
+      expect(result.layouts[0].id).toBe("classic-scroll");
     });
   });
 
-  describe('getLayout', () => {
-    it('should fetch single layout by ID', async () => {
-      const { apiRequest } = await import('./apiClient');
+  describe("getLayout", () => {
+    it("should fetch single layout by ID", async () => {
+      const { apiRequest } = await import("./apiClient");
       const mockLayout = {
-        id: 'classic-scroll',
-        name: 'Classic Scroll',
-        metadata: { tags: ['classic'] },
+        id: "classic-scroll",
+        name: "Classic Scroll",
+        metadata: { tags: ["classic"] },
       };
 
       const mockApiRequest = apiRequest as ReturnType<typeof vi.fn>;
@@ -111,20 +111,20 @@ describe('layoutService', () => {
         json: async () => ({ layout: mockLayout }),
       } as Response);
 
-      const result = await getLayout('classic-scroll');
+      const result = await getLayout("classic-scroll");
 
       expect(result).toEqual(mockLayout);
-      expect(mockApiRequest).toHaveBeenCalledWith('/layouts/classic-scroll', { method: 'GET' });
+      expect(mockApiRequest).toHaveBeenCalledWith("/layouts/classic-scroll", { method: "GET" });
     });
   });
 
-  describe('getLayoutManifest', () => {
-    it('should fetch layout manifest by ID', async () => {
-      const { apiRequest } = await import('./apiClient');
+  describe("getLayoutManifest", () => {
+    it("should fetch layout manifest by ID", async () => {
+      const { apiRequest } = await import("./apiClient");
       const mockManifest = {
-        id: 'classic-scroll',
-        name: 'Classic Scroll',
-        sections: [{ id: 'hero', name: 'Hero', required: true }],
+        id: "classic-scroll",
+        name: "Classic Scroll",
+        sections: [{ id: "hero", name: "Hero", required: true }],
         themes: [],
       };
 
@@ -134,20 +134,22 @@ describe('layoutService', () => {
         json: async () => ({ manifest: mockManifest }),
       } as Response);
 
-      const result = await getLayoutManifest('classic-scroll');
+      const result = await getLayoutManifest("classic-scroll");
 
       expect(result).toEqual(mockManifest);
-      expect(mockApiRequest).toHaveBeenCalledWith('/layouts/classic-scroll/manifest', { method: 'GET' });
+      expect(mockApiRequest).toHaveBeenCalledWith("/layouts/classic-scroll/manifest", {
+        method: "GET",
+      });
     });
   });
 
-  describe('getAllLayoutManifests', () => {
-    it('should fetch all layout manifests', async () => {
-      const { apiRequest } = await import('./apiClient');
+  describe("getAllLayoutManifests", () => {
+    it("should fetch all layout manifests", async () => {
+      const { apiRequest } = await import("./apiClient");
       const mockManifests = [
         {
-          id: 'classic-scroll',
-          name: 'Classic Scroll',
+          id: "classic-scroll",
+          name: "Classic Scroll",
           sections: [],
           themes: [],
         },
@@ -162,8 +164,7 @@ describe('layoutService', () => {
       const result = await getAllLayoutManifests();
 
       expect(result).toEqual(mockManifests);
-      expect(mockApiRequest).toHaveBeenCalledWith('/layouts/manifests', { method: 'GET' });
+      expect(mockApiRequest).toHaveBeenCalledWith("/layouts/manifests", { method: "GET" });
     });
   });
 });
-

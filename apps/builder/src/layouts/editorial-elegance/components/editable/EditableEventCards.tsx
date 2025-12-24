@@ -1,5 +1,5 @@
-import EditableText from '../shared/EditableText';
-import { formatEventDate } from '../../utils/dateFormatter';
+import EditableText from "../shared/EditableText";
+import { formatEventDate } from "../../utils/dateFormatter";
 
 /**
  * EditableEventCards - WYSIWYG editable Event Cards
@@ -7,16 +7,16 @@ import { formatEventDate } from '../../utils/dateFormatter';
 function EditableEventCards({ translations, currentLang, config = {}, onUpdate }) {
   const events = config.events || {};
   const eventList = events.events || [];
-  
+
   if (!eventList.length) return null;
-  
+
   return (
     <section className="ee-section ee-events-section">
       <div className="ee-section-header">
         <h2 className="ee-section-heading">Events</h2>
         <div className="ee-divider" />
       </div>
-      
+
       <div className="ee-event-cards">
         {eventList.map((event, index) => (
           <div key={index} className="ee-event-card">
@@ -29,13 +29,11 @@ function EditableEventCards({ translations, currentLang, config = {}, onUpdate }
                 tag="h3"
               />
               {formatEventDate(event.date) && (
-                <p className="ee-meta-text ee-event-date">
-                  {formatEventDate(event.date)}
-                </p>
+                <p className="ee-meta-text ee-event-date">{formatEventDate(event.date)}</p>
               )}
               <div className="ee-event-details">
                 <EditableText
-                  value={event.venue || 'Venue TBD'}
+                  value={event.venue || "Venue TBD"}
                   onUpdate={onUpdate}
                   path={`events.events.${index}.venue`}
                   className="ee-event-venue"
@@ -58,4 +56,3 @@ function EditableEventCards({ translations, currentLang, config = {}, onUpdate }
 }
 
 export default EditableEventCards;
-

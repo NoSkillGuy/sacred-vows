@@ -113,6 +113,15 @@ jobs:
         with:
           go-version: '1.21'
 
+      - name: Install swag (for docs generation)
+        if: matrix.test-type == 'go'
+        run: go install github.com/swaggo/swag/cmd/swag@latest
+
+      - name: Generate Go docs (for tests)
+        if: matrix.test-type == 'go'
+        working-directory: ./apps/api-go
+        run: make swagger
+
       - name: Test Go
         if: matrix.test-type == 'go'
         working-directory: ./apps/api-go

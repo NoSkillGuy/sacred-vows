@@ -1,7 +1,11 @@
-import { useEffect, useState, useRef, ReactNode } from 'react';
-import { Navigate, useLocation, useSearchParams } from 'react-router-dom';
-import { isAuthenticated, getCurrentUserFromAPI, refreshAccessToken } from '../../services/authService';
-import { setAccessToken } from '../../services/tokenStorage';
+import { useEffect, useState, useRef, ReactNode } from "react";
+import { Navigate, useLocation, useSearchParams } from "react-router-dom";
+import {
+  isAuthenticated,
+  getCurrentUserFromAPI,
+  refreshAccessToken,
+} from "../../services/authService";
+import { setAccessToken } from "../../services/tokenStorage";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -14,8 +18,8 @@ function handleOAuthToken(token: string): boolean {
     setAccessToken(token);
     // Clean the URL
     const url = new URL(window.location.href);
-    url.searchParams.delete('token');
-    window.history.replaceState({}, '', url.pathname);
+    url.searchParams.delete("token");
+    window.history.replaceState({}, "", url.pathname);
     return true;
   }
   return false;
@@ -49,7 +53,7 @@ function ProtectedRoute({ children }: ProtectedRouteProps): JSX.Element {
 
     const checkAuth = async (): Promise<void> => {
       // Check for OAuth callback token in URL
-      const oauthToken = searchParams.get('token');
+      const oauthToken = searchParams.get("token");
       if (oauthToken) {
         handleOAuthToken(oauthToken);
       }
@@ -103,10 +107,18 @@ function ProtectedRoute({ children }: ProtectedRouteProps): JSX.Element {
       <div className="auth-loading">
         <div className="auth-loading-spinner">
           <div className="spinner-ring"></div>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: '2rem', height: '2rem', color: '#e8b4b8' }}>
-            <circle cx="8" cy="15" r="5"/>
-            <circle cx="16" cy="15" r="5"/>
-            <path d="M8 10a5 5 0 0 1 8 0"/>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ width: "2rem", height: "2rem", color: "#e8b4b8" }}
+          >
+            <circle cx="8" cy="15" r="5" />
+            <circle cx="16" cy="15" r="5" />
+            <path d="M8 10a5 5 0 0 1 8 0" />
           </svg>
         </div>
         <p>Loading your workspace...</p>
@@ -165,4 +177,3 @@ function ProtectedRoute({ children }: ProtectedRouteProps): JSX.Element {
 }
 
 export default ProtectedRoute;
-

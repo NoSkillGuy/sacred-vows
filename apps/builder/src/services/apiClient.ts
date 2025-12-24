@@ -3,11 +3,11 @@
  * Centralized fetch wrapper with automatic token refresh on 401 errors
  */
 
-import { getAccessToken, clearAccessToken } from './tokenStorage';
-import { generateRequestId } from '../lib/observability';
-import { trace } from '@opentelemetry/api';
+import { getAccessToken, clearAccessToken } from "./tokenStorage";
+import { generateRequestId } from "../lib/observability";
+import { trace } from "@opentelemetry/api";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
 
 let isRefreshing = false;
 let refreshPromise: Promise<string> | null = null;
@@ -30,26 +30,28 @@ async function refreshAccessToken(): Promise<string> {
   refreshPromise = (async (): Promise<string> => {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
-        method: 'POST',
-        credentials: 'include', // Include cookies (refresh token)
+        method: "POST",
+        credentials: "include", // Include cookies (refresh token)
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ error: 'Refresh failed' })) as { error?: string };
-        throw new Error(error.error || 'Failed to refresh token');
+        const error = (await response.json().catch(() => ({ error: "Refresh failed" }))) as {
+          error?: string;
+        };
+        throw new Error(error.error || "Failed to refresh token");
       }
 
-      const data = await response.json() as RefreshResponse;
-      
+      const data = (await response.json()) as RefreshResponse;
+
       if (!data.accessToken) {
-        throw new Error('No access token in refresh response');
+        throw new Error("No access token in refresh response");
       }
 
       // Import dynamically to avoid circular dependency
-      const { setAccessToken } = await import('./tokenStorage');
+      const { setAccessToken } = await import("./tokenStorage");
       setAccessToken(data.accessToken);
 
       return data.accessToken;
@@ -79,7 +81,9 @@ interface RequestOptions extends RequestInit {
  */
 export async function apiRequest(url: string, options: RequestOptions = {}): Promise<Response> {
   // Ensure URL is absolute
-  const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url.startsWith('/') ? url : `/${url}`}`;
+  const fullUrl = url.startsWith("http")
+    ? url
+    : `${API_BASE_URL}${url.startsWith("/") ? url : `/${url}`}`;
 
   // Generate request ID for correlation
   const requestId = generateRequestId();
@@ -90,7 +94,7 @@ export async function apiRequest(url: string, options: RequestOptions = {}): Pro
   // Get current span to add request ID attribute
   const activeSpan = trace.getActiveSpan();
   if (activeSpan) {
-    activeSpan.setAttribute('http.request_id', requestId);
+    activeSpan.setAttribute("http.request_id", requestId);
   }
 
   // Prepare headers
@@ -98,9 +102,9 @@ export async function apiRequest(url: string, options: RequestOptions = {}): Pro
   // Fetch instrumentation automatically adds traceparent header for trace propagation
   const isFormData = options.body instanceof FormData;
   const headers: HeadersInit = {
-    ...(!isFormData && { 'Content-Type': 'application/json' }),
-    ...(token && { 'Authorization': `Bearer ${token}` }),
-    'X-Request-ID': requestId, // Add request ID header for correlation
+    ...(!isFormData && { "Content-Type": "application/json" }),
+    ...(token && { Authorization: `Bearer ${token}` }),
+    "X-Request-ID": requestId, // Add request ID header for correlation
     ...options.headers,
   };
 
@@ -108,7 +112,7 @@ export async function apiRequest(url: string, options: RequestOptions = {}): Pro
   let response = await fetch(fullUrl, {
     ...options,
     headers,
-    credentials: 'include', // Include cookies for refresh token
+    credentials: "include", // Include cookies for refresh token
   });
 
   // Handle 401 Unauthorized - token expired or invalid
@@ -116,16 +120,16 @@ export async function apiRequest(url: string, options: RequestOptions = {}): Pro
     // Check if this is a token expiry error
     let errorData: { error?: string } = {};
     try {
-      errorData = await response.clone().json() as { error?: string };
+      errorData = (await response.clone().json()) as { error?: string };
     } catch {
       errorData = {};
     }
 
     // Try to refresh token (unless this is already a refresh request)
-    if (!fullUrl.includes('/auth/refresh') && !fullUrl.includes('/auth/logout')) {
+    if (!fullUrl.includes("/auth/refresh") && !fullUrl.includes("/auth/logout")) {
       try {
         await refreshAccessToken();
-        
+
         // Get new token and retry original request (use same request ID)
         const newToken = getAccessToken();
         if (newToken) {
@@ -133,30 +137,29 @@ export async function apiRequest(url: string, options: RequestOptions = {}): Pro
             ...options,
             headers: {
               ...headers,
-              'Authorization': `Bearer ${newToken}`,
-              'X-Request-ID': requestId, // Preserve request ID on retry
+              Authorization: `Bearer ${newToken}`,
+              "X-Request-ID": requestId, // Preserve request ID on retry
             },
-            credentials: 'include',
+            credentials: "include",
           });
         } else {
           // No token after refresh, redirect to login
           clearAccessToken();
-          if (typeof window !== 'undefined') {
-            window.location.href = '/login';
+          if (typeof window !== "undefined") {
+            window.location.href = "/login";
           }
-          throw new Error('Session expired. Please login again.');
+          throw new Error("Session expired. Please login again.");
         }
       } catch (refreshError) {
         // Refresh failed, clear auth and redirect to login
         clearAccessToken();
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login';
+        if (typeof window !== "undefined") {
+          window.location.href = "/login";
         }
-        throw new Error('Session expired. Please login again.');
+        throw new Error("Session expired. Please login again.");
       }
     }
   }
 
   return response;
 }
-

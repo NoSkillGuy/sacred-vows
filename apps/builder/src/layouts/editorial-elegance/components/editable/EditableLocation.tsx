@@ -1,4 +1,4 @@
-import EditableText from '../shared/EditableText';
+import EditableText from "../shared/EditableText";
 
 /**
  * EditableLocation - WYSIWYG editable Location
@@ -6,10 +6,10 @@ import EditableText from '../shared/EditableText';
 function EditableLocation({ translations, currentLang, config = {}, onUpdate }) {
   const wedding = config.wedding || {};
   const venue = wedding.venue || {};
-  const mapStyle = config.location?.mapStyle || 'desaturated';
-  
+  const mapStyle = config.location?.mapStyle || "desaturated";
+
   if (!venue.name) return null;
-  
+
   return (
     <section className="ee-section ee-location-section">
       <div className="ee-location-container">
@@ -22,7 +22,7 @@ function EditableLocation({ translations, currentLang, config = {}, onUpdate }) 
             className="ee-section-heading"
             tag="h2"
           />
-          <div className="ee-divider" style={{ margin: 'var(--ee-space-sm) 0' }} />
+          <div className="ee-divider" style={{ margin: "var(--ee-space-sm) 0" }} />
           <p className="ee-location-address">
             <EditableText
               value={venue.address}
@@ -37,7 +37,7 @@ function EditableLocation({ translations, currentLang, config = {}, onUpdate }) 
               path="wedding.venue.city"
               tag="span"
             />
-            {', '}
+            {", "}
             <EditableText
               value={venue.state}
               onUpdate={onUpdate}
@@ -46,9 +46,9 @@ function EditableLocation({ translations, currentLang, config = {}, onUpdate }) 
             />
           </p>
           {venue.mapsUrl && (
-            <a 
-              href={venue.mapsUrl} 
-              target="_blank" 
+            <a
+              href={venue.mapsUrl}
+              target="_blank"
               rel="noopener noreferrer"
               className="ee-link ee-map-link"
             >
@@ -56,7 +56,7 @@ function EditableLocation({ translations, currentLang, config = {}, onUpdate }) 
             </a>
           )}
         </div>
-        
+
         <div className={`ee-location-map ee-map-${mapStyle}`}>
           {venue.mapsEmbedUrl ? (
             <iframe
@@ -81,4 +81,3 @@ function EditableLocation({ translations, currentLang, config = {}, onUpdate }) 
 }
 
 export default EditableLocation;
-

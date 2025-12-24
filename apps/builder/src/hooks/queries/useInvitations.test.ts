@@ -1,11 +1,11 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import React from 'react';
-import { useInvitationsQuery, useInvitationQuery } from './useInvitations';
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { renderHook, waitFor } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import React from "react";
+import { useInvitationsQuery, useInvitationQuery } from "./useInvitations";
 
 // Mock invitationService
-vi.mock('../../services/invitationService', () => ({
+vi.mock("../../services/invitationService", () => ({
   getInvitations: vi.fn(),
   getInvitation: vi.fn(),
   createInvitation: vi.fn(),
@@ -20,22 +20,21 @@ const createWrapper = () => {
       mutations: { retry: false },
     },
   });
-  
-  return ({ children }: { children: React.ReactNode }) => (
-    React.createElement(QueryClientProvider, { client: queryClient }, children)
-  );
+
+  return ({ children }: { children: React.ReactNode }) =>
+    React.createElement(QueryClientProvider, { client: queryClient }, children);
 };
 
-describe('useInvitations hooks', () => {
+describe("useInvitations hooks", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe('useInvitationsQuery', () => {
-    it('should fetch all invitations', async () => {
-      const { getInvitations } = await import('../../services/invitationService');
+  describe("useInvitationsQuery", () => {
+    it("should fetch all invitations", async () => {
+      const { getInvitations } = await import("../../services/invitationService");
       const mockInvitations = [
-        { id: 'inv-1', userId: '1', layoutId: 'classic-scroll', data: {}, layoutConfig: {} },
+        { id: "inv-1", userId: "1", layoutId: "classic-scroll", data: {}, layoutConfig: {} },
       ];
 
       vi.mocked(getInvitations).mockResolvedValue(mockInvitations);
@@ -50,14 +49,20 @@ describe('useInvitations hooks', () => {
     });
   });
 
-  describe('useInvitationQuery', () => {
-    it('should fetch single invitation by ID', async () => {
-      const invitationService = await import('../../services/invitationService');
-      const mockInvitation = { id: 'inv-1', userId: '1', layoutId: 'classic-scroll', data: {}, layoutConfig: {} };
+  describe("useInvitationQuery", () => {
+    it("should fetch single invitation by ID", async () => {
+      const invitationService = await import("../../services/invitationService");
+      const mockInvitation = {
+        id: "inv-1",
+        userId: "1",
+        layoutId: "classic-scroll",
+        data: {},
+        layoutConfig: {},
+      };
 
       vi.mocked(invitationService.getInvitation).mockResolvedValue(mockInvitation);
 
-      const { result } = renderHook(() => useInvitationQuery('inv-1', true), {
+      const { result } = renderHook(() => useInvitationQuery("inv-1", true), {
         wrapper: createWrapper(),
       });
 
@@ -66,10 +71,10 @@ describe('useInvitations hooks', () => {
       expect(result.current.data).toEqual(mockInvitation);
     });
 
-    it('should not fetch when enabled is false', async () => {
-      const invitationService = await import('../../services/invitationService');
+    it("should not fetch when enabled is false", async () => {
+      const invitationService = await import("../../services/invitationService");
 
-      renderHook(() => useInvitationQuery('inv-1', false), {
+      renderHook(() => useInvitationQuery("inv-1", false), {
         wrapper: createWrapper(),
       });
 
@@ -77,4 +82,3 @@ describe('useInvitations hooks', () => {
     });
   });
 });
-

@@ -3,8 +3,8 @@
  * Loads layout configuration and components dynamically
  */
 
-import type { LayoutManifest } from '@shared/types/layout';
-import type { UniversalWeddingData } from '@shared/types/wedding-data';
+import type { LayoutManifest } from "@shared/types/layout";
+import type { UniversalWeddingData } from "@shared/types/wedding-data";
 
 interface LayoutConfig {
   id: string;
@@ -26,17 +26,20 @@ interface LoadedLayout {
 export async function loadLayout(layoutId: string): Promise<LoadedLayout> {
   try {
     // In production, this would fetch from API or load from file system
-    const layoutMap: Record<string, {
-      config: () => Promise<{ default?: LayoutConfig; [key: string]: unknown }>;
-      manifest: () => Promise<{ default?: LayoutManifest; [key: string]: unknown }>;
-    }> = {
-      'classic-scroll': {
-        config: () => import('../../../layouts/classic-scroll/config.json'),
-        manifest: () => import('../../../layouts/classic-scroll/manifest.json'),
+    const layoutMap: Record<
+      string,
+      {
+        config: () => Promise<{ default?: LayoutConfig; [key: string]: unknown }>;
+        manifest: () => Promise<{ default?: LayoutManifest; [key: string]: unknown }>;
+      }
+    > = {
+      "classic-scroll": {
+        config: () => import("../../../layouts/classic-scroll/config.json"),
+        manifest: () => import("../../../layouts/classic-scroll/manifest.json"),
       },
-      'heritage-red': {
-        config: () => import('../../../layouts/heritage-red/config.json'),
-        manifest: () => import('../../../layouts/heritage-red/manifest.json'),
+      "heritage-red": {
+        config: () => import("../../../layouts/heritage-red/config.json"),
+        manifest: () => import("../../../layouts/heritage-red/manifest.json"),
       },
     };
 
@@ -45,10 +48,7 @@ export async function loadLayout(layoutId: string): Promise<LoadedLayout> {
       throw new Error(`Layout ${layoutId} not found`);
     }
 
-    const [config, manifest] = await Promise.all([
-      layoutLoader.config(),
-      layoutLoader.manifest(),
-    ]);
+    const [config, manifest] = await Promise.all([layoutLoader.config(), layoutLoader.manifest()]);
 
     return {
       config: (config.default || config) as LayoutConfig,
@@ -81,8 +81,14 @@ export function mergeLayoutData(
     const layoutCouple = layoutConfig.couple as Record<string, unknown>;
     const userCouple = userData.couple as Record<string, unknown>;
     merged.couple = {
-      bride: { ...(layoutCouple.bride as Record<string, unknown> || {}), ...(userCouple.bride as Record<string, unknown> || {}) },
-      groom: { ...(layoutCouple.groom as Record<string, unknown> || {}), ...(userCouple.groom as Record<string, unknown> || {}) },
+      bride: {
+        ...((layoutCouple.bride as Record<string, unknown>) || {}),
+        ...((userCouple.bride as Record<string, unknown>) || {}),
+      },
+      groom: {
+        ...((layoutCouple.groom as Record<string, unknown>) || {}),
+        ...((userCouple.groom as Record<string, unknown>) || {}),
+      },
     };
   }
 
@@ -92,7 +98,10 @@ export function mergeLayoutData(
     merged.wedding = {
       ...layoutWedding,
       ...userWedding,
-      venue: { ...(layoutWedding.venue as Record<string, unknown> || {}), ...(userWedding.venue as Record<string, unknown> || {}) },
+      venue: {
+        ...((layoutWedding.venue as Record<string, unknown>) || {}),
+        ...((userWedding.venue as Record<string, unknown>) || {}),
+      },
     };
   }
 
@@ -101,14 +110,20 @@ export function mergeLayoutData(
     const userEvents = userData.events as Record<string, unknown>;
     merged.events = {
       day1: {
-        ...(layoutEvents.day1 as Record<string, unknown> || {}),
-        ...(userEvents.day1 as Record<string, unknown> || {}),
-        events: (userEvents.day1 as Record<string, unknown>)?.events || (layoutEvents.day1 as Record<string, unknown>)?.events || [],
+        ...((layoutEvents.day1 as Record<string, unknown>) || {}),
+        ...((userEvents.day1 as Record<string, unknown>) || {}),
+        events:
+          (userEvents.day1 as Record<string, unknown>)?.events ||
+          (layoutEvents.day1 as Record<string, unknown>)?.events ||
+          [],
       },
       day2: {
-        ...(layoutEvents.day2 as Record<string, unknown> || {}),
-        ...(userEvents.day2 as Record<string, unknown> || {}),
-        events: (userEvents.day2 as Record<string, unknown>)?.events || (layoutEvents.day2 as Record<string, unknown>)?.events || [],
+        ...((layoutEvents.day2 as Record<string, unknown>) || {}),
+        ...((userEvents.day2 as Record<string, unknown>) || {}),
+        events:
+          (userEvents.day2 as Record<string, unknown>)?.events ||
+          (layoutEvents.day2 as Record<string, unknown>)?.events ||
+          [],
       },
     };
   }
@@ -139,7 +154,6 @@ export function mergeLayoutData(
  * @returns True if valid
  */
 export function validateLayoutConfig(config: Record<string, unknown>): boolean {
-  const requiredFields = ['id', 'name', 'version'];
-  return requiredFields.every(field => config[field] !== undefined);
+  const requiredFields = ["id", "name", "version"];
+  return requiredFields.every((field) => config[field] !== undefined);
 }
-

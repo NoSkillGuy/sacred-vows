@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import EditableText from '../shared/EditableText';
-import EditableImage from '../shared/EditableImage';
-import { formatWeddingDate } from '../../utils/dateFormatter';
+import { useState, useEffect } from "react";
+import EditableText from "../shared/EditableText";
+import EditableImage from "../shared/EditableImage";
+import { formatWeddingDate } from "../../utils/dateFormatter";
 
 /**
  * EditableEditorialHero - WYSIWYG editable version of Editorial Hero
@@ -14,31 +14,24 @@ function EditableEditorialHero({ translations, currentLang, config = {}, onUpdat
   const wedding = config.wedding || {};
   const hero = config.hero || {};
   const venue = wedding.venue || {};
-  
-  const brideName = bride.name || 'Bride';
-  const groomName = groom.name || 'Groom';
-  const weddingDate = wedding.dates?.[0] || 'Date TBD';
-  const city = venue.city || 'City';
-  
-  const alignment = hero.alignment || 'center';
-  const mediaType = hero.mediaType || 'image';
-  const mainImage = hero.mainImage || '';
-  const videoUrl = hero.videoUrl || '';
+
+  const brideName = bride.name || "Bride";
+  const groomName = groom.name || "Groom";
+  const weddingDate = wedding.dates?.[0] || "Date TBD";
+  const city = venue.city || "City";
+
+  const alignment = hero.alignment || "center";
+  const mediaType = hero.mediaType || "image";
+  const mainImage = hero.mainImage || "";
+  const videoUrl = hero.videoUrl || "";
   const videoPoster = hero.videoPoster || mainImage;
-  
+
   return (
     <section className="ee-hero" data-alignment={alignment}>
       {/* Background Media */}
       <div className="ee-hero-media">
-        {mediaType === 'video' && videoUrl ? (
-          <video
-            className="ee-hero-video"
-            autoPlay
-            muted
-            loop
-            playsInline
-            poster={videoPoster}
-          >
+        {mediaType === "video" && videoUrl ? (
+          <video className="ee-hero-video" autoPlay muted loop playsInline poster={videoPoster}>
             <source src={videoUrl} type="video/mp4" />
           </video>
         ) : (
@@ -52,7 +45,7 @@ function EditableEditorialHero({ translations, currentLang, config = {}, onUpdat
         )}
         <div className="ee-hero-overlay" />
       </div>
-      
+
       {/* Hero Content */}
       <div className="ee-hero-content">
         <div className="ee-hero-text">
@@ -63,7 +56,7 @@ function EditableEditorialHero({ translations, currentLang, config = {}, onUpdat
               path="couple.bride.name"
               tag="span"
             />
-            {' & '}
+            {" & "}
             <EditableText
               value={groomName}
               onUpdate={onUpdate}
@@ -73,20 +66,13 @@ function EditableEditorialHero({ translations, currentLang, config = {}, onUpdat
           </h1>
           <div className="ee-divider" />
           {formatWeddingDate(weddingDate) && (
-            <p className="ee-meta-text ee-hero-date">
-              {formatWeddingDate(weddingDate)}
-            </p>
+            <p className="ee-meta-text ee-hero-date">{formatWeddingDate(weddingDate)}</p>
           )}
           <p className="ee-meta-text ee-hero-location">
-            <EditableText
-              value={city}
-              onUpdate={onUpdate}
-              path="wedding.venue.city"
-              tag="span"
-            />
+            <EditableText value={city} onUpdate={onUpdate} path="wedding.venue.city" tag="span" />
           </p>
         </div>
-        
+
         <div className="ee-scroll-indicator">
           <span className="ee-scroll-line" />
         </div>
@@ -96,4 +82,3 @@ function EditableEditorialHero({ translations, currentLang, config = {}, onUpdat
 }
 
 export default EditableEditorialHero;
-

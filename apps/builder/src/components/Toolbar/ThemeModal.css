@@ -40,7 +40,7 @@
 
 .theme-modal-header h3 {
   margin: 0;
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.35rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -103,7 +103,7 @@
 }
 
 .theme-section-title::after {
-  content: '';
+  content: "";
   flex: 1;
   height: 1px;
   background: linear-gradient(90deg, var(--builder-border), transparent);
@@ -334,7 +334,7 @@
   border: 1px solid var(--builder-border);
   border-radius: var(--radius-sm);
   font-size: 0.8rem;
-  font-family: 'SF Mono', Monaco, monospace;
+  font-family: "SF Mono", Monaco, monospace;
   color: var(--text-dark);
   transition: border-color 0.2s ease;
 }

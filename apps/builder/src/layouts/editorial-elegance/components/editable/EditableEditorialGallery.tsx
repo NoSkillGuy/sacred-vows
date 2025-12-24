@@ -1,4 +1,4 @@
-import EditableImage from '../shared/EditableImage';
+import EditableImage from "../shared/EditableImage";
 
 /**
  * EditableEditorialGallery - WYSIWYG editable Gallery
@@ -6,13 +6,13 @@ import EditableImage from '../shared/EditableImage';
 function EditableEditorialGallery({ translations, currentLang, config = {}, onUpdate }) {
   const gallery = config.gallery || {};
   const galleryConfig = config.galleryConfig || {};
-  const layout = galleryConfig.layout || 'masonry';
+  const layout = galleryConfig.layout || "masonry";
   const maxImages = galleryConfig.maxImages || 12;
-  
+
   const galleryImages = (gallery.images || []).slice(0, maxImages);
-  
+
   if (!galleryImages.length) return null;
-  
+
   return (
     <section className="ee-section ee-gallery-section">
       <div className={`ee-gallery-container ee-gallery-${layout}`}>
@@ -33,4 +33,3 @@ function EditableEditorialGallery({ translations, currentLang, config = {}, onUp
 }
 
 export default EditableEditorialGallery;
-

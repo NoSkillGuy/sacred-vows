@@ -1,5 +1,5 @@
-import EditableText from '../shared/EditableText';
-import { getDefaultAssetUrl } from '../../../../services/defaultAssetService';
+import EditableText from "../shared/EditableText";
+import { getDefaultAssetUrl } from "../../../../services/defaultAssetService";
 
 /**
  * EditableEventsSection - WYSIWYG editable version of Events section
@@ -13,10 +13,10 @@ function EditableEventsSection({ translations, currentLang, config = {}, onUpdat
   const getTranslation = (key) => {
     let customValue = null;
     if (config?.customTranslations) {
-      const keys = key.split('.');
+      const keys = key.split(".");
       let current = config.customTranslations;
       for (const k of keys) {
-        if (current && typeof current === 'object' && k in current) {
+        if (current && typeof current === "object" && k in current) {
           current = current[k];
         } else {
           current = null;
@@ -25,45 +25,79 @@ function EditableEventsSection({ translations, currentLang, config = {}, onUpdat
       }
       customValue = current || null;
     }
-    return customValue || translations[key] || '';
+    return customValue || translations[key] || "";
   };
-  
+
   // Get day1 events from config or use defaults
   const day1Events = day1Config.events || [
-    { emoji: '🪔', label: getTranslation('events.tilak.label') || 'Tilak', tag: getTranslation('events.tilak.tag') || 'Auspicious beginning', time: '3:00 PM' },
-    { emoji: '🌼', label: getTranslation('events.haldi.label') || 'Haldi', tag: getTranslation('events.haldi.tag') || 'Turmeric & traditions', time: '6:00 PM' },
-    { emoji: '🌺', label: getTranslation('events.mehandi.label') || 'Mehandi', tag: getTranslation('events.mehandi.tag') || 'Henna & happiness', time: '9:00 PM' }
+    {
+      emoji: "🪔",
+      label: getTranslation("events.tilak.label") || "Tilak",
+      tag: getTranslation("events.tilak.tag") || "Auspicious beginning",
+      time: "3:00 PM",
+    },
+    {
+      emoji: "🌼",
+      label: getTranslation("events.haldi.label") || "Haldi",
+      tag: getTranslation("events.haldi.tag") || "Turmeric & traditions",
+      time: "6:00 PM",
+    },
+    {
+      emoji: "🌺",
+      label: getTranslation("events.mehandi.label") || "Mehandi",
+      tag: getTranslation("events.mehandi.tag") || "Henna & happiness",
+      time: "9:00 PM",
+    },
   ];
 
   // Get day2 events from config or use defaults
   const day2Events = day2Config.events || [
-    { emoji: '💐', label: getTranslation('events.jaimala.label') || 'Jaimala', tag: getTranslation('events.jaimala.tag') || 'Exchange of garlands', time: '5:00 PM' },
-    { emoji: '🍽️', label: getTranslation('events.dinner.label') || 'Dinner', tag: getTranslation('events.dinner.tag') || 'Feast with family & friends', time: '8:00 PM' },
-    { emoji: null, image: getDefaultAssetUrl('icons', null, '3.jpg'), label: getTranslation('events.wedding.label') || 'Wedding', tag: getTranslation('events.wedding.tag') || 'Sacred vows', time: '9:00 PM' }
+    {
+      emoji: "💐",
+      label: getTranslation("events.jaimala.label") || "Jaimala",
+      tag: getTranslation("events.jaimala.tag") || "Exchange of garlands",
+      time: "5:00 PM",
+    },
+    {
+      emoji: "🍽️",
+      label: getTranslation("events.dinner.label") || "Dinner",
+      tag: getTranslation("events.dinner.tag") || "Feast with family & friends",
+      time: "8:00 PM",
+    },
+    {
+      emoji: null,
+      image: getDefaultAssetUrl("icons", null, "3.jpg"),
+      label: getTranslation("events.wedding.label") || "Wedding",
+      tag: getTranslation("events.wedding.tag") || "Sacred vows",
+      time: "9:00 PM",
+    },
   ];
-  
-  const day1Date = day1Config.date || 'Thursday · 22 January 2026';
-  const day2Date = day2Config.date || 'Friday · 23 January 2026';
+
+  const day1Date = day1Config.date || "Thursday · 22 January 2026";
+  const day2Date = day2Config.date || "Friday · 23 January 2026";
 
   return (
     <section id="events">
       <div className="section-header">
         <EditableText
-          value={getTranslation('events.eyebrow') || 'Program Details'}
+          value={getTranslation("events.eyebrow") || "Program Details"}
           onUpdate={onUpdate}
           path="customTranslations.events.eyebrow"
           className="section-eyebrow"
           tag="div"
         />
         <EditableText
-          value={getTranslation('events.title') || 'The Celebrations'}
+          value={getTranslation("events.title") || "The Celebrations"}
           onUpdate={onUpdate}
           path="customTranslations.events.title"
           className="section-title"
           tag="div"
         />
         <EditableText
-          value={getTranslation('events.subtitle') || 'We would be honoured by your presence at each of these moments of joy.'}
+          value={
+            getTranslation("events.subtitle") ||
+            "We would be honoured by your presence at each of these moments of joy."
+          }
           onUpdate={onUpdate}
           path="customTranslations.events.subtitle"
           className="section-subtitle"
@@ -77,7 +111,7 @@ function EditableEventsSection({ translations, currentLang, config = {}, onUpdat
           {/* Day One */}
           <div className="event-day">
             <EditableText
-              value={getTranslation('events.day1') || 'Day One'}
+              value={getTranslation("events.day1") || "Day One"}
               onUpdate={onUpdate}
               path="customTranslations.events.day1"
               className="event-date-label"
@@ -132,7 +166,7 @@ function EditableEventsSection({ translations, currentLang, config = {}, onUpdat
           {/* Day Two */}
           <div className="event-day">
             <EditableText
-              value={getTranslation('events.day2') || 'Day Two'}
+              value={getTranslation("events.day2") || "Day Two"}
               onUpdate={onUpdate}
               path="customTranslations.events.day2"
               className="event-date-label"
@@ -186,13 +220,16 @@ function EditableEventsSection({ translations, currentLang, config = {}, onUpdat
         </div>
 
         <EditableText
-          value={getTranslation('events.complete') || 'Your presence and blessings at these ceremonies will make our celebration truly complete.'}
+          value={
+            getTranslation("events.complete") ||
+            "Your presence and blessings at these ceremonies will make our celebration truly complete."
+          }
           onUpdate={onUpdate}
           path="customTranslations.events.complete"
           className="muted"
           tag="p"
           multiline={true}
-          style={{ marginTop: '14px', fontSize: '12px' }}
+          style={{ marginTop: "14px", fontSize: "12px" }}
         />
       </div>
     </section>
@@ -200,5 +237,3 @@ function EditableEventsSection({ translations, currentLang, config = {}, onUpdat
 }
 
 export default EditableEventsSection;
-
-

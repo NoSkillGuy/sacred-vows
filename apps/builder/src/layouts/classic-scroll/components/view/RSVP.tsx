@@ -1,31 +1,31 @@
 function RSVP({ onRSVPClick, translations, currentLang, config = {} }) {
   const rsvp = config.rsvp || {};
   const contacts = rsvp.contacts || [
-    { badge: 'RSVP', name: 'Anil Kumar Singh' },
-    { badge: 'RSVP', name: 'Arun Kumar Singh' },
-    { badge: 'RSVP', name: 'Ashok Kumar Singh' },
-    { badge: 'RSVP', name: 'Arvind Kumar Singh' },
-    { badge: 'Host', name: 'Siva Praveen Rayapudi' },
-    { badge: 'Host', name: 'Pooja Singh' }
+    { badge: "RSVP", name: "Anil Kumar Singh" },
+    { badge: "RSVP", name: "Arun Kumar Singh" },
+    { badge: "RSVP", name: "Ashok Kumar Singh" },
+    { badge: "RSVP", name: "Arvind Kumar Singh" },
+    { badge: "Host", name: "Siva Praveen Rayapudi" },
+    { badge: "Host", name: "Pooja Singh" },
   ];
-  
+
   const couple = config.couple || {};
   const wedding = config.wedding || {};
-  const brideName = couple.bride?.name || 'Capt (Dr) Priya Singh';
-  const groomName = couple.groom?.name || 'Dr Saurabh Singh';
-  const dates = wedding.dates || ['2026-01-22', '2026-01-23'];
+  const brideName = couple.bride?.name || "Capt (Dr) Priya Singh";
+  const groomName = couple.groom?.name || "Dr Saurabh Singh";
+  const dates = wedding.dates || ["2026-01-22", "2026-01-23"];
   const venue = wedding.venue || {};
-  const venueName = venue.name || 'Royal Lotus View Resotel';
-  const venueCity = venue.city || 'Bengaluru';
+  const venueName = venue.name || "Royal Lotus View Resotel";
+  const venueCity = venue.city || "Bengaluru";
 
   // Get custom translations - handle nested paths
   const getTranslation = (key) => {
     let customValue = null;
     if (config?.customTranslations) {
-      const keys = key.split('.');
+      const keys = key.split(".");
       let current = config.customTranslations;
       for (const k of keys) {
-        if (current && typeof current === 'object' && k in current) {
+        if (current && typeof current === "object" && k in current) {
           current = current[k];
         } else {
           current = null;
@@ -34,41 +34,53 @@ function RSVP({ onRSVPClick, translations, currentLang, config = {} }) {
       }
       customValue = current || null;
     }
-    return customValue || translations[key] || '';
+    return customValue || translations[key] || "";
   };
-  
+
   const formatDates = (dates) => {
     if (dates.length === 1) {
-      return new Date(dates[0]).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+      return new Date(dates[0]).toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
     }
-    return dates.map(d => new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'long' })).join(' and ') + ' ' + new Date(dates[0]).getFullYear();
+    return (
+      dates
+        .map((d) => new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "long" }))
+        .join(" and ") +
+      " " +
+      new Date(dates[0]).getFullYear()
+    );
   };
-  
+
   const handleWhatsAppShare = (e) => {
     e.preventDefault();
     const pageUrl = window.location.href;
     const formattedDates = formatDates(dates);
     const defaultMessage = `You are warmly invited to the wedding of ${brideName} and ${groomName} on ${formattedDates} at ${venueName}, ${venueCity}.\n\nPlease tap the link to view the full invitation:\n`;
     const message = encodeURIComponent(
-      (getTranslation('rsvp.whatsapp_share') || defaultMessage) + pageUrl
+      (getTranslation("rsvp.whatsapp_share") || defaultMessage) + pageUrl
     );
-    window.open(`https://wa.me/?text=${message}`, '_blank');
+    window.open(`https://wa.me/?text=${message}`, "_blank");
   };
 
   return (
     <section id="rsvp">
       <div className="section-header">
-        <div className="section-eyebrow">{getTranslation('rsvp.eyebrow') || 'RSVP'}</div>
-        <div className="section-title">{getTranslation('rsvp.title') || 'With Warm Regards'}</div>
+        <div className="section-eyebrow">{getTranslation("rsvp.eyebrow") || "RSVP"}</div>
+        <div className="section-title">{getTranslation("rsvp.title") || "With Warm Regards"}</div>
         <div className="section-subtitle">
-          {getTranslation('rsvp.subtitle') || 'Kindly confirm your presence and feel free to reach out for any assistance.'}
+          {getTranslation("rsvp.subtitle") ||
+            "Kindly confirm your presence and feel free to reach out for any assistance."}
         </div>
       </div>
 
       <div className="card">
         <div className="card-inner">
           <p className="rsvp-text">
-            {getTranslation('rsvp.text') || 'On behalf of both families, you may contact the following for confirmations, travel details, or any other queries:'}
+            {getTranslation("rsvp.text") ||
+              "On behalf of both families, you may contact the following for confirmations, travel details, or any other queries:"}
           </p>
 
           <div className="rsvp-grid">
@@ -80,9 +92,17 @@ function RSVP({ onRSVPClick, translations, currentLang, config = {} }) {
             ))}
           </div>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center', marginBottom: '8px' }}>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "10px",
+              alignItems: "center",
+              marginBottom: "8px",
+            }}
+          >
             <button className="btn btn-primary" id="rsvpButton" onClick={onRSVPClick}>
-              {getTranslation('hero.actions.rsvp') || 'RSVP Now'}
+              {getTranslation("hero.actions.rsvp") || "RSVP Now"}
               <span className="btn-icon">✓</span>
             </button>
             <a
@@ -92,10 +112,11 @@ function RSVP({ onRSVPClick, translations, currentLang, config = {} }) {
               target="_blank"
               rel="noopener noreferrer"
             >
-              {getTranslation('rsvp.share.button') || 'Share Invitation on WhatsApp'}
+              {getTranslation("rsvp.share.button") || "Share Invitation on WhatsApp"}
             </a>
             <p className="small-note">
-              {getTranslation('rsvp.share.note') || 'You may share this link with friends and family whom you wish to invite.'}
+              {getTranslation("rsvp.share.note") ||
+                "You may share this link with friends and family whom you wish to invite."}
             </p>
           </div>
         </div>
@@ -105,4 +126,3 @@ function RSVP({ onRSVPClick, translations, currentLang, config = {} }) {
 }
 
 export default RSVP;
-

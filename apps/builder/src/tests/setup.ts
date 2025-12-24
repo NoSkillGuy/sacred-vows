@@ -1,6 +1,6 @@
-import '@testing-library/jest-dom';
-import { beforeAll, afterEach, afterAll, vi } from 'vitest';
-import { server } from './mocks/server';
+import "@testing-library/jest-dom";
+import { beforeAll, afterEach, afterAll, vi } from "vitest";
+import { server } from "./mocks/server";
 
 // Mock localStorage for jsdom environment
 const localStorageMock = (() => {
@@ -19,7 +19,7 @@ const localStorageMock = (() => {
   };
 })();
 
-Object.defineProperty(window, 'localStorage', {
+Object.defineProperty(window, "localStorage", {
   value: localStorageMock,
   writable: true,
 });
@@ -36,7 +36,7 @@ global.IntersectionObserver = class IntersectionObserver {
 } as any;
 
 // Mock window.matchMedia for components that use media queries
-Object.defineProperty(window, 'matchMedia', {
+Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: vi.fn().mockImplementation((query: string) => ({
     matches: false,
@@ -52,7 +52,7 @@ Object.defineProperty(window, 'matchMedia', {
 
 // Establish API mocking before all tests
 beforeAll(() => {
-  server.listen({ onUnhandledRequest: 'error' });
+  server.listen({ onUnhandledRequest: "error" });
 });
 
 // Reset any request handlers that are declared as a part of our tests
@@ -67,4 +67,3 @@ afterEach(() => {
 afterAll(() => {
   server.close();
 });
-

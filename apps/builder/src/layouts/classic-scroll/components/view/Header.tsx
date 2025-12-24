@@ -1,18 +1,18 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from "react";
 
 function Header({ onLanguageClick, translations, currentLang, config = {} }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef(null);
-  
+
   // Get config values with fallbacks
   const branding = config.branding || {};
   const music = config.music || {};
-  const monogram = branding.monogram || '';
+  const monogram = branding.monogram || "";
   const logo = branding.logo;
-  const title = branding.title || '';
-  const subtitle = branding.subtitle || '';
+  const title = branding.title || "";
+  const subtitle = branding.subtitle || "";
   const musicFile = music.file;
-  const musicVolume = typeof music.volume === 'number' ? music.volume : 0.5;
+  const musicVolume = typeof music.volume === "number" ? music.volume : 0.5;
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -21,8 +21,8 @@ function Header({ onLanguageClick, translations, currentLang, config = {} }) {
     const handlePlay = () => setIsPlaying(true);
     const handlePause = () => setIsPlaying(false);
 
-    audio.addEventListener('play', handlePlay);
-    audio.addEventListener('pause', handlePause);
+    audio.addEventListener("play", handlePlay);
+    audio.addEventListener("pause", handlePause);
 
     // Try autoplay
     audio.volume = musicVolume;
@@ -34,8 +34,8 @@ function Header({ onLanguageClick, translations, currentLang, config = {} }) {
     }
 
     return () => {
-      audio.removeEventListener('play', handlePlay);
-      audio.removeEventListener('pause', handlePause);
+      audio.removeEventListener("play", handlePlay);
+      audio.removeEventListener("pause", handlePause);
     };
   }, [musicVolume]);
 
@@ -55,11 +55,7 @@ function Header({ onLanguageClick, translations, currentLang, config = {} }) {
       <div className="nav-inner">
         <div className="brand">
           <div className="brand-monogram">
-            {logo ? (
-              <img src={logo} alt={monogram || 'Monogram'} />
-            ) : (
-              monogram
-            )}
+            {logo ? <img src={logo} alt={monogram || "Monogram"} /> : monogram}
           </div>
           <div className="brand-text">
             <div className="brand-title">{title}</div>
@@ -68,15 +64,15 @@ function Header({ onLanguageClick, translations, currentLang, config = {} }) {
         </div>
 
         <nav className="nav-links">
-          <a href="#top">{translations['nav.home'] || 'Home'}</a>
-          <a href="#couple">{translations['nav.couple'] || 'Couple'}</a>
-          <a href="#gallery">{translations['nav.photos'] || 'Photos'}</a>
-          <a href="#events">{translations['nav.program'] || 'Program'}</a>
-          <a href="#venue">{translations['nav.venue'] || 'Venue'}</a>
-          <a href="#rsvp">{translations['nav.rsvp'] || 'RSVP'}</a>
+          <a href="#top">{translations["nav.home"] || "Home"}</a>
+          <a href="#couple">{translations["nav.couple"] || "Couple"}</a>
+          <a href="#gallery">{translations["nav.photos"] || "Photos"}</a>
+          <a href="#events">{translations["nav.program"] || "Program"}</a>
+          <a href="#venue">{translations["nav.venue"] || "Venue"}</a>
+          <a href="#rsvp">{translations["nav.rsvp"] || "RSVP"}</a>
         </nav>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <button
             className="language-switcher"
             id="languageSwitcher"
@@ -87,8 +83,12 @@ function Header({ onLanguageClick, translations, currentLang, config = {} }) {
             🌐
           </button>
           <div className="music-toggle" id="musicToggle" onClick={toggleMusic}>
-            <div className={`music-dot ${isPlaying ? 'on' : ''}`} id="musicDot"></div>
-            <span>{isPlaying ? (translations['music.pause'] || 'Pause Music') : (translations['music.play'] || 'Play Music')}</span>
+            <div className={`music-dot ${isPlaying ? "on" : ""}`} id="musicDot"></div>
+            <span>
+              {isPlaying
+                ? translations["music.pause"] || "Pause Music"
+                : translations["music.play"] || "Play Music"}
+            </span>
           </div>
         </div>
       </div>
@@ -102,4 +102,3 @@ function Header({ onLanguageClick, translations, currentLang, config = {} }) {
 }
 
 export default Header;
-

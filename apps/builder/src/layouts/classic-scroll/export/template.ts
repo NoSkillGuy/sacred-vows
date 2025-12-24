@@ -1,11 +1,11 @@
 /**
  * Classic Scroll Layout Export Template
- * 
+ *
  * Generates HTML for exporting the classic-scroll layout invitation.
  * This ensures the exported invitation matches exactly what was built in the builder.
  */
 
-import type { InvitationData } from '@shared/types/wedding-data';
+import type { InvitationData } from "@shared/types/wedding-data";
 
 /**
  * Generate complete HTML for the invitation export
@@ -23,29 +23,29 @@ export async function generateHTML(
   const groom = couple.groom || {};
   const wedding = data?.wedding || {};
   const venue = wedding?.venue || {};
-  
-  const brideName = bride.name || 'Bride';
-  const groomName = groom.name || 'Groom';
-  const weddingDate = wedding.dates?.join(' & ') || 'Date TBD';
-  const venueName = venue.name || 'Venue TBD';
-  const venueAddress = venue.address || 'Address TBD';
+
+  const brideName = bride.name || "Bride";
+  const groomName = groom.name || "Groom";
+  const weddingDate = wedding.dates?.join(" & ") || "Date TBD";
+  const venueName = venue.name || "Venue TBD";
+  const venueAddress = venue.address || "Address TBD";
   const theme = layoutConfig?.theme || data?.theme || {};
   const colors = theme.colors || {};
 
   // Generate inline styles based on theme
   const themeStyles = `
     :root {
-      --bg-page: ${colors.background?.page || colors.background || '#fff8f0'};
-      --bg-card: ${colors.background?.card || colors.background?.section || '#fff7ee'};
-      --border-gold: ${colors.primary || '#d4af37'};
-      --accent-gold: ${colors.primary || '#d4af37'};
-      --accent-rose: ${colors.accent || '#c27d88'};
-      --text-main: ${colors.text?.primary || colors.text || '#2f2933'};
-      --text-muted: ${colors.text?.muted || colors.text || '#6c5b5b'};
-      --button-primary: ${colors.primary || '#7c2831'};
-      --font-heading: ${theme.fonts?.heading || 'Playfair Display'};
-      --font-body: ${theme.fonts?.body || 'Poppins'};
-      --font-script: ${theme.fonts?.script || 'Great Vibes'};
+      --bg-page: ${colors.background?.page || colors.background || "#fff8f0"};
+      --bg-card: ${colors.background?.card || colors.background?.section || "#fff7ee"};
+      --border-gold: ${colors.primary || "#d4af37"};
+      --accent-gold: ${colors.primary || "#d4af37"};
+      --accent-rose: ${colors.accent || "#c27d88"};
+      --text-main: ${colors.text?.primary || colors.text || "#2f2933"};
+      --text-muted: ${colors.text?.muted || colors.text || "#6c5b5b"};
+      --button-primary: ${colors.primary || "#7c2831"};
+      --font-heading: ${theme.fonts?.heading || "Playfair Display"};
+      --font-body: ${theme.fonts?.body || "Poppins"};
+      --font-script: ${theme.fonts?.script || "Great Vibes"};
     }
   `;
 
@@ -55,9 +55,9 @@ export async function generateHTML(
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Wedding invitation for ${brideName} & ${groomName}" />
-  
+
   <!-- PWA Meta Tags -->
-  <meta name="theme-color" content="${colors.primary || '#d4af37'}" />
+  <meta name="theme-color" content="${colors.primary || "#d4af37"}" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="${brideName} & ${groomName} Wedding" />
@@ -65,10 +65,10 @@ export async function generateHTML(
 
   <!-- Manifest -->
   <link rel="manifest" href="./manifest.json" />
-  
+
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Poppins:wght@300;400;500;600&family=Great+Vibes&display=swap" rel="stylesheet" />
-  
+
   <title>${brideName} & ${groomName} - Wedding Invitation</title>
   <link rel="stylesheet" href="styles.css" />
   <style>${themeStyles}</style>
@@ -92,11 +92,10 @@ export async function generateHTML(
       </p>
     </div>
   </div>
-  
+
   <script src="app.js"></script>
 </body>
 </html>`;
 }
 
 export default generateHTML;
-

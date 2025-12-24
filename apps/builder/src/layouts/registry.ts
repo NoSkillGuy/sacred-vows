@@ -1,17 +1,17 @@
 /**
  * Layout Registry System
- * 
+ *
  * Central registry for managing layout definitions, components, styles, and export templates.
  * Each layout must register itself with this registry to be available in the builder.
- * 
+ *
  * Architecture:
  * - Layouts are self-contained with their own components, styles, and export logic
  * - Registry provides a unified API for accessing layout resources
  * - Supports dynamic layout loading and validation
  */
 
-import type { LayoutManifest } from '@shared/types/layout';
-import type { ComponentType } from 'react';
+import type { LayoutManifest } from "@shared/types/layout";
+import type { ComponentType } from "react";
 
 // Registry storage
 const layouts = new Map<string, RegisteredLayout>();
@@ -85,41 +85,41 @@ export interface RegistryStats {
 export function registerLayout(layout: LayoutRegistration): LayoutRegistration {
   // Validate layout structure
   if (!layout.id) {
-    throw new Error('Layout must have an id');
+    throw new Error("Layout must have an id");
   }
-  
+
   if (layouts.has(layout.id)) {
     console.warn(`Layout '${layout.id}' is already registered. Overwriting.`);
   }
-  
+
   if (!layout.name) {
     throw new Error(`Layout '${layout.id}' must have a name`);
   }
-  
+
   if (!layout.version) {
     throw new Error(`Layout '${layout.id}' must have a version`);
   }
-  
+
   if (!layout.components || !layout.components.view || !layout.components.editable) {
     throw new Error(`Layout '${layout.id}' must provide view and editable components`);
   }
-  
+
   if (!layout.export || !layout.export.generateHTML) {
     throw new Error(`Layout '${layout.id}' must provide export.generateHTML function`);
   }
-  
+
   if (!layout.manifest) {
     throw new Error(`Layout '${layout.id}' must provide a manifest`);
   }
-  
+
   // Register the layout
   layouts.set(layout.id, {
     ...layout,
     registeredAt: new Date().toISOString(),
   });
-  
+
   console.log(`✓ Registered layout: ${layout.id} (v${layout.version})`);
-  
+
   return layout;
 }
 
@@ -214,11 +214,12 @@ export function getSharedComponents(layoutId: string): Record<string, ComponentT
  * @param editMode - Whether in edit mode
  * @returns Component mappings by section ID
  */
-export function getComponentRegistry(layoutId: string, editMode = false): Record<string, ComponentType<any>> {
-  const components = editMode 
-    ? getEditableComponents(layoutId) 
-    : getViewComponents(layoutId);
-  
+export function getComponentRegistry(
+  layoutId: string,
+  editMode = false
+): Record<string, ComponentType<any>> {
+  const components = editMode ? getEditableComponents(layoutId) : getViewComponents(layoutId);
+
   return components;
 }
 
@@ -273,7 +274,7 @@ export function applyLayoutStyles(layoutId: string): void {
   if (!layout) {
     throw new Error(`Layout '${layoutId}' not found in registry`);
   }
-  if (layout.styles && typeof layout.styles === 'function') {
+  if (layout.styles && typeof layout.styles === "function") {
     layout.styles();
   }
 }
@@ -293,7 +294,7 @@ export function getRegistryStats(): RegistryStats {
   return {
     totalLayouts: layouts.size,
     layoutIds: getLayoutIds(),
-    layouts: getAllLayouts().map(l => ({
+    layouts: getAllLayouts().map((l) => ({
       id: l.id,
       name: l.name,
       version: l.version,
@@ -313,11 +314,10 @@ declare global {
   }
 }
 
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.__layoutRegistry = {
     getStats: getRegistryStats,
     getLayout,
     getAllLayouts,
   };
 }
-

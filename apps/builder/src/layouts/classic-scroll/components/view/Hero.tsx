@@ -1,26 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 function Hero({ onRSVPClick, translations, currentLang, config = {} }) {
-  const [countdown, setCountdown] = useState('');
-  
+  const [countdown, setCountdown] = useState("");
+
   // Read values directly from config without layout defaults
   const wedding = config?.wedding || {};
   const countdownTarget = wedding?.countdownTarget;
   const heroImage = config?.hero?.mainImage;
   const couple = config?.couple || {};
-  const brideName = couple?.bride?.name || '';
-  const groomName = couple?.groom?.name || '';
-  
+  const brideName = couple?.bride?.name || "";
+  const groomName = couple?.groom?.name || "";
+
   // Get custom translations from config - read directly to ensure freshness
   // Handle nested paths like 'hero.eyebrow' -> customTranslations.hero.eyebrow
   const getTranslation = (key) => {
     // Check custom translations first - handle nested paths
     let customValue = null;
     if (config?.customTranslations) {
-      const keys = key.split('.');
+      const keys = key.split(".");
       let current = config.customTranslations;
       for (const k of keys) {
-        if (current && typeof current === 'object' && k in current) {
+        if (current && typeof current === "object" && k in current) {
           current = current[k];
         } else {
           current = null;
@@ -29,21 +29,21 @@ function Hero({ onRSVPClick, translations, currentLang, config = {} }) {
       }
       customValue = current || null;
     }
-    
+
     // Fall back to default translations
-    const defaultValue = translations[key] || '';
+    const defaultValue = translations[key] || "";
     return customValue || defaultValue;
   };
 
   useEffect(() => {
     if (!countdownTarget) {
-      setCountdown('');
+      setCountdown("");
       return;
     }
 
     const target = new Date(countdownTarget);
     if (Number.isNaN(target.getTime())) {
-      setCountdown('');
+      setCountdown("");
       return;
     }
 
@@ -52,7 +52,7 @@ function Hero({ onRSVPClick, translations, currentLang, config = {} }) {
       const diff = target - now;
 
       if (diff <= 0) {
-        setCountdown(translations['countdown.today'] || '');
+        setCountdown(translations["countdown.today"] || "");
         return;
       }
 
@@ -70,33 +70,32 @@ function Hero({ onRSVPClick, translations, currentLang, config = {} }) {
     return () => clearInterval(interval);
   }, [translations, countdownTarget]);
 
-  const namesText = getTranslation('hero.names') || (brideName || groomName ? `${brideName} & ${groomName}` : '');
-  const heroNames = namesText ? namesText.replace('&', '<span class="hero-amp">&amp;</span>') : '';
+  const namesText =
+    getTranslation("hero.names") || (brideName || groomName ? `${brideName} & ${groomName}` : "");
+  const heroNames = namesText ? namesText.replace("&", '<span class="hero-amp">&amp;</span>') : "";
 
   return (
     <section className="hero" id="top">
       <div className="hero-inner">
         <div>
-          <div className="hero-eyebrow">{getTranslation('hero.eyebrow')}</div>
-          <div className="hero-script">{getTranslation('hero.script')}</div>
+          <div className="hero-eyebrow">{getTranslation("hero.eyebrow")}</div>
+          <div className="hero-script">{getTranslation("hero.script")}</div>
 
           <div className="hero-names" dangerouslySetInnerHTML={{ __html: heroNames }} />
 
-          <div className="hero-sub">
-            {getTranslation('hero.sub')}
-          </div>
+          <div className="hero-sub">{getTranslation("hero.sub")}</div>
 
           <div className="hero-date">
-            {getTranslation('hero.date') || wedding.dates?.join(' & ')}
+            {getTranslation("hero.date") || wedding.dates?.join(" & ")}
           </div>
           <div className="hero-location">
-            {getTranslation('hero.location') || wedding.venue?.fullAddress}
+            {getTranslation("hero.location") || wedding.venue?.fullAddress}
           </div>
 
           <div className="hero-divider"></div>
 
           <div className="hero-countdown">
-            <div className="hero-count-label">{getTranslation('hero.countdown')}</div>
+            <div className="hero-count-label">{getTranslation("hero.countdown")}</div>
             <div className="hero-countdown-values" id="countdown">
               {countdown}
             </div>
@@ -104,14 +103,14 @@ function Hero({ onRSVPClick, translations, currentLang, config = {} }) {
 
           <div className="hero-actions">
             <a href="#events" className="btn btn-primary">
-              {getTranslation('hero.actions.program') || 'View Program Details'}
+              {getTranslation("hero.actions.program") || "View Program Details"}
               <span className="btn-icon">↧</span>
             </a>
             <a href="#venue" className="btn btn-ghost">
-              {getTranslation('hero.actions.venue') || 'View Venue & Directions'}
+              {getTranslation("hero.actions.venue") || "View Venue & Directions"}
             </a>
             <button className="btn btn-primary" id="rsvpButtonHeader" onClick={onRSVPClick}>
-              {getTranslation('hero.actions.rsvp') || 'RSVP Now'}
+              {getTranslation("hero.actions.rsvp") || "RSVP Now"}
               <span className="btn-icon">✓</span>
             </button>
           </div>
@@ -125,7 +124,10 @@ function Hero({ onRSVPClick, translations, currentLang, config = {} }) {
               ) : null}
             </div>
           </div>
-          <div className="hero-photo-caption" dangerouslySetInnerHTML={{ __html: getTranslation('hero.caption') || '' }} />
+          <div
+            className="hero-photo-caption"
+            dangerouslySetInnerHTML={{ __html: getTranslation("hero.caption") || "" }}
+          />
         </aside>
       </div>
     </section>
@@ -133,4 +135,3 @@ function Hero({ onRSVPClick, translations, currentLang, config = {} }) {
 }
 
 export default Hero;
-

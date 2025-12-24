@@ -1,5 +1,5 @@
-import { useState, ReactElement, MouseEvent } from 'react';
-import './ImageGallery.css';
+import { useState, ReactElement, MouseEvent } from "react";
+import "./ImageGallery.css";
 
 interface Image {
   src?: string;
@@ -35,14 +35,14 @@ function ImageGallery({ images = [], onSelect, onRemove }: ImageGalleryProps): R
           {images.map((image, index) => (
             <div
               key={index}
-              className={`gallery-item ${selectedIndex === index ? 'selected' : ''}`}
+              className={`gallery-item ${selectedIndex === index ? "selected" : ""}`}
               onClick={() => handleSelect(image, index)}
             >
               <img
                 src={image.src || image.url}
                 alt={image.alt || `Image ${index + 1}`}
                 onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
+                  (e.target as HTMLImageElement).style.display = "none";
                 }}
               />
               {onRemove && (
@@ -66,4 +66,3 @@ function ImageGallery({ images = [], onSelect, onRemove }: ImageGalleryProps): R
 }
 
 export default ImageGallery;
-

@@ -3,10 +3,10 @@ function Footer({ translations, currentLang, config = {} }) {
   const getTranslation = (key) => {
     let customValue = null;
     if (config?.customTranslations) {
-      const keys = key.split('.');
+      const keys = key.split(".");
       let current = config.customTranslations;
       for (const k of keys) {
-        if (current && typeof current === 'object' && k in current) {
+        if (current && typeof current === "object" && k in current) {
           current = current[k];
         } else {
           current = null;
@@ -15,22 +15,27 @@ function Footer({ translations, currentLang, config = {} }) {
       }
       customValue = current || null;
     }
-    return customValue || translations[key] || '';
+    return customValue || translations[key] || "";
   };
 
   return (
     <footer className="site-footer">
-      <div className="footer-main">{getTranslation('footer.compliments') || 'With Best Compliments'}</div>
-      <div className="footer-line">{getTranslation('footer.families') || 'From the families of Capt (Dr) Priya Singh & Dr Saurabh Singh'}</div>
+      <div className="footer-main">
+        {getTranslation("footer.compliments") || "With Best Compliments"}
+      </div>
+      <div className="footer-line">
+        {getTranslation("footer.families") ||
+          "From the families of Capt (Dr) Priya Singh & Dr Saurabh Singh"}
+      </div>
       <div className="footer-flowers">
-        {getTranslation('footer.flowers') || 'Awaiting eyes • Blooming hearts • Cherished invitations, timeless blessings'}
+        {getTranslation("footer.flowers") ||
+          "Awaiting eyes • Blooming hearts • Cherished invitations, timeless blessings"}
       </div>
       <div className="footer-mini">
-        {getTranslation('footer.waiting') || 'We look forward to celebrating with you'}
+        {getTranslation("footer.waiting") || "We look forward to celebrating with you"}
       </div>
     </footer>
   );
 }
 
 export default Footer;
-

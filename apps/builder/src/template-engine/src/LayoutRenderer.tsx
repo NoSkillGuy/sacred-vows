@@ -1,12 +1,12 @@
-import React from 'react';
-import { loadLayout, mergeLayoutData } from './loadLayout';
-import { applyThemeToDocument, mergeBrandThemes } from '../../shared/src/theme/applyTheme';
+import React from "react";
+import { loadLayout, mergeLayoutData } from "./loadLayout";
+import { applyThemeToDocument, mergeBrandThemes } from "../../shared/src/theme/applyTheme";
 
-const DEFAULT_LAYOUT_ID = 'classic-scroll';
+const DEFAULT_LAYOUT_ID = "classic-scroll";
 
 function mergeSections(baseSections = [], overrides = []) {
   const sectionMap = new Map(
-    baseSections.map((section) => [section.id, { enabled: true, ...section }]),
+    baseSections.map((section) => [section.id, { enabled: true, ...section }])
   );
 
   overrides.forEach((override) => {
@@ -38,17 +38,18 @@ function resolveTheme(layoutTheme = {}, manifest = {}, userTheme = {}) {
   const merged = mergeBrandThemes(manifestDefault, layoutTheme, userTheme);
   return {
     ...merged,
-    preset: userTheme?.preset || layoutTheme?.preset || manifestDefault.id || merged.preset || 'custom',
+    preset:
+      userTheme?.preset || layoutTheme?.preset || manifestDefault.id || merged.preset || "custom",
   };
 }
 
 function getSectionProps(sectionId, commonProps) {
   switch (sectionId) {
-    case 'header':
+    case "header":
       return { ...commonProps, onLanguageClick: commonProps.onLanguageClick };
-    case 'hero':
+    case "hero":
       return { ...commonProps, onRSVPClick: commonProps.onRSVPClick };
-    case 'rsvp':
+    case "rsvp":
       return { ...commonProps, onRSVPClick: commonProps.onRSVPClick };
     default:
       return commonProps;
@@ -59,7 +60,14 @@ function getSectionProps(sectionId, commonProps) {
  * Layout Renderer Component
  * Renders a layout with provided data
  */
-export function LayoutRenderer({ layoutId, userData, translations, currentLang, onRSVPClick, onLanguageClick }) {
+export function LayoutRenderer({
+  layoutId,
+  userData,
+  translations,
+  currentLang,
+  onRSVPClick,
+  onLanguageClick,
+}) {
   const [mergedConfig, setMergedConfig] = React.useState(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
@@ -72,23 +80,23 @@ export function LayoutRenderer({ layoutId, userData, translations, currentLang, 
         const definition = await loadLayout(layoutToLoad);
 
         // Universal content base (sample data for now)
-        const { defaultWeddingConfig } = await import('../../../src/config/wedding-config');
+        const { defaultWeddingConfig } = await import("../../../src/config/wedding-config");
         const contentConfig = mergeLayoutData(defaultWeddingConfig, userData || {});
 
         // Section ordering and theme resolution
         const userLayoutConfig = userData?.layoutConfig || {};
         const combinedSections = mergeSections(
           definition.config?.sections || [],
-          userLayoutConfig.sections || [],
+          userLayoutConfig.sections || []
         );
         const orderedSections = orderSections(
           combinedSections,
-          definition.manifest?.defaultSectionOrder || [],
+          definition.manifest?.defaultSectionOrder || []
         );
         const theme = resolveTheme(
           definition.config?.theme || {},
           definition.manifest || {},
-          userLayoutConfig.theme || {},
+          userLayoutConfig.theme || {}
         );
 
         const merged = {
@@ -107,7 +115,7 @@ export function LayoutRenderer({ layoutId, userData, translations, currentLang, 
         setMergedConfig(merged);
         setError(null);
       } catch (err) {
-        console.error('Error loading layout:', err);
+        console.error("Error loading layout:", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -136,21 +144,23 @@ export function LayoutRenderer({ layoutId, userData, translations, currentLang, 
   }
 
   // Dynamically import layout components
-  const LayoutComponents = React.lazy(() => 
-    import('../../../src/components').then(components => ({
+  const LayoutComponents = React.lazy(() =>
+    import("../../../src/components").then((components) => ({
       default: () => (
         <main className="page-shell">
           {(() => {
             const registry = {
-              header: components.Header || require('../../../src/components/Header').default,
-              hero: components.Hero || require('../../../src/components/Hero').default,
-              couple: components.Couple || require('../../../src/components/Couple').default,
-              'fathers-letter': components.FathersLetter || require('../../../src/components/FathersLetter').default,
-              gallery: components.Gallery || require('../../../src/components/Gallery').default,
-              events: components.Events || require('../../../src/components/Events').default,
-              venue: components.Venue || require('../../../src/components/Venue').default,
-              rsvp: components.RSVP || require('../../../src/components/RSVP').default,
-              footer: components.Footer || require('../../../src/components/Footer').default,
+              header: components.Header || require("../../../src/components/Header").default,
+              hero: components.Hero || require("../../../src/components/Hero").default,
+              couple: components.Couple || require("../../../src/components/Couple").default,
+              "fathers-letter":
+                components.FathersLetter ||
+                require("../../../src/components/FathersLetter").default,
+              gallery: components.Gallery || require("../../../src/components/Gallery").default,
+              events: components.Events || require("../../../src/components/Events").default,
+              venue: components.Venue || require("../../../src/components/Venue").default,
+              rsvp: components.RSVP || require("../../../src/components/RSVP").default,
+              footer: components.Footer || require("../../../src/components/Footer").default,
             };
 
             const commonProps = {
@@ -173,12 +183,7 @@ export function LayoutRenderer({ layoutId, userData, translations, currentLang, 
 
               const sectionProps = getSectionProps(section.id, commonProps);
 
-              return (
-                <SectionComponent
-                  key={section.id}
-                  {...sectionProps}
-                />
-              );
+              return <SectionComponent key={section.id} {...sectionProps} />;
             });
           })()}
         </main>
@@ -194,5 +199,3 @@ export function LayoutRenderer({ layoutId, userData, translations, currentLang, 
 }
 
 export default LayoutRenderer;
-
-

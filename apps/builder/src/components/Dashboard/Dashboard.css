@@ -10,7 +10,12 @@
 .dashboard-page,
 .layout-gallery-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, var(--blush-light) 0%, var(--cream) 50%, var(--champagne) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--blush-light) 0%,
+    var(--cream) 50%,
+    var(--champagne) 100%
+  );
   position: relative;
   overflow-x: hidden;
 }
@@ -18,13 +23,13 @@
 /* Animated background decorations */
 .dashboard-page::before,
 .layout-gallery-page::before {
-  content: '';
+  content: "";
   position: fixed;
   top: -50%;
   left: -50%;
   width: 200%;
   height: 200%;
-  background: 
+  background:
     radial-gradient(circle at 20% 30%, rgba(232, 180, 184, 0.1) 0%, transparent 40%),
     radial-gradient(circle at 80% 70%, rgba(212, 175, 55, 0.08) 0%, transparent 40%);
   animation: gradientDrift 20s ease-in-out infinite;
@@ -33,8 +38,13 @@
 }
 
 @keyframes gradientDrift {
-  0%, 100% { transform: translate(0, 0) rotate(0deg); }
-  50% { transform: translate(2%, 2%) rotate(1deg); }
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: translate(2%, 2%) rotate(1deg);
+  }
 }
 
 /* Page container */
@@ -93,7 +103,7 @@
 }
 
 .header-logo-text {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.5rem;
   font-weight: 600;
   background: linear-gradient(135deg, var(--burgundy) 0%, var(--rose-dark) 100%);
@@ -107,7 +117,7 @@
 }
 
 .header-welcome h1 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 2rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -150,7 +160,7 @@
 
 .btn-ghost {
   background: transparent;
-  border: 1px dashed rgba(0,0,0,0.15);
+  border: 1px dashed rgba(0, 0, 0, 0.15);
   color: var(--text-dark);
   padding: 0.85rem 1.1rem;
   border-radius: 12px;
@@ -283,7 +293,7 @@
 }
 
 .gallery-intro h2 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 2.25rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -480,7 +490,7 @@
 }
 
 .layout-name {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.35rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -625,7 +635,7 @@
 }
 
 .section-header h2 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -703,7 +713,7 @@
 }
 
 .invitation-couple {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -845,7 +855,7 @@
 }
 
 .create-new-text {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -894,7 +904,7 @@
 
 .dashboard-empty h3,
 .gallery-empty h3 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.75rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -933,7 +943,7 @@
 }
 
 .gallery-error h3 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.75rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -967,7 +977,7 @@
 }
 
 .page-loading-spinner::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   border: 3px solid var(--builder-border);
@@ -987,8 +997,15 @@
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 0.7; }
-  50% { transform: scale(1.1); opacity: 1; }
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
 }
 
 .page-loading p {
@@ -1005,7 +1022,7 @@
   .gallery-container {
     padding: 1.5rem;
   }
-  
+
   .layout-grid {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.5rem;
@@ -1017,27 +1034,27 @@
   .gallery-container {
     padding: 1rem;
   }
-  
+
   .dashboard-header,
   .gallery-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
-  
+
   .header-welcome h1 {
     font-size: 1.5rem;
   }
-  
+
   .header-actions {
     width: 100%;
     justify-content: space-between;
   }
-  
+
   .gallery-intro h2 {
     font-size: 1.75rem;
   }
-  
+
   .category-tabs {
     justify-content: flex-start;
     overflow-x: auto;
@@ -1046,36 +1063,36 @@
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
-  
+
   .category-tabs::-webkit-scrollbar {
     display: none;
   }
-  
+
   .category-tab {
     flex-shrink: 0;
     padding: 0.5rem 1rem;
     font-size: 0.8rem;
   }
-  
+
   .layout-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .invitations-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .layout-grid {
     grid-template-columns: 1fr;
     max-width: 380px;
     margin: 0 auto;
     gap: 1.5rem;
   }
-  
+
   .dashboard-stats {
     grid-template-columns: 1fr;
   }
-  
+
   .section-header {
     flex-direction: column;
     align-items: flex-start;
@@ -1087,17 +1104,17 @@
   .layout-actions {
     flex-direction: column;
   }
-  
+
   .invitation-actions {
     flex-direction: column;
   }
-  
+
   .layout-grid {
     grid-template-columns: 1fr;
     max-width: 100%;
     gap: 1.25rem;
   }
-  
+
   .user-dropdown {
     position: fixed;
     top: auto;
@@ -1107,9 +1124,8 @@
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     transform: translateY(100%);
   }
-  
+
   .user-dropdown.open {
     transform: translateY(0);
   }
 }
-

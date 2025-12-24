@@ -3,24 +3,24 @@
  * Handles fetching layouts and layout manifests
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery } from "@tanstack/react-query";
 import {
   getLayouts,
   getLayout,
   getLayoutManifest,
   getAllLayoutManifests,
   type LayoutOptions,
-} from '../../services/layoutService';
-import type { LayoutManifest } from '@shared/types/layout';
+} from "../../services/layoutService";
+import type { LayoutManifest } from "@shared/types/layout";
 
 // Query keys for consistent cache management
 export const layoutKeys = {
-  all: ['layouts'] as const,
-  lists: () => [...layoutKeys.all, 'list'] as const,
+  all: ["layouts"] as const,
+  lists: () => [...layoutKeys.all, "list"] as const,
   list: (options?: LayoutOptions) => [...layoutKeys.lists(), options] as const,
-  details: () => [...layoutKeys.all, 'detail'] as const,
+  details: () => [...layoutKeys.all, "detail"] as const,
   detail: (id: string) => [...layoutKeys.details(), id] as const,
-  manifests: () => [...layoutKeys.all, 'manifests'] as const,
+  manifests: () => [...layoutKeys.all, "manifests"] as const,
   manifest: (id: string) => [...layoutKeys.manifests(), id] as const,
 };
 
@@ -70,4 +70,3 @@ export function useLayoutManifestQuery(id: string | undefined, enabled: boolean 
     enabled: Boolean(id) && enabled,
   });
 }
-
