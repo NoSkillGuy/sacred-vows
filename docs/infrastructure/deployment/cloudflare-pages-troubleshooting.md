@@ -539,6 +539,6 @@ openssl s_client -connect api.dev.sacredvows.io:443 -servername api.dev.sacredvo
 ## Related Documentation
 
 - [Cloudflare Setup Guide](./cloudflare-setup.md)
-- [Cloudflare Terraform Setup](../infra/terraform/CLOUDFLARE_SETUP.md)
+- [Cloudflare Terraform Setup](../../infra/terraform/CLOUDFLARE_SETUP.md)
 - [Terraform Module README](../infra/terraform/modules/cloudflare-resources/README.md)
 

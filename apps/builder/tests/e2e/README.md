@@ -266,6 +266,6 @@ The test infrastructure is designed to work in CI environments:
 ## Additional Resources
 
 - [Playwright Documentation](https://playwright.dev/)
-- [Testing Strategy](../docs/testing-strategy.md)
-- [Local Development Setup](../../../docs/local-development.md)
+- [Testing Strategy](../../../docs/development/testing-strategy.md)
+- [Local Development Setup](../../../docs/getting-started/local-development.md)
 

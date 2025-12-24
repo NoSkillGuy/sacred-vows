@@ -1,6 +1,6 @@
-# Local Development with MinIO (Local R2)
+# Local Development
 
-This guide explains how to set up and use local R2 (MinIO) for development, making your local environment closer to production.
+This guide provides a complete setup for local development, including environment configuration, service setup, and development workflows.
 
 ## Overview
 
@@ -12,6 +12,8 @@ For local development, we use MinIO (an S3-compatible storage server) to simulat
 
 ## Prerequisites
 
+Before starting, ensure you have:
+- All [prerequisites](./prerequisites.md) installed
 - Docker and Docker Compose installed
 - MinIO Client (`mc`) - will be installed automatically by the init script, or install manually:
   - macOS: `brew install minio/stable/mc`
@@ -63,13 +65,59 @@ This script will:
 
 ### 3. Configure Environment Variables
 
-#### API Service (`apps/api-go/.env`)
+This project uses separate environment files for different deployment scenarios to avoid configuration conflicts.
 
-Add or update these variables:
+#### Environment Files Overview
+
+Each application uses:
+- **`.env.local`** - For running directly on your host machine (uses `localhost` addresses)
+- **`.env.docker`** - For running in Docker Compose (uses Docker service names)
+
+#### API Service Environment Setup
+
+**First time setup:** Create your environment files from the template:
+
+```bash
+cd apps/api-go
+cp env.example .env.local
+cp env.example .env.docker
+```
+
+**For Local Development (Running on Host):**
+
+1. Select the local environment file:
+   ```bash
+   cd apps/api-go
+   ./scripts/select-env.sh local
+   ```
+
+2. Edit `.env.local` with localhost addresses:
+   - `FIRESTORE_EMULATOR_HOST=localhost:8080`
+   - `S3_ENDPOINT=http://localhost:9000`
+   - `R2_ENDPOINT=http://localhost:9000`
+   - `OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317`
+   - `GCP_PROJECT_ID=test-project`
+   - Generate and set `JWT_SECRET` (minimum 32 characters)
+   - Add your API keys (Google OAuth, Mailjet, etc.)
+
+**For Docker Development:**
+
+Docker Compose automatically uses `.env.docker`. Edit `.env.docker` with Docker service names:
+- `FIRESTORE_EMULATOR_HOST=firestore-emulator:8080`
+- `S3_ENDPOINT=http://minio:9000`
+- `R2_ENDPOINT=http://minio:9000`
+- `OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4317`
+- `GCP_PROJECT_ID=test-project`
+- Generate and set `JWT_SECRET` (minimum 32 characters)
+- Add your API keys (Google OAuth, Mailjet, etc.)
+
+**Additional R2/MinIO Configuration:**
+
+Add or update these variables in your `.env.local` or `.env.docker`:
 
 ```bash
 # R2/MinIO configuration
-R2_ENDPOINT=http://minio:9000  # Use internal Docker network name
+R2_ENDPOINT=http://minio:9000  # Use internal Docker network name for Docker, localhost:9000 for host
 R2_ACCESS_KEY_ID=minioadmin
 R2_SECRET_ACCESS_KEY=minioadmin
 R2_BUCKET=sacred-vows-published-local
@@ -77,15 +125,35 @@ PUBLIC_ASSETS_R2_BUCKET=sacred-vows-public-assets-local
 PUBLIC_ASSETS_CDN_URL=http://localhost:9000/sacred-vows-public-assets-local
 ```
 
-**Note**: When running the API service outside Docker (directly with `go run`), use `http://localhost:9000` instead of `http://minio:9000`.
+For detailed API environment setup, see [API Environment Setup](../applications/api-go/env-setup.md).
 
-#### Builder App (`apps/builder/.env`)
+#### Builder App Environment Setup
 
-Add or update:
+**First time setup:** Create your environment files:
 
 ```bash
-VITE_PUBLIC_ASSETS_CDN_URL=http://localhost:9000/sacred-vows-public-assets-local
+cd apps/builder
+cp env.example .env.local
+cp env.example .env.docker
 ```
+
+**For Local Development:**
+
+Edit `.env.local`:
+- `VITE_API_URL=http://localhost:3000/api`
+- `VITE_PUBLIC_ASSETS_CDN_URL=http://localhost:9000/sacred-vows-public-assets-local`
+- `VITE_OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318`
+
+**For Docker Development:**
+
+Edit `.env.docker`:
+- `VITE_API_URL=http://api-go:3000/api` (Docker service name)
+- `VITE_PUBLIC_ASSETS_CDN_URL=http://localhost:9000/sacred-vows-public-assets-local` (browser access)
+- `VITE_OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4318` (Docker service name)
+
+**Note:** Vite automatically reads `.env.local` when you run `npm run dev`. No manual setup needed!
+
+For detailed Builder environment setup, see [Builder Environment Setup](../applications/builder/env-setup.md).
 
 ### 4. Update Configuration Files
 
@@ -427,7 +495,7 @@ docker-compose up -d tempo prometheus grafana
 
 ### Configuration
 
-Observability is enabled by default in local development. See [Telemetry Documentation](./telemetry.md) for:
+Observability is enabled by default in local development. See [Telemetry Documentation](../infrastructure/observability/telemetry.md) for:
 - Detailed configuration options
 - Request ID and trace correlation
 - How to disable observability

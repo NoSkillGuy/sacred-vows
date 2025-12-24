@@ -109,6 +109,6 @@ See `apps/edge-worker/README.md` for bindings and deploy steps.
 
 ## More detail
 
-For a detailed, end-to-end walkthrough of what happens during publish and during guest traffic, see `docs/publishing-process.md`.
+For a detailed, end-to-end walkthrough of what happens during publish and during guest traffic, see [Publishing Process](../architecture/publishing-process.md).
 
 

@@ -109,8 +109,8 @@ gcloud services enable \
 ### 3. Infrastructure
 
 The infrastructure should already be provisioned via Terraform. If not, see:
-- `infra/terraform/DEPLOYMENT.md` for GCP infrastructure setup
-- `infra/terraform/CLOUDFLARE_SETUP.md` for Cloudflare infrastructure setup
+- [Terraform Deployment Guide](../../infra/terraform/DEPLOYMENT.md) for GCP infrastructure setup
+- [Terraform Cloudflare Setup](../../infra/terraform/CLOUDFLARE_SETUP.md) for Cloudflare infrastructure setup
 
 ---
 
@@ -493,7 +493,7 @@ The workflow automatically purges Cloudflare's DNS cache after each deployment. 
    - Update the token in GitHub Secrets
 3. **Manual fix**: Toggle DNS proxy in Cloudflare Dashboard (disable then re-enable)
 
-**For detailed troubleshooting**, see `docs/cloudflare-pages-troubleshooting.md` → "Issue: Domain Stops Working After Deployment"
+**For detailed troubleshooting**, see [Cloudflare Pages Troubleshooting](./cloudflare-pages-troubleshooting.md) → "Issue: Domain Stops Working After Deployment"
 
 ### Debugging Steps
 
@@ -525,9 +525,9 @@ The workflow automatically purges Cloudflare's DNS cache after each deployment. 
 
 If issues persist:
 1. Check existing documentation:
-   - `infra/terraform/DEPLOYMENT.md` for GCP setup
-   - `docs/cloudflare-setup.md` for Cloudflare setup
-   - `docs/cloudflare-pages-troubleshooting.md` for Pages issues
+   - [Terraform Deployment Guide](../../infra/terraform/DEPLOYMENT.md) for GCP setup
+   - [Cloudflare Setup](./cloudflare-setup.md) for Cloudflare setup
+   - [Cloudflare Pages Troubleshooting](./cloudflare-pages-troubleshooting.md) for Pages issues
 2. Review GitHub Actions logs for specific error messages
 3. Test manual deployments to isolate the issue
 

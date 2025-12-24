@@ -143,7 +143,7 @@ The worker and R2 bucket are automatically created by Terraform:
 
 ## Troubleshooting
 
-For detailed troubleshooting information, see the [Cloudflare Pages Troubleshooting Guide](../../docs/cloudflare-pages-troubleshooting.md).
+For detailed troubleshooting information, see the [Cloudflare Pages Troubleshooting Guide](../../docs/infrastructure/deployment/cloudflare-pages-troubleshooting.md).
 
 ### Quick Troubleshooting
 
@@ -213,8 +213,8 @@ terraform init  # Download the provider
 
 ## Related Documentation
 
-- [Cloudflare Pages Troubleshooting Guide](../../docs/cloudflare-pages-troubleshooting.md) - **Comprehensive guide for all issues encountered**
+- [Cloudflare Pages Troubleshooting Guide](../../docs/infrastructure/deployment/cloudflare-pages-troubleshooting.md) - **Comprehensive guide for all issues encountered**
 - [Cloudflare Module README](./modules/cloudflare-resources/README.md)
 - [Main Terraform README](./README.md)
-- [Cloudflare Setup Guide](../../docs/cloudflare-setup.md)
+- [Cloudflare Setup Guide](../../docs/infrastructure/deployment/cloudflare-setup.md)
 

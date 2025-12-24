@@ -506,7 +506,7 @@ CREATE INDEX "idx_refresh_tokens_hmac_key_id" ON "refresh_tokens"("hmac_key_id")
 
 ### Publishing Environment Variables
 
-See `docs/publishing.md` for full publishing configuration. Key variables:
+See [Publishing Guide](../guides/publishing.md) for full publishing configuration. Key variables:
 
 - `PUBLISHED_BASE_DOMAIN`
 - `PUBLISH_ARTIFACT_STORE` (`filesystem` or `r2`)

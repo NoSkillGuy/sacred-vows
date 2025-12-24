@@ -459,9 +459,9 @@ The worker returns appropriate HTTP status codes:
 
 ## Related Documentation
 
-- **Publishing Process**: `docs/publishing-process.md` - End-to-end flow explanation
-- **Publishing Guide**: `docs/publishing.md` - API endpoints and configuration
-- **Deployment**: `docs/DEPLOYMENT.md` - Full deployment guide
+- **Publishing Process**: `docs/architecture/publishing-process.md` - End-to-end flow explanation
+- **Publishing Guide**: `docs/guides/publishing.md` - API endpoints and configuration
+- **Deployment**: `docs/infrastructure/deployment/overview.md` - Full deployment guide
 - **Cloudflare Setup**: `infra/terraform/CLOUDFLARE_SETUP.md` - Infrastructure setup
 
 ## Code Structure
