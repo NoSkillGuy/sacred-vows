@@ -72,7 +72,19 @@ function Hero({ onRSVPClick, translations, currentLang, config = {} }) {
 
   const namesText =
     getTranslation("hero.names") || (brideName || groomName ? `${brideName} & ${groomName}` : "");
-  const heroNames = namesText ? namesText.replace(/&/g, '<span class="hero-amp">&amp;</span>') : "";
+  // Escape HTML entities and replace & with styled ampersand
+  // First escape all HTML entities, then replace & with styled version
+  const escapeHtml = (text: string): string => {
+    return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  };
+  const heroNames = namesText
+    ? escapeHtml(namesText).replace(/&amp;/g, '<span class="hero-amp">&amp;</span>')
+    : "";
 
   return (
     <section className="hero" id="top">
