@@ -1,7 +1,7 @@
 import { FullConfig } from '@playwright/test';
 import { clearTestBuckets } from './test-env-setup';
 
-const API_BASE_URL = process.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = process.env.VITE_API_URL || 'http://localhost:3100/api';
 const TEST_USER_EMAIL = 'test@example.com';
 const TEST_USER_PASSWORD = 'password123';
 

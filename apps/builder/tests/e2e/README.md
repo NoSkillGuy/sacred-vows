@@ -19,7 +19,7 @@ The E2E test infrastructure provides complete isolation from development data:
 │  ┌──────────────┐         ┌──────────────┐              │
 │  │  Frontend    │         │   Backend    │              │
 │  │  (Vite)      │────────▶│  (Go API)    │              │
-│  │  Port 5173   │         │  Port 3001   │              │
+│  │  Port 5173   │         │  Port 3100   │              │
 │  └──────────────┘         └──────────────┘              │
 │                                                          │
 │         │                        │                       │
@@ -129,7 +129,7 @@ Buckets are automatically created if they don't exist and cleared after tests.
 ### Test Configuration
 
 The backend uses `apps/api-go/config/test.yaml` with:
-- Port `3001` (to avoid conflicts with dev server on `3000`)
+- Port `3100` (to avoid conflicts with dev server on `3000` and Grafana on `3001`)
 - Test-specific buckets and endpoints
 - Test-only endpoints enabled (`ENABLE_TEST_ENDPOINTS=true`)
 
@@ -156,8 +156,8 @@ This user is deleted after tests complete (unless `PRESERVE_TEST_DATA=true`).
 ### Test Execution
 
 Tests run against the isolated test environment:
-- Frontend at `http://localhost:5173` (configured with `VITE_API_URL=http://localhost:3001/api`)
-- Backend at `http://localhost:3001`
+- Frontend at `http://localhost:5173` (configured with `VITE_API_URL=http://localhost:3100/api`)
+- Backend at `http://localhost:3100`
 - Test database and storage buckets
 
 ### Global Teardown (`global-teardown.ts`)

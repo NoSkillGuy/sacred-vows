@@ -15,7 +15,7 @@ export ENV_FILE="$TEST_ENV_FILE"
 # These will not be overridden since we're using a test .env file
 export APP_ENV=test
 export FIRESTORE_DATABASE=test
-export PORT=3001
+export PORT=3100
 export ENABLE_TEST_ENDPOINTS=true
 export GCP_PROJECT_ID=test-project
 export FIRESTORE_EMULATOR_HOST=localhost:8080

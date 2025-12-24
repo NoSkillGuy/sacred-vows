@@ -5,7 +5,7 @@ import {
   verifyMinIO,
 } from './test-env-setup';
 
-const API_BASE_URL = process.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = process.env.VITE_API_URL || 'http://localhost:3100/api';
 const TEST_USER_EMAIL = 'test@example.com';
 const TEST_USER_PASSWORD = 'password123';
 const TEST_USER_NAME = 'Test User';
@@ -47,7 +47,7 @@ async function globalSetup(config: FullConfig) {
     // Step 3: Wait for backend server to be ready
     // (Playwright webServer should have started it, but migrations need time)
     console.log('\n3. Waiting for backend server to be ready...');
-    const backendHealthUrl = 'http://localhost:3001/health';
+    const backendHealthUrl = 'http://localhost:3100/health';
     try {
       await waitForServer(backendHealthUrl, 60, 2000); // Wait up to 2 minutes
       console.log('✓ Backend server is ready');
@@ -95,7 +95,7 @@ async function globalSetup(config: FullConfig) {
       }
     } catch (error: any) {
       console.error('✗ Error creating test user:', error.message);
-      console.error('✗ Make sure the backend server is running on http://localhost:3001');
+      console.error('✗ Make sure the backend server is running on http://localhost:3100');
       // Don't throw - let tests run and fail with clear error messages
     }
     

@@ -54,12 +54,12 @@ export default defineConfig({
       reuseExistingServer: !process.env.CI,
       timeout: 120 * 1000,
       env: {
-        VITE_API_URL: 'http://localhost:3001/api',
+        VITE_API_URL: 'http://localhost:3100/api',
       },
     },
     {
       command: 'bash ../api-go/scripts/start-test-server.sh',
-      url: 'http://localhost:3001/health',
+      url: 'http://localhost:3100/health',
       reuseExistingServer: !process.env.CI,
       timeout: 120 * 1000,
     },

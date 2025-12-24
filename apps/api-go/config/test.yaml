@@ -2,7 +2,7 @@
 # Non-sensitive settings only - sensitive values come from .env file or environment variables
 
 server:
-  port: "3001"  # Different port to avoid conflicts with dev server
+  port: "3100"  # Different port to avoid conflicts with dev server and Grafana
   read_timeout: "15s"
   write_timeout: "15s"
 
@@ -25,7 +25,7 @@ storage:
   image_quality: 85
 
 google:
-  redirect_uri: "http://localhost:3001/api/auth/google/callback"
+  redirect_uri: "http://localhost:3100/api/auth/google/callback"
   frontend_url: "http://localhost:5173"
 
 publishing:
@@ -39,7 +39,7 @@ publishing:
   snapshot_renderer_script: ""  # Set via env var if needed
   snapshot_renderer_node: "node"
   published_artifacts_dir: "./published-test"
-  published_artifacts_public_base: "http://localhost:3001"
+  published_artifacts_public_base: "http://localhost:3100"
 
 public_assets:
   r2_bucket: "sacred-vows-public-assets-test"  # Test bucket for public assets
