@@ -1,14 +1,32 @@
-import { ReactElement } from 'react';
-import { Link } from 'react-router-dom';
-import PageLayout from '../PageLayout';
-import './PressPage.css';
+import { ReactElement } from "react";
+import { Link } from "react-router-dom";
+import PageLayout from "../PageLayout";
+import "./PressPage.css";
 
 // SVG Icons
 const DownloadIcon = (): ReactElement => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M7 10L12 15L17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M12 15V3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    <path
+      d="M21 15V19C21 19.5304 20.7893 20.0391 20.4142 20.4142C20.0391 20.7893 19.5304 21 19 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V15"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M7 10L12 15L17 10"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M12 15V3"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 );
 
@@ -20,25 +38,28 @@ interface PressRelease {
 
 const pressReleases: PressRelease[] = [
   {
-    date: 'December 1, 2024',
-    title: 'Sacred Vows Reaches 50,000 Couples Milestone',
-    excerpt: 'Sacred Vows celebrates helping 50,000 couples share their love stories through beautiful digital invitations.'
+    date: "December 1, 2024",
+    title: "Sacred Vows Reaches 50,000 Couples Milestone",
+    excerpt:
+      "Sacred Vows celebrates helping 50,000 couples share their love stories through beautiful digital invitations.",
   },
   {
-    date: 'October 15, 2024',
-    title: 'Sacred Vows Launches New Luxury Layout Collection',
-    excerpt: 'Introducing our most elegant designs yet, featuring hand-crafted illustrations and premium animations.'
+    date: "October 15, 2024",
+    title: "Sacred Vows Launches New Luxury Layout Collection",
+    excerpt:
+      "Introducing our most elegant designs yet, featuring hand-crafted illustrations and premium animations.",
   },
   {
-    date: 'August 1, 2024',
-    title: 'Sacred Vows Expands Multi-Language Support',
-    excerpt: 'Now supporting 25+ languages to help couples connect with guests around the world.'
+    date: "August 1, 2024",
+    title: "Sacred Vows Expands Multi-Language Support",
+    excerpt: "Now supporting 25+ languages to help couples connect with guests around the world.",
   },
   {
-    date: 'May 15, 2024',
-    title: 'Sacred Vows Partners with Top Wedding Venues',
-    excerpt: 'Strategic partnerships bring seamless digital invitation experiences to premier wedding destinations.'
-  }
+    date: "May 15, 2024",
+    title: "Sacred Vows Partners with Top Wedding Venues",
+    excerpt:
+      "Strategic partnerships bring seamless digital invitation experiences to premier wedding destinations.",
+  },
 ];
 
 interface MediaCoverage {
@@ -48,10 +69,22 @@ interface MediaCoverage {
 }
 
 const mediaCoverage: MediaCoverage[] = [
-  { outlet: 'TechCrunch', title: 'Sacred Vows is Revolutionizing Wedding Invitations', date: 'Nov 2024' },
-  { outlet: 'Brides Magazine', title: 'Top Digital Invitation Platforms of 2024', date: 'Oct 2024' },
-  { outlet: 'The Knot', title: 'How Digital Invitations Are Transforming Weddings', date: 'Sep 2024' },
-  { outlet: 'Forbes', title: '10 Wedding Tech Startups to Watch', date: 'Aug 2024' }
+  {
+    outlet: "TechCrunch",
+    title: "Sacred Vows is Revolutionizing Wedding Invitations",
+    date: "Nov 2024",
+  },
+  {
+    outlet: "Brides Magazine",
+    title: "Top Digital Invitation Platforms of 2024",
+    date: "Oct 2024",
+  },
+  {
+    outlet: "The Knot",
+    title: "How Digital Invitations Are Transforming Weddings",
+    date: "Sep 2024",
+  },
+  { outlet: "Forbes", title: "10 Wedding Tech Startups to Watch", date: "Aug 2024" },
 ];
 
 interface PressKitItem {
@@ -61,11 +94,11 @@ interface PressKitItem {
 }
 
 const pressKitItems: PressKitItem[] = [
-  { name: 'Brand Guidelines', description: 'Logo usage, colors, typography', format: 'PDF' },
-  { name: 'Logo Package', description: 'All logo variations and formats', format: 'ZIP' },
-  { name: 'Product Screenshots', description: 'High-resolution product images', format: 'ZIP' },
-  { name: 'Founder Photos', description: 'Professional headshots', format: 'ZIP' },
-  { name: 'Company Factsheet', description: 'Key stats and information', format: 'PDF' }
+  { name: "Brand Guidelines", description: "Logo usage, colors, typography", format: "PDF" },
+  { name: "Logo Package", description: "All logo variations and formats", format: "ZIP" },
+  { name: "Product Screenshots", description: "High-resolution product images", format: "ZIP" },
+  { name: "Founder Photos", description: "Professional headshots", format: "ZIP" },
+  { name: "Company Factsheet", description: "Key stats and information", format: "PDF" },
 ];
 
 interface Stat {
@@ -74,10 +107,10 @@ interface Stat {
 }
 
 const stats: Stat[] = [
-  { number: '50,000+', label: 'Couples Served' },
-  { number: '2M+', label: 'Guests Reached' },
-  { number: '50+', label: 'Countries' },
-  { number: '2022', label: 'Founded' }
+  { number: "50,000+", label: "Couples Served" },
+  { number: "2M+", label: "Guests Reached" },
+  { number: "50+", label: "Countries" },
+  { number: "2022", label: "Founded" },
 ];
 
 function PressPage(): ReactElement {
@@ -85,7 +118,7 @@ function PressPage(): ReactElement {
     <PageLayout
       title="Press & Media"
       subtitle="Get the latest news about Sacred Vows and access our press resources."
-      breadcrumbs={[{ label: 'Company', path: '/about' }, { label: 'Press' }]}
+      breadcrumbs={[{ label: "Company", path: "/about" }, { label: "Press" }]}
     >
       <div className="press-page">
         {/* Company Stats */}
@@ -103,15 +136,15 @@ function PressPage(): ReactElement {
           <div className="about-content">
             <h2>About Sacred Vows</h2>
             <p>
-              Sacred Vows is a digital wedding invitation platform founded in 2022 with a mission 
-              to make beautiful, personalized wedding invitations accessible to every couple. 
-              Our platform combines elegant design with modern technology to create interactive 
-              digital experiences that guests love.
+              Sacred Vows is a digital wedding invitation platform founded in 2022 with a mission to
+              make beautiful, personalized wedding invitations accessible to every couple. Our
+              platform combines elegant design with modern technology to create interactive digital
+              experiences that guests love.
             </p>
             <p>
-              Trusted by over 50,000 couples worldwide, Sacred Vows has helped share millions 
-              of love stories with friends and family around the globe. Our team is passionate 
-              about being a part of the most important day in people's lives.
+              Trusted by over 50,000 couples worldwide, Sacred Vows has helped share millions of
+              love stories with friends and family around the globe. Our team is passionate about
+              being a part of the most important day in people&apos;s lives.
             </p>
           </div>
         </section>
@@ -179,10 +212,17 @@ function PressPage(): ReactElement {
         {/* Press Contact */}
         <section className="press-contact">
           <h2>Media Inquiries</h2>
-          <p>For press inquiries, interviews, or partnership opportunities, please contact our communications team.</p>
+          <p>
+            For press inquiries, interviews, or partnership opportunities, please contact our
+            communications team.
+          </p>
           <div className="contact-info">
-            <p><strong>Email:</strong> press@sacredvows.com</p>
-            <p><strong>Response Time:</strong> Within 24 hours</p>
+            <p>
+              <strong>Email:</strong> press@sacredvows.com
+            </p>
+            <p>
+              <strong>Response Time:</strong> Within 24 hours
+            </p>
           </div>
           <Link to="/contact" className="page-btn page-btn-primary">
             Contact Press Team
@@ -194,4 +234,3 @@ function PressPage(): ReactElement {
 }
 
 export default PressPage;
-

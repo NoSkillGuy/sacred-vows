@@ -1,36 +1,36 @@
-import PageLayout from '../PageLayout';
-import './LegalPage.css';
+import PageLayout from "../PageLayout";
+import "./LegalPage.css";
 
 function CookiesPage(): JSX.Element {
   return (
     <PageLayout
       title="Cookie Policy"
       subtitle="Last updated: December 1, 2024"
-      breadcrumbs={[{ label: 'Legal' }, { label: 'Cookie Policy' }]}
+      breadcrumbs={[{ label: "Legal" }, { label: "Cookie Policy" }]}
     >
       <div className="legal-page">
         <div className="legal-content">
           <section className="legal-section">
             <h2>1. What Are Cookies?</h2>
             <p>
-              Cookies are small text files that are stored on your device when you visit a 
-              website. They are widely used to make websites work more efficiently and to 
-              provide information to website owners.
+              Cookies are small text files that are stored on your device when you visit a website.
+              They are widely used to make websites work more efficiently and to provide information
+              to website owners.
             </p>
             <p>
-              This Cookie Policy explains how Sacred Vows uses cookies and similar technologies 
-              to recognize you when you visit our website.
+              This Cookie Policy explains how Sacred Vows uses cookies and similar technologies to
+              recognize you when you visit our website.
             </p>
           </section>
 
           <section className="legal-section">
             <h2>2. Types of Cookies We Use</h2>
-            
+
             <h3>Essential Cookies</h3>
             <p>
-              These cookies are necessary for the website to function properly. They enable 
-              core functionality such as security, account authentication, and remembering 
-              your preferences. You cannot opt out of these cookies.
+              These cookies are necessary for the website to function properly. They enable core
+              functionality such as security, account authentication, and remembering your
+              preferences. You cannot opt out of these cookies.
             </p>
             <div className="cookie-table">
               <table>
@@ -63,9 +63,9 @@ function CookiesPage(): JSX.Element {
 
             <h3>Analytics Cookies</h3>
             <p>
-              These cookies help us understand how visitors interact with our website by 
-              collecting and reporting information anonymously. This helps us improve our 
-              services and user experience.
+              These cookies help us understand how visitors interact with our website by collecting
+              and reporting information anonymously. This helps us improve our services and user
+              experience.
             </p>
             <div className="cookie-table">
               <table>
@@ -93,42 +93,42 @@ function CookiesPage(): JSX.Element {
 
             <h3>Functional Cookies</h3>
             <p>
-              These cookies enable enhanced functionality and personalization, such as 
-              remembering your language preferences or the region you are in.
+              These cookies enable enhanced functionality and personalization, such as remembering
+              your language preferences or the region you are in.
             </p>
 
             <h3>Marketing Cookies</h3>
             <p>
-              These cookies may be set through our site by advertising partners. They may 
-              be used to build a profile of your interests and show you relevant ads on 
-              other sites. We currently do not use marketing cookies.
+              These cookies may be set through our site by advertising partners. They may be used to
+              build a profile of your interests and show you relevant ads on other sites. We
+              currently do not use marketing cookies.
             </p>
           </section>
 
           <section className="legal-section">
             <h2>3. How to Control Cookies</h2>
             <p>
-              You have the right to decide whether to accept or reject cookies. You can 
-              exercise your cookie preferences in the following ways:
+              You have the right to decide whether to accept or reject cookies. You can exercise
+              your cookie preferences in the following ways:
             </p>
             <ul>
               <li>
-                <strong>Browser Settings:</strong> Most browsers allow you to control cookies 
-                through their settings. You can set your browser to block or alert you about 
+                <strong>Browser Settings:</strong> Most browsers allow you to control cookies
+                through their settings. You can set your browser to block or alert you about
                 cookies.
               </li>
               <li>
-                <strong>Cookie Consent:</strong> When you first visit our site, you can choose 
-                which types of cookies to accept through our cookie consent banner.
+                <strong>Cookie Consent:</strong> When you first visit our site, you can choose which
+                types of cookies to accept through our cookie consent banner.
               </li>
               <li>
-                <strong>Opt-Out Links:</strong> Some analytics providers offer opt-out mechanisms. 
+                <strong>Opt-Out Links:</strong> Some analytics providers offer opt-out mechanisms.
                 For Google Analytics, visit: tools.google.com/dlpage/gaoptout
               </li>
             </ul>
             <p>
-              Please note that blocking certain cookies may impact your experience on our 
-              website and limit the services we can provide.
+              Please note that blocking certain cookies may impact your experience on our website
+              and limit the services we can provide.
             </p>
           </section>
 
@@ -137,16 +137,16 @@ function CookiesPage(): JSX.Element {
             <p>In addition to cookies, we may use other tracking technologies:</p>
             <ul>
               <li>
-                <strong>Local Storage:</strong> Similar to cookies but can store larger amounts 
-                of data. Used for offline functionality and caching.
+                <strong>Local Storage:</strong> Similar to cookies but can store larger amounts of
+                data. Used for offline functionality and caching.
               </li>
               <li>
-                <strong>Session Storage:</strong> Temporary storage that is cleared when you 
-                close your browser.
+                <strong>Session Storage:</strong> Temporary storage that is cleared when you close
+                your browser.
               </li>
               <li>
-                <strong>Pixels/Beacons:</strong> Small invisible images used to track page views 
-                and email opens.
+                <strong>Pixels/Beacons:</strong> Small invisible images used to track page views and
+                email opens.
               </li>
             </ul>
           </section>
@@ -154,9 +154,9 @@ function CookiesPage(): JSX.Element {
           <section className="legal-section">
             <h2>5. Third-Party Cookies</h2>
             <p>
-              Some cookies on our site are placed by third parties. These third parties may 
-              include analytics providers and payment processors. We do not control these 
-              third-party cookies and recommend reviewing their privacy policies:
+              Some cookies on our site are placed by third parties. These third parties may include
+              analytics providers and payment processors. We do not control these third-party
+              cookies and recommend reviewing their privacy policies:
             </p>
             <ul>
               <li>Google Analytics - privacy.google.com</li>
@@ -167,20 +167,22 @@ function CookiesPage(): JSX.Element {
           <section className="legal-section">
             <h2>6. Updates to This Policy</h2>
             <p>
-              We may update this Cookie Policy from time to time to reflect changes in our 
-              practices or for other operational, legal, or regulatory reasons. Please check 
-              this page periodically for updates.
+              We may update this Cookie Policy from time to time to reflect changes in our practices
+              or for other operational, legal, or regulatory reasons. Please check this page
+              periodically for updates.
             </p>
           </section>
 
           <section className="legal-section">
             <h2>7. Contact Us</h2>
-            <p>
-              If you have any questions about our use of cookies, please contact us at:
-            </p>
+            <p>If you have any questions about our use of cookies, please contact us at:</p>
             <div className="contact-info">
-              <p><strong>Email:</strong> privacy@sacredvows.com</p>
-              <p><strong>Address:</strong> 123 Love Lane, Suite 100, San Francisco, CA 94102</p>
+              <p>
+                <strong>Email:</strong> privacy@sacredvows.com
+              </p>
+              <p>
+                <strong>Address:</strong> 123 Love Lane, Suite 100, San Francisco, CA 94102
+              </p>
             </div>
           </section>
         </div>
@@ -190,4 +192,3 @@ function CookiesPage(): JSX.Element {
 }
 
 export default CookiesPage;
-

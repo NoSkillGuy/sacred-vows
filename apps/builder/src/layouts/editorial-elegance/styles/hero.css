@@ -92,7 +92,7 @@
 /* Text styling */
 .ee-hero-names {
   margin: 0 0 var(--ee-space-sm);
-  text-shadow: 
+  text-shadow:
     0 2px 8px rgba(0, 0, 0, 0.3),
     0 4px 16px rgba(0, 0, 0, 0.2);
   letter-spacing: -0.02em;
@@ -126,18 +126,16 @@
 .ee-scroll-line {
   width: 1px;
   height: 48px;
-  background: linear-gradient(to bottom, 
-    rgba(255, 255, 255, 0.9), 
-    rgba(255, 255, 255, 0.1)
-  );
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.1));
   border-radius: 1px;
 }
 
 @keyframes scroll-bounce {
-  0%, 100% { 
+  0%,
+  100% {
     transform: translate(-50%, 0);
   }
-  50% { 
+  50% {
     transform: translate(-50%, 10px);
   }
 }
@@ -147,14 +145,13 @@
   .ee-hero {
     min-height: 100vh;
   }
-  
+
   .ee-hero-content {
     padding: var(--ee-space-sm);
   }
-  
+
   .ee-hero[data-alignment="bottom-left"] .ee-hero-content {
     bottom: var(--ee-space-md);
     left: var(--ee-space-sm);
   }
 }
-

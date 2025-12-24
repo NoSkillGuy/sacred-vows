@@ -78,4 +78,3 @@ func NewFromEnv(ctx context.Context) (*Client, error) {
 func (c *Client) Close() error {
 	return c.client.Close()
 }
-

@@ -24,7 +24,7 @@
   background: var(--white);
   border: 2px solid var(--builder-border);
   border-radius: 100px;
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   font-size: 0.85rem;
   font-weight: 500;
   color: var(--text-medium);
@@ -110,7 +110,7 @@
 }
 
 .featured-content h3 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.4rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -180,7 +180,7 @@
 }
 
 .post-content h3 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.15rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -217,7 +217,7 @@
 }
 
 .blog-newsletter::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.1) 0%, transparent 60%);
@@ -232,7 +232,7 @@
 }
 
 .blog-newsletter h2 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 2.25rem;
   font-weight: 500;
   color: var(--white);
@@ -256,7 +256,7 @@
   padding: 0.9rem 1.25rem;
   border: 2px solid rgba(255, 255, 255, 0.1);
   border-radius: 100px;
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   font-size: 0.95rem;
   color: var(--white);
   background: rgba(255, 255, 255, 0.05);
@@ -318,4 +318,3 @@
     font-size: 1.75rem;
   }
 }
-

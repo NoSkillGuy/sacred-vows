@@ -96,7 +96,7 @@
 }
 
 .pricing-card-name {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.75rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -124,7 +124,7 @@
 }
 
 .pricing-card-price .amount {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 3.5rem;
   font-weight: 700;
   color: var(--text-dark);
@@ -175,7 +175,7 @@
   width: 100%;
   padding: 1rem 1.5rem;
   border-radius: 100px;
-  font-family: 'Quicksand', sans-serif;
+  font-family: "Quicksand", sans-serif;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -259,7 +259,7 @@
 }
 
 .comparison-table th {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -324,7 +324,7 @@
 }
 
 .faq-item h3 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.2rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -351,7 +351,7 @@
 }
 
 .pricing-cta-section::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   background: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.1) 0%, transparent 60%);
@@ -364,7 +364,7 @@
 }
 
 .pricing-cta-section h2 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 2.25rem;
   font-weight: 500;
   color: var(--white);
@@ -435,4 +435,3 @@
     gap: 1rem;
   }
 }
-

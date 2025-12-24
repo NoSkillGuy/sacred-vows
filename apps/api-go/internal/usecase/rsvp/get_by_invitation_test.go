@@ -57,4 +57,3 @@ func TestGetRSVPByInvitationUseCase_Execute_InvitationHasRSVPs_ReturnsRSVPs(t *t
 	assert.Equal(t, "rsvp-1", output.Responses[0].ID, "First RSVP ID should match")
 	assert.Equal(t, "rsvp-2", output.Responses[1].ID, "Second RSVP ID should match")
 }
-

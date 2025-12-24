@@ -4,15 +4,15 @@ import "time"
 
 // PublishedSite maps a subdomain (and later custom domains) to an invitation and a published snapshot version.
 type PublishedSite struct {
-	ID            string
-	InvitationID  string
-	OwnerUserID   string
-	Subdomain     string
-	Published     bool
+	ID             string
+	InvitationID   string
+	OwnerUserID    string
+	Subdomain      string
+	Published      bool
 	CurrentVersion int
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
-	PublishedAt   *time.Time
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	PublishedAt    *time.Time
 }
 
 func (p *PublishedSite) Validate() error {
@@ -27,5 +27,3 @@ func (p *PublishedSite) Validate() error {
 	}
 	return nil
 }
-
-

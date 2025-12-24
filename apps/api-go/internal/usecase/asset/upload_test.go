@@ -81,4 +81,3 @@ func TestUploadAssetUseCase_Execute_RepositoryError_ReturnsError(t *testing.T) {
 	require.Error(t, err, "Repository error should return error")
 	assert.Nil(t, output, "Output should be nil on error")
 }
-
