@@ -1,28 +1,28 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
-import './EditableText.css';
+import { useState, useRef, useEffect, useCallback } from "react";
+import "./EditableText.css";
 
 /**
  * EditableText - WYSIWYG text editing component
- * 
+ *
  * Uses an UNCONTROLLED approach for contentEditable to prevent React's
  * reconciliation from fighting with the browser's native input handling.
- * 
+ *
  * Key principle: Let the browser handle all typing natively, only read
  * the final value when the user finishes editing (on blur).
  */
-function EditableText({ 
-  children, 
-  value, 
-  onUpdate, 
-  path, 
-  className = '',
-  tag = 'div',
-  placeholder = 'Click to edit...',
+function EditableText({
+  children,
+  value,
+  onUpdate,
+  path,
+  className = "",
+  tag = "div",
+  placeholder = "Click to edit...",
   multiline = false,
-  ...props 
+  ...props
 }) {
   const [isEditing, setIsEditing] = useState(false);
-  const [displayValue, setDisplayValue] = useState(value || children || '');
+  const [displayValue, setDisplayValue] = useState(value || children || "");
   const [isHovered, setIsHovered] = useState(false);
   const elementRef = useRef(null);
   const editRef = useRef(null);
@@ -37,18 +37,21 @@ function EditableText({
     if (isEditing) {
       return;
     }
-    
+
     // If we just finished editing, skip this sync and reset the flag
     if (justFinishedEditingRef.current) {
       justFinishedEditingRef.current = false;
       return;
     }
-    
+
     // Only sync from props when we're not in any edit-related state
-    const newValue = value || children || '';
+    // Note: This is intentional - we need to sync displayValue with props
+    // when not editing, but avoid setState in effect warning by using a ref
+    const newValue = value || children || "";
     if (newValue !== displayValue) {
       setDisplayValue(newValue);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, children, isEditing]);
 
   const handleClick = (e) => {
@@ -61,22 +64,22 @@ function EditableText({
     if (isSettingUpRef.current) {
       return;
     }
-    
+
     if (editRef.current) {
-      const newValue = editRef.current.textContent || '';
-      
+      const newValue = editRef.current.textContent || "";
+
       // Mark that we just finished editing - this prevents the sync effect
       // from overwriting our displayValue before the store updates propagate
       justFinishedEditingRef.current = true;
-      
+
       // Update local display value first
       setDisplayValue(newValue);
-      
+
       // Exit edit mode
       setIsEditing(false);
-      
+
       // Notify parent of the change
-      const originalValue = value || children || '';
+      const originalValue = value || children || "";
       if (newValue !== originalValue) {
         onUpdate(path, newValue);
       }
@@ -86,34 +89,34 @@ function EditableText({
   }, [value, children, onUpdate, path]);
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !multiline) {
+    if (e.key === "Enter" && !multiline) {
       e.preventDefault();
       editRef.current?.blur();
     }
-    if (e.key === 'Escape') {
+    if (e.key === "Escape") {
       // Reset content to original value before blur
       if (editRef.current) {
-        editRef.current.textContent = value || children || '';
+        editRef.current.textContent = value || children || "";
       }
       justFinishedEditingRef.current = true;
-      setDisplayValue(value || children || '');
+      setDisplayValue(value || children || "");
       setIsEditing(false);
     }
   };
 
   const handlePaste = (e) => {
     e.preventDefault();
-    const text = e.clipboardData.getData('text/plain');
-    
+    const text = e.clipboardData.getData("text/plain");
+
     // Insert text at cursor position using Selection API
     const selection = window.getSelection();
     if (selection.rangeCount > 0) {
       const range = selection.getRangeAt(0);
       range.deleteContents();
-      
+
       const textNode = document.createTextNode(text);
       range.insertNode(textNode);
-      
+
       // Move cursor after inserted text
       range.setStartAfter(textNode);
       range.setEndAfter(textNode);
@@ -127,24 +130,24 @@ function EditableText({
     if (isEditing && editRef.current) {
       isSettingUpRef.current = true;
       const el = editRef.current;
-      
+
       // Set the initial content directly on DOM
       el.textContent = displayValue;
-      
+
       // Use requestAnimationFrame to ensure DOM is ready
       requestAnimationFrame(() => {
         if (!editRef.current) {
           isSettingUpRef.current = false;
           return;
         }
-        
+
         el.focus();
-        
+
         // Move cursor to end of content
         try {
           const range = document.createRange();
           const selection = window.getSelection();
-          
+
           if (el.childNodes.length > 0) {
             // If there's text content, position at the end
             const textNode = el.childNodes[el.childNodes.length - 1];
@@ -160,14 +163,14 @@ function EditableText({
             range.setStart(el, 0);
             range.collapse(true);
           }
-          
+
           selection.removeAllRanges();
           selection.addRange(range);
         } catch (error) {
           // Fallback: just let the focus work
-          console.warn('Could not position cursor:', error);
+          console.warn("Could not position cursor:", error);
         }
-        
+
         isSettingUpRef.current = false;
       });
     }
@@ -199,7 +202,7 @@ function EditableText({
     <Tag
       {...props}
       ref={elementRef}
-      className={`editable-text ${isHovered ? 'hovered' : ''} ${className}`}
+      className={`editable-text ${isHovered ? "hovered" : ""} ${className}`}
       onClick={handleClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

@@ -1,13 +1,13 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import PageLayout from '../PageLayout';
-import { getAllLayoutManifests } from '../../../services/layoutService';
-import LayoutCardUnified from '../../Layouts/LayoutCardUnified';
-import './LayoutsGalleryPage.css';
+import { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import PageLayout from "../PageLayout";
+import { getAllLayoutManifests } from "../../../services/layoutService";
+import LayoutCardUnified from "../../Layouts/LayoutCardUnified";
+import "./LayoutsGalleryPage.css";
 
 function LayoutsGalleryPage() {
   const [layouts, setLayouts] = useState([]);
-  const [activeCategory, setActiveCategory] = useState('all');
+  const [activeCategory, setActiveCategory] = useState("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -23,8 +23,8 @@ function LayoutsGalleryPage() {
       const manifests = await getAllLayoutManifests();
       setLayouts(manifests || []);
     } catch (error) {
-      console.error('Failed to load layouts', error);
-      setError(error.message || 'Failed to load layouts. Please try again.');
+      console.error("Failed to load layouts", error);
+      setError(error.message || "Failed to load layouts. Please try again.");
       setLayouts([]);
     } finally {
       setLoading(false);
@@ -34,7 +34,7 @@ function LayoutsGalleryPage() {
   const categories = useMemo(() => {
     const counts = new Map();
     layouts.forEach((layout) => {
-      const category = layout.category || 'uncategorized';
+      const category = layout.category || "uncategorized";
       counts.set(category, (counts.get(category) || 0) + 1);
     });
 
@@ -44,26 +44,25 @@ function LayoutsGalleryPage() {
       count,
     }));
 
-    return [{ id: 'all', name: 'All Layouts', count: layouts.length }, ...items];
+    return [{ id: "all", name: "All Layouts", count: layouts.length }, ...items];
   }, [layouts]);
 
-  const filteredLayouts = activeCategory === 'all'
-    ? layouts
-    : layouts.filter(l => l.category === activeCategory);
+  const filteredLayouts =
+    activeCategory === "all" ? layouts : layouts.filter((l) => l.category === activeCategory);
 
   return (
     <PageLayout
       title="Wedding Invitation Layouts"
       subtitle="Browse our collection of beautifully designed layouts. Find the perfect style to tell your love story."
-      breadcrumbs={[{ label: 'Layouts' }]}
+      breadcrumbs={[{ label: "Layouts" }]}
     >
       <div className="layouts-gallery-page">
         {/* Category Filters */}
         <div className="layout-filters">
-          {categories.map(category => (
+          {categories.map((category) => (
             <button
               key={category.id}
-              className={`filter-btn ${activeCategory === category.id ? 'active' : ''}`}
+              className={`filter-btn ${activeCategory === category.id ? "active" : ""}`}
               onClick={() => setActiveCategory(category.id)}
             >
               {category.name}
@@ -108,17 +107,17 @@ function LayoutsGalleryPage() {
                 <p>There are no layouts available at the moment. Please check back later.</p>
               </div>
             ) : (
-              filteredLayouts.map(layout => {
-                const isReady = layout.status === 'ready' || layout.isAvailable;
-                const badge = !isReady ? 'Coming Soon' : (layout.isFeatured ? 'Featured' : null);
+              filteredLayouts.map((layout) => {
+                const isReady = layout.status === "ready" || layout.isAvailable;
+                const badge = !isReady ? "Coming Soon" : layout.isFeatured ? "Featured" : null;
 
                 return (
                   <LayoutCardUnified
                     key={layout.id}
                     layout={layout}
                     badgeOverride={badge}
-                    onPrimaryAction={() => isReady && navigate('/signup')}
-                    primaryLabel={isReady ? 'Use This Layout' : 'Coming Soon'}
+                    onPrimaryAction={() => isReady && navigate("/signup")}
+                    primaryLabel={isReady ? "Use This Layout" : "Coming Soon"}
                     primaryDisabled={!isReady}
                   />
                 );
@@ -132,10 +131,7 @@ function LayoutsGalleryPage() {
           <h2>Ready to Create Your Invitation?</h2>
           <p>Sign up free and start customizing your perfect layout today.</p>
           <div className="cta-buttons">
-            <button 
-              className="page-btn page-btn-primary"
-              onClick={() => navigate('/signup')}
-            >
+            <button className="page-btn page-btn-primary" onClick={() => navigate("/signup")}>
               Start Creating Free
               <span>→</span>
             </button>
@@ -150,4 +146,3 @@ function LayoutsGalleryPage() {
 }
 
 export default LayoutsGalleryPage;
-

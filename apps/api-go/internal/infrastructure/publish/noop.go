@@ -30,5 +30,3 @@ func (s *NoopArtifactStorage) ListVersions(ctx context.Context, subdomain string
 func (s *NoopArtifactStorage) DeleteVersion(ctx context.Context, subdomain string, version int) error {
 	return errors.New("artifact storage not configured")
 }
-
-

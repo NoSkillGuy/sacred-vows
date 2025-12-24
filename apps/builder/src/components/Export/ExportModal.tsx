@@ -1,36 +1,44 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useBuilderStore } from '../../store/builderStore';
-import { exportInvitationAsJSON } from '../../services/exportService';
-import { publishInvitation, validateSubdomain, listVersions, rollbackToVersion } from '../../services/publishService';
-import './ExportModal.css';
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useBuilderStore } from "../../store/builderStore";
+import { exportInvitationAsJSON } from "../../services/exportService";
+import {
+  publishInvitation,
+  validateSubdomain,
+  listVersions,
+  rollbackToVersion,
+} from "../../services/publishService";
+import "./ExportModal.css";
 
 function PublishModal({ isOpen, onClose }) {
   const { currentInvitation } = useBuilderStore();
   const [publishing, setPublishing] = useState(false);
-  const [exportFormat, setExportFormat] = useState('publish');
-  const [subdomain, setSubdomain] = useState('');
-  const [normalized, setNormalized] = useState('');
+  const [exportFormat, setExportFormat] = useState("publish");
+  const [subdomain, setSubdomain] = useState("");
+  const [normalized, setNormalized] = useState("");
   const [available, setAvailable] = useState(null); // null | boolean
-  const [reason, setReason] = useState('');
-  const [publishedUrl, setPublishedUrl] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
+  const [reason, setReason] = useState("");
+  const [publishedUrl, setPublishedUrl] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
   const [versions, setVersions] = useState([]);
-  const [loadingVersions, setLoadingVersions] = useState(false);
+  const [, setLoadingVersions] = useState(false);
   const [rollingBack, setRollingBack] = useState(false);
   const [rollbackTarget, setRollbackTarget] = useState(null);
   const validateReqIdRef = useRef(0);
 
   const invitationId = currentInvitation?.id;
 
-  const canValidate = useMemo(() => subdomain.trim().length >= 1 && !!invitationId, [subdomain, invitationId]);
+  const canValidate = useMemo(
+    () => subdomain.trim().length >= 1 && !!invitationId,
+    [subdomain, invitationId]
+  );
 
   useEffect(() => {
     if (!isOpen) return;
-    setPublishedUrl('');
-    setReason('');
+    setPublishedUrl("");
+    setReason("");
     setAvailable(null);
-    setNormalized('');
-    setErrorMsg('');
+    setNormalized("");
+    setErrorMsg("");
     setVersions([]);
     setRollbackTarget(null);
   }, [isOpen]);
@@ -38,7 +46,7 @@ function PublishModal({ isOpen, onClose }) {
   // Fetch versions when subdomain is available and site is published
   useEffect(() => {
     if (!isOpen) return;
-    if (exportFormat !== 'publish') return;
+    if (exportFormat !== "publish") return;
     if (!normalized || !available) {
       setVersions([]);
       return;
@@ -49,7 +57,7 @@ function PublishModal({ isOpen, onClose }) {
       try {
         const res = await listVersions(normalized);
         setVersions(res.versions || []);
-      } catch (e) {
+      } catch (_e) {
         // Silently fail - versions might not exist yet
         setVersions([]);
       } finally {
@@ -62,12 +70,12 @@ function PublishModal({ isOpen, onClose }) {
 
   useEffect(() => {
     if (!isOpen) return;
-    if (exportFormat !== 'publish') return;
+    if (exportFormat !== "publish") return;
     if (!canValidate) {
       setAvailable(null);
-      setReason('');
-      setNormalized('');
-      setErrorMsg('');
+      setReason("");
+      setNormalized("");
+      setErrorMsg("");
       return;
     }
     const t = setTimeout(async () => {
@@ -75,15 +83,15 @@ function PublishModal({ isOpen, onClose }) {
       try {
         const res = await validateSubdomain(invitationId, subdomain);
         if (!isOpen || reqId !== validateReqIdRef.current) return;
-        setNormalized(res.normalizedSubdomain || '');
+        setNormalized(res.normalizedSubdomain || "");
         setAvailable(!!res.available);
-        setReason(res.reason || '');
-        setErrorMsg('');
-      } catch (e) {
+        setReason(res.reason || "");
+        setErrorMsg("");
+      } catch (_e) {
         if (!isOpen || reqId !== validateReqIdRef.current) return;
         setAvailable(false);
-        setReason('error');
-        setErrorMsg('Failed to validate subdomain. Please try again.');
+        setReason("error");
+        setErrorMsg("Failed to validate subdomain. Please try again.");
       }
     }, 350);
     return () => clearTimeout(t);
@@ -91,32 +99,32 @@ function PublishModal({ isOpen, onClose }) {
 
   const handlePrimary = async () => {
     setPublishing(true);
-    setErrorMsg('');
+    setErrorMsg("");
     try {
-      if (exportFormat === 'json') {
+      if (exportFormat === "json") {
         // Export as JSON backup - pass full invitation object
         exportInvitationAsJSON(currentInvitation);
         onClose();
         return;
       }
       // Publish
-      if (!invitationId) throw new Error('Missing invitation');
+      if (!invitationId) throw new Error("Missing invitation");
       const res = await publishInvitation(invitationId, subdomain);
-      setPublishedUrl(res.url || '');
-      if (!res.url) throw new Error('Publish succeeded but no URL was returned.');
-      
+      setPublishedUrl(res.url || "");
+      if (!res.url) throw new Error("Publish succeeded but no URL was returned.");
+
       // Refresh versions after publish
       if (normalized) {
         try {
           const versionsRes = await listVersions(normalized);
           setVersions(versionsRes.versions || []);
-        } catch (e) {
+        } catch (_e) {
           // Ignore version fetch errors
         }
       }
     } catch (error) {
-      console.error('Publish error:', error);
-      setErrorMsg(error?.message || 'Failed to publish. Please try again.');
+      console.error("Publish error:", error);
+      setErrorMsg(error?.message || "Failed to publish. Please try again.");
     } finally {
       setPublishing(false);
     }
@@ -124,19 +132,19 @@ function PublishModal({ isOpen, onClose }) {
 
   const handleRollback = async (version) => {
     if (!normalized) return;
-    
+
     setRollingBack(true);
-    setErrorMsg('');
+    setErrorMsg("");
     try {
       await rollbackToVersion(normalized, version);
       // Refresh versions after rollback
       const versionsRes = await listVersions(normalized);
       setVersions(versionsRes.versions || []);
       setRollbackTarget(null);
-      setErrorMsg('');
+      setErrorMsg("");
     } catch (error) {
-      console.error('Rollback error:', error);
-      setErrorMsg(error?.message || 'Failed to rollback. Please try again.');
+      console.error("Rollback error:", error);
+      setErrorMsg(error?.message || "Failed to rollback. Please try again.");
     } finally {
       setRollingBack(false);
     }
@@ -149,7 +157,9 @@ function PublishModal({ isOpen, onClose }) {
       <div className="export-modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="export-modal-header">
           <h3>Publish Invitation</h3>
-          <button className="export-modal-close" onClick={onClose}>×</button>
+          <button className="export-modal-close" onClick={onClose}>
+            ×
+          </button>
         </div>
 
         <div className="export-modal-body">
@@ -166,9 +176,11 @@ function PublishModal({ isOpen, onClose }) {
           </div>
 
           <div className="export-info">
-            {exportFormat === 'publish' ? (
+            {exportFormat === "publish" ? (
               <>
-                <p><strong>Choose a subdomain:</strong></p>
+                <p>
+                  <strong>Choose a subdomain:</strong>
+                </p>
                 <div className="form-group">
                   <label className="form-label">Subdomain</label>
                   <input
@@ -177,26 +189,29 @@ function PublishModal({ isOpen, onClose }) {
                     onChange={(e) => setSubdomain(e.target.value)}
                     placeholder="e.g. john-wedding"
                   />
-                  <div style={{ marginTop: 8, fontSize: 13, color: '#666' }}>
+                  <div style={{ marginTop: 8, fontSize: 13, color: "#666" }}>
                     {available === null ? (
                       <span>Enter a subdomain to check availability.</span>
                     ) : available ? (
-                      <span style={{ color: '#1a7f37' }}>Available: {normalized}</span>
+                      <span style={{ color: "#1a7f37" }}>Available: {normalized}</span>
                     ) : (
-                      <span style={{ color: '#b42318' }}>Not available{normalized ? `: ${normalized}` : ''}{reason ? ` (${reason})` : ''}</span>
+                      <span style={{ color: "#b42318" }}>
+                        Not available{normalized ? `: ${normalized}` : ""}
+                        {reason ? ` (${reason})` : ""}
+                      </span>
                     )}
                   </div>
                   {errorMsg ? (
-                    <div style={{ marginTop: 8, fontSize: 13, color: '#b42318' }}>
-                      {errorMsg}
-                    </div>
+                    <div style={{ marginTop: 8, fontSize: 13, color: "#b42318" }}>{errorMsg}</div>
                   ) : null}
                 </div>
 
                 {publishedUrl ? (
                   <div style={{ marginTop: 12 }}>
-                    <p><strong>Published URL</strong></p>
-                    <div style={{ display: 'flex', gap: 8 }}>
+                    <p>
+                      <strong>Published URL</strong>
+                    </p>
+                    <div style={{ display: "flex", gap: 8 }}>
                       <input className="form-select" readOnly value={publishedUrl} />
                       <button
                         className="btn btn-secondary"
@@ -204,7 +219,13 @@ function PublishModal({ isOpen, onClose }) {
                       >
                         Copy
                       </button>
-                      <a className="btn btn-primary" href={publishedUrl} target="_blank" rel="noopener">
+                      <a
+                        className="btn btn-primary"
+                        href={publishedUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        rel="noopener"
+                      >
                         Open
                       </a>
                     </div>
@@ -213,14 +234,14 @@ function PublishModal({ isOpen, onClose }) {
 
                 {versions.length > 0 && (
                   <div style={{ marginTop: 16 }}>
-                    <p><strong>Version History</strong></p>
+                    <p>
+                      <strong>Version History</strong>
+                    </p>
                     <div className="version-list">
                       {versions.map((v) => (
                         <div key={v.version} className="version-item">
                           <span className="version-number">Version {v.version}</span>
-                          {v.isCurrent && (
-                            <span className="version-badge current">Current</span>
-                          )}
+                          {v.isCurrent && <span className="version-badge current">Current</span>}
                           {!v.isCurrent && (
                             <button
                               className="btn btn-secondary btn-sm"
@@ -237,20 +258,29 @@ function PublishModal({ isOpen, onClose }) {
                 )}
 
                 {rollbackTarget !== null && (
-                  <div className="rollback-confirmation" style={{ marginTop: 16, padding: 12, backgroundColor: '#fff3cd', borderRadius: 4 }}>
-                    <p style={{ margin: '0 0 8px 0', fontWeight: 'bold' }}>
+                  <div
+                    className="rollback-confirmation"
+                    style={{
+                      marginTop: 16,
+                      padding: 12,
+                      backgroundColor: "#fff3cd",
+                      borderRadius: 4,
+                    }}
+                  >
+                    <p style={{ margin: "0 0 8px 0", fontWeight: "bold" }}>
                       Rollback to Version {rollbackTarget}?
                     </p>
-                    <p style={{ margin: '0 0 8px 0', fontSize: 13 }}>
-                      This will make Version {rollbackTarget} the active version. The current version will remain available for rollback.
+                    <p style={{ margin: "0 0 8px 0", fontSize: 13 }}>
+                      This will make Version {rollbackTarget} the active version. The current
+                      version will remain available for rollback.
                     </p>
-                    <div style={{ display: 'flex', gap: 8 }}>
+                    <div style={{ display: "flex", gap: 8 }}>
                       <button
                         className="btn btn-primary btn-sm"
                         onClick={() => handleRollback(rollbackTarget)}
                         disabled={rollingBack}
                       >
-                        {rollingBack ? 'Rolling back...' : 'Confirm Rollback'}
+                        {rollingBack ? "Rolling back..." : "Confirm Rollback"}
                       </button>
                       <button
                         className="btn btn-secondary btn-sm"
@@ -265,8 +295,10 @@ function PublishModal({ isOpen, onClose }) {
               </>
             ) : (
               <>
-                <p><strong>JSON Backup</strong></p>
-                <p style={{ marginTop: '8px', fontSize: '13px', color: '#666' }}>
+                <p>
+                  <strong>JSON Backup</strong>
+                </p>
+                <p style={{ marginTop: "8px", fontSize: "13px", color: "#666" }}>
                   Download a portable backup of your invitation data for safekeeping.
                 </p>
               </>
@@ -281,9 +313,13 @@ function PublishModal({ isOpen, onClose }) {
           <button
             className="btn btn-primary"
             onClick={handlePrimary}
-            disabled={publishing || (exportFormat === 'publish' && available !== true)}
+            disabled={publishing || (exportFormat === "publish" && available !== true)}
           >
-            {publishing ? 'Publishing...' : exportFormat === 'publish' ? 'Publish' : 'Download JSON'}
+            {publishing
+              ? "Publishing..."
+              : exportFormat === "publish"
+                ? "Publish"
+                : "Download JSON"}
           </button>
         </div>
       </div>
@@ -292,4 +328,3 @@ function PublishModal({ isOpen, onClose }) {
 }
 
 export default PublishModal;
-

@@ -1,114 +1,114 @@
-import { http, HttpResponse } from 'msw';
+import { http, HttpResponse } from "msw";
 
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = "http://localhost:3000/api";
 
 // Mock data
 const mockUser = {
-  id: '1',
-  email: 'test@example.com',
-  name: 'Test User',
+  id: "1",
+  email: "test@example.com",
+  name: "Test User",
 };
 
-const mockAccessToken = 'mock-access-token-123';
+const mockAccessToken = "mock-access-token-123";
 
 const mockInvitations = [
   {
-    id: 'inv-1',
-    userId: '1',
-    layoutId: 'classic-scroll',
+    id: "inv-1",
+    userId: "1",
+    layoutId: "classic-scroll",
     data: {
       couple: {
-        bride: { name: 'Sarah' },
-        groom: { name: 'John' },
+        bride: { name: "Sarah" },
+        groom: { name: "John" },
       },
       wedding: {
-        date: '2025-12-15',
-        venue: { name: 'Grand Hotel' },
+        date: "2025-12-15",
+        venue: { name: "Grand Hotel" },
       },
     },
     layoutConfig: {
       sections: [],
       theme: {
-        preset: 'default',
+        preset: "default",
         colors: {},
         fonts: {},
       },
     },
-    status: 'draft',
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
+    status: "draft",
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
   },
   {
-    id: 'inv-2',
-    userId: '1',
-    layoutId: 'editorial-elegance',
+    id: "inv-2",
+    userId: "1",
+    layoutId: "editorial-elegance",
     data: {
       couple: {
-        bride: { name: 'Emma' },
-        groom: { name: 'David' },
+        bride: { name: "Emma" },
+        groom: { name: "David" },
       },
       wedding: {
-        date: '2025-06-20',
-        venue: { name: 'Beach Resort' },
+        date: "2025-06-20",
+        venue: { name: "Beach Resort" },
       },
     },
     layoutConfig: {
       sections: [],
       theme: {
-        preset: 'default',
+        preset: "default",
         colors: {},
         fonts: {},
       },
     },
-    status: 'published',
-    createdAt: '2024-01-02T00:00:00Z',
-    updatedAt: '2024-01-02T00:00:00Z',
+    status: "published",
+    createdAt: "2024-01-02T00:00:00Z",
+    updatedAt: "2024-01-02T00:00:00Z",
   },
 ];
 
 const mockLayoutManifests = [
   {
-    id: 'classic-scroll',
-    name: 'Classic Scroll',
-    description: 'A timeless classic design',
+    id: "classic-scroll",
+    name: "Classic Scroll",
+    description: "A timeless classic design",
     metadata: {
-      tags: ['classic', 'elegant'],
+      tags: ["classic", "elegant"],
       isFeatured: true,
     },
     sections: [
-      { id: 'hero', name: 'Hero', required: true },
-      { id: 'couple', name: 'Couple', required: true },
+      { id: "hero", name: "Hero", required: true },
+      { id: "couple", name: "Couple", required: true },
     ],
     themes: [
       {
-        id: 'default',
-        name: 'Default',
+        id: "default",
+        name: "Default",
         isDefault: true,
-        colors: { primary: '#000000', secondary: '#ffffff' },
-        fonts: { heading: 'serif', body: 'sans-serif' },
+        colors: { primary: "#000000", secondary: "#ffffff" },
+        fonts: { heading: "serif", body: "sans-serif" },
       },
     ],
   },
   {
-    id: 'editorial-elegance',
-    name: 'Editorial Elegance',
-    description: 'Modern editorial style',
+    id: "editorial-elegance",
+    name: "Editorial Elegance",
+    description: "Modern editorial style",
     metadata: {
-      tags: ['modern', 'editorial'],
+      tags: ["modern", "editorial"],
       isFeatured: true,
     },
     sections: [
-      { id: 'hero', name: 'Hero', required: true },
-      { id: 'couple', name: 'Couple', required: true },
-      { id: 'story', name: 'Our Story', required: false },
+      { id: "hero", name: "Hero", required: true },
+      { id: "couple", name: "Couple", required: true },
+      { id: "story", name: "Our Story", required: false },
     ],
     themes: [
       {
-        id: 'default',
-        name: 'Default',
+        id: "default",
+        name: "Default",
         isDefault: true,
-        colors: { primary: '#1a1a1a', secondary: '#f5f5f5' },
-        fonts: { heading: 'sans-serif', body: 'serif' },
+        colors: { primary: "#1a1a1a", secondary: "#f5f5f5" },
+        fonts: { heading: "sans-serif", body: "serif" },
       },
     ],
   },
@@ -116,12 +116,12 @@ const mockLayoutManifests = [
 
 const mockAssets = [
   {
-    id: 'asset-1',
-    url: '/uploads/test-image-1.jpg',
+    id: "asset-1",
+    url: "/uploads/test-image-1.jpg",
   },
   {
-    id: 'asset-2',
-    url: '/uploads/test-image-2.jpg',
+    id: "asset-2",
+    url: "/uploads/test-image-2.jpg",
   },
 ];
 
@@ -129,13 +129,10 @@ const mockAssets = [
 export const handlers = [
   // Register
   http.post(`${API_BASE_URL}/auth/register`, async ({ request }) => {
-    const body = await request.json() as { email: string; password: string; name?: string };
-    
-    if (body.email === 'existing@example.com') {
-      return HttpResponse.json(
-        { error: 'Email already registered' },
-        { status: 400 }
-      );
+    const body = (await request.json()) as { email: string; password: string; name?: string };
+
+    if (body.email === "existing@example.com") {
+      return HttpResponse.json({ error: "Email already registered" }, { status: 400 });
     }
 
     return HttpResponse.json({
@@ -150,13 +147,10 @@ export const handlers = [
 
   // Login
   http.post(`${API_BASE_URL}/auth/login`, async ({ request }) => {
-    const body = await request.json() as { email: string; password: string };
-    
-    if (body.email === 'wrong@example.com' || body.password === 'wrong') {
-      return HttpResponse.json(
-        { error: 'Invalid email or password' },
-        { status: 401 }
-      );
+    const body = (await request.json()) as { email: string; password: string };
+
+    if (body.email === "wrong@example.com" || body.password === "wrong") {
+      return HttpResponse.json({ error: "Invalid email or password" }, { status: 401 });
     }
 
     return HttpResponse.json({
@@ -170,7 +164,7 @@ export const handlers = [
 
   // Logout
   http.post(`${API_BASE_URL}/auth/logout`, () => {
-    return HttpResponse.json({ message: 'Logged out successfully' });
+    return HttpResponse.json({ message: "Logged out successfully" });
   }),
 
   // Refresh token
@@ -189,88 +183,79 @@ export const handlers = [
 
   // Forgot password
   http.post(`${API_BASE_URL}/auth/forgot-password`, async ({ request }) => {
-    const body = await request.json() as { email: string };
-    
-    if (body.email === 'notfound@example.com') {
-      return HttpResponse.json(
-        { error: 'Email not found' },
-        { status: 404 }
-      );
+    const body = (await request.json()) as { email: string };
+
+    if (body.email === "notfound@example.com") {
+      return HttpResponse.json({ error: "Email not found" }, { status: 404 });
     }
 
     return HttpResponse.json({
-      message: 'Password reset email sent',
+      message: "Password reset email sent",
     });
   }),
 
   // Reset password
   http.post(`${API_BASE_URL}/auth/reset-password`, async ({ request }) => {
-    const body = await request.json() as { token: string; password: string };
-    
-    if (body.token === 'invalid-token') {
-      return HttpResponse.json(
-        { error: 'Invalid or expired token' },
-        { status: 400 }
-      );
+    const body = (await request.json()) as { token: string; password: string };
+
+    if (body.token === "invalid-token") {
+      return HttpResponse.json({ error: "Invalid or expired token" }, { status: 400 });
     }
 
     return HttpResponse.json({
-      message: 'Password reset successfully',
+      message: "Password reset successfully",
     });
   }),
 
   // Request password change OTP
   http.post(`${API_BASE_URL}/auth/password/request-otp`, async ({ request }) => {
-    const body = await request.json() as { email: string };
-    
+    const _body = (await request.json()) as { email: string };
+
     // Check for cooldown error (simulate by checking a header or query param)
     const url = new URL(request.url);
-    if (url.searchParams.get('cooldown') === 'true') {
+    if (url.searchParams.get("cooldown") === "true") {
       return HttpResponse.json(
-        { error: 'Please wait 30 seconds before requesting a new OTP' },
+        { error: "Please wait 30 seconds before requesting a new OTP" },
         { status: 429 }
       );
     }
 
     return HttpResponse.json({
-      message: 'If an account with that email exists, we\'ve sent a verification code.',
+      message: "If an account with that email exists, we've sent a verification code.",
     });
   }),
 
   // Verify password change OTP
   http.post(`${API_BASE_URL}/auth/password/verify-otp`, async ({ request }) => {
-    const body = await request.json() as { otp: string; newPassword: string };
-    
-    if (body.otp === 'invalid-otp') {
+    const body = (await request.json()) as { otp: string; newPassword: string };
+
+    if (body.otp === "invalid-otp") {
+      return HttpResponse.json({ error: "Invalid OTP. 4 attempt(s) remaining." }, { status: 401 });
+    }
+
+    if (body.otp === "expired-otp") {
       return HttpResponse.json(
-        { error: 'Invalid OTP. 4 attempt(s) remaining.' },
+        { error: "OTP has expired. Please request a new one." },
         { status: 401 }
       );
     }
 
-    if (body.otp === 'expired-otp') {
+    if (body.otp === "max-attempts-otp") {
       return HttpResponse.json(
-        { error: 'OTP has expired. Please request a new one.' },
-        { status: 401 }
-      );
-    }
-
-    if (body.otp === 'max-attempts-otp') {
-      return HttpResponse.json(
-        { error: 'Maximum attempts reached. Please request a new OTP.' },
+        { error: "Maximum attempts reached. Please request a new OTP." },
         { status: 401 }
       );
     }
 
     if (body.newPassword.length < 8) {
       return HttpResponse.json(
-        { error: 'Password must be at least 8 characters long' },
+        { error: "Password must be at least 8 characters long" },
         { status: 400 }
       );
     }
 
     return HttpResponse.json({
-      message: 'Password updated successfully',
+      message: "Password updated successfully",
     });
   }),
 
@@ -284,13 +269,10 @@ export const handlers = [
   // Get single invitation
   http.get(`${API_BASE_URL}/invitations/:id`, ({ params }) => {
     const { id } = params;
-    const invitation = mockInvitations.find(inv => inv.id === id);
-    
+    const invitation = mockInvitations.find((inv) => inv.id === id);
+
     if (!invitation) {
-      return HttpResponse.json(
-        { error: 'Invitation not found' },
-        { status: 404 }
-      );
+      return HttpResponse.json({ error: "Invitation not found" }, { status: 404 });
     }
 
     return HttpResponse.json({
@@ -300,15 +282,15 @@ export const handlers = [
 
   // Create invitation
   http.post(`${API_BASE_URL}/invitations`, async ({ request }) => {
-    const body = await request.json() as Partial<typeof mockInvitations[0]>;
-    
+    const body = (await request.json()) as Partial<(typeof mockInvitations)[0]>;
+
     const newInvitation = {
       id: `inv-${Date.now()}`,
-      userId: '1',
-      layoutId: body.layoutId || 'classic-scroll',
+      userId: "1",
+      layoutId: body.layoutId || "classic-scroll",
       data: body.data || mockInvitations[0].data,
       layoutConfig: body.layoutConfig || mockInvitations[0].layoutConfig,
-      status: 'draft',
+      status: "draft",
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -321,15 +303,12 @@ export const handlers = [
   // Update invitation
   http.put(`${API_BASE_URL}/invitations/:id`, async ({ params, request }) => {
     const { id } = params;
-    const body = await request.json() as Partial<typeof mockInvitations[0]>;
-    
-    const invitation = mockInvitations.find(inv => inv.id === id);
-    
+    const body = (await request.json()) as Partial<(typeof mockInvitations)[0]>;
+
+    const invitation = mockInvitations.find((inv) => inv.id === id);
+
     if (!invitation) {
-      return HttpResponse.json(
-        { error: 'Invitation not found' },
-        { status: 404 }
-      );
+      return HttpResponse.json({ error: "Invitation not found" }, { status: 404 });
     }
 
     const updatedInvitation = {
@@ -346,17 +325,14 @@ export const handlers = [
   // Delete invitation
   http.delete(`${API_BASE_URL}/invitations/:id`, ({ params }) => {
     const { id } = params;
-    const invitation = mockInvitations.find(inv => inv.id === id);
-    
+    const invitation = mockInvitations.find((inv) => inv.id === id);
+
     if (!invitation) {
-      return HttpResponse.json(
-        { error: 'Invitation not found' },
-        { status: 404 }
-      );
+      return HttpResponse.json({ error: "Invitation not found" }, { status: 404 });
     }
 
     return HttpResponse.json({
-      message: 'Invitation deleted',
+      message: "Invitation deleted",
     });
   }),
 
@@ -370,13 +346,10 @@ export const handlers = [
   // Get single layout
   http.get(`${API_BASE_URL}/layouts/:id`, ({ params }) => {
     const { id } = params;
-    const layout = mockLayoutManifests.find(l => l.id === id);
-    
+    const layout = mockLayoutManifests.find((l) => l.id === id);
+
     if (!layout) {
-      return HttpResponse.json(
-        { error: 'Layout not found' },
-        { status: 404 }
-      );
+      return HttpResponse.json({ error: "Layout not found" }, { status: 404 });
     }
 
     return HttpResponse.json({
@@ -387,13 +360,10 @@ export const handlers = [
   // Get layout manifest
   http.get(`${API_BASE_URL}/layouts/:id/manifest`, ({ params }) => {
     const { id } = params;
-    const manifest = mockLayoutManifests.find(l => l.id === id);
-    
+    const manifest = mockLayoutManifests.find((l) => l.id === id);
+
     if (!manifest) {
-      return HttpResponse.json(
-        { error: 'Layout manifest not found' },
-        { status: 404 }
-      );
+      return HttpResponse.json({ error: "Layout manifest not found" }, { status: 404 });
     }
 
     return HttpResponse.json({
@@ -404,13 +374,10 @@ export const handlers = [
   // Upload asset
   http.post(`${API_BASE_URL}/assets/upload`, async ({ request }) => {
     const formData = await request.formData();
-    const file = formData.get('file') as File;
-    
+    const file = formData.get("file") as File;
+
     if (!file) {
-      return HttpResponse.json(
-        { error: 'No file provided' },
-        { status: 400 }
-      );
+      return HttpResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
     return HttpResponse.json({
@@ -439,18 +406,14 @@ export const handlers = [
   // Delete asset
   http.delete(`${API_BASE_URL}/assets/:id`, ({ params }) => {
     const { id } = params;
-    const asset = mockAssets.find(a => a.id === id);
-    
+    const asset = mockAssets.find((a) => a.id === id);
+
     if (!asset) {
-      return HttpResponse.json(
-        { error: 'Asset not found' },
-        { status: 404 }
-      );
+      return HttpResponse.json({ error: "Asset not found" }, { status: 404 });
     }
 
     return HttpResponse.json({
-      message: 'Asset deleted',
+      message: "Asset deleted",
     });
   }),
 ];
-

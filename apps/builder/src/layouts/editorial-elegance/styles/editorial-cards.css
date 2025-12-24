@@ -16,7 +16,7 @@
 }
 
 .ee-event-card::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   border: 1px solid transparent;
@@ -36,7 +36,7 @@
 }
 
 .ee-event-name {
-  font-family: var(--font-heading, 'Playfair Display', serif);
+  font-family: var(--font-heading, "Playfair Display", serif);
   font-size: var(--ee-text-subheading);
   margin: 0 0 var(--ee-space-sm);
   font-weight: var(--ee-weight-regular);
@@ -170,7 +170,7 @@
 }
 
 .ee-party-name {
-  font-family: var(--font-heading, 'Playfair Display', serif);
+  font-family: var(--font-heading, "Playfair Display", serif);
   font-size: 24px;
   margin: 0;
   font-weight: var(--ee-weight-regular);
@@ -240,7 +240,7 @@
   border: none;
   border-bottom: 1px solid var(--ee-color-divider);
   background: transparent;
-  font-family: var(--font-body, 'Inter', sans-serif);
+  font-family: var(--font-body, "Inter", sans-serif);
   font-size: 16px;
   color: var(--ee-color-text);
   transition: border-color 0.2s ease;
@@ -263,7 +263,7 @@
   border: 1px solid var(--ee-color-text);
   background: transparent;
   color: var(--ee-color-text);
-  font-family: var(--font-body, 'Inter', sans-serif);
+  font-family: var(--font-body, "Inter", sans-serif);
   font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -309,7 +309,7 @@
 }
 
 .ee-footer-container h3 {
-  font-family: var(--font-heading, 'Playfair Display', serif);
+  font-family: var(--font-heading, "Playfair Display", serif);
   font-size: clamp(28px, 4vw, 36px);
   font-weight: var(--ee-weight-regular);
   letter-spacing: var(--ee-spacing-heading);
@@ -351,27 +351,27 @@
     grid-template-columns: 1fr;
     gap: var(--ee-space-sm);
   }
-  
+
   .ee-intro-container,
   .ee-location-container {
     grid-template-columns: 1fr;
     gap: var(--ee-space-md);
   }
-  
+
   .ee-party-grid {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: var(--ee-space-md);
   }
-  
+
   .ee-gallery-masonry {
     column-count: 2;
     column-gap: var(--ee-space-sm);
   }
-  
+
   .ee-intro-image-container {
     height: 400px;
   }
-  
+
   .ee-location-map {
     height: 300px;
   }
@@ -381,9 +381,8 @@
   .ee-gallery-masonry {
     column-count: 1;
   }
-  
+
   .ee-party-grid {
     grid-template-columns: 1fr;
   }
 }
-

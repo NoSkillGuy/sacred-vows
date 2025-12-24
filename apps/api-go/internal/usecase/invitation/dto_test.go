@@ -212,4 +212,3 @@ func TestExtractMetadataFromData_EmptyString(t *testing.T) {
 		t.Errorf("Expected status to be nil, got '%s'", *status)
 	}
 }
-

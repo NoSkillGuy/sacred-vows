@@ -3,18 +3,18 @@
  * Registers the layout with the central layout registry
  */
 
-import { registerLayout, type LayoutRegistration } from '../registry';
-import { editorialEleganceManifest } from './manifest';
-import * as components from './components/index';
-import * as styles from './styles/index';
-import * as hooks from './hooks/index';
-import * as exportModule from './export/index';
+import { registerLayout, type LayoutRegistration } from "../registry";
+import { editorialEleganceManifest } from "./manifest";
+import * as components from "./components/index";
+import * as styles from "./styles/index";
+import * as hooks from "./hooks/index";
+import * as exportModule from "./export/index";
 
 // Register editorial-elegance layout
 registerLayout({
-  id: 'editorial-elegance',
-  name: 'Editorial Elegance',
-  version: '1.0.0',
+  id: "editorial-elegance",
+  name: "Editorial Elegance",
+  version: "1.0.0",
   manifest: editorialEleganceManifest,
   components: {
     view: components.view,
@@ -26,5 +26,4 @@ registerLayout({
   export: exportModule,
 } as LayoutRegistration);
 
-console.log('✓ Registered layout: editorial-elegance (v1.0.0)');
-
+console.log("✓ Registered layout: editorial-elegance (v1.0.0)");

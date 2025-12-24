@@ -32,5 +32,3 @@ func (uc *ValidateSubdomainUseCase) Execute(ctx context.Context, rawSubdomain st
 	}
 	return normalized, true, "", nil
 }
-
-

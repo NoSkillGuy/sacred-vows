@@ -16,10 +16,10 @@ func TestGetLayoutByIDUseCase_Execute_LayoutFound_ReturnsLayout(t *testing.T) {
 	layoutID := "classic-scroll"
 	manifestData := json.RawMessage(`{"name": "Classic Scroll", "category": "elegant", "status": "ready"}`)
 	layout := &domain.Layout{
-		ID:       layoutID,
-		Name:     "Classic Scroll",
-		Manifest: &manifestData,
-		IsActive: true,
+		ID:        layoutID,
+		Name:      "Classic Scroll",
+		Manifest:  &manifestData,
+		IsActive:  true,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
@@ -64,4 +64,3 @@ func TestGetLayoutByIDUseCase_Execute_LayoutNotFound_ReturnsError(t *testing.T) 
 	require.Error(t, err, "Layout not found should return error")
 	assert.Nil(t, output, "Output should be nil on error")
 }
-

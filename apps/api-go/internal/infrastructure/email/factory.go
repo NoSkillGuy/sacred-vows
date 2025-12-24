@@ -17,4 +17,3 @@ func NewEmailService(cfg config.EmailConfig, usageRepo repository.EmailUsageRepo
 
 	return NewMultiVendorService(cfg.Vendors, usageRepo, cfg.FromAddress, cfg.FromName)
 }
-

@@ -38,7 +38,7 @@
 
 .export-modal-header h3 {
   margin: 0;
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.35rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -103,7 +103,7 @@
 }
 
 .export-success h4 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.5rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -129,7 +129,7 @@
 
 .export-url {
   flex: 1;
-  font-family: 'SF Mono', Monaco, monospace;
+  font-family: "SF Mono", Monaco, monospace;
   font-size: 0.85rem;
   color: var(--text-dark);
   white-space: nowrap;
@@ -244,8 +244,8 @@
 
 .share-btn.whatsapp:hover {
   background: #e7f5e7;
-  border-color: #25D366;
-  color: #128C7E;
+  border-color: #25d366;
+  color: #128c7e;
 }
 
 .share-btn.email:hover {
@@ -316,7 +316,7 @@
   .export-modal-content {
     border-radius: var(--radius-lg);
   }
-  
+
   .export-share-buttons {
     flex-direction: column;
   }

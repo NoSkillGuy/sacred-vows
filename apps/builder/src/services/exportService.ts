@@ -1,9 +1,9 @@
-import JSZip from 'jszip';
-import { getLayout, getLayoutExport } from '../layouts/registry';
-import type { InvitationData } from '@shared/types/wedding-data';
+import JSZip from "jszip";
+import { getLayout, getLayoutExport } from "../layouts/registry";
+import type { InvitationData } from "@shared/types/wedding-data";
 // Import layouts to ensure they're registered
-import '../layouts/classic-scroll';
-import '../layouts/editorial-elegance';
+import "../layouts/classic-scroll";
+import "../layouts/editorial-elegance";
 
 /**
  * Client-side export service
@@ -16,26 +16,29 @@ import '../layouts/editorial-elegance';
  * @param translations - Translation data
  * @returns Generated HTML
  */
-export async function generateInvitationHTML(invitation: InvitationData, translations?: Record<string, unknown> | null): Promise<string> {
-  const layoutId = invitation.layoutId || 'classic-scroll';
-  
+export async function generateInvitationHTML(
+  invitation: InvitationData,
+  translations?: Record<string, unknown> | null
+): Promise<string> {
+  const layoutId = invitation.layoutId || "classic-scroll";
+
   try {
     // Get layout-specific export functions from registry
     const layout = getLayout(layoutId);
     if (!layout) {
       throw new Error(`Layout "${layoutId}" not found in registry`);
     }
-    
+
     const layoutExport = getLayoutExport(layoutId);
     if (!layoutExport.generateHTML) {
       throw new Error(`Layout "${layoutId}" does not provide generateHTML export function`);
     }
-    
+
     // Use layout-specific HTML generation
     const html = await layoutExport.generateHTML(invitation, translations);
     return html;
   } catch (error) {
-    console.error('Failed to generate HTML:', error);
+    console.error("Failed to generate HTML:", error);
     // Fallback to basic HTML
     return generateFallbackHTML(invitation);
   }
@@ -51,11 +54,11 @@ function generateFallbackHTML(invitation: InvitationData): string {
   const groom = couple.groom || {};
   const wedding = data?.wedding || {};
   const venue = wedding?.venue || {};
-  
-  const brideName = bride.name || 'Bride';
-  const groomName = groom.name || 'Groom';
-  const weddingDate = wedding.dates?.join(' & ') || 'Date TBD';
-  const venueName = venue.name || 'Venue TBD';
+
+  const brideName = bride.name || "Bride";
+  const groomName = groom.name || "Groom";
+  const weddingDate = wedding.dates?.join(" & ") || "Date TBD";
+  const venueName = venue.name || "Venue TBD";
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -82,7 +85,10 @@ function generateFallbackHTML(invitation: InvitationData): string {
 /**
  * Export invitation as downloadable ZIP file
  */
-export async function exportInvitationAsZip(invitationData: InvitationData, translations?: Record<string, unknown> | null): Promise<Blob> {
+export async function exportInvitationAsZip(
+  invitationData: InvitationData,
+  translations?: Record<string, unknown> | null
+): Promise<Blob> {
   const zip = new JSZip();
   const manifest = `{
   "name": "Priya & Saurabh Wedding Invitation",
@@ -104,21 +110,25 @@ export async function exportInvitationAsZip(invitationData: InvitationData, tran
   ]
 }`;
 
-  const png1x1 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==';
-  const jpeg1x1 = '/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxISEhISEhIVFRUVFRUVFRUVFRUVFRUWFxUVFRUYHSggGBolGxUVITEhJSkrLi4uFx8zODMsNygtLisBCgoKDg0OGhAQGi0lICUtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLf/AABEIAKgBLAMBIgACEQEDEQH/xAAbAAEAAgMBAQAAAAAAAAAAAAAABQYBAwQCB//EADwQAAEDAgQDBgQEBQQCAwAAAAEAAhEDIQQSMUEFUWFxBhMicYGRoQcjQrHB0fAHFSNSYuEzgpKiFf/EABoBAQADAQEBAAAAAAAAAAAAAAABAgMEBQb/xAAuEQACAgECBAMIAwEBAAAAAAAAAQIRAxIhMUETIlFhBRQycaGxwTNScpHB0f/aAAwDAQACEQMRAD8A9xREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQf/2Q==';
-  
+  const png1x1 =
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==";
+  const jpeg1x1 =
+    "/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxISEhISEhIVFRUVFRUVFRUVFRUVFRUWFxUVFRUYHSggGBolGxUVITEhJSkrLi4uFx8zODMsNygtLisBCgoKDg0OGhAQGi0lICUtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLf/AABEIAKgBLAMBIgACEQEDEQH/xAAbAAEAAgMBAQAAAAAAAAAAAAAABQYBAwQCB//EADwQAAEDAgQDBgQEBQQCAwAAAAEAAhEDIQQSMUEFUWFxBhMicYGRoQcjQrHB0fAHFSNSYuEzgpKiFf/EABoBAQADAQEBAAAAAAAAAAAAAAABAgMEBQb/xAAuEQACAgECBAMIAwEBAAAAAAAAAQIRAxIhMUETIlFhBRQycaGxwTNScpHB0f/aAAwDAQACEQMRAD8A9xREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERAREQf/2Q==";
+
   // Generate HTML
   const html = await generateInvitationHTML(invitationData, translations);
-  zip.file('index.html', html);
-  zip.file('manifest.json', manifest);
-  zip.file('assets/photos/icons/icon-192.png', png1x1, { base64: true });
-  zip.file('assets/photos/icons/icon-512.png', png1x1, { base64: true });
-  zip.file('assets/photos/icons/logo.jpeg', jpeg1x1, { base64: true });
-  
+  zip.file("index.html", html);
+  zip.file("manifest.json", manifest);
+  zip.file("assets/photos/icons/icon-192.png", png1x1, { base64: true });
+  zip.file("assets/photos/icons/icon-512.png", png1x1, { base64: true });
+  zip.file("assets/photos/icons/logo.jpeg", jpeg1x1, { base64: true });
+
   // Add placeholder files (in production, these would be actual bundled files)
-  zip.file('styles.css', '/* Styles will be included in production */');
-  zip.file('app.js', '// JavaScript will be included in production');
-  zip.file('README.txt', `Wedding Invitation Export
+  zip.file("styles.css", "/* Styles will be included in production */");
+  zip.file("app.js", "// JavaScript will be included in production");
+  zip.file(
+    "README.txt",
+    `Wedding Invitation Export
 Generated: ${new Date().toISOString()}
 
 To deploy:
@@ -132,19 +142,20 @@ For quick deployment:
 - GitHub Pages: Upload to a GitHub repository and enable Pages
 
 Note: This is a basic export. Full functionality requires the complete build.
-`);
-  
+`
+  );
+
   // Generate and download ZIP
-  const blob = await zip.generateAsync({ type: 'blob' });
+  const blob = await zip.generateAsync({ type: "blob" });
   const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = `wedding-invitation-${Date.now()}.zip`;
   document.body.appendChild(a);
   a.click();
   window.URL.revokeObjectURL(url);
   document.body.removeChild(a);
-  
+
   return blob;
 }
 
@@ -155,17 +166,17 @@ Note: This is a basic export. Full functionality requires the complete build.
 export function exportInvitationAsJSON(invitation: InvitationData): void {
   // Export the full invitation object including layoutId and layoutConfig
   const exportData = {
-    layoutId: invitation.layoutId || 'classic-scroll',
+    layoutId: invitation.layoutId || "classic-scroll",
     data: invitation.data,
     layoutConfig: invitation.layoutConfig,
     exportedAt: new Date().toISOString(),
-    version: '1.0.0',
+    version: "1.0.0",
   };
-  
+
   const dataStr = JSON.stringify(exportData, null, 2);
-  const dataBlob = new Blob([dataStr], { type: 'application/json' });
+  const dataBlob = new Blob([dataStr], { type: "application/json" });
   const url = window.URL.createObjectURL(dataBlob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = `wedding-invitation-backup-${Date.now()}.json`;
   document.body.appendChild(a);
@@ -173,4 +184,3 @@ export function exportInvitationAsJSON(invitation: InvitationData): void {
   window.URL.revokeObjectURL(url);
   document.body.removeChild(a);
 }
-
