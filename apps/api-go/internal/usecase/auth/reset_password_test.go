@@ -151,4 +151,3 @@ func TestResetPasswordUseCase_Execute_ExpiredToken_ReturnsError(t *testing.T) {
 	require.Error(t, err, "Expired token should return error")
 	assert.Nil(t, output, "Output should be nil on error")
 }
-

@@ -73,7 +73,3 @@ func (uc *RollbackPublishedSiteUseCase) Execute(ctx context.Context, subdomain s
 
 	return nil
 }
-
-
-
-

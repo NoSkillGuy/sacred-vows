@@ -131,7 +131,7 @@ func (c *Client) RunMigrations(ctx context.Context) error {
 func (c *Client) createMigrationsCollection(ctx context.Context) error {
 	log := logger.GetLogger()
 	log.Info("Checking if schema_migrations collection exists...")
-	
+
 	// Check if schema_migrations collection exists by trying to read a document
 	// If collection doesn't exist, this will just return empty, which is fine
 	// We'll create it implicitly when we write the first migration record
@@ -244,7 +244,7 @@ func validateMigrationSequence(applied map[int]bool, migrations []Migration) err
 // Firestore doesn't require schema migrations (collections are created automatically)
 func getAllMigrations() []Migration {
 	return []Migration{
-		{Version: 1, Name: "load_layouts", Up: migration001LoadLayouts}, // Seeds classic-scroll and editorial-elegance layouts
+		{Version: 1, Name: "load_layouts", Up: migration001LoadLayouts},                               // Seeds classic-scroll and editorial-elegance layouts
 		{Version: 2, Name: "create_password_reset_tokens", Up: migration002CreatePasswordResetTokens}, // Creates password_reset_tokens collection structure
 	}
 }
@@ -806,7 +806,7 @@ func migration002CreatePasswordResetTokens(ctx context.Context, client *Client) 
 	// Firestore creates collections automatically when first document is written
 	// This migration just ensures the collection structure is documented
 	// The collection will be created when the first password reset token is stored
-	
+
 	// Create a placeholder document to ensure collection exists, then delete it
 	placeholderID := "_schema_placeholder"
 	placeholderData := map[string]interface{}{

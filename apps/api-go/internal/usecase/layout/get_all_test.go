@@ -16,10 +16,10 @@ func TestGetAllLayoutsUseCase_Execute_NoFilters_ReturnsAllLayouts(t *testing.T) 
 	manifestData := json.RawMessage(`{"name": "Classic Scroll", "category": "elegant", "isFeatured": true, "status": "ready"}`)
 	layouts := []*domain.Layout{
 		{
-			ID:       "classic-scroll",
-			Name:     "Classic Scroll",
-			Manifest: &manifestData,
-			IsActive: true,
+			ID:        "classic-scroll",
+			Name:      "Classic Scroll",
+			Manifest:  &manifestData,
+			IsActive:  true,
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		},
@@ -42,4 +42,3 @@ func TestGetAllLayoutsUseCase_Execute_NoFilters_ReturnsAllLayouts(t *testing.T) 
 	require.NotNil(t, output, "Output should not be nil")
 	assert.GreaterOrEqual(t, len(output.Layouts), 0, "Should return layouts")
 }
-

@@ -76,4 +76,3 @@ func NewEmailUsage(vendor, date, month string) (*EmailUsage, error) {
 
 	return usage, nil
 }
-
