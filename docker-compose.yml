@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: ./apps/api-go/Dockerfile.dev
+    # env_file is optional - if .env.docker doesn't exist, environment variables below will be used
     env_file:
       - ./apps/api-go/.env.docker
     ports:
@@ -36,9 +37,9 @@ services:
       S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-minioadmin}
       S3_ASSETS_BUCKET: ${S3_ASSETS_BUCKET:-sacred-vows-assets-local}
       S3_REGION: ${S3_REGION:-us-east-1}
-      # OpenTelemetry (development)
+      # OpenTelemetry (development) - explicitly set to use tempo service in Docker network
       OTEL_ENABLED: ${OTEL_ENABLED:-true}
-      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-http://tempo:4317}
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4317
       OTEL_EXPORTER_OTLP_PROTOCOL: ${OTEL_EXPORTER_OTLP_PROTOCOL:-grpc}
       OTEL_SERVICE_NAME: ${OTEL_SERVICE_NAME:-sacred-vows-api}
       OTEL_RESOURCE_ATTRIBUTES: deployment.environment=${APP_ENV:-local}
@@ -72,6 +73,7 @@ services:
     build:
       context: .
       dockerfile: ./apps/builder/Dockerfile.dev
+    # env_file is optional - if .env.docker doesn't exist, environment variables below will be used
     env_file:
       - ./apps/builder/.env.docker
     ports:
@@ -157,11 +159,13 @@ services:
       - ./docker/tempo/tempo.yml:/etc/tempo/tempo.yml:ro
       - tempo_data:/var/tempo
     healthcheck:
-      test: ["CMD", "/tempo", "--version"]
+      # Check if Tempo HTTP server is ready (port 3200)
+      # The OTLP endpoints will be ready when the HTTP server is up
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3200/ready"]
       interval: 10s
       timeout: 5s
-      retries: 3
-      start_period: 15s
+      retries: 5
+      start_period: 20s
 
   prometheus:
     image: prom/prometheus:latest
