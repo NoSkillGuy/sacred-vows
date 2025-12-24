@@ -40,15 +40,16 @@ function RSVPModal({ isOpen, onClose, translations, currentLang, config = {} }) 
     if (!isOpen) return;
 
     const storedName = localStorage.getItem("wedding-guest-name");
-    // Use setTimeout to defer setState and avoid synchronous setState in effect
-    setTimeout(() => {
-      if (storedName) {
-        setName(storedName);
-      } else {
-        setName("");
-      }
-      setDate(defaultArrivalDate);
-    }, 0);
+    // Initialize state from localStorage - this is acceptable for initialization
+    if (storedName) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setName(storedName);
+    } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setName("");
+    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDate(defaultArrivalDate);
   }, [isOpen, defaultArrivalDate]);
 
   const handleSubmit = (e) => {

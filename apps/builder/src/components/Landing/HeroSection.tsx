@@ -185,10 +185,9 @@ function HeroSection({ onSectionView }: HeroSectionProps): ReactElement {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const data = JSON.parse(stored) as PersonalizationData;
-        // Use setTimeout to defer setState and avoid synchronous setState in effect
-        setTimeout(() => {
-          setPersonalizationData(data);
-        }, 0);
+        // Initialize state from localStorage - this is acceptable for initialization
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setPersonalizationData(data);
       } else {
         // Show modal after 15 seconds to give users time to understand the website
         const timer = setTimeout(() => {
@@ -213,10 +212,9 @@ function HeroSection({ onSectionView }: HeroSectionProps): ReactElement {
   }, []);
 
   useEffect(() => {
-    // Use setTimeout to defer setState and avoid synchronous setState in effect
-    setTimeout(() => {
-      setMounted(true);
-    }, 0);
+    // Initialize mounted state - this is acceptable for initialization
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
     if (onSectionView && sectionRef.current) {
       onSectionView("hero");
     }

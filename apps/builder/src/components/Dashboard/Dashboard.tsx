@@ -193,10 +193,9 @@ function Dashboard(): JSX.Element {
 
   useEffect(() => {
     const currentUser = getCurrentUser();
-    // Use setTimeout to defer setState and avoid synchronous setState in effect
-    setTimeout(() => {
-      setUser(currentUser);
-    }, 0);
+    // Initialize state from external source - this is acceptable for initialization
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setUser(currentUser);
   }, []);
 
   useEffect(() => {

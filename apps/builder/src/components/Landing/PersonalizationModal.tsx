@@ -104,21 +104,25 @@ function PersonalizationModal({
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         const data = JSON.parse(stored) as PersonalizationData;
-        // Use setTimeout to defer setState and avoid synchronous setState in effect
-        setTimeout(() => {
-          setBrideName(data.brideName || "");
-          setGroomName(data.groomName || "");
-          setWeddingDate(data.weddingDate || "");
-          setVenue(data.venue || "");
-        }, 0);
+        // Initialize state from localStorage - this is acceptable for initialization
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setBrideName(data.brideName || "");
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setGroomName(data.groomName || "");
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setWeddingDate(data.weddingDate || "");
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setVenue(data.venue || "");
       } else {
-        // Reset to empty if no stored data - use setTimeout to defer setState
-        setTimeout(() => {
-          setBrideName("");
-          setGroomName("");
-          setWeddingDate("");
-          setVenue("");
-        }, 0);
+        // Reset to empty if no stored data
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setBrideName("");
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setGroomName("");
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setWeddingDate("");
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setVenue("");
       }
     } catch (error) {
       console.error("Failed to load personalization data:", error);

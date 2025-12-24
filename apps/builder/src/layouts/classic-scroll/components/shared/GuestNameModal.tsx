@@ -8,11 +8,11 @@ function GuestNameModal({ isOpen, onClose, translations, _currentLang }) {
     if (!isOpen) return;
     const storedName = localStorage.getItem("wedding-guest-name") || "";
     const storedTitle = localStorage.getItem("wedding-guest-title") || "";
-    // Use setTimeout to defer setState and avoid synchronous setState in effect
-    setTimeout(() => {
-      setName(storedName);
-      setTitle(storedTitle);
-    }, 0);
+    // Initialize state from localStorage - this is acceptable for initialization
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setName(storedName);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setTitle(storedTitle);
   }, [isOpen]);
 
   if (!isOpen) return null;
