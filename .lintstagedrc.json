@@ -1,11 +1,11 @@
 {
   "apps/builder/**/*.{ts,tsx,js,jsx}": [
     "prettier --write",
-    "eslint --fix --config apps/builder/.eslintrc.json"
+    "eslint --fix"
   ],
   "apps/edge-worker/**/*.ts": [
     "prettier --write",
-    "eslint --fix --config apps/edge-worker/.eslintrc.json"
+    "eslint --fix"
   ],
   "apps/api-go/**/*.go": [
     "cd apps/api-go && go fmt",
