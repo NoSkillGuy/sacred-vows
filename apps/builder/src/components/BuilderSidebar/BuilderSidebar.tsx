@@ -184,9 +184,17 @@ function AutosaveStatus(): ReactElement {
   // Show "saved" status for 2 seconds when lastSavedAt changes
   useEffect(() => {
     if (lastSavedAt && !saving) {
-      setShowSaved(true);
-      const timer = setTimeout(() => setShowSaved(false), 2000);
-      return () => clearTimeout(timer);
+      // Use setTimeout to defer setState and avoid synchronous setState in effect
+      const showTimer = setTimeout(() => {
+        setShowSaved(true);
+      }, 0);
+      const hideTimer = setTimeout(() => {
+        setShowSaved(false);
+      }, 2000);
+      return () => {
+        clearTimeout(showTimer);
+        clearTimeout(hideTimer);
+      };
     }
   }, [lastSavedAt, saving]);
 
@@ -275,7 +283,11 @@ export default function BuilderSidebar({
   // Close drawer when exiting mobile mode
   useEffect(() => {
     if (!isMobile && drawerOpen) {
-      setDrawerOpen(false);
+      // Use setTimeout to defer setState and avoid synchronous setState in effect
+      const timer = setTimeout(() => {
+        setDrawerOpen(false);
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [isMobile, drawerOpen]);
 

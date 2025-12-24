@@ -20,13 +20,9 @@ export async function generateHTML(
   const couple = data?.couple || {};
   const bride = couple.bride || {};
   const groom = couple.groom || {};
-  const wedding = data?.wedding || {};
-  const venue = wedding?.venue || {};
 
   const brideName = bride.name || "Bride";
   const groomName = groom.name || "Groom";
-  const weddingDate = wedding.dates?.[0] || "Date TBD";
-  const city = venue.city || "City";
   const theme = layoutConfig?.theme || data?.theme || {};
   const colors = theme.colors || {};
   const fonts = theme.fonts || {};
@@ -149,7 +145,7 @@ function generateBodyHTML(
           year: "numeric",
         })
         .toUpperCase();
-    } catch (_error) {
+    } catch {
       return "";
     }
   };

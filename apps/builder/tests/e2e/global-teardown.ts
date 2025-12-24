@@ -11,7 +11,7 @@ const PRESERVE_TEST_DATA = process.env.PRESERVE_TEST_DATA === "true";
 /**
  * Global teardown: Clean up test data after all tests run
  */
-async function globalTeardown(config: FullConfig) {
+async function globalTeardown(_config: FullConfig) {
   console.log("\n=== E2E Test Global Teardown ===");
 
   if (PRESERVE_TEST_DATA) {

@@ -127,9 +127,9 @@ function TermsPage(): JSX.Element {
           <section className="legal-section">
             <h2>9. Disclaimer of Warranties</h2>
             <p>
-              THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND,
-              EITHER EXPRESS OR IMPLIED. WE DO NOT WARRANT THAT THE SERVICE WILL BE UNINTERRUPTED,
-              ERROR-FREE, OR COMPLETELY SECURE.
+              THE SERVICE IS PROVIDED &quot;AS IS&quot; AND &quot;AS AVAILABLE&quot; WITHOUT
+              WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED. WE DO NOT WARRANT THAT THE SERVICE
+              WILL BE UNINTERRUPTED, ERROR-FREE, OR COMPLETELY SECURE.
             </p>
           </section>
 

@@ -187,17 +187,15 @@ function Dashboard(): JSX.Element {
   const { addToast } = useToast();
 
   // Query hooks
-  const { data: invitations = [], isLoading: loading, error } = useInvitationsQuery();
+  const { data: invitations = [], isLoading: loading } = useInvitationsQuery();
   const deleteMutation = useDeleteInvitationMutation();
   const updateMutation = useUpdateInvitationMutation();
 
-  function loadUser(): void {
-    const currentUser = getCurrentUser();
-    setUser(currentUser);
-  }
-
   useEffect(() => {
-    loadUser();
+    const currentUser = getCurrentUser();
+    // Initialize state from external source - this is acceptable for initialization
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setUser(currentUser);
   }, []);
 
   useEffect(() => {

@@ -6,13 +6,11 @@ function Couple({ translations, _currentLang, config = {} }) {
   const groom = couple.groom || {};
 
   const brideName = bride.name || "Capt (Dr) Priya Singh";
-  const _brideTitle = bride.title || "Capt (Dr)";
   const brideMother = bride.parents?.mother || "Mrs. Geeta Singh";
   const brideFather = bride.parents?.father || "Mr. Sanjay Kumar Singh";
   const brideImage = bride.image || getDefaultAssetUrl("couple1", "bride", "1.jpeg");
 
   const groomName = groom.name || "Dr Saurabh Singh";
-  const _groomTitle = groom.title || "Dr";
   const groomMother = groom.parents?.mother || "Mrs. Vibha Singh";
   const groomFather = groom.parents?.father || "Mr. Ashok Kumar Singh";
   const groomImage = groom.image || getDefaultAssetUrl("couple1", "groom", "1.jpeg");
