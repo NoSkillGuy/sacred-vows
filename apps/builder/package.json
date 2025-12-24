@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@opentelemetry/api": "^1.8.0",
-    "@opentelemetry/context-zone-peer-dep": "^1.21.0",
+    "@opentelemetry/context-zone-peer-dep": "^2.2.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.52.0",
     "@opentelemetry/instrumentation": "^0.52.0",
     "@opentelemetry/instrumentation-document-load": "^0.52.0",
