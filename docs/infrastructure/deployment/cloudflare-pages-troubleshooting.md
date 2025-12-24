@@ -352,7 +352,7 @@ If you need to manually fix this issue:
    ZONE_ID=$(curl -s -X GET "https://api.cloudflare.com/client/v4/zones?name=sacredvows.io" \
      -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
      -H "Content-Type: application/json" | jq -r '.result[0].id')
-   
+
    # Purge cache
    curl -X POST "https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/purge_cache" \
      -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
@@ -431,7 +431,7 @@ Framework preset: Vite
 **Environment Variables:**
 ```
 VITE_API_URL = https://api.dev.sacredvows.io/api
-NODE_VERSION = 18
+NODE_VERSION = 20.19.0
 ```
 
 ### Cloudflare DNS Settings

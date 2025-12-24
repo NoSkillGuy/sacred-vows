@@ -6,7 +6,7 @@ This document lists all required tools, accounts, and system requirements for de
 
 ### Development Tools
 
-- **Node.js**: Version 18 or higher
+- **Node.js**: Version 20.19.0 or higher (required by vite 7.3.0 and vitest 4.0.16)
   - Install from [nodejs.org](https://nodejs.org/)
   - Verify: `node --version`
 
@@ -109,7 +109,7 @@ Run these commands to verify your setup:
 
 ```bash
 # Check Node.js
-node --version  # Should be 18+
+node --version  # Should be 20.19.0+
 
 # Check Go
 go version  # Should be 1.21+
