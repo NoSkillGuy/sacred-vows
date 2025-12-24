@@ -53,7 +53,7 @@
 }
 
 .api-features .feature-card h3 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -75,7 +75,7 @@
 }
 
 .api-section h2 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 1.75rem;
   font-weight: 600;
   color: var(--text-dark);
@@ -128,7 +128,7 @@
 
 .code-block code,
 .code-block pre {
-  font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+  font-family: "Fira Code", "Monaco", "Consolas", monospace;
   font-size: 0.85rem;
   color: #cdd6f4;
   line-height: 1.6;
@@ -204,7 +204,7 @@
 }
 
 .endpoints-table td code {
-  font-family: 'Fira Code', 'Monaco', 'Consolas', monospace;
+  font-family: "Fira Code", "Monaco", "Consolas", monospace;
   font-size: 0.85rem;
   background: var(--blush-light);
   padding: 0.25rem 0.5rem;
@@ -226,7 +226,7 @@
   border-radius: var(--radius-sm);
   font-size: 0.7rem;
   font-weight: 700;
-  font-family: 'Fira Code', monospace;
+  font-family: "Fira Code", monospace;
   text-transform: uppercase;
 }
 
@@ -263,7 +263,7 @@
 }
 
 .api-help h2 {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: "Cormorant Garamond", serif;
   font-size: 2rem;
   font-weight: 500;
   color: var(--text-dark);
@@ -319,4 +319,3 @@
     padding: 1.5rem;
   }
 }
-

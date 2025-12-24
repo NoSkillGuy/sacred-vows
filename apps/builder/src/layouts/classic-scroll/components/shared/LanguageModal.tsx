@@ -1,26 +1,26 @@
-function LanguageModal({ isOpen, onClose, onSelect, currentLang, translations }) {
+function LanguageModal({ isOpen, _onClose, onSelect, currentLang, translations }) {
   if (!isOpen) return null;
 
   const languages = [
-    { code: 'en', name: 'English' },
-    { code: 'hi', name: 'हिंदी (Hindi)' },
-    { code: 'te', name: 'తెలుగు (Telugu)' }
+    { code: "en", name: "English" },
+    { code: "hi", name: "हिंदी (Hindi)" },
+    { code: "te", name: "తెలుగు (Telugu)" },
   ];
 
   return (
     <div className="language-modal active">
       <div className="language-modal-content">
         <div className="language-modal-title">
-          {translations['language.title'] || 'Choose the Language'}
+          {translations["language.title"] || "Choose the Language"}
         </div>
         <div className="language-modal-subtitle">
-          {translations['language.subtitle'] || 'Please select your preferred language'}
+          {translations["language.subtitle"] || "Please select your preferred language"}
         </div>
         <div className="language-options">
           {languages.map((lang) => (
             <button
               key={lang.code}
-              className={`language-option ${currentLang === lang.code ? 'active' : ''}`}
+              className={`language-option ${currentLang === lang.code ? "active" : ""}`}
               data-lang={lang.code}
               onClick={() => onSelect(lang.code)}
             >
@@ -34,4 +34,3 @@ function LanguageModal({ isOpen, onClose, onSelect, currentLang, translations })
 }
 
 export default LanguageModal;
-

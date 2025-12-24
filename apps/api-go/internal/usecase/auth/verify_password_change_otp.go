@@ -28,8 +28,8 @@ func NewVerifyPasswordChangeOTPUseCase(
 }
 
 type VerifyPasswordChangeOTPInput struct {
-	UserID     string
-	OTP        string
+	UserID      string
+	OTP         string
 	NewPassword string
 }
 
@@ -121,4 +121,3 @@ func (uc *VerifyPasswordChangeOTPUseCase) Execute(ctx context.Context, input Ver
 
 	return &VerifyPasswordChangeOTPOutput{Success: true}, nil
 }
-

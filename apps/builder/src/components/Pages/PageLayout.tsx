@@ -1,14 +1,14 @@
-import { ReactNode } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import LandingFooter from '../Landing/LandingFooter';
-import './PageLayout.css';
+import { ReactNode } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import LandingFooter from "../Landing/LandingFooter";
+import "./PageLayout.css";
 
 // SVG Components matching brand
 const RingIcon = (): JSX.Element => (
   <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="20" cy="20" r="12" stroke="#d4af37" strokeWidth="2.5" fill="none"/>
-    <circle cx="20" cy="8" r="3" fill="#d4af37"/>
-    <path d="M17 8L20 3L23 8" stroke="#d4af37" strokeWidth="1.5" fill="none"/>
+    <circle cx="20" cy="20" r="12" stroke="#d4af37" strokeWidth="2.5" fill="none" />
+    <circle cx="20" cy="8" r="3" fill="#d4af37" />
+    <path d="M17 8L20 3L23 8" stroke="#d4af37" strokeWidth="1.5" fill="none" />
   </svg>
 );
 
@@ -38,13 +38,13 @@ function PageLayout({ children, title, subtitle, breadcrumbs = [] }: PageLayoutP
             </span>
             <span className="logo-text">Sacred Vows</span>
           </Link>
-          
+
           <div className="nav-links">
             <Link to="/layouts-gallery">Layouts</Link>
             <Link to="/pricing">Pricing</Link>
             <Link to="/about">About</Link>
             <Link to="/help">Support</Link>
-            <button className="nav-login" onClick={() => navigate('/login')}>
+            <button className="nav-login" onClick={() => navigate("/login")}>
               <span>Sign In</span>
             </button>
           </div>
@@ -87,9 +87,7 @@ function PageLayout({ children, title, subtitle, breadcrumbs = [] }: PageLayoutP
       )}
 
       {/* Page Content */}
-      <main className="page-content">
-        {children}
-      </main>
+      <main className="page-content">{children}</main>
 
       {/* Footer */}
       <LandingFooter />
@@ -98,4 +96,3 @@ function PageLayout({ children, title, subtitle, breadcrumbs = [] }: PageLayoutP
 }
 
 export default PageLayout;
-

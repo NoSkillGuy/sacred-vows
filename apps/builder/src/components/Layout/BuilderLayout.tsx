@@ -1,21 +1,21 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import BuilderSidebar from '../BuilderSidebar/BuilderSidebar';
-import PreviewPane from '../Preview/PreviewPane';
-import { useBuilderStore } from '../../store/builderStore';
-import { useInvitationQuery } from '../../hooks/queries/useInvitations';
-import { useLayoutManifestQuery } from '../../hooks/queries/useLayouts';
-import type { Invitation } from '../../services/invitationService';
-import './BuilderLayout.css';
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import BuilderSidebar from "../BuilderSidebar/BuilderSidebar";
+import PreviewPane from "../Preview/PreviewPane";
+import { useBuilderStore } from "../../store/builderStore";
+import { useInvitationQuery } from "../../hooks/queries/useInvitations";
+import { useLayoutManifestQuery } from "../../hooks/queries/useLayouts";
+// Invitation type removed - unused
+import "./BuilderLayout.css";
 
-type DeviceMode = 'desktop' | 'tablet' | 'mobile';
+type DeviceMode = "desktop" | "tablet" | "mobile";
 
 function BuilderLayout(): JSX.Element {
   const { invitationId } = useParams<{ invitationId: string }>();
   const navigate = useNavigate();
   const { setCurrentInvitation, loadLayoutManifest } = useBuilderStore();
   const [editMode, setEditMode] = useState(true);
-  const [deviceMode, setDeviceMode] = useState<DeviceMode>('desktop');
+  const [deviceMode, setDeviceMode] = useState<DeviceMode>("desktop");
 
   // Query hooks
   const {
@@ -24,18 +24,18 @@ function BuilderLayout(): JSX.Element {
     error: invitationError,
   } = useInvitationQuery(invitationId, Boolean(invitationId));
 
-  const {
-    data: layoutManifest,
-    isLoading: manifestLoading,
-  } = useLayoutManifestQuery(invitation?.layoutId, Boolean(invitation?.layoutId));
+  const { data: layoutManifest, isLoading: manifestLoading } = useLayoutManifestQuery(
+    invitation?.layoutId,
+    Boolean(invitation?.layoutId)
+  );
 
   const loading = invitationLoading || manifestLoading;
-  const error = invitationError ? 'Failed to load invitation' : null;
+  const error = invitationError ? "Failed to load invitation" : null;
 
   useEffect(() => {
     if (!invitationId) {
       // No invitation ID, redirect to dashboard
-      navigate('/dashboard');
+      navigate("/dashboard");
       return;
     }
   }, [invitationId, navigate]);
@@ -56,7 +56,7 @@ function BuilderLayout(): JSX.Element {
   useEffect(() => {
     if (error && invitationId) {
       // Redirect to dashboard if invitation not found
-      setTimeout(() => navigate('/dashboard'), 2000);
+      setTimeout(() => navigate("/dashboard"), 2000);
     }
   }, [error, invitationId, navigate]);
 
@@ -66,9 +66,9 @@ function BuilderLayout(): JSX.Element {
         <div className="builder-loading-content">
           <div className="builder-loading-spinner">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="8" cy="15" r="5"/>
-              <circle cx="16" cy="15" r="5"/>
-              <path d="M8 10a5 5 0 0 1 8 0"/>
+              <circle cx="8" cy="15" r="5" />
+              <circle cx="16" cy="15" r="5" />
+              <path d="M8 10a5 5 0 0 1 8 0" />
             </svg>
           </div>
           <p>Loading your invitation...</p>
@@ -149,14 +149,10 @@ function BuilderLayout(): JSX.Element {
         onDeviceModeChange={setDeviceMode}
       />
       <div className="builder-main">
-        <PreviewPane 
-          editMode={editMode}
-          deviceMode={deviceMode}
-        />
+        <PreviewPane editMode={editMode} deviceMode={deviceMode} />
       </div>
     </div>
   );
 }
 
 export default BuilderLayout;
-

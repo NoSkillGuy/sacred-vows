@@ -13,5 +13,3 @@ type PublishedSiteRepository interface {
 	Create(ctx context.Context, site *domain.PublishedSite) error
 	Update(ctx context.Context, site *domain.PublishedSite) error
 }
-
-

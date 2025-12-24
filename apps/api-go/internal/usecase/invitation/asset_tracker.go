@@ -78,4 +78,3 @@ func isAssetURL(url string) bool {
 
 	return false
 }
-
