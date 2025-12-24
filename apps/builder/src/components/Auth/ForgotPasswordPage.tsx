@@ -1,5 +1,5 @@
 import { useState, ChangeEvent, FormEvent } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { requestPasswordReset } from "../../services/authService";
 import { usePetals } from "./usePetals";
 import "./AuthPage.css";
@@ -48,7 +48,6 @@ const PetalSVG = ({ color = "#e8b4b8" }: PetalSVGProps): JSX.Element => (
 );
 
 function ForgotPasswordPage(): JSX.Element {
-  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -131,7 +130,7 @@ function ForgotPasswordPage(): JSX.Element {
           <div className="auth-header">
             <h1 className="auth-title">Forgot Password?</h1>
             <p className="auth-subtitle">
-              Enter your email address and we'll send you a link to reset your password
+              Enter your email address and we&apos;ll send you a link to reset your password
             </p>
           </div>
 
@@ -148,8 +147,8 @@ function ForgotPasswordPage(): JSX.Element {
                 border: "1px solid var(--sage)",
               }}
             >
-              If an account with that email exists, we've sent a password reset link. Please check
-              your email.
+              If an account with that email exists, we&apos;ve sent a password reset link. Please
+              check your email.
             </div>
           )}
 
