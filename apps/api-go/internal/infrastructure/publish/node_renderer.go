@@ -26,6 +26,23 @@ func NewNodeSnapshotGenerator(invitationRepo repository.InvitationRepository, sc
 		return nil, errors.New("snapshot renderer script path is required (path to renderPublishedHTML.js)")
 	}
 
+	// In Docker containers, ensure absolute paths starting with /app are used as-is
+	// This prevents resolution against host filesystem when volumes are mounted
+	if len(scriptPath) > 0 && scriptPath[0] == '/' {
+		// Absolute path - verify it exists
+		if _, err := os.Stat(scriptPath); os.IsNotExist(err) {
+			return nil, fmt.Errorf("snapshot renderer script not found at: %s", scriptPath)
+		}
+		if nodeBinary == "" {
+			nodeBinary = "node"
+		}
+		return &NodeSnapshotGenerator{
+			invitationRepo: invitationRepo,
+			nodeBinary:     nodeBinary,
+			scriptPath:     scriptPath,
+		}, nil
+	}
+
 	// Resolve the script path (handle relative paths for local dev convenience)
 	resolvedPath, err := resolveScriptPath(scriptPath)
 	if err != nil {
@@ -51,8 +68,9 @@ func NewNodeSnapshotGenerator(invitationRepo repository.InvitationRepository, sc
 // - Absolute paths are used as-is
 // - Relative paths are resolved relative to workspace root (for local dev convenience)
 func resolveScriptPath(scriptPath string) (string, error) {
-	// If it's already an absolute path, use it as-is
-	if filepath.IsAbs(scriptPath) {
+	// If it's already an absolute path (starts with /), use it as-is
+	// This handles both Unix paths and ensures Docker container paths work correctly
+	if filepath.IsAbs(scriptPath) || (len(scriptPath) > 0 && scriptPath[0] == '/') {
 		return scriptPath, nil
 	}
 
@@ -68,7 +86,11 @@ func resolveScriptPath(scriptPath string) (string, error) {
 	}
 
 	resolved := filepath.Join(workspaceRoot, scriptPath)
-	return filepath.Abs(resolved)
+	absPath, err := filepath.Abs(resolved)
+	if err != nil {
+		return "", fmt.Errorf("failed to resolve absolute path: %w", err)
+	}
+	return absPath, nil
 }
 
 // findWorkspaceRoot finds the workspace root by looking for the apps/builder directory

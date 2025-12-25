@@ -283,7 +283,8 @@ func Load() (*Config, error) {
 func loadDotEnv() error {
 	// 1) If caller provided explicit path via ENV_FILE, use it.
 	if envFile := os.Getenv("ENV_FILE"); envFile != "" {
-		if err := godotenv.Overload(envFile); err != nil {
+		// Use Load instead of Overload to preserve existing env vars (e.g., from docker-compose)
+		if err := godotenv.Load(envFile); err != nil {
 			return fmt.Errorf("failed to load ENV_FILE=%s: %w", envFile, err)
 		}
 		return nil
@@ -298,8 +299,9 @@ func loadDotEnv() error {
 
 	for _, p := range candidates {
 		if _, err := os.Stat(p); err == nil {
-			// Overload so local .env wins over any inherited env vars.
-			if err := godotenv.Overload(p); err != nil {
+			// Use Load instead of Overload to preserve existing env vars (e.g., from docker-compose)
+			// This ensures docker-compose environment variables take precedence over .env file values
+			if err := godotenv.Load(p); err != nil {
 				return fmt.Errorf("failed to load %s: %w", p, err)
 			}
 			return nil

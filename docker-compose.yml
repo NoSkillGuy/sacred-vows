@@ -38,9 +38,10 @@ services:
       S3_ASSETS_BUCKET: ${S3_ASSETS_BUCKET:-sacred-vows-assets-local}
       S3_REGION: ${S3_REGION:-us-east-1}
       # OpenTelemetry (development) - explicitly set to use tempo service in Docker network
+      # Using HTTP protocol instead of gRPC to avoid DNS resolution issues in Docker
       OTEL_ENABLED: ${OTEL_ENABLED:-true}
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4317
-      OTEL_EXPORTER_OTLP_PROTOCOL: ${OTEL_EXPORTER_OTLP_PROTOCOL:-grpc}
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4318
+      OTEL_EXPORTER_OTLP_PROTOCOL: ${OTEL_EXPORTER_OTLP_PROTOCOL:-http}
       OTEL_SERVICE_NAME: ${OTEL_SERVICE_NAME:-sacred-vows-api}
       OTEL_RESOURCE_ATTRIBUTES: deployment.environment=${APP_ENV:-local}
       # Snapshot renderer configuration
@@ -52,7 +53,7 @@ services:
       minio:
         condition: service_healthy
       tempo:
-        condition: service_healthy
+        condition: service_started
     volumes:
       - ./apps/builder/layouts:/app/layouts
       - api_go_uploads:/app/uploads
@@ -96,7 +97,7 @@ services:
       minio:
         condition: service_healthy
       tempo:
-        condition: service_healthy
+        condition: service_started
     volumes:
       # Mount source code for hot reloading - Vite will watch for changes
       - ./apps/builder:/app:rw
@@ -158,14 +159,8 @@ services:
     volumes:
       - ./docker/tempo/tempo.yml:/etc/tempo/tempo.yml:ro
       - tempo_data:/var/tempo
-    healthcheck:
-      # Check if Tempo HTTP server is ready (port 3200)
-      # The OTLP endpoints will be ready when the HTTP server is up
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3200/ready"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 20s
+    # Note: Healthcheck removed for distroless container compatibility
+    # Tempo starts quickly and services use service_started condition instead
 
   prometheus:
     image: prom/prometheus:latest
@@ -178,7 +173,8 @@ services:
       - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
     depends_on:
-      - tempo
+      tempo:
+        condition: service_started
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
       interval: 10s
@@ -198,8 +194,10 @@ services:
       - grafana_data:/var/lib/grafana
       - ./docker/grafana/provisioning:/etc/grafana/provisioning:ro
     depends_on:
-      - tempo
-      - prometheus
+      tempo:
+        condition: service_started
+      prometheus:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health"]
       interval: 10s
