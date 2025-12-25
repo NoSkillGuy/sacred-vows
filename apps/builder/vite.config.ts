@@ -53,6 +53,9 @@ export default defineConfig({
       "@template-engine": path.resolve(__dirname, "./src/template-engine/src"),
     },
   },
+  optimizeDeps: {
+    include: ["@opentelemetry/resources"],
+  },
   // Only use publicDir in local development (when CDN is not configured)
   publicDir: isCDNConfigured ? false : "public",
   server: {
@@ -65,13 +68,14 @@ export default defineConfig({
     },
     proxy: {
       "/api": {
-        // Use VITE_API_URL from env file if set, otherwise default to localhost
-        // In Docker, VITE_API_URL will be http://api-go:3000/api, so we extract the base URL
-        // In local, it will be http://localhost:3000/api
+        // Use VITE_API_PROXY_TARGET if set (for Docker), otherwise extract from VITE_API_URL
+        // In Docker: VITE_API_PROXY_TARGET=http://api-go:3000 (Docker service name works in Node.js)
+        // In local: VITE_API_URL=http://localhost:3000/api, extract base URL
         target:
-          env.VITE_API_URL && env.VITE_API_URL.includes("/api")
+          env.VITE_API_PROXY_TARGET ||
+          (env.VITE_API_URL && env.VITE_API_URL.includes("/api")
             ? env.VITE_API_URL.replace("/api", "")
-            : "http://localhost:3000",
+            : "http://localhost:3000"),
         changeOrigin: true,
       },
     },

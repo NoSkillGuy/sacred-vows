@@ -82,11 +82,16 @@ services:
     environment:
       # Pass Vite environment variables from env_file
       # Vite reads these at dev server start
-      VITE_API_URL: ${VITE_API_URL:-http://api-go:3000/api}
+      # Use relative path /api so browser requests go through Vite proxy
+      # The proxy target is set separately in vite.config.ts
+      VITE_API_URL: ${VITE_API_URL:-/api}
+      # Proxy target for Vite dev server (used by Node.js, can use Docker service names)
+      VITE_API_PROXY_TARGET: ${VITE_API_PROXY_TARGET:-http://api-go:3000}
       VITE_PUBLIC_ASSETS_CDN_URL: ${VITE_PUBLIC_ASSETS_CDN_URL:-http://localhost:9000/sacred-vows-public-assets-local}
       VITE_ENABLE_ASSET_CACHING: ${VITE_ENABLE_ASSET_CACHING:-true}
       VITE_OTEL_ENABLED: ${VITE_OTEL_ENABLED:-true}
-      VITE_OTEL_EXPORTER_OTLP_ENDPOINT: ${VITE_OTEL_EXPORTER_OTLP_ENDPOINT:-http://tempo:4318}
+      # Use localhost since browser connects directly (tempo is exposed on port 4318)
+      VITE_OTEL_EXPORTER_OTLP_ENDPOINT: ${VITE_OTEL_EXPORTER_OTLP_ENDPOINT:-http://localhost:4318}
       VITE_OTEL_SERVICE_NAME: ${VITE_OTEL_SERVICE_NAME:-sacred-vows-web}
       VITE_OTEL_SERVICE_VERSION: ${VITE_OTEL_SERVICE_VERSION:-unknown}
       VITE_OTEL_DEPLOYMENT_ENVIRONMENT: ${VITE_OTEL_DEPLOYMENT_ENVIRONMENT:-local}
@@ -167,6 +172,7 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
+      - '--web.enable-remote-write-receiver'  # Enable remote write receiver for Tempo
     ports:
       - "9090:9090"  # Prometheus UI
     volumes:

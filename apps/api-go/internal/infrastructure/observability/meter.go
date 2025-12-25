@@ -25,12 +25,22 @@ func InitMeter(ctx context.Context, cfg MeterConfig) error {
 		return nil
 	}
 
+	protocol := strings.ToLower(cfg.Protocol)
+	endpoint := normalizeEndpoint(cfg.Endpoint, protocol)
+
+	// Tempo only supports traces, not OTLP metrics - automatically disable metrics
+	// Check if endpoint contains "tempo" (case-insensitive)
+	if strings.Contains(strings.ToLower(cfg.Endpoint), "tempo") {
+		// Silently use no-op meter provider - this is expected behavior for Tempo
+		meterProvider = metric.NewMeterProvider()
+		otel.SetMeterProvider(meterProvider)
+		// Return nil to indicate success (no-op is valid for Tempo)
+		return nil
+	}
+
 	// Create OTLP metric exporter based on protocol
 	var exporter metric.Reader
 	var err error
-
-	protocol := strings.ToLower(cfg.Protocol)
-	endpoint := normalizeEndpoint(cfg.Endpoint, protocol)
 
 	if protocol == "http" || protocol == "http/protobuf" {
 		exp, err := otlpmetrichttp.New(

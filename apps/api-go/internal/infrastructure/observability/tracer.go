@@ -13,27 +13,18 @@ import (
 )
 
 // normalizeEndpoint normalizes the endpoint based on protocol:
-// - For gRPC: strips http:// or https:// prefix and returns host:port (no path)
-// - For HTTP: keeps the full URL format
+// - For both gRPC and HTTP: strips http:// or https:// prefix and returns host:port (no path)
+// - OTLP exporters expect host:port format, not full URLs (they add scheme and path internally)
 func normalizeEndpoint(endpoint, protocol string) string {
 	protocol = strings.ToLower(protocol)
 
-	// For gRPC, we need just host:port, not a full URL
-	if protocol != "http" && protocol != "http/protobuf" {
-		// Remove http:// or https:// prefix if present
-		endpoint = strings.TrimPrefix(endpoint, "http://")
-		endpoint = strings.TrimPrefix(endpoint, "https://")
-		// Remove any path component (gRPC only needs host:port)
-		if idx := strings.Index(endpoint, "/"); idx != -1 {
-			endpoint = endpoint[:idx]
-		}
-		return endpoint
-	}
+	// Remove http:// or https:// prefix if present (both gRPC and HTTP exporters expect host:port)
+	endpoint = strings.TrimPrefix(endpoint, "http://")
+	endpoint = strings.TrimPrefix(endpoint, "https://")
 
-	// For HTTP, ensure we have a proper URL format
-	if !strings.HasPrefix(endpoint, "http://") && !strings.HasPrefix(endpoint, "https://") {
-		// If no scheme, assume http://
-		endpoint = "http://" + endpoint
+	// Remove any path component (exporters only need host:port)
+	if idx := strings.Index(endpoint, "/"); idx != -1 {
+		endpoint = endpoint[:idx]
 	}
 
 	return endpoint
