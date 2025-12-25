@@ -160,7 +160,7 @@ export async function logout(): Promise<void> {
     // The refresh token is sent automatically via HttpOnly cookie
     const token = getAccessToken();
     if (token) {
-      await apiRequest(`${API_BASE_URL}/auth/logout`, {
+      await apiRequest("/auth/logout", {
         method: "POST",
       });
     }
@@ -255,7 +255,7 @@ export async function refreshAccessToken(): Promise<string> {
  */
 export async function getCurrentUserFromAPI(): Promise<User> {
   try {
-    const response = await apiRequest(`${API_BASE_URL}/auth/me`, {
+    const response = await apiRequest("/auth/me", {
       method: "GET",
     });
 
@@ -341,7 +341,7 @@ export async function resetPassword(token: string, password: string): Promise<Su
  */
 export async function requestPasswordChangeOTP(email: string): Promise<SuccessResponse> {
   try {
-    const response = await apiRequest(`${API_BASE_URL}/auth/password/request-otp`, {
+    const response = await apiRequest("/auth/password/request-otp", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -373,7 +373,7 @@ export async function verifyPasswordChangeOTP(
   newPassword: string
 ): Promise<SuccessResponse> {
   try {
-    const response = await apiRequest(`${API_BASE_URL}/auth/password/verify-otp`, {
+    const response = await apiRequest("/auth/password/verify-otp", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
