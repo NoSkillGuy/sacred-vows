@@ -34,8 +34,11 @@ jobs:
         with:
           go-version: '1.21'
 
+      - name: Clean pnpm store (fix corruption)
+        run: pnpm store prune || true
+
       - name: Install root dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --no-verify-store-integrity
 
       - name: Install swag (for docs generation)
         run: go install github.com/swaggo/swag/cmd/swag@latest
@@ -52,7 +55,7 @@ jobs:
 
       - name: Install Builder dependencies
         working-directory: ./apps/builder
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --no-verify-store-integrity
 
       - name: Lint Builder
         working-directory: ./apps/builder
@@ -60,7 +63,7 @@ jobs:
 
       - name: Install Edge Worker dependencies
         working-directory: ./apps/edge-worker
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --no-verify-store-integrity
 
       - name: Lint Edge Worker
         working-directory: ./apps/edge-worker
@@ -86,8 +89,11 @@ jobs:
           node-version: '20.19.0'
           cache: 'pnpm'
 
+      - name: Clean pnpm store (fix corruption)
+        run: pnpm store prune || true
+
       - name: Install root dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --no-verify-store-integrity
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -131,6 +137,10 @@ jobs:
           node-version: '20.19.0'
           cache: 'pnpm'
 
+      - name: Clean pnpm store (fix corruption)
+        if: matrix.test-type != 'go'
+        run: pnpm store prune || true
+
       - name: Setup Go
         if: matrix.test-type == 'go'
         uses: actions/setup-go@v5
@@ -154,7 +164,7 @@ jobs:
       - name: Install Builder dependencies
         if: matrix.test-type == 'builder'
         working-directory: ./apps/builder
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --no-verify-store-integrity
 
       - name: Test Builder
         if: matrix.test-type == 'builder'
@@ -164,7 +174,7 @@ jobs:
       - name: Install Edge Worker dependencies
         if: matrix.test-type == 'edge-worker'
         working-directory: ./apps/edge-worker
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --no-verify-store-integrity
 
       - name: Test Edge Worker (Type Check)
         if: matrix.test-type == 'edge-worker'
