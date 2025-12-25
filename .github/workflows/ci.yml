@@ -18,24 +18,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.24.0
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20.19.0'
-          cache: 'pnpm'
+
+      - name: Enable corepack and setup pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.24.0 --activate
 
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
           go-version: '1.21'
-
-      - name: Clean pnpm store (fix corruption)
-        run: pnpm store prune || true
 
       - name: Install root dependencies
         run: pnpm install --frozen-lockfile --no-verify-store-integrity
@@ -78,19 +74,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.24.0
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20.19.0'
-          cache: 'pnpm'
 
-      - name: Clean pnpm store (fix corruption)
-        run: pnpm store prune || true
+      - name: Enable corepack and setup pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.24.0 --activate
 
       - name: Install root dependencies
         run: pnpm install --frozen-lockfile --no-verify-store-integrity
@@ -124,22 +116,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        if: matrix.test-type != 'go'
-        uses: pnpm/action-setup@v4
-        with:
-          version: 10.24.0
-
       - name: Setup Node.js
         if: matrix.test-type != 'go'
         uses: actions/setup-node@v4
         with:
           node-version: '20.19.0'
-          cache: 'pnpm'
 
-      - name: Clean pnpm store (fix corruption)
+      - name: Enable corepack and setup pnpm
         if: matrix.test-type != 'go'
-        run: pnpm store prune || true
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.24.0 --activate
 
       - name: Setup Go
         if: matrix.test-type == 'go'
