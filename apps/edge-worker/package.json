@@ -2,6 +2,7 @@
   "name": "@sacred-vows/edge-worker",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@10.24.0",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
@@ -13,6 +14,9 @@
     "@cloudflare/workers-types": "^4.20251224.0",
     "@eslint/eslintrc": "^3.3.3",
     "@eslint/js": "^9.39.2",
+    "@typescript-eslint/eslint-plugin": "^8.50.1",
+    "@typescript-eslint/parser": "^8.50.1",
+    "eslint": "^9.39.2",
     "globals": "^16.5.0",
     "typescript": "^5.7.2",
     "wrangler": "^4.56.0"

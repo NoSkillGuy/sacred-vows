@@ -17,28 +17,33 @@ A modern wedding invitation builder platform that enables users to create, custo
 
 ### Prerequisites
 
-- Node.js 18+ and npm
+- Node.js 20.19.0+ and pnpm 10.24.0+
 
 ### Setup
 
-1. Install dependencies:
+1. Install pnpm (if not already installed):
 ```bash
-npm install
+npm install -g pnpm@10.24.0
 ```
 
-2. Start development server:
+2. Install dependencies:
 ```bash
-npm run dev
+pnpm install
 ```
 
-3. Build for production:
+3. Start development server:
 ```bash
-npm run build
+pnpm run dev
 ```
 
-4. Preview production build:
+4. Build for production:
 ```bash
-npm run preview
+pnpm run build
+```
+
+5. Preview production build:
+```bash
+pnpm run preview
 ```
 
 ## Deployment
@@ -63,7 +68,7 @@ This project is configured for automatic deployment to GitHub Pages via GitHub A
 
 1. Build the project:
 ```bash
-npm run build
+pnpm run build
 ```
 
 2. Deploy the `dist` folder to your hosting provider

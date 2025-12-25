@@ -175,8 +175,8 @@ curl -I https://api.dev.sacredvows.io/health
 2. **Test Build Locally**
    ```bash
    cd apps/builder
-   npm install
-   npm run build
+   pnpm install
+   pnpm run build
    ```
 
    This should create a `dist` folder with the production build.
@@ -209,7 +209,7 @@ curl -I https://api.dev.sacredvows.io/health
    **Important Settings:**
    ```
    Framework preset: Vite
-   Build command: cd apps/builder && npm run build
+   Build command: cd apps/builder && pnpm run build
    Build output directory: apps/builder/dist
    ```
 
@@ -261,7 +261,7 @@ If you need custom build settings, create a `wrangler.toml` or use Cloudflare Pa
 **For Monorepo Setup:**
 ```
 Root directory: (leave empty)
-Build command: cd apps/builder && npm ci && npm run build
+Build command: cd apps/builder && pnpm install --frozen-lockfile && pnpm run build
 Build output directory: apps/builder/dist
 Node version: 20.19.0
 ```

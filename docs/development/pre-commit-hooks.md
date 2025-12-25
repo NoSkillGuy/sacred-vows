@@ -52,36 +52,36 @@ chore: maintenance tasks
 
 ```bash
 # Format all code
-npm run format
+pnpm run format
 
 # Format specific app
-npm run format:builder
-npm run format:edge-worker
+pnpm run format:builder
+pnpm run format:edge-worker
 ```
 
 ### Lint Code
 
 ```bash
 # Lint all code
-npm run lint
+pnpm run lint
 
 # Lint specific app
-npm run lint:builder
-npm run lint:edge-worker
-npm run lint:go
+pnpm run lint:builder
+pnpm run lint:edge-worker
+pnpm run lint:go
 ```
 
 ### Check Dependencies
 
 ```bash
 # Check for vulnerable dependencies
-npm run deps:check
+pnpm run deps:check
 ```
 
 ### Run Pre-Commit Checks Manually
 
 ```bash
-npm run pre-commit
+pnpm run pre-commit
 ```
 
 ## Skipping Hooks

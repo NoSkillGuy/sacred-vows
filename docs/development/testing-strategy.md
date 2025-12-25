@@ -609,17 +609,22 @@ jobs:
         with:
           node-version: '20.19.0'
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.24.0
+
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Run unit/integration tests
-        run: npm test -- --run
+        run: pnpm test -- --run
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps
+        run: pnpm exec playwright install --with-deps
 
       - name: Run E2E tests
-        run: npm run test:e2e
+        run: pnpm run test:e2e
         env:
           CI: true
 ```
@@ -642,7 +647,7 @@ jobs:
 
 - Ensure `@vitest/coverage-v8` is installed
 - Check `vitest.config.ts` has coverage configuration
-- Run `npm run test:coverage` explicitly
+- Run `pnpm run test:coverage` explicitly
 
 ## Resources
 
@@ -659,7 +664,7 @@ jobs:
 Each test case must follow this strict workflow:
 
 1. **Write ONE test case** - Focus on a single, specific test scenario
-2. **Run the test** - Execute the test to verify it works (`npm test` for frontend)
+2. **Run the test** - Execute the test to verify it works (`pnpm test` for frontend)
 3. **Verify success** - Ensure the test passes completely before proceeding
 4. **Move to next test** - Only after current test passes, write the next test case
 
@@ -667,8 +672,8 @@ Each test case must follow this strict workflow:
 - Never write multiple tests without running them individually
 - Never proceed to the next test if the current one fails
 - Fix any failing tests immediately before continuing
-- Run tests frequently: `npm test` (frontend)
-- Use watch mode for faster feedback: `npm test -- --watch`
+- Run tests frequently: `pnpm test` (frontend)
+- Use watch mode for faster feedback: `pnpm test -- --watch`
 
 **Benefits:**
 - Catches issues early

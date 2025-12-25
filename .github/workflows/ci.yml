@@ -23,13 +23,18 @@ jobs:
         with:
           node-version: '20.19.0'
 
+      - name: Enable corepack and setup pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.24.0 --activate
+
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
           go-version: '1.21'
 
       - name: Install root dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile --no-verify-store-integrity
 
       - name: Install swag (for docs generation)
         run: go install github.com/swaggo/swag/cmd/swag@latest
@@ -46,19 +51,19 @@ jobs:
 
       - name: Install Builder dependencies
         working-directory: ./apps/builder
-        run: npm ci --legacy-peer-deps
+        run: pnpm install --frozen-lockfile --no-verify-store-integrity
 
       - name: Lint Builder
         working-directory: ./apps/builder
-        run: npm run lint
+        run: pnpm run lint
 
       - name: Install Edge Worker dependencies
         working-directory: ./apps/edge-worker
-        run: npm ci --legacy-peer-deps
+        run: pnpm install --frozen-lockfile --no-verify-store-integrity
 
       - name: Lint Edge Worker
         working-directory: ./apps/edge-worker
-        run: npm run lint
+        run: pnpm run lint
 
   format-check:
     name: Format Check
@@ -74,8 +79,13 @@ jobs:
         with:
           node-version: '20.19.0'
 
+      - name: Enable corepack and setup pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.24.0 --activate
+
       - name: Install root dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile --no-verify-store-integrity
 
       - name: Setup Go
         uses: actions/setup-go@v5
@@ -92,7 +102,7 @@ jobs:
           fi
 
       - name: Check Prettier formatting
-        run: npm run format:check
+        run: pnpm run format:check
 
   test:
     name: Test
@@ -107,9 +117,16 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Node.js
+        if: matrix.test-type != 'go'
         uses: actions/setup-node@v4
         with:
           node-version: '20.19.0'
+
+      - name: Enable corepack and setup pnpm
+        if: matrix.test-type != 'go'
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.24.0 --activate
 
       - name: Setup Go
         if: matrix.test-type == 'go'
@@ -134,22 +151,22 @@ jobs:
       - name: Install Builder dependencies
         if: matrix.test-type == 'builder'
         working-directory: ./apps/builder
-        run: npm ci --legacy-peer-deps
+        run: pnpm install --frozen-lockfile --no-verify-store-integrity
 
       - name: Test Builder
         if: matrix.test-type == 'builder'
         working-directory: ./apps/builder
-        run: npm test -- --run
+        run: pnpm test -- --run
 
       - name: Install Edge Worker dependencies
         if: matrix.test-type == 'edge-worker'
         working-directory: ./apps/edge-worker
-        run: npm ci --legacy-peer-deps
+        run: pnpm install --frozen-lockfile --no-verify-store-integrity
 
       - name: Test Edge Worker (Type Check)
         if: matrix.test-type == 'edge-worker'
         working-directory: ./apps/edge-worker
-        run: npm run typecheck
+        run: pnpm run typecheck
 
   pre-commit-checks:
     name: Pre-commit Checks
