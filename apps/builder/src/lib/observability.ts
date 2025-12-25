@@ -4,8 +4,6 @@
  */
 
 import { WebTracerProvider, BatchSpanProcessor } from "@opentelemetry/sdk-trace-web";
-import { Resource } from "@opentelemetry/resources";
-import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
 import { ZoneContextManager } from "@opentelemetry/context-zone-peer-dep";
 import { registerInstrumentations } from "@opentelemetry/instrumentation";
@@ -56,16 +54,12 @@ export function initObservability(): void {
       url: `${endpoint}/v1/traces`,
     });
 
-    // Create resource with service attributes
-    const resource = new Resource({
-      [SemanticResourceAttributes.SERVICE_NAME]: serviceName,
-      [SemanticResourceAttributes.SERVICE_VERSION]: serviceVersion,
-      "deployment.environment": deploymentEnvironment,
-    });
-
-    // Create tracer provider with sampling
+    // Note: Resource class is not exported from @opentelemetry/resources ESM build (v2.2.0)
+    // This is a known issue with the package's ESM build
+    // Using default resource - service attributes can be set via OTEL_RESOURCE_ATTRIBUTES
+    // environment variable if needed
+    // See: https://github.com/open-telemetry/opentelemetry-js/issues/4642
     tracerProvider = new WebTracerProvider({
-      resource,
       sampler: new TraceIdRatioBasedSampler(samplingRatio),
     });
 
