@@ -4,7 +4,7 @@
  */
 
 import { WebTracerProvider, BatchSpanProcessor } from "@opentelemetry/sdk-trace-web";
-import { resourceFromAttributes } from "@opentelemetry/resources";
+import { Resource } from "@opentelemetry/resources";
 import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
 import { ZoneContextManager } from "@opentelemetry/context-zone-peer-dep";
@@ -57,7 +57,7 @@ export function initObservability(): void {
     });
 
     // Create resource with service attributes
-    const resource = resourceFromAttributes({
+    const resource = new Resource({
       [SemanticResourceAttributes.SERVICE_NAME]: serviceName,
       [SemanticResourceAttributes.SERVICE_VERSION]: serviceVersion,
       "deployment.environment": deploymentEnvironment,
