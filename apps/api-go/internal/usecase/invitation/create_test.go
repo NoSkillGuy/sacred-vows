@@ -151,4 +151,5 @@ func TestCreateInvitationUseCase_Execute_DefaultLayoutID(t *testing.T) {
 	if savedInvitation.LayoutID != "classic-scroll" {
 		t.Errorf("Expected LayoutID to default to 'classic-scroll', got '%s'", savedInvitation.LayoutID)
 	}
+	// Note: Metrics tracking (RecordInvitationCreated, RecordLayoutSelection) is verified in integration tests
 }
