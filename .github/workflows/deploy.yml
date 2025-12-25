@@ -8,7 +8,7 @@ on:
 jobs:
   deploy-api-go:
     name: Deploy API (Go) to Cloud Run
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     environment:
       name: dev
     steps:
@@ -124,7 +124,7 @@ jobs:
 
   deploy-edge-worker:
     name: Deploy Edge Worker to Cloudflare
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     environment:
       name: dev
     steps:

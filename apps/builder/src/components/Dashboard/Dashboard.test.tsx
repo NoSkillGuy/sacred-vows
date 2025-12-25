@@ -200,9 +200,11 @@ describe("Dashboard", () => {
       const chooseLayoutButton = screen.getByRole("button", { name: /choose layout/i });
       await user.click(chooseLayoutButton);
 
-      // Should navigate to layouts page
-      expect(mockNavigate).toHaveBeenCalledWith("/layouts");
-    });
+      // Should navigate to layouts page - wait for navigation to be called
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith("/layouts");
+      });
+    }, 10000);
 
     it("should navigate to builder when clicking on invitation", async () => {
       const user = userEvent.setup();
