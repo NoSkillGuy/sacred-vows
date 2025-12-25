@@ -6,6 +6,7 @@ import (
 
 	"github.com/sacred-vows/api-go/internal/domain"
 	"github.com/sacred-vows/api-go/internal/infrastructure/auth"
+	"github.com/sacred-vows/api-go/internal/infrastructure/observability"
 	"github.com/sacred-vows/api-go/internal/interfaces/repository"
 	"github.com/sacred-vows/api-go/pkg/errors"
 	"github.com/segmentio/ksuid"
@@ -64,7 +65,9 @@ func (uc *GoogleOAuthUseCase) Execute(ctx context.Context, input GoogleOAuthInpu
 
 	// Find or create user
 	user, err := uc.userRepo.FindByEmail(ctx, userInfo.Email)
+	isNewUser := false
 	if err != nil || user == nil {
+		isNewUser = true
 		// Create new user
 		user, err = domain.NewUser(userInfo.Email, "", nil) // No password for OAuth users
 		if err != nil {
@@ -82,6 +85,15 @@ func (uc *GoogleOAuthUseCase) Execute(ctx context.Context, input GoogleOAuthInpu
 		if err := uc.userRepo.Create(ctx, user); err != nil {
 			return nil, errors.Wrap(errors.ErrInternalServerError.Code, "Failed to create user", err)
 		}
+	}
+
+	// Track OAuth signup or login
+	if isNewUser {
+		observability.RecordUserSignup("oauth")
+		observability.MarkUserActiveWithID(user.ID)
+	} else {
+		observability.RecordUserLogin("oauth")
+		observability.MarkUserActiveWithID(user.ID)
 	}
 
 	return &GoogleOAuthOutput{
@@ -111,7 +123,9 @@ func (uc *GoogleOAuthUseCase) Verify(ctx context.Context, input GoogleVerifyInpu
 
 	// Find or create user
 	user, err := uc.userRepo.FindByEmail(ctx, userInfo.Email)
+	isNewUser := false
 	if err != nil || user == nil {
+		isNewUser = true
 		// Create new user
 		user, err = domain.NewUser(userInfo.Email, "", nil) // No password for OAuth users
 		if err != nil {
@@ -139,6 +153,15 @@ func (uc *GoogleOAuthUseCase) Verify(ctx context.Context, input GoogleVerifyInpu
 				// User already exists, so we can continue
 			}
 		}
+	}
+
+	// Track OAuth signup or login
+	if isNewUser {
+		observability.RecordUserSignup("oauth")
+		observability.MarkUserActiveWithID(user.ID)
+	} else {
+		observability.RecordUserLogin("oauth")
+		observability.MarkUserActiveWithID(user.ID)
 	}
 
 	return &GoogleVerifyOutput{

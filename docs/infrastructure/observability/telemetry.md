@@ -246,6 +246,12 @@ The backend emits standard RED (Rate, Errors, Duration) metrics:
 Metrics use low-cardinality labels only:
 - `http.method` (GET, POST, etc.)
 - `http.route` (e.g., `/api/auth/login`)
+
+## Business Metrics
+
+In addition to RED metrics, the application tracks business metrics for user behavior, engagement, and conversion events. See [Business Metrics Documentation](./business-metrics.md) for details.
+
+Business metrics are sent to OpenTelemetry Collector (separate from traces which go to Tempo) and stored in Prometheus for visualization in Grafana.
 - `http.status_code` (200, 404, 500, etc.)
 
 **Note**: Request ID is NOT included in metric labels (too high cardinality), but IS included in trace attributes and logs for correlation.
@@ -287,7 +293,7 @@ Metrics use low-cardinality labels only:
    ```bash
    # Backend
    echo $OTEL_ENABLED
-   
+
    # Frontend
    echo $VITE_OTEL_ENABLED
    ```
@@ -296,7 +302,7 @@ Metrics use low-cardinality labels only:
    ```bash
    # For gRPC (backend)
    grpcurl -plaintext localhost:4317 list
-   
+
    # For HTTP (frontend)
    curl http://localhost:4318/v1/traces
    ```

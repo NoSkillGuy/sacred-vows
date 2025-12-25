@@ -1,0 +1,176 @@
+{
+  "dashboard": {
+    "title": "Business Metrics",
+    "tags": ["business", "metrics"],
+    "timezone": "browser",
+    "schemaVersion": 38,
+    "version": 1,
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "title": "User Signups Over Time",
+        "type": "graph",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+        "targets": [
+          {
+            "expr": "rate(business_user_signups_total[5m])",
+            "refId": "A",
+            "legendFormat": "Signups/sec"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Signup Method Breakdown",
+        "type": "piechart",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+        "targets": [
+          {
+            "expr": "sum by (method) (business_user_signups_total)",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "title": "User Logins Over Time",
+        "type": "graph",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+        "targets": [
+          {
+            "expr": "rate(business_user_logins_total[5m])",
+            "refId": "A",
+            "legendFormat": "Logins/sec"
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Active Users",
+        "type": "stat",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+        "targets": [
+          {
+            "expr": "business_users_active_daily",
+            "refId": "A",
+            "legendFormat": "Daily"
+          },
+          {
+            "expr": "business_users_active_weekly",
+            "refId": "B",
+            "legendFormat": "Weekly"
+          },
+          {
+            "expr": "business_users_active_monthly",
+            "refId": "C",
+            "legendFormat": "Monthly"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Invitations Created Over Time",
+        "type": "graph",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+        "targets": [
+          {
+            "expr": "rate(business_invitations_created_total[5m])",
+            "refId": "A",
+            "legendFormat": "Created/sec"
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Invitations Published Over Time",
+        "type": "graph",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+        "targets": [
+          {
+            "expr": "rate(business_invitations_published_total[5m])",
+            "refId": "A",
+            "legendFormat": "Published/sec"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "title": "Publish Success Rate",
+        "type": "stat",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
+        "targets": [
+          {
+            "expr": "rate(business_publish_success_total[5m]) / rate(business_publish_attempts_total[5m]) * 100",
+            "refId": "A",
+            "legendFormat": "Success Rate %"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Invitation Views Over Time",
+        "type": "graph",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 },
+        "targets": [
+          {
+            "expr": "rate(business_invitation_views_total[5m])",
+            "refId": "A",
+            "legendFormat": "Views/sec"
+          }
+        ]
+      },
+      {
+        "id": 9,
+        "title": "RSVP Submissions Over Time",
+        "type": "graph",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 32 },
+        "targets": [
+          {
+            "expr": "rate(business_rsvp_submissions_total[5m])",
+            "refId": "A",
+            "legendFormat": "RSVPs/sec"
+          }
+        ]
+      },
+      {
+        "id": 10,
+        "title": "View to RSVP Conversion Rate",
+        "type": "stat",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 32 },
+        "targets": [
+          {
+            "expr": "rate(business_rsvp_submissions_total[5m]) / rate(business_invitation_views_total[5m]) * 100",
+            "refId": "A",
+            "legendFormat": "Conversion Rate %"
+          }
+        ]
+      },
+      {
+        "id": 11,
+        "title": "Asset Uploads by Type",
+        "type": "piechart",
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 40 },
+        "targets": [
+          {
+            "expr": "sum by (file_type) (business_asset_uploads_total)",
+            "refId": "A"
+          }
+        ]
+      },
+      {
+        "id": 12,
+        "title": "Builder Sessions",
+        "type": "graph",
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 40 },
+        "targets": [
+          {
+            "expr": "rate(business_builder_sessions_total[5m])",
+            "refId": "A",
+            "legendFormat": "Sessions/sec"
+          }
+        ]
+      }
+    ]
+  }
+}

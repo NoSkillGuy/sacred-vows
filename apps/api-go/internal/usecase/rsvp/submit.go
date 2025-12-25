@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/sacred-vows/api-go/internal/domain"
+	"github.com/sacred-vows/api-go/internal/infrastructure/observability"
 	"github.com/sacred-vows/api-go/internal/interfaces/repository"
 	"github.com/sacred-vows/api-go/pkg/errors"
 	"github.com/segmentio/ksuid"
@@ -43,6 +44,9 @@ func (uc *SubmitRSVPUseCase) Execute(ctx context.Context, input SubmitRSVPInput)
 	if err := uc.rsvpRepo.Create(ctx, rsvp); err != nil {
 		return nil, errors.Wrap(errors.ErrInternalServerError.Code, "Failed to submit RSVP", err)
 	}
+
+	// Track RSVP submission
+	observability.RecordRSVPSubmission()
 
 	return &SubmitRSVPOutput{
 		RSVP: toRSVPDTO(rsvp),

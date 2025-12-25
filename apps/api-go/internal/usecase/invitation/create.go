@@ -3,8 +3,10 @@ package invitation
 import (
 	"context"
 	"encoding/json"
+	"time"
 
 	"github.com/sacred-vows/api-go/internal/domain"
+	"github.com/sacred-vows/api-go/internal/infrastructure/observability"
 	"github.com/sacred-vows/api-go/internal/interfaces/repository"
 	"github.com/sacred-vows/api-go/pkg/errors"
 	"github.com/segmentio/ksuid"
@@ -34,6 +36,8 @@ type CreateInvitationOutput struct {
 }
 
 func (uc *CreateInvitationUseCase) Execute(ctx context.Context, input CreateInvitationInput) (*CreateInvitationOutput, error) {
+	startTime := time.Now()
+
 	if input.Data == nil {
 		input.Data = json.RawMessage("{}")
 	}
@@ -61,6 +65,15 @@ func (uc *CreateInvitationUseCase) Execute(ctx context.Context, input CreateInvi
 
 	if err := uc.invitationRepo.Create(ctx, invitation); err != nil {
 		return nil, errors.Wrap(errors.ErrInternalServerError.Code, "Failed to create invitation", err)
+	}
+
+	// Track invitation creation with duration
+	duration := time.Since(startTime).Seconds()
+	observability.RecordInvitationCreatedWithDuration(duration)
+
+	// Track layout selection
+	if layoutID != "" {
+		observability.RecordLayoutSelection(layoutID)
 	}
 
 	// Track asset usage

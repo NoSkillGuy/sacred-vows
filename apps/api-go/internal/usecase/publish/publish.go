@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/sacred-vows/api-go/internal/domain"
+	"github.com/sacred-vows/api-go/internal/infrastructure/observability"
 	"github.com/sacred-vows/api-go/internal/interfaces/clock"
 	"github.com/sacred-vows/api-go/internal/interfaces/repository"
 	"github.com/sacred-vows/api-go/pkg/logger"
@@ -98,6 +99,9 @@ func (uc *PublishInvitationUseCase) Execute(ctx context.Context, invitationID, o
 	}
 
 	version = site.CurrentVersion + 1
+	// Track publish attempt
+	observability.RecordPublishAttempt(false) // Will update to success if publish completes
+
 	// Generate snapshot bundle first. If this fails, do not advance any published pointers.
 	bundle, err := uc.snapshotGen.GenerateBundle(ctx, invitationID)
 	if err != nil {
@@ -152,6 +156,10 @@ func (uc *PublishInvitationUseCase) Execute(ctx context.Context, invitationID, o
 	if err := uc.publishedRepo.Update(ctx, site); err != nil {
 		return "", 0, "", err
 	}
+
+	// Track successful publish
+	observability.RecordPublishAttempt(true)
+	observability.RecordInvitationPublished()
 
 	// Cleanup old versions in background (don't block response)
 	go uc.cleanupOldVersions(context.Background(), subdomain, version)

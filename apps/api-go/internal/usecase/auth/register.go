@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/sacred-vows/api-go/internal/domain"
+	"github.com/sacred-vows/api-go/internal/infrastructure/observability"
 	"github.com/sacred-vows/api-go/internal/interfaces/repository"
 	"github.com/sacred-vows/api-go/pkg/errors"
 	"github.com/segmentio/ksuid"
@@ -57,6 +58,10 @@ func (uc *RegisterUseCase) Execute(ctx context.Context, input RegisterInput) (*R
 	if err := uc.userRepo.Create(ctx, user); err != nil {
 		return nil, errors.Wrap(errors.ErrInternalServerError.Code, "Failed to create user", err)
 	}
+
+	// Track user signup (email method)
+	observability.RecordUserSignup("email")
+	observability.MarkUserActiveWithID(user.ID)
 
 	// Generate token (will be done by auth service)
 	// For now, return user data - token generation will be handled by handler

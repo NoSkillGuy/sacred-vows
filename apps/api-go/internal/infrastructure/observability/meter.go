@@ -28,10 +28,12 @@ func InitMeter(ctx context.Context, cfg MeterConfig) error {
 	protocol := strings.ToLower(cfg.Protocol)
 	endpoint := normalizeEndpoint(cfg.Endpoint, protocol)
 
-	// Tempo only supports traces, not OTLP metrics - automatically disable metrics
+	// Tempo only supports traces, not OTLP metrics - automatically disable metrics if endpoint is Tempo
+	// Note: Metrics should use OpenTelemetry Collector endpoint (otel-collector:4317) instead
 	// Check if endpoint contains "tempo" (case-insensitive)
 	if strings.Contains(strings.ToLower(cfg.Endpoint), "tempo") {
 		// Silently use no-op meter provider - this is expected behavior for Tempo
+		// Metrics should be sent to OpenTelemetry Collector, not Tempo
 		meterProvider = metric.NewMeterProvider()
 		otel.SetMeterProvider(meterProvider)
 		// Return nil to indicate success (no-op is valid for Tempo)

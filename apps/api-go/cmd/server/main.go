@@ -308,7 +308,7 @@ func main() {
 		meterCfg := observability.MeterConfig{
 			Enabled:               cfg.Observability.Enabled,
 			Endpoint:              cfg.Observability.MetricsEndpoint,
-			Protocol:              cfg.Observability.ExporterProtocol,
+			Protocol:              cfg.Observability.MetricsProtocol,
 			ServiceName:           cfg.Observability.ServiceName,
 			ServiceVersion:        cfg.Observability.ServiceVersion,
 			DeploymentEnvironment: cfg.Observability.DeploymentEnvironment,
@@ -320,6 +320,10 @@ func main() {
 			meter := observability.Meter("sacred-vows-api")
 			if err := observability.InitMetrics(meter); err != nil {
 				logger.GetLogger().Warn("Failed to initialize metrics", zap.Error(err))
+			} else {
+				// Start active users tracker
+				observability.StartActiveUsersTracker()
+				logger.GetLogger().Info("Active users tracker started")
 			}
 		}
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/sacred-vows/api-go/internal/domain"
+	"github.com/sacred-vows/api-go/internal/infrastructure/observability"
 	"github.com/sacred-vows/api-go/internal/interfaces/repository"
 	"github.com/sacred-vows/api-go/pkg/errors"
 	"github.com/segmentio/ksuid"
@@ -37,6 +38,9 @@ func (uc *TrackViewUseCase) Execute(ctx context.Context, input TrackViewInput) e
 	if err := uc.analyticsRepo.Create(ctx, analytics); err != nil {
 		return errors.Wrap(errors.ErrInternalServerError.Code, "Failed to track view", err)
 	}
+
+	// Track invitation view metric
+	observability.RecordInvitationView()
 
 	return nil
 }

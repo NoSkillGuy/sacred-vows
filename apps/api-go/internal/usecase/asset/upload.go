@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/sacred-vows/api-go/internal/domain"
+	"github.com/sacred-vows/api-go/internal/infrastructure/observability"
 	"github.com/sacred-vows/api-go/internal/interfaces/repository"
 	"github.com/sacred-vows/api-go/pkg/errors"
 	"github.com/segmentio/ksuid"
@@ -64,6 +65,13 @@ func (uc *UploadAssetUseCase) Execute(ctx context.Context, input UploadAssetInpu
 	if err := uc.assetRepo.Create(ctx, asset); err != nil {
 		return nil, errors.Wrap(errors.ErrInternalServerError.Code, "Failed to create asset", err)
 	}
+
+	// Track asset upload
+	fileType := input.MimeType
+	if fileType == "" {
+		fileType = "unknown"
+	}
+	observability.RecordAssetUpload(fileType)
 
 	return &UploadAssetOutput{
 		URL:      url,

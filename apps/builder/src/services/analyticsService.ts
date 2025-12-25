@@ -1,3 +1,11 @@
+// Import metrics tracking functions
+import {
+  trackPageView as trackPageViewMetric,
+  trackButtonClick,
+  trackLayoutView as trackLayoutViewMetric,
+  trackBuilderAction,
+} from "../lib/metrics";
+
 const STORAGE_KEY = "sv_analytics_events";
 const MAX_EVENTS = 100;
 
@@ -80,22 +88,44 @@ export const trackEvent = (name: string, payload: Record<string, unknown> = {}):
   return event;
 };
 
-export const trackPageView = (meta: Record<string, unknown> = {}): AnalyticsEvent =>
-  trackEvent("page_view", meta);
-export const trackCTA = (label: string, meta: Record<string, unknown> = {}): AnalyticsEvent =>
-  trackEvent("cta_click", { label, ...meta });
+export const trackPageView = (meta: Record<string, unknown> = {}): AnalyticsEvent => {
+  const event = trackEvent("page_view", meta);
+  // Also track as metric
+  const page =
+    (meta.page as string) || (typeof window !== "undefined" ? window.location.pathname : "unknown");
+  trackPageViewMetric(page);
+  return event;
+};
+
+export const trackCTA = (label: string, meta: Record<string, unknown> = {}): AnalyticsEvent => {
+  const event = trackEvent("cta_click", { label, ...meta });
+  // Also track as metric
+  const page =
+    (meta.page as string) || (typeof window !== "undefined" ? window.location.pathname : "unknown");
+  trackButtonClick(label, page);
+  return event;
+};
+
 export const trackLayoutView = (
   layoutId: string,
   meta: Record<string, unknown> = {}
-): AnalyticsEvent => trackEvent("layout_view", { layoutId, ...meta });
+): AnalyticsEvent => {
+  const event = trackEvent("layout_view", { layoutId, ...meta });
+  // Also track as metric
+  trackLayoutViewMetric(layoutId);
+  return event;
+};
+
 export const trackLayoutDemo = (
   layoutId: string,
   meta: Record<string, unknown> = {}
 ): AnalyticsEvent => trackEvent("layout_demo", { layoutId, ...meta });
+
 export const trackSectionViewed = (
   sectionId: string,
   meta: Record<string, unknown> = {}
 ): AnalyticsEvent => trackEvent("section_view", { sectionId, ...meta });
+
 export const trackExperiment = (
   name: string,
   variant: string,

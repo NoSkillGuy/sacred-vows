@@ -1,6 +1,6 @@
 /**
  * OpenTelemetry Observability Setup
- * Initializes tracing for the frontend application
+ * Initializes tracing and metrics for the frontend application
  */
 
 import { WebTracerProvider, BatchSpanProcessor } from "@opentelemetry/sdk-trace-web";
@@ -11,8 +11,11 @@ import { DocumentLoadInstrumentation } from "@opentelemetry/instrumentation-docu
 import { FetchInstrumentation } from "@opentelemetry/instrumentation-fetch";
 import { UserInteractionInstrumentation } from "@opentelemetry/instrumentation-user-interaction";
 import { TraceIdRatioBasedSampler } from "@opentelemetry/sdk-trace-base";
+import { MeterProvider, PeriodicExportingMetricReader } from "@opentelemetry/sdk-metrics-web";
+import { OTLPMetricExporter } from "@opentelemetry/exporter-metrics-otlp-http";
 
 let tracerProvider: WebTracerProvider | null = null;
+let meterProvider: MeterProvider | null = null;
 
 /**
  * Generate a UUID for request ID
@@ -87,6 +90,27 @@ export function initObservability(): void {
       contextManager: new ZoneContextManager(),
     });
 
+    // Initialize metrics meter provider
+    try {
+      const metricsExporter = new OTLPMetricExporter({
+        url: `${endpoint}/v1/metrics`,
+      });
+
+      meterProvider = new MeterProvider({
+        readers: [
+          new PeriodicExportingMetricReader({
+            exporter: metricsExporter,
+            exportIntervalMillis: 60000, // Export every 60 seconds
+          }),
+        ],
+      });
+
+      console.log("[Observability] Metrics initialized successfully");
+    } catch (error) {
+      console.error("[Observability] Failed to initialize metrics:", error);
+      // Don't fail observability initialization if metrics fail
+    }
+
     console.log("[Observability] Initialized successfully");
   } catch (error) {
     console.error("[Observability] Failed to initialize:", error);
@@ -94,11 +118,22 @@ export function initObservability(): void {
 }
 
 /**
- * Shutdown observability (flush remaining spans)
+ * Get the meter provider for metrics
+ */
+export function getMeterProvider(): MeterProvider | null {
+  return meterProvider;
+}
+
+/**
+ * Shutdown observability (flush remaining spans and metrics)
  */
 export function shutdownObservability(): Promise<void> {
+  const promises: Promise<void>[] = [];
   if (tracerProvider) {
-    return tracerProvider.shutdown();
+    promises.push(tracerProvider.shutdown());
   }
-  return Promise.resolve();
+  if (meterProvider) {
+    promises.push(meterProvider.shutdown());
+  }
+  return Promise.all(promises).then(() => undefined);
 }

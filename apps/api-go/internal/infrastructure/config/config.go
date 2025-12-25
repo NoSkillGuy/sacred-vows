@@ -129,6 +129,7 @@ type ObservabilityConfig struct {
 	ExporterEndpoint      string  // OTEL_EXPORTER_OTLP_ENDPOINT (for traces)
 	MetricsEndpoint       string  // OTEL_METRICS_EXPORTER_OTLP_ENDPOINT (for metrics, defaults to ExporterEndpoint if not set)
 	ExporterProtocol      string  // OTEL_EXPORTER_OTLP_PROTOCOL, default: grpc
+	MetricsProtocol       string  // OTEL_METRICS_EXPORTER_OTLP_PROTOCOL, default: grpc
 	ServiceName           string  // OTEL_SERVICE_NAME, default: sacred-vows-api
 	ServiceVersion        string  // from git SHA or build info
 	DeploymentEnvironment string  // OTEL_RESOURCE_ATTRIBUTES or APP_ENV
@@ -746,12 +747,14 @@ func loadObservabilityConfig(yamlConfig *ConfigFile) ObservabilityConfig {
 	// If traces endpoint is Tempo and metrics endpoint is not explicitly set, metrics will be disabled
 	tracesEndpoint := getEnv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4317")
 	metricsEndpoint := getEnv("OTEL_METRICS_EXPORTER_OTLP_ENDPOINT", tracesEndpoint)
+	metricsProtocol := getEnv("OTEL_METRICS_EXPORTER_OTLP_PROTOCOL", getEnv("OTEL_EXPORTER_OTLP_PROTOCOL", "grpc"))
 
 	return ObservabilityConfig{
 		Enabled:               enabled,
 		ExporterEndpoint:      tracesEndpoint,
 		MetricsEndpoint:       metricsEndpoint,
 		ExporterProtocol:      getEnv("OTEL_EXPORTER_OTLP_PROTOCOL", "grpc"),
+		MetricsProtocol:       metricsProtocol,
 		ServiceName:           getEnv("OTEL_SERVICE_NAME", "sacred-vows-api"),
 		ServiceVersion:        serviceVersion,
 		DeploymentEnvironment: deploymentEnv,
