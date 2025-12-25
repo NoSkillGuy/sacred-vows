@@ -126,7 +126,8 @@ type EmailConfig struct {
 
 type ObservabilityConfig struct {
 	Enabled               bool    // OTEL_ENABLED, default: true in dev/local, false in prod unless explicitly enabled
-	ExporterEndpoint      string  // OTEL_EXPORTER_OTLP_ENDPOINT
+	ExporterEndpoint      string  // OTEL_EXPORTER_OTLP_ENDPOINT (for traces)
+	MetricsEndpoint       string  // OTEL_METRICS_EXPORTER_OTLP_ENDPOINT (for metrics, defaults to ExporterEndpoint if not set)
 	ExporterProtocol      string  // OTEL_EXPORTER_OTLP_PROTOCOL, default: grpc
 	ServiceName           string  // OTEL_SERVICE_NAME, default: sacred-vows-api
 	ServiceVersion        string  // from git SHA or build info
@@ -741,9 +742,15 @@ func loadObservabilityConfig(yamlConfig *ConfigFile) ObservabilityConfig {
 		}
 	}
 
+	// Get metrics endpoint - if not set, default to traces endpoint
+	// If traces endpoint is Tempo and metrics endpoint is not explicitly set, metrics will be disabled
+	tracesEndpoint := getEnv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4317")
+	metricsEndpoint := getEnv("OTEL_METRICS_EXPORTER_OTLP_ENDPOINT", tracesEndpoint)
+
 	return ObservabilityConfig{
 		Enabled:               enabled,
-		ExporterEndpoint:      getEnv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:4317"),
+		ExporterEndpoint:      tracesEndpoint,
+		MetricsEndpoint:       metricsEndpoint,
 		ExporterProtocol:      getEnv("OTEL_EXPORTER_OTLP_PROTOCOL", "grpc"),
 		ServiceName:           getEnv("OTEL_SERVICE_NAME", "sacred-vows-api"),
 		ServiceVersion:        serviceVersion,

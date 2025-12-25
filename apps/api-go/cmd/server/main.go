@@ -307,7 +307,7 @@ func main() {
 		}
 		meterCfg := observability.MeterConfig{
 			Enabled:               cfg.Observability.Enabled,
-			Endpoint:              cfg.Observability.ExporterEndpoint,
+			Endpoint:              cfg.Observability.MetricsEndpoint,
 			Protocol:              cfg.Observability.ExporterProtocol,
 			ServiceName:           cfg.Observability.ServiceName,
 			ServiceVersion:        cfg.Observability.ServiceVersion,

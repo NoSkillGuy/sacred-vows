@@ -45,9 +45,10 @@ Docker Compose is configured to automatically use `.env.docker`. No manual setup
    - Configure other OpenTelemetry variables as needed
 
 3. Edit `.env.docker` (for Docker Compose):
-   - Set `VITE_API_URL=http://api-go:3000/api` (Docker service name)
+   - Set `VITE_API_URL=/api` (relative path - browser uses Vite proxy)
+   - Set `VITE_API_PROXY_TARGET=http://api-go:3000` (proxy target for Vite dev server - uses Docker service name)
    - Set `VITE_PUBLIC_ASSETS_CDN_URL=http://localhost:9000/sacred-vows-public-assets-local` (browser access)
-   - Set `VITE_OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4318` (Docker service name)
+   - Set `VITE_OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318` (browser connects directly - tempo exposed on port 4318)
    - Configure other OpenTelemetry variables as needed
 
 4. See `env.example` for detailed instructions and all available variables.
@@ -56,11 +57,15 @@ Docker Compose is configured to automatically use `.env.docker`. No manual setup
 
 | Setting | .env.local | .env.docker |
 |---------|------------|-------------|
-| `VITE_API_URL` | `http://localhost:3000/api` | `http://api-go:3000/api` |
+| `VITE_API_URL` | `http://localhost:3000/api` | `/api` (relative - uses Vite proxy) |
+| `VITE_API_PROXY_TARGET` | (not needed) | `http://api-go:3000` (Docker service name for proxy) |
 | `VITE_PUBLIC_ASSETS_CDN_URL` | `http://localhost:9000/...` | `http://localhost:9000/...` |
-| `VITE_OTEL_EXPORTER_OTLP_ENDPOINT` | `http://localhost:4318` | `http://tempo:4318` |
+| `VITE_OTEL_EXPORTER_OTLP_ENDPOINT` | `http://localhost:4318` | `http://localhost:4318` |
 
-**Note:** `VITE_PUBLIC_ASSETS_CDN_URL` uses `localhost:9000` in both cases because it's accessed from the browser, not from within the Docker container.
+**Notes:**
+- `VITE_PUBLIC_ASSETS_CDN_URL` uses `localhost:9000` in both cases because it's accessed from the browser, not from within the Docker container.
+- In Docker, `VITE_API_URL` is set to `/api` (relative path) so browser requests go through the Vite proxy. The proxy target (`VITE_API_PROXY_TARGET`) uses the Docker service name `api-go:3000` which works because the proxy runs in Node.js, not the browser.
+- `VITE_OTEL_EXPORTER_OTLP_ENDPOINT` uses `localhost:4318` in both cases because the browser connects directly to Tempo, which is exposed on port 4318.
 
 ## Running the Builder Application
 
@@ -109,9 +114,10 @@ File changes in `apps/builder/src/` will automatically trigger Vite to rebuild a
 - Check that the API is accessible at `http://localhost:3000`
 
 **Issue: Can't connect to API in Docker**
-- Ensure `.env.docker` has `VITE_API_URL=http://api-go:3000/api`
+- Ensure `.env.docker` has `VITE_API_URL=/api` and `VITE_API_PROXY_TARGET=http://api-go:3000`
 - Check that the `api-go` service is running: `docker compose ps`
 - Verify the `api-go` service is healthy: `docker compose logs api-go`
+- Verify the Vite proxy is working: check browser network tab - API requests should go to `/api/...` and be proxied
 
 **Issue: Assets not loading**
 - Ensure `VITE_PUBLIC_ASSETS_CDN_URL` is set correctly
