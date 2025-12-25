@@ -48,28 +48,28 @@ npm error enoent Could not read package.json: Error: ENOENT: no such file or dir
 ```
 
 **Root Cause:**
-Cloudflare Pages automatically runs `npm ci` at the repository root before executing the build command. In a monorepo structure, there's no `package.json` at the root, causing the build to fail before your custom build command runs.
+Cloudflare Pages automatically runs `pnpm install --frozen-lockfile` at the repository root before executing the build command. In a monorepo structure, there's no `package.json` at the root, causing the build to fail before your custom build command runs.
 
 **Solution:**
 Set the **Root directory** in Cloudflare Pages build settings:
 
 1. Go to Pages project → **Settings** → **Builds & deployments**
 2. Set **Root directory** to: `apps/builder`
-3. Update **Build command** to: `npm ci && npm run build` (remove the `cd apps/builder` part)
+3. Update **Build command** to: `pnpm install --frozen-lockfile && pnpm run build` (remove the `cd apps/builder` part)
 4. Set **Build output directory** to: `dist` (relative to root directory)
 
 **Correct Configuration:**
 | Setting | Value |
 |---------|-------|
 | **Root directory** | `apps/builder` |
-| **Build command** | `npm ci && npm run build` |
+| **Build command** | `pnpm install --frozen-lockfile && pnpm run build` |
 | **Build output directory** | `dist` |
 | **Framework preset** | `Vite` (or `None`) |
 
 **Why This Works:**
 - Cloudflare runs all commands from the root directory
 - Setting root directory to `apps/builder` makes Cloudflare treat that as the project root
-- `npm ci` then runs in the correct directory where `package.json` exists
+- `pnpm install --frozen-lockfile` then runs in the correct directory where `package.json` exists
 
 ---
 

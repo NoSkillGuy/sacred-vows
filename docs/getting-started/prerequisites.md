@@ -10,8 +10,9 @@ This document lists all required tools, accounts, and system requirements for de
   - Install from [nodejs.org](https://nodejs.org/)
   - Verify: `node --version`
 
-- **npm**: Comes with Node.js
-  - Verify: `npm --version`
+- **pnpm**: Version 10.24.0 or higher (package manager)
+  - Install: `npm install -g pnpm@10.24.0`
+  - Verify: `pnpm --version`
 
 - **Go**: Version 1.21 or higher
   - Install from [golang.org](https://golang.org/dl/)
@@ -41,8 +42,8 @@ This document lists all required tools, accounts, and system requirements for de
 - **gcloud CLI**: For GCP operations (if deploying)
   - Install from [cloud.google.com/sdk](https://cloud.google.com/sdk/docs/install)
 
-- **Wrangler CLI**: For Cloudflare Workers (usually via npm)
-  - Install: `npm install -g wrangler`
+- **Wrangler CLI**: For Cloudflare Workers (usually via pnpm)
+  - Install: `pnpm install -g wrangler`
 
 ## Required Accounts
 

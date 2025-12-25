@@ -2,6 +2,7 @@
   "name": "@sacred-vows/edge-worker",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@10.24.0",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",

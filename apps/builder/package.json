@@ -2,6 +2,7 @@
   "name": "@wedding-builder/builder",
   "version": "1.0.0",
   "type": "module",
+  "packageManager": "pnpm@10.24.0",
   "description": "Wedding invitation builder UI",
   "scripts": {
     "dev": "vite",
