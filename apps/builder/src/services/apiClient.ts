@@ -85,11 +85,16 @@ export async function apiRequest(url: string, options: RequestOptions = {}): Pro
   // This handles both new code (passing "/auth/me") and old cached code (passing "/api/auth/me")
   let cleanUrl = url;
   if (!url.startsWith("http") && API_BASE_URL) {
-    // Check if URL already starts with API_BASE_URL (handles old cached code path)
-    if (url.startsWith(API_BASE_URL)) {
-      cleanUrl = url.substring(API_BASE_URL.length);
+    // Extract path from API_BASE_URL (handles both absolute and relative URLs)
+    const apiBasePath = API_BASE_URL.startsWith("http")
+      ? new URL(API_BASE_URL).pathname
+      : API_BASE_URL;
+
+    // Check if URL already starts with the API base path
+    if (url.startsWith(apiBasePath)) {
+      cleanUrl = url.substring(apiBasePath.length);
     }
-    // Also handle case where API_BASE_URL might be "/api" and url is "/api/auth/me"
+
     // Normalize to ensure cleanUrl starts with "/"
     if (cleanUrl && !cleanUrl.startsWith("/") && !cleanUrl.startsWith("http")) {
       cleanUrl = "/" + cleanUrl;
