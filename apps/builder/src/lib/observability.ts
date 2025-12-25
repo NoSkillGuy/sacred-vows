@@ -11,7 +11,7 @@ import { DocumentLoadInstrumentation } from "@opentelemetry/instrumentation-docu
 import { FetchInstrumentation } from "@opentelemetry/instrumentation-fetch";
 import { UserInteractionInstrumentation } from "@opentelemetry/instrumentation-user-interaction";
 import { TraceIdRatioBasedSampler } from "@opentelemetry/sdk-trace-base";
-import { MeterProvider, PeriodicExportingMetricReader } from "@opentelemetry/sdk-metrics-web";
+import { MeterProvider, PeriodicExportingMetricReader } from "@opentelemetry/sdk-metrics";
 import { OTLPMetricExporter } from "@opentelemetry/exporter-metrics-otlp-http";
 
 let tracerProvider: WebTracerProvider | null = null;
