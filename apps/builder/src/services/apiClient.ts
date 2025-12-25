@@ -81,9 +81,23 @@ interface RequestOptions extends RequestInit {
  */
 export async function apiRequest(url: string, options: RequestOptions = {}): Promise<Response> {
   // Ensure URL is absolute
-  const fullUrl = url.startsWith("http")
-    ? url
-    : `${API_BASE_URL}${url.startsWith("/") ? url : `/${url}`}`;
+  // Defensive fix: if url already starts with API_BASE_URL, remove it to avoid double prefix
+  // This handles both new code (passing "/auth/me") and old cached code (passing "/api/auth/me")
+  let cleanUrl = url;
+  if (!url.startsWith("http") && API_BASE_URL) {
+    // Check if URL already starts with API_BASE_URL (handles old cached code path)
+    if (url.startsWith(API_BASE_URL)) {
+      cleanUrl = url.substring(API_BASE_URL.length);
+    }
+    // Also handle case where API_BASE_URL might be "/api" and url is "/api/auth/me"
+    // Normalize to ensure cleanUrl starts with "/"
+    if (cleanUrl && !cleanUrl.startsWith("/") && !cleanUrl.startsWith("http")) {
+      cleanUrl = "/" + cleanUrl;
+    }
+  }
+  const fullUrl = cleanUrl.startsWith("http")
+    ? cleanUrl
+    : `${API_BASE_URL}${cleanUrl.startsWith("/") ? cleanUrl : `/${cleanUrl}`}`;
 
   // Generate request ID for correlation
   const requestId = generateRequestId();
