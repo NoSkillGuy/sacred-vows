@@ -1,176 +1,1813 @@
 {
-  "dashboard": {
-    "title": "Business Metrics",
-    "tags": ["business", "metrics"],
-    "timezone": "browser",
-    "schemaVersion": 38,
-    "version": 1,
-    "refresh": "30s",
-    "panels": [
-      {
-        "id": 1,
-        "title": "User Signups Over Time",
-        "type": "graph",
-        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
-        "targets": [
-          {
-            "expr": "rate(business_user_signups_total[5m])",
-            "refId": "A",
-            "legendFormat": "Signups/sec"
-          }
-        ]
+  "title": "Business Metrics Dashboard",
+  "tags": [
+    "business",
+    "metrics",
+    "observability"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "version": 2,
+  "refresh": "30s",
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Daily Active Users",
+      "type": "stat",
+      "gridPos": {
+        "h": 6,
+        "w": 4,
+        "x": 0,
+        "y": 0
       },
-      {
-        "id": 2,
-        "title": "Signup Method Breakdown",
-        "type": "piechart",
-        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
-        "targets": [
-          {
-            "expr": "sum by (method) (business_user_signups_total)",
-            "refId": "A"
+      "targets": [
+        {
+          "expr": "business_users_active_daily",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
           }
-        ]
-      },
-      {
-        "id": 3,
-        "title": "User Logins Over Time",
-        "type": "graph",
-        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
-        "targets": [
-          {
-            "expr": "rate(business_user_logins_total[5m])",
-            "refId": "A",
-            "legendFormat": "Logins/sec"
-          }
-        ]
-      },
-      {
-        "id": 4,
-        "title": "Active Users",
-        "type": "stat",
-        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
-        "targets": [
-          {
-            "expr": "business_users_active_daily",
-            "refId": "A",
-            "legendFormat": "Daily"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
           },
-          {
-            "expr": "business_users_active_weekly",
-            "refId": "B",
-            "legendFormat": "Weekly"
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "green"
+              }
+            ]
           },
-          {
-            "expr": "business_users_active_monthly",
-            "refId": "C",
-            "legendFormat": "Monthly"
-          }
-        ]
-      },
-      {
-        "id": 5,
-        "title": "Invitations Created Over Time",
-        "type": "graph",
-        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
-        "targets": [
-          {
-            "expr": "rate(business_invitations_created_total[5m])",
-            "refId": "A",
-            "legendFormat": "Created/sec"
-          }
-        ]
-      },
-      {
-        "id": 6,
-        "title": "Invitations Published Over Time",
-        "type": "graph",
-        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
-        "targets": [
-          {
-            "expr": "rate(business_invitations_published_total[5m])",
-            "refId": "A",
-            "legendFormat": "Published/sec"
-          }
-        ]
-      },
-      {
-        "id": 7,
-        "title": "Publish Success Rate",
-        "type": "stat",
-        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
-        "targets": [
-          {
-            "expr": "rate(business_publish_success_total[5m]) / rate(business_publish_attempts_total[5m]) * 100",
-            "refId": "A",
-            "legendFormat": "Success Rate %"
-          }
-        ]
-      },
-      {
-        "id": 8,
-        "title": "Invitation Views Over Time",
-        "type": "graph",
-        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 },
-        "targets": [
-          {
-            "expr": "rate(business_invitation_views_total[5m])",
-            "refId": "A",
-            "legendFormat": "Views/sec"
-          }
-        ]
-      },
-      {
-        "id": 9,
-        "title": "RSVP Submissions Over Time",
-        "type": "graph",
-        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 32 },
-        "targets": [
-          {
-            "expr": "rate(business_rsvp_submissions_total[5m])",
-            "refId": "A",
-            "legendFormat": "RSVPs/sec"
-          }
-        ]
-      },
-      {
-        "id": 10,
-        "title": "View to RSVP Conversion Rate",
-        "type": "stat",
-        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 32 },
-        "targets": [
-          {
-            "expr": "rate(business_rsvp_submissions_total[5m]) / rate(business_invitation_views_total[5m]) * 100",
-            "refId": "A",
-            "legendFormat": "Conversion Rate %"
-          }
-        ]
-      },
-      {
-        "id": 11,
-        "title": "Asset Uploads by Type",
-        "type": "piechart",
-        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 40 },
-        "targets": [
-          {
-            "expr": "sum by (file_type) (business_asset_uploads_total)",
-            "refId": "A"
-          }
-        ]
-      },
-      {
-        "id": 12,
-        "title": "Builder Sessions",
-        "type": "graph",
-        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 40 },
-        "targets": [
-          {
-            "expr": "rate(business_builder_sessions_total[5m])",
-            "refId": "A",
-            "legendFormat": "Sessions/sec"
-          }
-        ]
+          "unit": "short"
+        }
       }
-    ]
-  }
+    },
+    {
+      "id": 2,
+      "title": "Weekly Active Users",
+      "type": "stat",
+      "gridPos": {
+        "h": 6,
+        "w": 4,
+        "x": 4,
+        "y": 0
+      },
+      "targets": [
+        {
+          "expr": "business_users_active_weekly",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "short"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Monthly Active Users",
+      "type": "stat",
+      "gridPos": {
+        "h": 6,
+        "w": 4,
+        "x": 8,
+        "y": 0
+      },
+      "targets": [
+        {
+          "expr": "business_users_active_monthly",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "purple"
+              }
+            ]
+          },
+          "unit": "short"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "Total Published Invitations",
+      "type": "stat",
+      "gridPos": {
+        "h": 6,
+        "w": 4,
+        "x": 12,
+        "y": 0
+      },
+      "targets": [
+        {
+          "expr": "business_invitations_active",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "orange"
+              }
+            ]
+          },
+          "unit": "short"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Publish Success Rate",
+      "type": "stat",
+      "gridPos": {
+        "h": 6,
+        "w": 4,
+        "x": 16,
+        "y": 0
+      },
+      "targets": [
+        {
+          "expr": "rate(business_publish_success_total[5m]) / rate(business_publish_attempts_total[5m]) * 100",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "red"
+              },
+              {
+                "value": 80,
+                "color": "yellow"
+              },
+              {
+                "value": 95,
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "percent",
+          "decimals": 1
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "View to RSVP Conversion Rate",
+      "type": "stat",
+      "gridPos": {
+        "h": 6,
+        "w": 4,
+        "x": 20,
+        "y": 0
+      },
+      "targets": [
+        {
+          "expr": "rate(business_rsvp_submissions_total[5m]) / rate(business_invitation_views_total[5m]) * 100",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "red"
+              },
+              {
+                "value": 10,
+                "color": "yellow"
+              },
+              {
+                "value": 25,
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "percent",
+          "decimals": 1
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "User Signups Over Time",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 6
+      },
+      "targets": [
+        {
+          "expr": "sum by (method) (rate(business_user_signups_total[5m]))",
+          "refId": "A",
+          "legendFormat": "{{method}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "ops"
+        }
+      }
+    },
+    {
+      "id": 8,
+      "title": "Signup Method Distribution",
+      "type": "piechart",
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 12,
+        "y": 6
+      },
+      "targets": [
+        {
+          "expr": "sum by (method) (business_user_signups_total)",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Login Method Distribution",
+      "type": "piechart",
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 18,
+        "y": 6
+      },
+      "targets": [
+        {
+          "expr": "sum by (method) (business_user_logins_total)",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "title": "User Logins Over Time",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 14
+      },
+      "targets": [
+        {
+          "expr": "sum by (method) (rate(business_user_logins_total[5m]))",
+          "refId": "A",
+          "legendFormat": "{{method}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "ops"
+        }
+      }
+    },
+    {
+      "id": 11,
+      "title": "Active Users Trend",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 14
+      },
+      "targets": [
+        {
+          "expr": "business_users_active_daily",
+          "refId": "A",
+          "legendFormat": "Daily",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        },
+        {
+          "expr": "business_users_active_weekly",
+          "refId": "B",
+          "legendFormat": "Weekly",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        },
+        {
+          "expr": "business_users_active_monthly",
+          "refId": "C",
+          "legendFormat": "Monthly",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short"
+        }
+      }
+    },
+    {
+      "id": 12,
+      "title": "Complete User Journey Funnel",
+      "type": "barchart",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 22
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(business_user_signups_total[5m]))",
+          "refId": "A",
+          "legendFormat": "Signups",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        },
+        {
+          "expr": "sum(rate(business_invitations_created_total[5m]))",
+          "refId": "B",
+          "legendFormat": "Invitations Created",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        },
+        {
+          "expr": "sum(rate(business_invitations_published_total[5m]))",
+          "refId": "C",
+          "legendFormat": "Published",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        },
+        {
+          "expr": "sum(rate(business_invitation_views_total[5m]))",
+          "refId": "D",
+          "legendFormat": "Views",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        },
+        {
+          "expr": "sum(rate(business_rsvp_submissions_total[5m]))",
+          "refId": "E",
+          "legendFormat": "RSVPs",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "title": "Signup to Invitation Rate",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 22
+      },
+      "targets": [
+        {
+          "expr": "rate(business_invitations_created_total[5m]) / rate(business_user_signups_total[5m]) * 100",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "percent",
+          "decimals": 1
+        }
+      }
+    },
+    {
+      "id": 14,
+      "title": "Invitation to Publish Rate",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 22
+      },
+      "targets": [
+        {
+          "expr": "rate(business_invitations_published_total[5m]) / rate(business_invitations_created_total[5m]) * 100",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "percent",
+          "decimals": 1
+        }
+      }
+    },
+    {
+      "id": 15,
+      "title": "Drop-off: Signup to Invitation",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 22
+      },
+      "targets": [
+        {
+          "expr": "(1 - (rate(business_invitations_created_total[5m]) / rate(business_user_signups_total[5m]))) * 100",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "green"
+              },
+              {
+                "value": 50,
+                "color": "yellow"
+              },
+              {
+                "value": 75,
+                "color": "red"
+              }
+            ]
+          },
+          "unit": "percent",
+          "decimals": 1
+        }
+      }
+    },
+    {
+      "id": 16,
+      "title": "Drop-off: Invitation to Publish",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 26
+      },
+      "targets": [
+        {
+          "expr": "(1 - (rate(business_invitations_published_total[5m]) / rate(business_invitations_created_total[5m]))) * 100",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "green"
+              },
+              {
+                "value": 50,
+                "color": "yellow"
+              },
+              {
+                "value": 75,
+                "color": "red"
+              }
+            ]
+          },
+          "unit": "percent",
+          "decimals": 1
+        }
+      }
+    },
+    {
+      "id": 17,
+      "title": "Invitations Created Over Time",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 30
+      },
+      "targets": [
+        {
+          "expr": "rate(business_invitations_created_total[5m])",
+          "refId": "A",
+          "legendFormat": "Created/sec",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "ops"
+        }
+      }
+    },
+    {
+      "id": 18,
+      "title": "Invitations Published Over Time",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 30
+      },
+      "targets": [
+        {
+          "expr": "rate(business_invitations_published_total[5m])",
+          "refId": "A",
+          "legendFormat": "Published/sec",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "ops"
+        }
+      }
+    },
+    {
+      "id": 19,
+      "title": "Active Published Invitations",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 38
+      },
+      "targets": [
+        {
+          "expr": "business_invitations_active",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "short"
+        }
+      }
+    },
+    {
+      "id": 20,
+      "title": "Publish Failure Rate",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 38
+      },
+      "targets": [
+        {
+          "expr": "rate(business_publish_failures_total[5m]) / rate(business_publish_attempts_total[5m]) * 100",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "green"
+              },
+              {
+                "value": 5,
+                "color": "yellow"
+              },
+              {
+                "value": 10,
+                "color": "red"
+              }
+            ]
+          },
+          "unit": "percent",
+          "decimals": 1
+        }
+      }
+    },
+    {
+      "id": 21,
+      "title": "Publish Attempts vs Success",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 38
+      },
+      "targets": [
+        {
+          "expr": "rate(business_publish_attempts_total[5m])",
+          "refId": "A",
+          "legendFormat": "Attempts",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        },
+        {
+          "expr": "rate(business_publish_success_total[5m])",
+          "refId": "B",
+          "legendFormat": "Success",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "ops"
+        }
+      }
+    },
+    {
+      "id": 22,
+      "title": "Invitation Creation Duration",
+      "type": "histogram",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 46
+      },
+      "targets": [
+        {
+          "expr": "rate(business_invitation_creation_duration_seconds_bucket[5m])",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "title": "Invitation Views Over Time",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 46
+      },
+      "targets": [
+        {
+          "expr": "rate(business_invitation_views_total[5m])",
+          "refId": "A",
+          "legendFormat": "Views/sec",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "ops"
+        }
+      }
+    },
+    {
+      "id": 24,
+      "title": "RSVP Submissions Over Time",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 54
+      },
+      "targets": [
+        {
+          "expr": "rate(business_rsvp_submissions_total[5m])",
+          "refId": "A",
+          "legendFormat": "RSVPs/sec",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "ops"
+        }
+      }
+    },
+    {
+      "id": 25,
+      "title": "View to RSVP Conversion Rate Trend",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 54
+      },
+      "targets": [
+        {
+          "expr": "rate(business_rsvp_submissions_total[5m]) / rate(business_invitation_views_total[5m]) * 100",
+          "refId": "A",
+          "legendFormat": "Conversion Rate %",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "percent",
+          "decimals": 1
+        }
+      }
+    },
+    {
+      "id": 26,
+      "title": "Total Views vs RSVPs",
+      "type": "barchart",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 62
+      },
+      "targets": [
+        {
+          "expr": "sum(business_invitation_views_total)",
+          "refId": "A",
+          "legendFormat": "Total Views",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        },
+        {
+          "expr": "sum(business_rsvp_submissions_total)",
+          "refId": "B",
+          "legendFormat": "Total RSVPs",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "title": "Builder Sessions Over Time",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 62
+      },
+      "targets": [
+        {
+          "expr": "rate(business_builder_sessions_total[5m])",
+          "refId": "A",
+          "legendFormat": "Sessions/sec",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "ops"
+        }
+      }
+    },
+    {
+      "id": 28,
+      "title": "Average Session Duration",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 70
+      },
+      "targets": [
+        {
+          "expr": "rate(business_builder_session_duration_seconds_sum[5m]) / rate(business_builder_sessions_total[5m])",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "s",
+          "decimals": 1
+        }
+      }
+    },
+    {
+      "id": 29,
+      "title": "Builder Sessions per User",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 70
+      },
+      "targets": [
+        {
+          "expr": "rate(business_builder_sessions_total[5m]) / rate(business_user_logins_total[5m])",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "short",
+          "decimals": 2
+        }
+      }
+    },
+    {
+      "id": 30,
+      "title": "Session Duration Distribution",
+      "type": "histogram",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 70
+      },
+      "targets": [
+        {
+          "expr": "rate(business_builder_session_duration_seconds_bucket[5m])",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "title": "Asset Uploads by Type",
+      "type": "piechart",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 78
+      },
+      "targets": [
+        {
+          "expr": "sum by (file_type) (business_asset_uploads_total)",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "title": "Asset Uploads Over Time",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 16,
+        "x": 8,
+        "y": 78
+      },
+      "targets": [
+        {
+          "expr": "sum by (file_type) (rate(business_asset_uploads_total[5m]))",
+          "refId": "A",
+          "legendFormat": "{{file_type}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "ops"
+        }
+      }
+    },
+    {
+      "id": 33,
+      "title": "Most Popular Layouts",
+      "type": "barchart",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 86
+      },
+      "targets": [
+        {
+          "expr": "topk(10, sum by (layout_id) (business_layout_selections_total))",
+          "refId": "A",
+          "legendFormat": "{{layout_id}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 34,
+      "title": "Layout Selections Over Time",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 86
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(business_layout_selections_total[5m]))",
+          "refId": "A",
+          "legendFormat": "Selections/sec",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "ops"
+        }
+      }
+    },
+    {
+      "id": 35,
+      "title": "Theme Changes Over Time",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 0,
+        "y": 94
+      },
+      "targets": [
+        {
+          "expr": "rate(business_theme_changes_total[5m])",
+          "refId": "A",
+          "legendFormat": "Changes/sec",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "ops"
+        }
+      }
+    },
+    {
+      "id": 36,
+      "title": "Section Toggles Over Time",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 8,
+        "y": 94
+      },
+      "targets": [
+        {
+          "expr": "rate(business_section_toggles_total[5m])",
+          "refId": "A",
+          "legendFormat": "Toggles/sec",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "ops"
+        }
+      }
+    },
+    {
+      "id": 37,
+      "title": "Language Switches Over Time",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 94
+      },
+      "targets": [
+        {
+          "expr": "rate(business_language_switches_total[5m])",
+          "refId": "A",
+          "legendFormat": "Switches/sec",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "ops"
+        }
+      }
+    },
+    {
+      "id": 38,
+      "title": "Page Views by Page",
+      "type": "barchart",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 102
+      },
+      "targets": [
+        {
+          "expr": "sum by (page) (frontend_page_views_total)",
+          "refId": "A",
+          "legendFormat": "{{page}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 39,
+      "title": "Page Views Over Time",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 102
+      },
+      "targets": [
+        {
+          "expr": "sum by (page) (rate(frontend_page_views_total[5m]))",
+          "refId": "A",
+          "legendFormat": "{{page}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "ops"
+        }
+      }
+    },
+    {
+      "id": 40,
+      "title": "Button Clicks by Button",
+      "type": "barchart",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 110
+      },
+      "targets": [
+        {
+          "expr": "topk(10, sum by (button_id) (frontend_button_clicks_total))",
+          "refId": "A",
+          "legendFormat": "{{button_id}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 41,
+      "title": "Button Clicks Over Time",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 110
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(frontend_button_clicks_total[5m]))",
+          "refId": "A",
+          "legendFormat": "Clicks/sec",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "ops"
+        }
+      }
+    },
+    {
+      "id": 42,
+      "title": "Frontend Session Duration",
+      "type": "histogram",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 118
+      },
+      "targets": [
+        {
+          "expr": "rate(frontend_session_duration_seconds_bucket[5m])",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 43,
+      "title": "Builder Actions by Type",
+      "type": "barchart",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 118
+      },
+      "targets": [
+        {
+          "expr": "sum by (action_type) (frontend_builder_actions_total)",
+          "refId": "A",
+          "legendFormat": "{{action_type}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 44,
+      "title": "Layout Views in Gallery",
+      "type": "barchart",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 126
+      },
+      "targets": [
+        {
+          "expr": "topk(10, sum by (layout_id) (frontend_layout_views_total))",
+          "refId": "A",
+          "legendFormat": "{{layout_id}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ]
+    },
+    {
+      "id": 45,
+      "title": "Invitation Creation Duration P50",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 126
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, rate(business_invitation_creation_duration_seconds_bucket[5m]))",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "s",
+          "decimals": 2
+        }
+      }
+    },
+    {
+      "id": 46,
+      "title": "Invitation Creation Duration P95",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 126
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, rate(business_invitation_creation_duration_seconds_bucket[5m]))",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "s",
+          "decimals": 2
+        }
+      }
+    },
+    {
+      "id": 47,
+      "title": "Invitation Creation Duration P99",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 126
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.99, rate(business_invitation_creation_duration_seconds_bucket[5m]))",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "s",
+          "decimals": 2
+        }
+      }
+    },
+    {
+      "id": 48,
+      "title": "Builder Session Duration P50",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 134
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, rate(business_builder_session_duration_seconds_bucket[5m]))",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "s",
+          "decimals": 2
+        }
+      }
+    },
+    {
+      "id": 49,
+      "title": "Builder Session Duration P95",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 134
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, rate(business_builder_session_duration_seconds_bucket[5m]))",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "s",
+          "decimals": 2
+        }
+      }
+    },
+    {
+      "id": 50,
+      "title": "Builder Session Duration P99",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 8,
+        "y": 134
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.99, rate(business_builder_session_duration_seconds_bucket[5m]))",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "s",
+          "decimals": 2
+        }
+      }
+    },
+    {
+      "id": 51,
+      "title": "Frontend Session Duration P50",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 12,
+        "y": 134
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, rate(frontend_session_duration_seconds_bucket[5m]))",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "s",
+          "decimals": 2
+        }
+      }
+    },
+    {
+      "id": 52,
+      "title": "Frontend Session Duration P95",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 16,
+        "y": 134
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, rate(frontend_session_duration_seconds_bucket[5m]))",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "s",
+          "decimals": 2
+        }
+      }
+    },
+    {
+      "id": 53,
+      "title": "Frontend Session Duration P99",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 20,
+        "y": 134
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.99, rate(frontend_session_duration_seconds_bucket[5m]))",
+          "refId": "A",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "value": null,
+                "color": "blue"
+              }
+            ]
+          },
+          "unit": "s",
+          "decimals": 2
+        }
+      }
+    }
+  ]
 }
