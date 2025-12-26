@@ -89,7 +89,6 @@ function EditableTime({
   useEffect(() => {
     if (!isEditing) {
       // Keep original 12-hour format for display
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDisplayValue(value || "");
     }
   }, [value, isEditing]);

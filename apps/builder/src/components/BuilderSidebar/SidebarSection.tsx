@@ -44,7 +44,7 @@ export default function SidebarSection({
         )}
       </button>
 
-      {!collapsed && (
+      {!collapsed && isOpen && (
         <div id={contentId} className="sidebar-section-content">
           {children}
         </div>
