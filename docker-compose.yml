@@ -193,8 +193,6 @@ services:
     image: otel/opentelemetry-collector:latest
     command: ["--config=/etc/otel-collector-config.yaml"]
     ports:
-      - "4317:4317"  # OTLP gRPC (backend)
-      - "4318:4318"  # OTLP HTTP (frontend)
       - "8889:8889"  # Prometheus metrics endpoint
     volumes:
       - ./docker/otel-collector/config.yaml:/etc/otel-collector-config.yaml:ro
