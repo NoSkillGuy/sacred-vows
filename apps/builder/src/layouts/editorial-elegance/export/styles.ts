@@ -155,6 +155,7 @@ export async function generateCSS(invitation: InvitationData): Promise<string> {
       width: 100%;
       height: 100vh;
       min-height: 600px;
+      margin-top: 0;
       overflow: hidden;
       display: flex;
       align-items: center;
