@@ -44,7 +44,7 @@ func TestDeleteInvitationUseCase_Execute_InvitationExists_DeletesInvitation(t *t
 		},
 	}
 
-	useCase := NewDeleteInvitationUseCase(mockInvitationRepo, mockAssetRepo, nil)
+	useCase := NewDeleteInvitationUseCase(mockInvitationRepo, nil, mockAssetRepo, nil)
 
 	// Act
 	output, err := useCase.Execute(context.Background(), invitationID)
@@ -65,7 +65,7 @@ func TestDeleteInvitationUseCase_Execute_InvitationNotFound_ReturnsError(t *test
 	}
 	mockAssetRepo := &MockAssetRepository{}
 
-	useCase := NewDeleteInvitationUseCase(mockInvitationRepo, mockAssetRepo, nil)
+	useCase := NewDeleteInvitationUseCase(mockInvitationRepo, nil, mockAssetRepo, nil)
 
 	// Act
 	output, err := useCase.Execute(context.Background(), invitationID)

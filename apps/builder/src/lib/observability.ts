@@ -27,13 +27,14 @@ export function generateRequestId(): string {
 /**
  * Initialize OpenTelemetry observability
  * Returns early if disabled via environment variable
+ * Returns a promise that resolves when initialization is complete
  */
-export function initObservability(): void {
+export function initObservability(): Promise<void> {
   // Check if observability is enabled
   const enabled = import.meta.env.VITE_OTEL_ENABLED !== "false";
   if (!enabled) {
     console.log("[Observability] Disabled via VITE_OTEL_ENABLED=false");
-    return;
+    return Promise.resolve();
   }
 
   const endpoint = import.meta.env.VITE_OTEL_EXPORTER_OTLP_ENDPOINT || "http://localhost:4318";
@@ -112,8 +113,10 @@ export function initObservability(): void {
     }
 
     console.log("[Observability] Initialized successfully");
+    return Promise.resolve();
   } catch (error) {
     console.error("[Observability] Failed to initialize:", error);
+    return Promise.reject(error);
   }
 }
 

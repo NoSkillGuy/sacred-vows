@@ -229,7 +229,7 @@ func main() {
 	deleteAssetUC := asset.NewDeleteAssetUseCase(assetRepo)
 	deleteAssetsByURLsUC := asset.NewDeleteAssetsByURLsUseCase(assetRepo)
 	getAssetsByURLsUC := asset.NewGetAssetsByURLsUseCase(assetRepo)
-	deleteInvitationUC := invitation.NewDeleteInvitationUseCase(invitationRepo, assetRepo, deleteAssetsByURLsUC)
+	deleteInvitationUC := invitation.NewDeleteInvitationUseCase(invitationRepo, publishedSiteRepo, assetRepo, deleteAssetsByURLsUC)
 
 	submitRSVPUC := rsvp.NewSubmitRSVPUseCase(rsvpRepo)
 	getRSVPByInvitationUC := rsvp.NewGetRSVPByInvitationUseCase(rsvpRepo)

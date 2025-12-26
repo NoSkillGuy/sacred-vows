@@ -70,15 +70,6 @@ func TestMarkUserActiveWithID_EmptyID_NoOp(t *testing.T) {
 	assert.Equal(t, initialMonthlyCount, countActiveUsers(&activeUsersMonthly))
 }
 
-func TestMarkUserActive_NoOp(t *testing.T) {
-	// Arrange
-	provider, _ := setupTestMetrics(t)
-	defer provider.Shutdown(context.Background())
-
-	// Act & Assert - MarkUserActive is a no-op placeholder
-	assert.NotPanics(t, func() { MarkUserActive() })
-}
-
 func TestUpdateActiveUserGauges_UpdatesAllGauges(t *testing.T) {
 	// Arrange
 	provider, reader := setupTestMetrics(t)

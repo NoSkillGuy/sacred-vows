@@ -8,6 +8,11 @@ import (
 )
 
 // RecordUserSignup records a user signup event
+// This tracks the event of a user signing up (counter metric).
+// Active user tracking (daily/weekly/monthly active users) is separate and handled by
+// use cases calling MarkUserActiveWithID directly. This separation exists because:
+// - Signup/login metrics track events (how many signups/logins occurred)
+// - Active user tracking tracks unique users over time periods (how many unique users were active)
 func RecordUserSignup(method string) {
 	if businessUserSignupsTotal != nil {
 		attrs := []attribute.KeyValue{
@@ -15,10 +20,14 @@ func RecordUserSignup(method string) {
 		}
 		businessUserSignupsTotal.Add(context.Background(), 1, otelmetric.WithAttributes(attrs...))
 	}
-	// Note: Active user tracking is handled by use cases calling MarkUserActiveWithID directly
 }
 
 // RecordUserLogin records a user login event
+// This tracks the event of a user logging in (counter metric).
+// Active user tracking (daily/weekly/monthly active users) is separate and handled by
+// use cases calling MarkUserActiveWithID directly. This separation exists because:
+// - Signup/login metrics track events (how many signups/logins occurred)
+// - Active user tracking tracks unique users over time periods (how many unique users were active)
 func RecordUserLogin(method string) {
 	if businessUserLoginsTotal != nil {
 		attrs := []attribute.KeyValue{
@@ -26,7 +35,6 @@ func RecordUserLogin(method string) {
 		}
 		businessUserLoginsTotal.Add(context.Background(), 1, otelmetric.WithAttributes(attrs...))
 	}
-	// Note: Active user tracking is handled by use cases calling MarkUserActiveWithID directly
 }
 
 // RecordInvitationCreated records an invitation creation event

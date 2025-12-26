@@ -54,12 +54,33 @@ function initMetrics() {
   });
 }
 
-// Initialize metrics when module loads
-if (typeof window !== "undefined") {
-  // Wait a bit for observability to initialize
-  setTimeout(() => {
-    initMetrics();
-  }, 100);
+// Initialize metrics after observability is ready
+let metricsInitialized = false;
+
+export async function initMetricsAfterObservability(): Promise<void> {
+  if (metricsInitialized) {
+    return;
+  }
+
+  // Poll for meter provider to be available (with timeout)
+  const maxAttempts = 20;
+  const delayMs = 50;
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const provider = getMeterProvider();
+    if (provider) {
+      initMetrics();
+      metricsInitialized = true;
+      return;
+    }
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
+  }
+
+  // If meter provider is still not available, try initializing anyway
+  // (initMetrics handles null meter provider gracefully)
+  console.warn("[Metrics] Meter provider not available after waiting, initializing anyway");
+  initMetrics();
+  metricsInitialized = true;
 }
 
 /**

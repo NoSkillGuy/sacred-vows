@@ -16,13 +16,6 @@ var (
 	trackerWg              sync.WaitGroup
 )
 
-// MarkUserActive marks a user as active (called from tracking functions)
-func MarkUserActive() {
-	// This will be called with user ID from use cases
-	// For now, we'll track by timestamp-based keys to avoid needing user IDs
-	// In production, you'd pass user ID and track: activeUsersDaily.Store(userID, true)
-}
-
 // MarkUserActiveWithID marks a specific user as active
 func MarkUserActiveWithID(userID string) {
 	if userID == "" {
