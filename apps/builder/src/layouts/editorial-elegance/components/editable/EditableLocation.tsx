@@ -8,7 +8,20 @@ function EditableLocation({ _translations, _currentLang, config = {}, onUpdate }
   const venue = wedding.venue || {};
   const mapStyle = config.location?.mapStyle || "desaturated";
 
+  // Generate embed URL from coordinates if not provided
+  // Halcyon Hotel Residences coordinates: 12.935688, 77.631266
+  const getEmbedUrl = (mapsUrl: string, mapsEmbedUrl: string): string => {
+    if (mapsEmbedUrl) return mapsEmbedUrl;
+    // Fallback: use coordinate-based embed URL for Halcyon Hotel Residences
+    return "https://www.google.com/maps?q=12.935688,77.631266&hl=en&z=17&output=embed";
+  };
+
   if (!venue.name) return null;
+
+  const displayVenue = {
+    ...venue,
+    mapsEmbedUrl: getEmbedUrl(venue.mapsUrl || "", venue.mapsEmbedUrl || ""),
+  };
 
   return (
     <section className="ee-section ee-location-section">
@@ -58,9 +71,9 @@ function EditableLocation({ _translations, _currentLang, config = {}, onUpdate }
         </div>
 
         <div className={`ee-location-map ee-map-${mapStyle}`}>
-          {venue.mapsEmbedUrl ? (
+          {displayVenue.mapsEmbedUrl ? (
             <iframe
-              src={venue.mapsEmbedUrl}
+              src={displayVenue.mapsEmbedUrl}
               width="100%"
               height="100%"
               style={{ border: 0 }}

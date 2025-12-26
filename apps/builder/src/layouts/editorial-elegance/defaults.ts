@@ -86,19 +86,19 @@ export const editorialEleganceDefaults: EditorialEleganceDefaults = {
       image: getLayoutAssetUrl(LAYOUT_ID, "/assets/photos/couple2/bride/1.jpeg"),
     },
     groom: {
-      name: "Siva Praveen Rayapudi",
+      name: "Siva Praveen",
       image: getLayoutAssetUrl(LAYOUT_ID, "/assets/photos/couple2/groom/1.jpeg"),
     },
   },
   wedding: {
-    dates: ["2021-05-15"],
+    dates: ["2021-05-13", "2021-05-14", "2021-05-15"],
     venue: {
       name: "Halcyon Hotel Residences",
-      address: "",
-      city: "",
-      state: "",
-      mapsUrl: "https://maps.app.goo.gl/s2JsPaRY3z6DbVkV6",
-      mapsEmbedUrl: "", // Will be converted from mapsUrl if needed
+      address: "P.B. 4708, Drafadilla, 9, 5th Main Rd, BDA Layout, 4th Block, Koramangala",
+      city: "Bengaluru",
+      state: "Karnataka",
+      mapsUrl: "https://maps.app.goo.gl/GgjVoMrJE1nEMK4F6",
+      mapsEmbedUrl: "https://www.google.com/maps?q=12.935688,77.631266&hl=en&z=17&output=embed",
     },
   },
   hero: {
@@ -114,9 +114,51 @@ export const editorialEleganceDefaults: EditorialEleganceDefaults = {
   events: {
     events: [
       {
-        label: "Wedding Ceremony",
-        date: "2021-05-15",
+        label: "Haldi",
+        date: "2021-05-13",
+        time: "9:00 AM",
+        venue: "Halcyon Hotel Residences",
+      },
+      {
+        label: "Tilak",
+        date: "2021-05-13",
+        time: "10:00 AM",
+        venue: "Halcyon Hotel Residences",
+      },
+      {
+        label: "Chumavan",
+        date: "2021-05-13",
+        time: "11:00 AM",
+        venue: "Halcyon Hotel Residences",
+      },
+      {
+        label: "Satyanarayan Pujan",
+        date: "2021-05-13",
+        time: "5:00 PM",
+        venue: "Halcyon Hotel Residences",
+      },
+      {
+        label: "Mehendi",
+        date: "2021-05-14",
+        time: "9:00 AM",
+        venue: "Halcyon Hotel Residences",
+      },
+      {
+        label: "Jaimala",
+        date: "2021-05-14",
         time: "6:00 PM",
+        venue: "Halcyon Hotel Residences",
+      },
+      {
+        label: "Dinner",
+        date: "2021-05-14",
+        time: "7:30 PM",
+        venue: "Halcyon Hotel Residences",
+      },
+      {
+        label: "Marriage",
+        date: "2021-05-15",
+        time: "12:00 AM",
         venue: "Halcyon Hotel Residences",
       },
     ],
@@ -128,7 +170,7 @@ export const editorialEleganceDefaults: EditorialEleganceDefaults = {
       bio: "",
     },
     groom: {
-      name: "Siva Praveen Rayapudi",
+      name: "Siva Praveen",
       image: getLayoutAssetUrl(LAYOUT_ID, "/assets/photos/couple2/groom/1.jpeg"),
       bio: "",
     },
@@ -248,8 +290,8 @@ export function mergeWithDefaults(
       events:
         (existingData.events as Record<string, unknown>)?.events &&
         Array.isArray((existingData.events as Record<string, unknown>).events) &&
-        (existingData.events as Record<string, unknown>).events.length
-          ? (existingData.events as Record<string, unknown>).events
+        ((existingData.events as Record<string, unknown>).events as unknown[]).length
+          ? ((existingData.events as Record<string, unknown>).events as unknown[])
           : editorialEleganceDefaults.events.events,
     },
     weddingParty: {
@@ -276,8 +318,8 @@ export function mergeWithDefaults(
       images:
         (existingData.gallery as Record<string, unknown>)?.images &&
         Array.isArray((existingData.gallery as Record<string, unknown>).images) &&
-        (existingData.gallery as Record<string, unknown>).images.length
-          ? (existingData.gallery as Record<string, unknown>).images
+        ((existingData.gallery as Record<string, unknown>).images as unknown[]).length
+          ? ((existingData.gallery as Record<string, unknown>).images as unknown[])
           : editorialEleganceDefaults.gallery.images,
     },
     galleryConfig: {

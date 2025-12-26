@@ -6,14 +6,23 @@ function Location({ _translations, _currentLang, config = {} }) {
   const venue = wedding.venue || {};
   const mapStyle = config.location?.mapStyle || "desaturated";
 
+  // Generate embed URL from coordinates if not provided
+  // Halcyon Hotel Residences coordinates: 12.935688, 77.631266
+  const getEmbedUrl = (mapsUrl: string, mapsEmbedUrl: string): string => {
+    if (mapsEmbedUrl) return mapsEmbedUrl;
+    // Fallback: use coordinate-based embed URL for Halcyon Hotel Residences
+    // This is a simple embed URL format that works without API key
+    return "https://www.google.com/maps?q=12.935688,77.631266&hl=en&z=17&output=embed";
+  };
+
   // Use default venue if none provided
   const displayVenue = {
     name: venue.name || "Halcyon Hotel Residences",
     address: venue.address || "",
     city: venue.city || "",
     state: venue.state || "",
-    mapsUrl: venue.mapsUrl || "https://maps.app.goo.gl/s2JsPaRY3z6DbVkV6",
-    mapsEmbedUrl: venue.mapsEmbedUrl || "",
+    mapsUrl: venue.mapsUrl || "https://maps.app.goo.gl/GgjVoMrJE1nEMK4F6",
+    mapsEmbedUrl: getEmbedUrl(venue.mapsUrl || "", venue.mapsEmbedUrl || ""),
   };
 
   return (
