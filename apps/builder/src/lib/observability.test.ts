@@ -3,27 +3,31 @@ import { initObservability, getMeterProvider, shutdownObservability } from "./ob
 
 // Mock OpenTelemetry SDK
 vi.mock("@opentelemetry/sdk-trace-web", () => ({
-  WebTracerProvider: vi.fn().mockImplementation(() => ({
-    addSpanProcessor: vi.fn(),
-    register: vi.fn(),
-    shutdown: vi.fn(() => Promise.resolve()),
-  })),
-  BatchSpanProcessor: vi.fn(),
+  WebTracerProvider: class MockWebTracerProvider {
+    addSpanProcessor = vi.fn();
+    register = vi.fn();
+    shutdown = vi.fn(() => Promise.resolve());
+  },
+  BatchSpanProcessor: class MockBatchSpanProcessor {},
 }));
 
 vi.mock("@opentelemetry/exporter-trace-otlp-http", () => ({
-  OTLPTraceExporter: vi.fn().mockImplementation(() => ({})),
+  OTLPTraceExporter: class MockOTLPTraceExporter {
+    constructor() {}
+  },
 }));
 
-vi.mock("@opentelemetry/sdk-metrics-web", () => ({
-  MeterProvider: vi.fn().mockImplementation(() => ({
-    shutdown: vi.fn(() => Promise.resolve()),
-  })),
-  PeriodicExportingMetricReader: vi.fn(),
+vi.mock("@opentelemetry/sdk-metrics", () => ({
+  MeterProvider: class MockMeterProvider {
+    shutdown = vi.fn(() => Promise.resolve());
+  },
+  PeriodicExportingMetricReader: class MockPeriodicExportingMetricReader {},
 }));
 
 vi.mock("@opentelemetry/exporter-metrics-otlp-http", () => ({
-  OTLPMetricExporter: vi.fn().mockImplementation(() => ({})),
+  OTLPMetricExporter: class MockOTLPMetricExporter {
+    constructor() {}
+  },
 }));
 
 vi.mock("@opentelemetry/instrumentation", () => ({
@@ -31,23 +35,23 @@ vi.mock("@opentelemetry/instrumentation", () => ({
 }));
 
 vi.mock("@opentelemetry/instrumentation-document-load", () => ({
-  DocumentLoadInstrumentation: vi.fn(),
+  DocumentLoadInstrumentation: class MockDocumentLoadInstrumentation {},
 }));
 
 vi.mock("@opentelemetry/instrumentation-fetch", () => ({
-  FetchInstrumentation: vi.fn(),
+  FetchInstrumentation: class MockFetchInstrumentation {},
 }));
 
 vi.mock("@opentelemetry/instrumentation-user-interaction", () => ({
-  UserInteractionInstrumentation: vi.fn(),
+  UserInteractionInstrumentation: class MockUserInteractionInstrumentation {},
 }));
 
 vi.mock("@opentelemetry/sdk-trace-base", () => ({
-  TraceIdRatioBasedSampler: vi.fn(),
+  TraceIdRatioBasedSampler: class MockTraceIdRatioBasedSampler {},
 }));
 
 vi.mock("@opentelemetry/context-zone-peer-dep", () => ({
-  ZoneContextManager: vi.fn(),
+  ZoneContextManager: class MockZoneContextManager {},
 }));
 
 describe("observability", () => {
@@ -63,33 +67,30 @@ describe("observability", () => {
   });
 
   describe("initObservability", () => {
-    it("initializes metrics meter provider when enabled", () => {
+    it("initializes metrics meter provider when enabled", async () => {
       // Arrange
       import.meta.env.VITE_OTEL_ENABLED = "true";
       import.meta.env.VITE_OTEL_EXPORTER_OTLP_ENDPOINT = "http://localhost:4318";
 
-      // Act
-      initObservability();
-
-      // Assert - verify no errors thrown
-      expect(() => initObservability()).not.toThrow();
+      // Act & Assert - verify no errors thrown
+      await expect(initObservability()).resolves.not.toThrow();
     });
 
-    it("handles disabled observability gracefully", () => {
+    it("handles disabled observability gracefully", async () => {
       // Arrange
       import.meta.env.VITE_OTEL_ENABLED = "false";
 
       // Act & Assert
-      expect(() => initObservability()).not.toThrow();
+      await expect(initObservability()).resolves.not.toThrow();
     });
   });
 
   describe("getMeterProvider", () => {
-    it("returns meter provider when initialized", () => {
+    it("returns meter provider when initialized", async () => {
       // Arrange
       import.meta.env.VITE_OTEL_ENABLED = "true";
       import.meta.env.VITE_OTEL_EXPORTER_OTLP_ENDPOINT = "http://localhost:4318";
-      initObservability();
+      await initObservability();
 
       // Act & Assert
       // Provider may be null if initialization failed or is disabled
@@ -112,13 +113,10 @@ describe("observability", () => {
       // Arrange
       import.meta.env.VITE_OTEL_ENABLED = "true";
       import.meta.env.VITE_OTEL_EXPORTER_OTLP_ENDPOINT = "http://localhost:4318";
-      initObservability();
+      await initObservability();
 
-      // Act
-      await shutdownObservability();
-
-      // Assert - verify no errors
-      expect(shutdownObservability()).resolves.not.toThrow();
+      // Act & Assert - verify no errors
+      await expect(shutdownObservability()).resolves.not.toThrow();
     });
 
     it("handles shutdown when not initialized", async () => {
