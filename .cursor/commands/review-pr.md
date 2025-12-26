@@ -83,14 +83,26 @@ Perform a thorough review covering:
 
 #### 3. Testing
 
-- ✅ New features have corresponding tests
-- ✅ Bug fixes include regression tests
+**Testing Philosophy**: We strive for 100% test coverage with tests that have real logical meaning and real flows. Tests should validate actual business logic, user flows, and edge cases—not just exist for the sake of coverage. Every test should answer "What behavior am I verifying?" and "Why does this test matter?"
+
+**Test Coverage Requirements:**
+- ✅ **100% test coverage goal**: All new code must have comprehensive test coverage
+- ✅ **Meaningful tests**: Tests must validate real business logic, user flows, and edge cases
+- ✅ **No trivial tests**: Avoid tests that don't verify meaningful behavior (e.g., testing getters/setters without logic)
+- ✅ **Proper test pyramid**: Tests should be organized across three levels:
+  - **Unit tests**: Test individual functions/methods in isolation with mocked dependencies
+  - **Integration tests**: Test interactions between components (e.g., use case + repository, service + API)
+  - **End-to-end tests**: Test complete user flows from frontend to backend
+- ✅ New features have corresponding tests at appropriate levels (unit, integration, e2e)
+- ✅ Bug fixes include regression tests that prevent the bug from reoccurring
 - ✅ Tests follow repository patterns:
   - **Go**: Table-driven tests, mock interfaces (not concrete structs)
   - **Frontend**: React Testing Library, MSW for API mocking
-- ✅ Test coverage is adequate for critical paths
 - ✅ Tests are isolated and don't depend on external state
 - ✅ Tests follow "one test at a time" workflow
+- ✅ Test names clearly describe what behavior is being verified
+- ✅ Tests cover both happy paths and error cases
+- ✅ Tests validate actual business outcomes, not just implementation details
 
 #### 4. Documentation
 
@@ -319,7 +331,13 @@ if err != nil {
 1. **Missing error handling**: Check all function calls that return errors
 2. **Business logic in handlers**: Should be in use case layer
 3. **Missing Swagger annotations**: New endpoints need annotations
-4. **Missing tests**: New features need tests
+4. **Missing or inadequate tests**:
+   - New features need comprehensive tests (unit, integration, e2e as appropriate)
+   - Tests must have real logical meaning and validate actual business flows
+   - Missing tests for error cases and edge conditions
+   - Trivial tests that don't verify meaningful behavior
+   - Missing integration tests for component interactions
+   - Missing e2e tests for critical user flows
 5. **Hardcoded values**: Should use config
 6. **Missing context propagation**: Long-running operations need context
 7. **Improper error wrapping**: Use `fmt.Errorf` with `%w`
@@ -332,7 +350,13 @@ if err != nil {
 3. **Memory leaks**: Check useEffect cleanup
 4. **Missing accessibility**: Check ARIA labels, keyboard navigation
 5. **Performance issues**: Check unnecessary re-renders, missing memoization
-6. **Missing tests**: New components need tests
+6. **Missing or inadequate tests**:
+   - New components need comprehensive tests (unit, integration, e2e as appropriate)
+   - Tests must validate real user interactions and business flows
+   - Missing tests for error states, loading states, and edge cases
+   - Trivial tests that don't verify meaningful behavior
+   - Missing integration tests for component interactions with services
+   - Missing e2e tests for critical user flows (use Playwright)
 7. **Business logic in components**: Should be in hooks/services
 8. **Missing loading states**: Async operations need loading indicators
 
@@ -374,26 +398,102 @@ func (h *InvitationHandler) Create(c *gin.Context) {
 \`\`\`
 ```
 
-### Example 2: Missing Test
+### Example 2: Missing or Inadequate Tests
 
 ```markdown
 **Issue Type**: TESTING
 **Severity**: MAJOR
 
-**Issue**: New use case method `CreateInvitation` doesn't have tests. All business logic should be covered by tests.
+**Issue**: New use case method `CreateInvitation` doesn't have comprehensive tests. We strive for 100% test coverage with tests that validate real business logic and flows.
 
 **Location**: `apps/api-go/internal/usecase/invitation/create.go`
 
-**Suggestion**: Add table-driven tests following the repository pattern. See `apps/api-go/internal/usecase/invitation/create_test.go` for examples.
+**Suggestion**: Add meaningful tests at appropriate levels following the repository pattern. Tests should validate actual business outcomes, not just implementation details.
 
-**Test cases to cover**:
-- Valid invitation creation
-- Invalid input validation
-- Database errors
-- Duplicate invitation handling
+**Required test coverage**:
+
+1. **Unit tests** (in `create_test.go`):
+   - Valid invitation creation with proper business logic validation
+   - Invalid input validation (all validation rules)
+   - Database errors (connection failures, constraint violations)
+   - Duplicate invitation handling (business rule enforcement)
+   - Edge cases (boundary conditions, nil values)
+
+2. **Integration tests** (if applicable):
+   - Use case + repository interaction
+   - Transaction handling
+   - Error propagation
+
+3. **End-to-end tests** (Playwright):
+   - Complete user flow: create invitation → receive email → accept invitation
+   - Error scenarios in the full flow
+
+**Test quality requirements**:
+- Each test should clearly describe what business behavior it's verifying
+- Tests should use table-driven approach for Go (see existing patterns)
+- Mock interfaces, not concrete structs
+- Tests should be isolated and not depend on external state
+- Avoid trivial tests that don't verify meaningful behavior
 ```
 
-### Example 3: Security Issue
+### Example 3: Trivial or Meaningless Tests
+
+```markdown
+**Issue Type**: TESTING
+**Severity**: MAJOR
+
+**Issue**: Tests exist but don't validate meaningful behavior. These tests add maintenance burden without providing real value.
+
+**Location**: `apps/api-go/internal/usecase/invitation/create_test.go:45`
+
+**Suggestion**: Replace trivial tests with tests that validate actual business logic and real flows.
+
+**Examples of trivial tests to avoid**:
+- Testing simple getters/setters without business logic
+- Testing that a function returns what you passed in (no transformation)
+- Testing implementation details rather than behavior
+- Tests that only verify no errors occurred without checking outcomes
+
+**What to test instead**:
+- Business rules and validation logic
+- Error handling and edge cases
+- Data transformations and calculations
+- Integration between components
+- Complete user flows (e2e)
+
+**Example**:
+\`\`\`go
+// ❌ Trivial test - doesn't verify meaningful behavior
+func TestCreateInvitation_ReturnsInvitation(t *testing.T) {
+    inv := &Invitation{Email: "test@example.com"}
+    result := createInvitation(inv)
+    assert.NotNil(t, result) // This doesn't verify any business logic
+}
+
+// ✅ Meaningful test - validates business logic
+func TestCreateInvitation_ValidatesEmailFormat(t *testing.T) {
+    tests := []struct {
+        name    string
+        email   string
+        wantErr bool
+    }{
+        {"valid email", "user@example.com", false},
+        {"invalid email", "not-an-email", true},
+        {"empty email", "", true},
+    }
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            _, err := createInvitation(&Invitation{Email: tt.email})
+            if (err != nil) != tt.wantErr {
+                t.Errorf("CreateInvitation() error = %v, wantErr %v", err, tt.wantErr)
+            }
+        })
+    }
+}
+\`\`\`
+```
+
+### Example 4: Security Issue
 
 ```markdown
 **Issue Type**: SECURITY
@@ -426,4 +526,5 @@ if err := validator.Validate(req); err != nil {
 - For inline comments, you may need to use `gh api` for more control
 - Group related comments when possible to avoid spam
 - Post a summary comment at the end with overall assessment
+- **Test quality is critical**: Reject tests that exist only for coverage metrics. Every test must validate meaningful business logic, user flows, or edge cases. Ensure proper test pyramid: unit tests for isolated logic, integration tests for component interactions, and e2e tests for critical user journeys.
 
