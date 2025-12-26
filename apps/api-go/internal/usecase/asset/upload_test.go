@@ -48,6 +48,7 @@ func TestUploadAssetUseCase_Execute_ValidAsset_ReturnsAsset(t *testing.T) {
 	assert.Equal(t, originalName, output.Asset.OriginalName, "Original name should match")
 	assert.Equal(t, mimeType, output.Asset.MimeType, "Mime type should match")
 	assert.Equal(t, userID, output.Asset.UserID, "User ID should match")
+	// Note: Metrics tracking (RecordAssetUpload) is verified in integration tests
 }
 
 func TestUploadAssetUseCase_Execute_RepositoryError_ReturnsError(t *testing.T) {

@@ -3,6 +3,7 @@ package invitation
 import (
 	"context"
 
+	"github.com/sacred-vows/api-go/internal/infrastructure/observability"
 	"github.com/sacred-vows/api-go/internal/interfaces/repository"
 	"github.com/sacred-vows/api-go/internal/usecase/asset"
 	"github.com/sacred-vows/api-go/pkg/errors"
@@ -10,17 +11,20 @@ import (
 
 type DeleteInvitationUseCase struct {
 	invitationRepo       repository.InvitationRepository
+	publishedRepo        repository.PublishedSiteRepository
 	assetRepo            repository.AssetRepository
 	deleteAssetsByURLsUC *asset.DeleteAssetsByURLsUseCase
 }
 
 func NewDeleteInvitationUseCase(
 	invitationRepo repository.InvitationRepository,
+	publishedRepo repository.PublishedSiteRepository,
 	assetRepo repository.AssetRepository,
 	deleteAssetsByURLsUC *asset.DeleteAssetsByURLsUseCase,
 ) *DeleteInvitationUseCase {
 	return &DeleteInvitationUseCase{
 		invitationRepo:       invitationRepo,
+		publishedRepo:        publishedRepo,
 		assetRepo:            assetRepo,
 		deleteAssetsByURLsUC: deleteAssetsByURLsUC,
 	}
@@ -43,6 +47,15 @@ func (uc *DeleteInvitationUseCase) Execute(ctx context.Context, id string) (*Del
 	var assetURLs []string
 	if uc.assetRepo != nil {
 		assetURLs = extractAssetURLs(invitation.Data)
+	}
+
+	// Check if invitation was published before deleting
+	if uc.publishedRepo != nil {
+		site, err := uc.publishedRepo.FindByInvitationID(ctx, id)
+		if err == nil && site != nil && site.Published {
+			// Record unpublish metric before deletion
+			observability.RecordInvitationUnpublished()
+		}
 	}
 
 	// Delete invitation first

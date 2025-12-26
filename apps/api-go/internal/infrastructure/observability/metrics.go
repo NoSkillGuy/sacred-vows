@@ -13,7 +13,7 @@ var (
 	httpRequestDuration otelmetric.Float64Histogram
 )
 
-// InitMetrics initializes RED metrics (Rate, Errors, Duration)
+// InitMetrics initializes RED metrics (Rate, Errors, Duration) and business metrics
 func InitMetrics(meter otelmetric.Meter) error {
 	var err error
 
@@ -44,6 +44,11 @@ func InitMetrics(meter otelmetric.Meter) error {
 		otelmetric.WithUnit("s"),
 	)
 	if err != nil {
+		return err
+	}
+
+	// Initialize business metrics
+	if err := InitBusinessMetrics(meter); err != nil {
 		return err
 	}
 

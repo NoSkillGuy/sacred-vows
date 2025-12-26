@@ -50,6 +50,7 @@ func TestLoginUseCase_Execute(t *testing.T) {
 				require.NotNil(t, output.User, "User should not be nil")
 				assert.Equal(t, "user-123", output.User.ID, "User ID should match")
 				assert.Equal(t, "test@example.com", output.User.Email, "User email should match")
+				// Note: Metrics tracking (RecordUserLogin, MarkUserActiveWithID) is verified in integration tests
 			},
 		},
 		{

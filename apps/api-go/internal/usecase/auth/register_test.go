@@ -45,6 +45,7 @@ func TestRegisterUseCase_Execute_ValidRegistration_ReturnsUser(t *testing.T) {
 	assert.Equal(t, email, output.User.Email, "User email should match")
 	assert.Equal(t, name, output.User.Name, "User name should match")
 	assert.NotEmpty(t, output.User.ID, "User ID should be generated")
+	// Note: Metrics tracking (RecordUserSignup, MarkUserActiveWithID) is verified in integration tests
 }
 
 func TestRegisterUseCase_Execute_DuplicateEmail_ReturnsError(t *testing.T) {

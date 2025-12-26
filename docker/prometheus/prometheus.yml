@@ -12,6 +12,11 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
+  - job_name: 'otel-collector'
+    static_configs:
+      - targets: ['otel-collector:8889']
+    metrics_path: '/metrics'
+
 # Remote write to Tempo disabled - endpoint /api/prom/remote/write not available
 # To enable exemplars, configure Tempo to accept Prometheus remote write
 # remote_write:

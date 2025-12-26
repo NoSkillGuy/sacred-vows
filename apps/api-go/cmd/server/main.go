@@ -229,7 +229,7 @@ func main() {
 	deleteAssetUC := asset.NewDeleteAssetUseCase(assetRepo)
 	deleteAssetsByURLsUC := asset.NewDeleteAssetsByURLsUseCase(assetRepo)
 	getAssetsByURLsUC := asset.NewGetAssetsByURLsUseCase(assetRepo)
-	deleteInvitationUC := invitation.NewDeleteInvitationUseCase(invitationRepo, assetRepo, deleteAssetsByURLsUC)
+	deleteInvitationUC := invitation.NewDeleteInvitationUseCase(invitationRepo, publishedSiteRepo, assetRepo, deleteAssetsByURLsUC)
 
 	submitRSVPUC := rsvp.NewSubmitRSVPUseCase(rsvpRepo)
 	getRSVPByInvitationUC := rsvp.NewGetRSVPByInvitationUseCase(rsvpRepo)
@@ -308,7 +308,7 @@ func main() {
 		meterCfg := observability.MeterConfig{
 			Enabled:               cfg.Observability.Enabled,
 			Endpoint:              cfg.Observability.MetricsEndpoint,
-			Protocol:              cfg.Observability.ExporterProtocol,
+			Protocol:              cfg.Observability.MetricsProtocol,
 			ServiceName:           cfg.Observability.ServiceName,
 			ServiceVersion:        cfg.Observability.ServiceVersion,
 			DeploymentEnvironment: cfg.Observability.DeploymentEnvironment,
@@ -320,6 +320,10 @@ func main() {
 			meter := observability.Meter("sacred-vows-api")
 			if err := observability.InitMetrics(meter); err != nil {
 				logger.GetLogger().Warn("Failed to initialize metrics", zap.Error(err))
+			} else {
+				// Start active users tracker with context for graceful shutdown
+				observability.StartActiveUsersTracker(ctx)
+				logger.GetLogger().Info("Active users tracker started")
 			}
 		}
 	}
@@ -361,6 +365,10 @@ func main() {
 
 	// Shutdown observability (flush telemetry)
 	if cfg.Observability.Enabled {
+		// Stop active users tracker gracefully
+		observability.StopActiveUsersTracker()
+		logger.GetLogger().Info("Active users tracker stopped")
+
 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer shutdownCancel()
 		if err := observability.Shutdown(shutdownCtx); err != nil {

@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/sacred-vows/api-go/internal/domain"
+	"github.com/sacred-vows/api-go/internal/infrastructure/observability"
 	"github.com/sacred-vows/api-go/internal/interfaces/clock"
 	"github.com/sacred-vows/api-go/internal/interfaces/repository"
 	"github.com/sacred-vows/api-go/pkg/logger"
@@ -98,15 +99,18 @@ func (uc *PublishInvitationUseCase) Execute(ctx context.Context, invitationID, o
 	}
 
 	version = site.CurrentVersion + 1
+
 	// Generate snapshot bundle first. If this fails, do not advance any published pointers.
 	bundle, err := uc.snapshotGen.GenerateBundle(ctx, invitationID)
 	if err != nil {
+		observability.RecordPublishAttempt(false)
 		return "", 0, "", err
 	}
 
 	prefix := fmt.Sprintf("sites/%s/v%d", subdomain, version)
 	indexKey := prefix + "/index.html"
 	if err := uc.artifactStore.Put(ctx, indexKey, "text/html; charset=utf-8", "public, max-age=60", bundle.IndexHTML); err != nil {
+		observability.RecordPublishAttempt(false)
 		return "", 0, "", err
 	}
 
@@ -118,6 +122,7 @@ func (uc *PublishInvitationUseCase) Execute(ctx context.Context, invitationID, o
 	cssKey := prefix + "/styles.css"
 	if len(bundle.StylesCSS) > 0 {
 		if err := uc.artifactStore.Put(ctx, cssKey, "text/css; charset=utf-8", "public, max-age=31536000, immutable", bundle.StylesCSS); err != nil {
+			observability.RecordPublishAttempt(false)
 			return "", 0, "", err
 		}
 	}
@@ -126,6 +131,7 @@ func (uc *PublishInvitationUseCase) Execute(ctx context.Context, invitationID, o
 	jsBody := []byte("// placeholder\n")
 	// Optional placeholder (can be removed once layouts no longer reference app.js)
 	if err := uc.artifactStore.Put(ctx, jsKey, "application/javascript; charset=utf-8", "public, max-age=31536000, immutable", jsBody); err != nil {
+		observability.RecordPublishAttempt(false)
 		return "", 0, "", err
 	}
 
@@ -140,6 +146,7 @@ func (uc *PublishInvitationUseCase) Execute(ctx context.Context, invitationID, o
 			ct = "application/octet-stream"
 		}
 		if err := uc.artifactStore.Put(ctx, key, ct, cc, a.Body); err != nil {
+			observability.RecordPublishAttempt(false)
 			return "", 0, "", err
 		}
 	}
@@ -150,8 +157,13 @@ func (uc *PublishInvitationUseCase) Execute(ctx context.Context, invitationID, o
 	site.PublishedAt = &now
 	site.UpdatedAt = now
 	if err := uc.publishedRepo.Update(ctx, site); err != nil {
+		observability.RecordPublishAttempt(false)
 		return "", 0, "", err
 	}
+
+	// Track successful publish
+	observability.RecordPublishAttempt(true)
+	observability.RecordInvitationPublished()
 
 	// Cleanup old versions in background (don't block response)
 	go uc.cleanupOldVersions(context.Background(), subdomain, version)

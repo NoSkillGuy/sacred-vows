@@ -8,11 +8,14 @@ import { ToastProvider } from "./components/Toast/ToastProvider";
 import { queryClient } from "./lib/queryClient";
 import { initObservability } from "./lib/observability";
 import { ObservabilityRouter } from "./lib/observabilityRouter";
+import { initMetricsAfterObservability } from "./lib/metrics";
 import "./styles/index.css";
 // Invitation styles are loaded in PreviewPane to avoid conflicts with builder UI
 
-// Initialize observability before React render
-initObservability();
+// Initialize observability and metrics before React render
+Promise.all([initObservability(), initMetricsAfterObservability()]).catch((error) => {
+  console.error("[App] Failed to initialize observability:", error);
+});
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {
