@@ -1,6 +1,15 @@
 import { useState, useRef, useEffect } from "react";
-import { formatEventDate } from "../../utils/dateFormatter";
+import { formatEventDate, isValidDate } from "../../utils/dateFormatter";
 import "./EditableDate.css";
+
+interface EditableDateProps {
+  value?: string;
+  onUpdate: (path: string, value: string) => void;
+  path: string;
+  className?: string;
+  placeholder?: string;
+  [key: string]: unknown;
+}
 
 /**
  * EditableDate - Inline editable date input component
@@ -13,7 +22,7 @@ function EditableDate({
   className = "",
   placeholder = "Click to set date...",
   ...props
-}) {
+}: EditableDateProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [displayValue, setDisplayValue] = useState(value || "");
   const [isHovered, setIsHovered] = useState(false);
@@ -30,7 +39,10 @@ function EditableDate({
   useEffect(() => {
     if (isEditing && inputRef.current) {
       inputRef.current.focus();
-      inputRef.current.showPicker?.();
+      // Feature detection for showPicker() - not supported in all browsers
+      if (typeof inputRef.current.showPicker === "function") {
+        inputRef.current.showPicker();
+      }
     }
   }, [isEditing]);
 
@@ -88,7 +100,11 @@ function EditableDate({
       data-editable="true"
       data-path={path}
     >
-      {formatEventDate(displayValue) || <span className="editable-placeholder">{placeholder}</span>}
+      {isValidDate(displayValue) && formatEventDate(displayValue) ? (
+        formatEventDate(displayValue)
+      ) : (
+        <span className="editable-placeholder">{placeholder}</span>
+      )}
     </p>
   );
 }

@@ -1,22 +1,61 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import EditableText from "../shared/EditableText";
 import EditableDate from "../shared/EditableDate";
 import EditableTime from "../shared/EditableTime";
 import { useBuilderStore } from "../../../../store/builderStore";
 
+interface Event {
+  id?: string;
+  label: string;
+  date: string;
+  time: string;
+  venue: string;
+}
+
+interface EditableEventCardsProps {
+  _translations?: unknown;
+  _currentLang?: string;
+  config?: {
+    events?: {
+      events?: Event[];
+    };
+    wedding?: {
+      dates?: string[];
+      venue?: {
+        name?: string;
+      };
+    };
+  };
+  onUpdate?: (path: string, value: unknown) => void;
+}
+
 /**
  * EditableEventCards - WYSIWYG editable Event Cards
  */
-function EditableEventCards({ _translations, _currentLang, config = {}, onUpdate }) {
+function EditableEventCards({
+  _translations,
+  _currentLang,
+  config = {},
+  onUpdate,
+}: EditableEventCardsProps) {
   const { currentInvitation, updateNestedData } = useBuilderStore();
   // Read events directly from store to ensure reactivity
   const events = currentInvitation.data.events || config.events || {};
-  const eventList = events.events || [];
-  const [hoveredIndex, setHoveredIndex] = useState(null);
+  // Ensure all events have IDs for stable React keys (use index-based ID if missing)
+  const eventList: Event[] = useMemo(
+    () =>
+      (events.events || []).map((event: Event, index: number) => ({
+        ...event,
+        id: event.id || `event-${index}`,
+      })),
+    [events.events]
+  );
+  const [hoveredEventId, setHoveredEventId] = useState<string | null>(null);
 
   const handleAddEvent = () => {
     const wedding = currentInvitation.data.wedding || config.wedding || {};
-    const newEvent = {
+    const newEvent: Event = {
+      id: `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       label: "New Event",
       date: wedding.dates?.[0] || new Date().toISOString().split("T")[0],
       time: "6:00 PM",
@@ -27,8 +66,8 @@ function EditableEventCards({ _translations, _currentLang, config = {}, onUpdate
     });
   };
 
-  const handleDeleteEvent = (index) => {
-    const newEvents = eventList.filter((_, i) => i !== index);
+  const handleDeleteEvent = (eventId: string) => {
+    const newEvents = eventList.filter((event) => event.id !== eventId);
     updateNestedData("events", {
       events: newEvents,
     });
@@ -44,70 +83,84 @@ function EditableEventCards({ _translations, _currentLang, config = {}, onUpdate
       {eventList.length === 0 ? (
         <div className="ee-events-empty">
           <p className="ee-events-empty-message">No events added yet</p>
-          <button type="button" className="ee-event-add-btn" onClick={handleAddEvent}>
+          <button
+            type="button"
+            className="ee-event-add-btn"
+            onClick={handleAddEvent}
+            aria-label="Add new event"
+          >
             + Add Event
           </button>
         </div>
       ) : (
         <>
           <div className="ee-event-cards">
-            {eventList.map((event, index) => (
-              <div
-                key={index}
-                className="ee-event-card"
-                onMouseEnter={() => setHoveredIndex(index)}
-                onMouseLeave={() => setHoveredIndex(null)}
-              >
-                {hoveredIndex === index && (
-                  <button
-                    type="button"
-                    className="ee-event-delete-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteEvent(index);
-                    }}
-                    title="Delete event"
-                  >
-                    ×
-                  </button>
-                )}
-                <div className="ee-event-card-inner">
-                  <EditableText
-                    value={event.label}
-                    onUpdate={onUpdate}
-                    path={`events.events.${index}.label`}
-                    className="ee-event-name"
-                    tag="h3"
-                  />
-                  <EditableDate
-                    value={event.date}
-                    onUpdate={onUpdate}
-                    path={`events.events.${index}.date`}
-                    className="ee-meta-text ee-event-date"
-                    placeholder="Click to set date..."
-                  />
-                  <div className="ee-event-details">
+            {eventList.map((event, index) => {
+              const eventId = event.id || `event-${index}`;
+              return (
+                <div
+                  key={eventId}
+                  className="ee-event-card"
+                  onMouseEnter={() => setHoveredEventId(eventId)}
+                  onMouseLeave={() => setHoveredEventId(null)}
+                >
+                  {hoveredEventId === eventId && (
+                    <button
+                      type="button"
+                      className="ee-event-delete-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteEvent(eventId);
+                      }}
+                      title="Delete event"
+                      aria-label={`Delete event: ${event.label}`}
+                    >
+                      <span aria-hidden="true">×</span>
+                    </button>
+                  )}
+                  <div className="ee-event-card-inner">
                     <EditableText
-                      value={event.venue || "Venue TBD"}
+                      value={event.label}
                       onUpdate={onUpdate}
-                      path={`events.events.${index}.venue`}
-                      className="ee-event-venue"
-                      tag="p"
+                      path={`events.events.${index}.label`}
+                      className="ee-event-name"
+                      tag="h3"
                     />
-                    <EditableTime
-                      value={event.time}
+                    <EditableDate
+                      value={event.date}
                       onUpdate={onUpdate}
-                      path={`events.events.${index}.time`}
-                      className="ee-event-time"
-                      placeholder="Click to set time..."
+                      path={`events.events.${index}.date`}
+                      className="ee-meta-text ee-event-date"
+                      placeholder="Click to set date..."
                     />
+                    <div className="ee-event-details">
+                      <EditableText
+                        value={event.venue || "Venue TBD"}
+                        onUpdate={onUpdate}
+                        path={`events.events.${index}.venue`}
+                        className="ee-event-venue"
+                        tag="p"
+                      />
+                      <EditableTime
+                        value={event.time}
+                        onUpdate={onUpdate}
+                        path={`events.events.${index}.time`}
+                        className="ee-event-time"
+                        placeholder="Click to set time..."
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
           <div className="ee-events-actions">
-            <button type="button" className="ee-event-add-btn" onClick={handleAddEvent}>
+            <button
+              type="button"
+              className="ee-event-add-btn"
+              onClick={handleAddEvent}
+              aria-label="Add new event"
+            >
               + Add Event
             </button>
           </div>

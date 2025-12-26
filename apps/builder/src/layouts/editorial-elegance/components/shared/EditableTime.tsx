@@ -1,6 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 import "./EditableTime.css";
 
+interface EditableTimeProps {
+  value?: string;
+  onUpdate: (path: string, value: string) => void;
+  path: string;
+  className?: string;
+  placeholder?: string;
+  [key: string]: unknown;
+}
+
 /**
  * EditableTime - Inline editable time input component
  * Uses native HTML5 time picker
@@ -12,21 +21,31 @@ function EditableTime({
   className = "",
   placeholder = "Click to set time...",
   ...props
-}) {
+}: EditableTimeProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [displayValue, setDisplayValue] = useState(value || "");
   const [isHovered, setIsHovered] = useState(false);
   const inputRef = useRef(null);
 
   // Convert 12-hour format (e.g., "6:00 PM") to 24-hour format (e.g., "18:00")
-  const convertTo24Hour = (time12h) => {
+  const convertTo24Hour = (time12h: string): string => {
     if (!time12h) return "";
-    const time = time12h.match(/(\d+):(\d+)\s*(AM|PM)/i);
+    // More robust regex: handles times with/without leading zeros, optional seconds
+    const time = time12h.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$/i);
     if (!time) return time12h; // Return as-is if not in expected format
 
     let hours = parseInt(time[1], 10);
     const minutes = time[2];
-    const ampm = time[3].toUpperCase();
+    const ampm = time[4].toUpperCase();
+
+    // Validate hours (1-12) and minutes (0-59)
+    if (hours < 1 || hours > 12) {
+      return time12h; // Return as-is if invalid
+    }
+    const minutesNum = parseInt(minutes, 10);
+    if (minutesNum < 0 || minutesNum > 59) {
+      return time12h; // Return as-is if invalid
+    }
 
     if (ampm === "PM" && hours !== 12) {
       hours += 12;
@@ -38,14 +57,24 @@ function EditableTime({
   };
 
   // Convert 24-hour format (e.g., "18:00") to 12-hour format (e.g., "6:00 PM")
-  const convertTo12Hour = (time24h) => {
+  const convertTo12Hour = (time24h: string): string => {
     if (!time24h) return "";
-    const time = time24h.match(/(\d+):(\d+)/);
+    // More robust regex: handles times with/without leading zeros, optional seconds
+    const time = time24h.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
     if (!time) return time24h; // Return as-is if not in expected format
 
     let hours = parseInt(time[1], 10);
     const minutes = time[2];
     const ampm = hours >= 12 ? "PM" : "AM";
+
+    // Validate hours (0-23) and minutes (0-59)
+    if (hours < 0 || hours > 23) {
+      return time24h; // Return as-is if invalid
+    }
+    const minutesNum = parseInt(minutes, 10);
+    if (minutesNum < 0 || minutesNum > 59) {
+      return time24h; // Return as-is if invalid
+    }
 
     if (hours > 12) {
       hours -= 12;
@@ -72,7 +101,10 @@ function EditableTime({
   useEffect(() => {
     if (isEditing && inputRef.current) {
       inputRef.current.focus();
-      inputRef.current.showPicker?.();
+      // Feature detection for showPicker() - not supported in all browsers
+      if (typeof inputRef.current.showPicker === "function") {
+        inputRef.current.showPicker();
+      }
     }
   }, [isEditing]);
 
