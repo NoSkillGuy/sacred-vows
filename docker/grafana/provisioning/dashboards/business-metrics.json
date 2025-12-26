@@ -1,4 +1,5 @@
 {
+  "uid": "business-metrics",
   "title": "Business Metrics Dashboard",
   "tags": [
     "business",
@@ -26,7 +27,7 @@
       },
       "targets": [
         {
-          "expr": "business_users_active_daily",
+          "expr": "sum(business_users_active_daily_ratio)",
           "refId": "A",
           "datasource": {
             "type": "prometheus",
@@ -64,7 +65,7 @@
       },
       "targets": [
         {
-          "expr": "business_users_active_weekly",
+          "expr": "sum(business_users_active_weekly_ratio)",
           "refId": "A",
           "datasource": {
             "type": "prometheus",
@@ -102,7 +103,7 @@
       },
       "targets": [
         {
-          "expr": "business_users_active_monthly",
+          "expr": "sum(business_users_active_monthly_ratio)",
           "refId": "A",
           "datasource": {
             "type": "prometheus",
@@ -140,7 +141,7 @@
       },
       "targets": [
         {
-          "expr": "business_invitations_active",
+          "expr": "sum(business_invitations_active)",
           "refId": "A",
           "datasource": {
             "type": "prometheus",
@@ -178,7 +179,7 @@
       },
       "targets": [
         {
-          "expr": "rate(business_publish_success_total[5m]) / rate(business_publish_attempts_total[5m]) * 100",
+          "expr": "((sum(rate(business_publish_success_total[5m])) / sum(rate(business_publish_attempts_total[5m]))) * 100) or vector(0)",
           "refId": "A",
           "datasource": {
             "type": "prometheus",
@@ -225,7 +226,7 @@
       },
       "targets": [
         {
-          "expr": "rate(business_rsvp_submissions_total[5m]) / rate(business_invitation_views_total[5m]) * 100",
+          "expr": "((sum(rate(business_rsvp_submissions_total[5m])) / sum(rate(business_invitation_views_total[5m]))) * 100) or vector(0)",
           "refId": "A",
           "datasource": {
             "type": "prometheus",
@@ -293,7 +294,7 @@
     {
       "id": 8,
       "title": "Signup Method Distribution",
-      "type": "piechart",
+      "type": "bargauge",
       "gridPos": {
         "h": 8,
         "w": 6,
@@ -309,12 +310,24 @@
             "uid": "prometheus"
           }
         }
-      ]
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short"
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient"
+      }
     },
     {
       "id": 9,
       "title": "Login Method Distribution",
-      "type": "piechart",
+      "type": "bargauge",
       "gridPos": {
         "h": 8,
         "w": 6,
@@ -330,7 +343,19 @@
             "uid": "prometheus"
           }
         }
-      ]
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short"
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient"
+      }
     },
     {
       "id": 10,
@@ -374,7 +399,7 @@
       },
       "targets": [
         {
-          "expr": "business_users_active_daily",
+          "expr": "sum(business_users_active_daily_ratio)",
           "refId": "A",
           "legendFormat": "Daily",
           "datasource": {
@@ -383,7 +408,7 @@
           }
         },
         {
-          "expr": "business_users_active_weekly",
+          "expr": "sum(business_users_active_weekly_ratio)",
           "refId": "B",
           "legendFormat": "Weekly",
           "datasource": {
@@ -392,7 +417,7 @@
           }
         },
         {
-          "expr": "business_users_active_monthly",
+          "expr": "sum(business_users_active_monthly_ratio)",
           "refId": "C",
           "legendFormat": "Monthly",
           "datasource": {
@@ -413,7 +438,7 @@
     {
       "id": 12,
       "title": "Complete User Journey Funnel",
-      "type": "barchart",
+      "type": "bargauge",
       "gridPos": {
         "h": 8,
         "w": 12,
@@ -466,7 +491,19 @@
             "uid": "prometheus"
           }
         }
-      ]
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "ops"
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient"
+      }
     },
     {
       "id": 13,
@@ -480,7 +517,7 @@
       },
       "targets": [
         {
-          "expr": "rate(business_invitations_created_total[5m]) / rate(business_user_signups_total[5m]) * 100",
+          "expr": "((sum(rate(business_invitations_created_total[5m])) / sum(rate(business_user_signups_total[5m]))) * 100) or vector(0)",
           "refId": "A",
           "datasource": {
             "type": "prometheus",
@@ -519,7 +556,7 @@
       },
       "targets": [
         {
-          "expr": "rate(business_invitations_published_total[5m]) / rate(business_invitations_created_total[5m]) * 100",
+          "expr": "((sum(rate(business_invitations_published_total[5m])) / sum(rate(business_invitations_created_total[5m]))) * 100) or vector(0)",
           "refId": "A",
           "datasource": {
             "type": "prometheus",
@@ -558,7 +595,7 @@
       },
       "targets": [
         {
-          "expr": "(1 - (rate(business_invitations_created_total[5m]) / rate(business_user_signups_total[5m]))) * 100",
+          "expr": "((1 - (sum(rate(business_invitations_created_total[5m])) / sum(rate(business_user_signups_total[5m])))) * 100) or vector(0)",
           "refId": "A",
           "datasource": {
             "type": "prometheus",
@@ -605,7 +642,7 @@
       },
       "targets": [
         {
-          "expr": "(1 - (rate(business_invitations_published_total[5m]) / rate(business_invitations_created_total[5m]))) * 100",
+          "expr": "((1 - (sum(rate(business_invitations_published_total[5m])) / sum(rate(business_invitations_created_total[5m])))) * 100) or vector(0)",
           "refId": "A",
           "datasource": {
             "type": "prometheus",
@@ -652,7 +689,7 @@
       },
       "targets": [
         {
-          "expr": "rate(business_invitations_created_total[5m])",
+          "expr": "sum(rate(business_invitations_created_total[5m]))",
           "refId": "A",
           "legendFormat": "Created/sec",
           "datasource": {
@@ -682,7 +719,7 @@
       },
       "targets": [
         {
-          "expr": "rate(business_invitations_published_total[5m])",
+          "expr": "sum(rate(business_invitations_published_total[5m]))",
           "refId": "A",
           "legendFormat": "Published/sec",
           "datasource": {
@@ -712,7 +749,7 @@
       },
       "targets": [
         {
-          "expr": "business_invitations_active",
+          "expr": "sum(business_invitations_active)",
           "refId": "A",
           "datasource": {
             "type": "prometheus",
@@ -750,7 +787,7 @@
       },
       "targets": [
         {
-          "expr": "rate(business_publish_failures_total[5m]) / rate(business_publish_attempts_total[5m]) * 100",
+          "expr": "((sum(rate(business_publish_failures_total[5m])) / sum(rate(business_publish_attempts_total[5m]))) * 100) or vector(0)",
           "refId": "A",
           "datasource": {
             "type": "prometheus",
@@ -797,7 +834,7 @@
       },
       "targets": [
         {
-          "expr": "rate(business_publish_attempts_total[5m])",
+          "expr": "sum(rate(business_publish_attempts_total[5m]))",
           "refId": "A",
           "legendFormat": "Attempts",
           "datasource": {
@@ -806,7 +843,7 @@
           }
         },
         {
-          "expr": "rate(business_publish_success_total[5m])",
+          "expr": "sum(rate(business_publish_success_total[5m]))",
           "refId": "B",
           "legendFormat": "Success",
           "datasource": {
@@ -827,7 +864,7 @@
     {
       "id": 22,
       "title": "Invitation Creation Duration",
-      "type": "histogram",
+      "type": "timeseries",
       "gridPos": {
         "h": 8,
         "w": 12,
@@ -843,7 +880,21 @@
             "uid": "prometheus"
           }
         }
-      ]
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short",
+          "custom": {
+            "drawStyle": "bars",
+            "barAlignment": 0,
+            "lineInterpolation": "linear",
+            "fillOpacity": 100
+          }
+        }
+      }
     },
     {
       "id": 23,
@@ -857,7 +908,7 @@
       },
       "targets": [
         {
-          "expr": "rate(business_invitation_views_total[5m])",
+          "expr": "sum(rate(business_invitation_views_total[5m]))",
           "refId": "A",
           "legendFormat": "Views/sec",
           "datasource": {
@@ -887,7 +938,7 @@
       },
       "targets": [
         {
-          "expr": "rate(business_rsvp_submissions_total[5m])",
+          "expr": "sum(rate(business_rsvp_submissions_total[5m]))",
           "refId": "A",
           "legendFormat": "RSVPs/sec",
           "datasource": {
@@ -917,7 +968,7 @@
       },
       "targets": [
         {
-          "expr": "rate(business_rsvp_submissions_total[5m]) / rate(business_invitation_views_total[5m]) * 100",
+          "expr": "((sum(rate(business_rsvp_submissions_total[5m])) / sum(rate(business_invitation_views_total[5m]))) * 100) or vector(0)",
           "refId": "A",
           "legendFormat": "Conversion Rate %",
           "datasource": {
@@ -939,7 +990,7 @@
     {
       "id": 26,
       "title": "Total Views vs RSVPs",
-      "type": "barchart",
+      "type": "bargauge",
       "gridPos": {
         "h": 8,
         "w": 12,
@@ -965,7 +1016,19 @@
             "uid": "prometheus"
           }
         }
-      ]
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short"
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient"
+      }
     },
     {
       "id": 27,
@@ -979,7 +1042,7 @@
       },
       "targets": [
         {
-          "expr": "rate(business_builder_sessions_total[5m])",
+          "expr": "sum(rate(business_builder_sessions_total[5m]))",
           "refId": "A",
           "legendFormat": "Sessions/sec",
           "datasource": {
@@ -1009,7 +1072,7 @@
       },
       "targets": [
         {
-          "expr": "rate(business_builder_session_duration_seconds_sum[5m]) / rate(business_builder_sessions_total[5m])",
+          "expr": "(sum(rate(business_builder_session_duration_seconds_sum[5m])) / sum(rate(business_builder_sessions_total[5m]))) or vector(0)",
           "refId": "A",
           "datasource": {
             "type": "prometheus",
@@ -1048,7 +1111,7 @@
       },
       "targets": [
         {
-          "expr": "rate(business_builder_sessions_total[5m]) / rate(business_user_logins_total[5m])",
+          "expr": "(sum(rate(business_builder_sessions_total[5m])) / sum(rate(business_user_logins_total[5m]))) or vector(0)",
           "refId": "A",
           "datasource": {
             "type": "prometheus",
@@ -1078,7 +1141,7 @@
     {
       "id": 30,
       "title": "Session Duration Distribution",
-      "type": "histogram",
+      "type": "timeseries",
       "gridPos": {
         "h": 8,
         "w": 12,
@@ -1094,12 +1157,26 @@
             "uid": "prometheus"
           }
         }
-      ]
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short",
+          "custom": {
+            "drawStyle": "bars",
+            "barAlignment": 0,
+            "lineInterpolation": "linear",
+            "fillOpacity": 100
+          }
+        }
+      }
     },
     {
       "id": 31,
       "title": "Asset Uploads by Type",
-      "type": "piechart",
+      "type": "bargauge",
       "gridPos": {
         "h": 8,
         "w": 8,
@@ -1115,7 +1192,19 @@
             "uid": "prometheus"
           }
         }
-      ]
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short"
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient"
+      }
     },
     {
       "id": 32,
@@ -1150,7 +1239,7 @@
     {
       "id": 33,
       "title": "Most Popular Layouts",
-      "type": "barchart",
+      "type": "bargauge",
       "gridPos": {
         "h": 8,
         "w": 12,
@@ -1167,7 +1256,19 @@
             "uid": "prometheus"
           }
         }
-      ]
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short"
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient"
+      }
     },
     {
       "id": 34,
@@ -1211,7 +1312,7 @@
       },
       "targets": [
         {
-          "expr": "rate(business_theme_changes_total[5m])",
+          "expr": "sum(rate(business_theme_changes_total[5m]))",
           "refId": "A",
           "legendFormat": "Changes/sec",
           "datasource": {
@@ -1241,7 +1342,7 @@
       },
       "targets": [
         {
-          "expr": "rate(business_section_toggles_total[5m])",
+          "expr": "sum(rate(business_section_toggles_total[5m]))",
           "refId": "A",
           "legendFormat": "Toggles/sec",
           "datasource": {
@@ -1271,7 +1372,7 @@
       },
       "targets": [
         {
-          "expr": "rate(business_language_switches_total[5m])",
+          "expr": "sum(rate(business_language_switches_total[5m]))",
           "refId": "A",
           "legendFormat": "Switches/sec",
           "datasource": {
@@ -1292,7 +1393,7 @@
     {
       "id": 38,
       "title": "Page Views by Page",
-      "type": "barchart",
+      "type": "bargauge",
       "gridPos": {
         "h": 8,
         "w": 12,
@@ -1309,7 +1410,19 @@
             "uid": "prometheus"
           }
         }
-      ]
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short"
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient"
+      }
     },
     {
       "id": 39,
@@ -1344,7 +1457,7 @@
     {
       "id": 40,
       "title": "Button Clicks by Button",
-      "type": "barchart",
+      "type": "bargauge",
       "gridPos": {
         "h": 8,
         "w": 12,
@@ -1361,7 +1474,19 @@
             "uid": "prometheus"
           }
         }
-      ]
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short"
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient"
+      }
     },
     {
       "id": 41,
@@ -1396,7 +1521,7 @@
     {
       "id": 42,
       "title": "Frontend Session Duration",
-      "type": "histogram",
+      "type": "timeseries",
       "gridPos": {
         "h": 8,
         "w": 12,
@@ -1412,12 +1537,26 @@
             "uid": "prometheus"
           }
         }
-      ]
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short",
+          "custom": {
+            "drawStyle": "bars",
+            "barAlignment": 0,
+            "lineInterpolation": "linear",
+            "fillOpacity": 100
+          }
+        }
+      }
     },
     {
       "id": 43,
       "title": "Builder Actions by Type",
-      "type": "barchart",
+      "type": "bargauge",
       "gridPos": {
         "h": 8,
         "w": 12,
@@ -1434,12 +1573,24 @@
             "uid": "prometheus"
           }
         }
-      ]
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short"
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient"
+      }
     },
     {
       "id": 44,
       "title": "Layout Views in Gallery",
-      "type": "barchart",
+      "type": "bargauge",
       "gridPos": {
         "h": 8,
         "w": 12,
@@ -1456,7 +1607,19 @@
             "uid": "prometheus"
           }
         }
-      ]
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "short"
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient"
+      }
     },
     {
       "id": 45,
@@ -1470,7 +1633,7 @@
       },
       "targets": [
         {
-          "expr": "histogram_quantile(0.50, rate(business_invitation_creation_duration_seconds_bucket[5m]))",
+          "expr": "histogram_quantile(0.50, sum(rate(business_invitation_creation_duration_seconds_bucket[5m])) by (le))",
           "refId": "A",
           "datasource": {
             "type": "prometheus",
@@ -1509,7 +1672,7 @@
       },
       "targets": [
         {
-          "expr": "histogram_quantile(0.95, rate(business_invitation_creation_duration_seconds_bucket[5m]))",
+          "expr": "histogram_quantile(0.95, sum(rate(business_invitation_creation_duration_seconds_bucket[5m])) by (le))",
           "refId": "A",
           "datasource": {
             "type": "prometheus",
@@ -1548,7 +1711,7 @@
       },
       "targets": [
         {
-          "expr": "histogram_quantile(0.99, rate(business_invitation_creation_duration_seconds_bucket[5m]))",
+          "expr": "histogram_quantile(0.99, sum(rate(business_invitation_creation_duration_seconds_bucket[5m])) by (le))",
           "refId": "A",
           "datasource": {
             "type": "prometheus",
@@ -1587,7 +1750,7 @@
       },
       "targets": [
         {
-          "expr": "histogram_quantile(0.50, rate(business_builder_session_duration_seconds_bucket[5m]))",
+          "expr": "histogram_quantile(0.50, sum(rate(business_builder_session_duration_seconds_bucket[5m])) by (le))",
           "refId": "A",
           "datasource": {
             "type": "prometheus",
@@ -1626,7 +1789,7 @@
       },
       "targets": [
         {
-          "expr": "histogram_quantile(0.95, rate(business_builder_session_duration_seconds_bucket[5m]))",
+          "expr": "histogram_quantile(0.95, sum(rate(business_builder_session_duration_seconds_bucket[5m])) by (le))",
           "refId": "A",
           "datasource": {
             "type": "prometheus",
@@ -1665,7 +1828,7 @@
       },
       "targets": [
         {
-          "expr": "histogram_quantile(0.99, rate(business_builder_session_duration_seconds_bucket[5m]))",
+          "expr": "histogram_quantile(0.99, sum(rate(business_builder_session_duration_seconds_bucket[5m])) by (le))",
           "refId": "A",
           "datasource": {
             "type": "prometheus",
@@ -1704,7 +1867,7 @@
       },
       "targets": [
         {
-          "expr": "histogram_quantile(0.50, rate(frontend_session_duration_seconds_bucket[5m]))",
+          "expr": "histogram_quantile(0.50, sum(rate(frontend_session_duration_seconds_bucket[5m])) by (le))",
           "refId": "A",
           "datasource": {
             "type": "prometheus",
@@ -1743,7 +1906,7 @@
       },
       "targets": [
         {
-          "expr": "histogram_quantile(0.95, rate(frontend_session_duration_seconds_bucket[5m]))",
+          "expr": "histogram_quantile(0.95, sum(rate(frontend_session_duration_seconds_bucket[5m])) by (le))",
           "refId": "A",
           "datasource": {
             "type": "prometheus",
@@ -1782,7 +1945,7 @@
       },
       "targets": [
         {
-          "expr": "histogram_quantile(0.99, rate(frontend_session_duration_seconds_bucket[5m]))",
+          "expr": "histogram_quantile(0.99, sum(rate(frontend_session_duration_seconds_bucket[5m])) by (le))",
           "refId": "A",
           "datasource": {
             "type": "prometheus",
@@ -1809,5 +1972,6 @@
         }
       }
     }
-  ]
+  ],
+  "uid": "business-metrics"
 }

@@ -217,7 +217,6 @@ services:
     volumes:
       - grafana_data:/var/lib/grafana
       - ./docker/grafana/provisioning:/etc/grafana/provisioning:ro
-      - ./docker/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
     depends_on:
       tempo:
         condition: service_started
