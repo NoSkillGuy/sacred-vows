@@ -98,7 +98,7 @@ export const editorialEleganceDefaults: EditorialEleganceDefaults = {
       city: "Bengaluru",
       state: "Karnataka",
       mapsUrl: "https://maps.app.goo.gl/GgjVoMrJE1nEMK4F6",
-      mapsEmbedUrl: "", // Will be converted from mapsUrl if needed
+      mapsEmbedUrl: "https://www.google.com/maps?q=12.935688,77.631266&hl=en&z=17&output=embed",
     },
   },
   hero: {
@@ -290,8 +290,8 @@ export function mergeWithDefaults(
       events:
         (existingData.events as Record<string, unknown>)?.events &&
         Array.isArray((existingData.events as Record<string, unknown>).events) &&
-        (existingData.events as Record<string, unknown>).events.length
-          ? (existingData.events as Record<string, unknown>).events
+        ((existingData.events as Record<string, unknown>).events as unknown[]).length
+          ? ((existingData.events as Record<string, unknown>).events as unknown[])
           : editorialEleganceDefaults.events.events,
     },
     weddingParty: {
@@ -318,8 +318,8 @@ export function mergeWithDefaults(
       images:
         (existingData.gallery as Record<string, unknown>)?.images &&
         Array.isArray((existingData.gallery as Record<string, unknown>).images) &&
-        (existingData.gallery as Record<string, unknown>).images.length
-          ? (existingData.gallery as Record<string, unknown>).images
+        ((existingData.gallery as Record<string, unknown>).images as unknown[]).length
+          ? ((existingData.gallery as Record<string, unknown>).images as unknown[])
           : editorialEleganceDefaults.gallery.images,
     },
     galleryConfig: {
