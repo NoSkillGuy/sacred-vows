@@ -18,7 +18,7 @@ When the user invokes `/fix-pr`, fetch the GitHub PR, read all PR comments, chec
 
 ## GitHub MCP Functions to Use
 
-All GitHub operations should use these MCP functions:
+Most GitHub operations should use these MCP functions:
 
 - **Get PR details**: `mcp_github_pull_request_read` with method `get`
 - **Get PR comments**: `mcp_github_pull_request_read` with method `get_comments`
@@ -30,6 +30,10 @@ All GitHub operations should use these MCP functions:
 - **Add PR comment**: `mcp_github_add_issue_comment` (use PR number as issue number)
 - **Add review comment**: `mcp_github_add_comment_to_pending_review`
 - **Create/update review**: `mcp_github_pull_request_review_write`
+
+**Note**: For replying to review comment threads and resolving them, use `gh api` directly since this functionality is not available in MCP:
+- **Reply to review comment**: `gh api repos/{owner}/{repo}/pulls/{pull_number}/comments/{comment_id}/replies -X POST`
+- **Resolve comment thread**: `gh api repos/{owner}/{repo}/pulls/{pull_number}/comments/{comment_id} -X PATCH -f resolved=true`
 
 ## Fix Process
 
@@ -410,27 +414,87 @@ For each actionable review comment, track what needs to be fixed:
 
 ### Step 7: Address Review Comments
 
-After all fixes are complete and tests pass, respond to review comments explaining how issues were fixed using GitHub MCP:
+After all fixes are complete and tests pass, respond to review comments explaining how issues were fixed. **Reply directly to review comment threads and resolve them** to show that feedback has been addressed.
 
-1. **For inline review comments** (comments on specific lines):
-   - Use `mcp_github_add_comment_to_pending_review` to add replies to review comments
+#### 7.1: Get Review Comment Threads
+
+1. **Get all review comments with thread information**:
+   - Use `mcp_github_pull_request_read` with method `get_review_comments`
    - Repository: Detect from git remote (see Step 1.2)
-   - Provide: PR number, file path, line number, comment body explaining the fix
-   - Example body: "✅ Fixed! I've [description of fix]. The changes address your feedback by [explanation]."
+   - Extract for each comment:
+     - `id` - Comment ID (needed for replies)
+     - `body` - Comment text
+     - `path` - File path
+     - `line` - Line number
+     - `thread_id` or `in_reply_to_id` - Thread information
+     - `is_resolved` - Whether thread is already resolved
+     - `author` - Who made the comment
 
-2. **For general PR comments**:
+2. **Group comments by thread**:
+   - Comments with the same `thread_id` or `in_reply_to_id` belong to the same thread
+   - The root comment of a thread has no `in_reply_to_id` (or `in_reply_to_id` is null)
+   - Track which comments have been fixed and need replies
+   - **Important**: When replying, reply to the **root comment** of the thread (the original review comment), not to replies within the thread
+
+#### 7.2: Reply to Review Comment Threads
+
+For each review comment that has been fixed, reply to the comment thread using the GitHub API:
+
+1. **For inline review comments** (comments on specific lines in code):
+   ```bash
+   # Get repository info
+   REPO=$(git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/')
+   OWNER=$(echo $REPO | cut -d'/' -f1)
+   REPO_NAME=$(echo $REPO | cut -d'/' -f2)
+
+   # Reply to a review comment thread
+   # ROOT_COMMENT_ID is the ID of the root comment in the thread (the original review comment)
+   # Find the root comment by looking for comments with no in_reply_to_id
+   # or by following the thread_id to find the first comment
+   gh api repos/$OWNER/$REPO_NAME/pulls/$PR_NUMBER/comments/$ROOT_COMMENT_ID/replies \
+     -X POST \
+     -f body="✅ Fixed! I've [description of fix]. The changes address your feedback by [explanation].
+
+   The fix:
+   - [Specific change made]
+   - [How it addresses the concern]
+   - [Any additional context]"
+   ```
+
+2. **Resolve the comment thread** (after replying):
+   ```bash
+   # Resolve the thread by updating the root comment
+   # ROOT_COMMENT_ID is the ID of the root comment in the thread
+   gh api repos/$OWNER/$REPO_NAME/pulls/$PR_NUMBER/comments/$ROOT_COMMENT_ID \
+     -X PATCH \
+     -f body="[Original comment text]" \
+     -f resolved=true
+   ```
+
+   **Note**: If the GitHub API doesn't support `resolved` in the PATCH body, you may need to use a different approach. Check the actual API response structure from `get_review_comments` to see how resolution is handled.
+
+3. **Alternative: Use GitHub web interface markers**:
+   - If direct API resolution isn't available, include "✅ Resolved" or "Fixed" in your reply
+   - The reviewer can manually resolve the thread, or it may auto-resolve
+
+#### 7.3: Reply to General PR Comments
+
+For general PR comments (not inline code comments):
+
+1. **Use MCP to add a reply**:
    - Use `mcp_github_add_issue_comment` (PRs are issues in GitHub)
    - Repository: Detect from git remote (see Step 1.2)
    - Issue number: PR number
    - Body: "✅ Fixed! [Description of how the comment was addressed]"
 
-3. **For review threads** (if you have a pending review):
-   - Use `mcp_github_pull_request_review_write` with method `create`
-   - Repository: Detect from git remote (see Step 1.2)
-   - Event: `COMMENT` or `APPROVE` (if all changes addressed)
-   - Body: Summary of all fixes addressing the review feedback
+2. **Or reference the original comment**:
+   - If the comment has an ID, you can reference it: "✅ Fixed! @[original-comment-author] [Description]"
 
-4. **Create summary comment** (if multiple comments addressed):
+#### 7.4: Create Summary Comment
+
+If multiple review comments were addressed, create a summary comment:
+
+1. **Use MCP to add summary**:
    - Use `mcp_github_add_issue_comment`
    - Repository: Detect from git remote (see Step 1.2)
    - Issue number: PR number
@@ -438,14 +502,56 @@ After all fixes are complete and tests pass, respond to review comments explaini
      ```
      ## ✅ Review Comments Addressed
 
-     I've addressed all review comments:
+     I've addressed all review comments and replied to each thread:
 
-     - **Comment 1**: [How it was fixed]
-     - **Comment 2**: [How it was fixed]
-     - **Comment 3**: [How it was fixed]
+     - **[@reviewer] Comment on `file/path.tsx:123`**: ✅ Fixed - [How it was fixed]
+     - **[@reviewer] Comment on `file/path.go:45`**: ✅ Fixed - [How it was fixed]
+     - **[@reviewer] General comment**: ✅ Fixed - [How it was fixed]
 
-     All CI checks are now passing and the test suite runs successfully.
+     All comment threads have been replied to and resolved. All CI checks are now passing and the test suite runs successfully.
      ```
+
+#### 7.5: Example Workflow for Replying to Review Comments
+
+```bash
+# 1. Get repository info
+REPO=$(git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/')
+OWNER=$(echo $REPO | cut -d'/' -f1)
+REPO_NAME=$(echo $REPO | cut -d'/' -f2)
+
+# 2. Get all review comments to identify threads
+# Use mcp_github_pull_request_read with method get_review_comments
+# For each comment, check:
+#   - in_reply_to_id: null or missing = root comment
+#   - thread_id: same ID = same thread
+#   - is_resolved: false = needs resolution
+
+# 3. For each review comment that was fixed:
+#    - ROOT_COMMENT_ID: The ID of the root comment in the thread
+#      (find by checking in_reply_to_id is null for that thread)
+#    - REPLY_BODY: Your reply explaining the fix
+
+# 4. Reply to the root comment of the thread
+gh api repos/$OWNER/$REPO_NAME/pulls/$PR_NUMBER/comments/$ROOT_COMMENT_ID/replies \
+  -X POST \
+  -f body="$REPLY_BODY"
+
+# 5. (Optional) Resolve the thread if the API supports it
+# Try to mark the thread as resolved
+gh api repos/$OWNER/$REPO_NAME/pulls/$PR_NUMBER/comments/$ROOT_COMMENT_ID \
+  -X PATCH \
+  -f resolved=true
+# Note: If this fails, the reply itself indicates the fix is complete
+```
+
+#### 7.6: Track Comment Replies
+
+Maintain a list of comments that have been:
+- ✅ Fixed in code
+- ✅ Replied to in the thread
+- ✅ Thread resolved (if applicable)
+
+This helps ensure all feedback is properly addressed and acknowledged.
 
 ### Step 8: Commit Fixes
 
@@ -541,12 +647,14 @@ After all fixes are complete and tests pass, respond to review comments explaini
    - Verify no regressions
    - Do NOT commit until all tests pass
 
-8. **Address review comments using GitHub MCP**:
-   - For inline comments: `mcp_github_add_comment_to_pending_review`
-   - For general comments: `mcp_github_add_issue_comment` (PR number as issue number)
-   - For review responses: `mcp_github_pull_request_review_write`
-   - Explain how the fix addresses the feedback
-   - Create summary if multiple comments
+8. **Address review comments**:
+   - Get all review comment threads using `mcp_github_pull_request_read` with method `get_review_comments`
+   - For each fixed comment, reply to the thread using `gh api`:
+     - POST to `/repos/{owner}/{repo}/pulls/{pull_number}/comments/{comment_id}/replies`
+     - Explain how the fix addresses the feedback
+   - Resolve comment threads (if API supports it) or mark as resolved in reply
+   - For general comments: Use `mcp_github_add_issue_comment` (PR number as issue number)
+   - Create summary comment if multiple comments were addressed
 
 9. **Commit and push**:
    - Stage changes
@@ -597,7 +705,19 @@ npm run format
 - Understand the requested change
 - Apply the fix
 - Verify it addresses the comment
-- Reply to comment explaining how it was fixed
+- **Reply to the comment thread** using GitHub API:
+  ```bash
+  gh api repos/$OWNER/$REPO_NAME/pulls/$PR_NUMBER/comments/$COMMENT_ID/replies \
+    -X POST \
+    -f body="✅ Fixed! [Explanation of fix]"
+  ```
+- **Resolve the thread** (if API supports it):
+  ```bash
+  gh api repos/$OWNER/$REPO_NAME/pulls/$PR_NUMBER/comments/$ROOT_COMMENT_ID \
+    -X PATCH \
+    -f resolved=true
+  ```
+- Track which comments have been fixed, replied to, and resolved
 
 ### Merge Conflicts
 - Identify conflicted files with `git status`
@@ -644,15 +764,19 @@ npm run format
 - Fix issues in order: conflicts → format → lint → test → comments
 - **CRITICAL**: Run full test suite before committing - ALL tests must pass
 - Do NOT commit if any test fails - fix it first
-- Address review comments by explaining how fixes address the feedback
+- Address review comments by replying to comment threads and resolving them
 - Use descriptive commit messages
 - Reference PR number in commit message
 - If no issues found, clearly state "No fixes required"
 - Be thorough but efficient - fix all issues in one go
 - After pushing, CI will automatically re-run
 - Monitor CI status after pushing fixes
-- Reply to review comments to show that feedback was addressed
-- **Use GitHub MCP server for all GitHub operations** - do not use `gh` CLI
+- **Reply to review comment threads** to show that feedback was addressed:
+  - Use `gh api` to POST replies to review comment threads
+  - Resolve threads after replying (if API supports it)
+  - Track which comments have been fixed, replied to, and resolved
+- **Use GitHub MCP server for most GitHub operations** (PR reading, adding comments)
+- **Use `gh api` for replying to and resolving review comment threads** (not available in MCP)
 - Repository: Always detect dynamically from git remote using: `git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/'`
-- All GitHub API calls should use MCP functions, not shell commands
+- Most GitHub API calls should use MCP functions, but review comment thread replies use `gh api`
 
