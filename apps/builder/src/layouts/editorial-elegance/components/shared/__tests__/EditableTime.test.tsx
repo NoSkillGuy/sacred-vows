@@ -135,7 +135,7 @@ describe("EditableTime", () => {
       const timeDisplay = screen.getByText("6:00 PM");
       await user.click(timeDisplay);
 
-      const input = await screen.findByDisplayValue("18:00");
+      await screen.findByDisplayValue("18:00");
       // The conversion function validates hours, so invalid times won't convert
       // This is tested at the conversion function level
     });

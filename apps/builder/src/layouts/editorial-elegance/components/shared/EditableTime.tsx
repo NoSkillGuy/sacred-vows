@@ -25,7 +25,7 @@ function EditableTime({
   const [isEditing, setIsEditing] = useState(false);
   const [displayValue, setDisplayValue] = useState(value || "");
   const [isHovered, setIsHovered] = useState(false);
-  const inputRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Convert 12-hour format (e.g., "6:00 PM") to 24-hour format (e.g., "18:00")
   const convertTo24Hour = (time12h: string): string => {
@@ -89,6 +89,7 @@ function EditableTime({
   useEffect(() => {
     if (!isEditing) {
       // Keep original 12-hour format for display
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDisplayValue(value || "");
     }
   }, [value, isEditing]);
@@ -115,12 +116,12 @@ function EditableTime({
     }
   }, [isEditing]);
 
-  const handleClick = (e) => {
+  const handleClick = (e: React.MouseEvent<HTMLParagraphElement>) => {
     e.stopPropagation();
     setIsEditing(true);
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setDisplayValue(newValue);
   };
@@ -137,7 +138,7 @@ function EditableTime({
     setIsEditing(false);
   };
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
       inputRef.current?.blur();

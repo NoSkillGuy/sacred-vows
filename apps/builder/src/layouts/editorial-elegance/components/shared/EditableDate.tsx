@@ -26,11 +26,13 @@ function EditableDate({
   const [isEditing, setIsEditing] = useState(false);
   const [displayValue, setDisplayValue] = useState(value || "");
   const [isHovered, setIsHovered] = useState(false);
-  const inputRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Update display value when external value changes
+  // This is intentional - we need to sync external state to internal state when not editing
   useEffect(() => {
     if (!isEditing) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDisplayValue(value || "");
     }
   }, [value, isEditing]);
@@ -46,12 +48,12 @@ function EditableDate({
     }
   }, [isEditing]);
 
-  const handleClick = (e) => {
+  const handleClick = (e: React.MouseEvent<HTMLParagraphElement>) => {
     e.stopPropagation();
     setIsEditing(true);
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setDisplayValue(newValue);
   };
@@ -64,7 +66,7 @@ function EditableDate({
     setIsEditing(false);
   };
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
       inputRef.current?.blur();

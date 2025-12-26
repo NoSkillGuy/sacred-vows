@@ -160,7 +160,7 @@ describe("EditableDate", () => {
       const dateDisplay = screen.getByText(/DECEMBER 25, 2025/i);
       await user.click(dateDisplay);
 
-      const input = await screen.findByDisplayValue("2025-12-25");
+      await screen.findByDisplayValue("2025-12-25");
       await user.tab(); // Blur without changing
 
       // Should not call onUpdate if value hasn't changed

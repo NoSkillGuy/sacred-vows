@@ -107,7 +107,8 @@ function EditableEventCards({
         <>
           <div className="ee-event-cards">
             {eventList.map((event) => {
-              const eventId = event.id || `event-${eventList.indexOf(event)}`;
+              // event.id is guaranteed to exist from useMemo mapping
+              const eventId = event.id!;
               return (
                 <div
                   key={eventId}
