@@ -15,8 +15,7 @@ func RecordUserSignup(method string) {
 		}
 		businessUserSignupsTotal.Add(context.Background(), 1, otelmetric.WithAttributes(attrs...))
 	}
-	// Update active users (handled by active users tracker)
-	MarkUserActive()
+	// Note: Active user tracking is handled by use cases calling MarkUserActiveWithID directly
 }
 
 // RecordUserLogin records a user login event
@@ -27,8 +26,7 @@ func RecordUserLogin(method string) {
 		}
 		businessUserLoginsTotal.Add(context.Background(), 1, otelmetric.WithAttributes(attrs...))
 	}
-	// Update active users (handled by active users tracker)
-	MarkUserActive()
+	// Note: Active user tracking is handled by use cases calling MarkUserActiveWithID directly
 }
 
 // RecordInvitationCreated records an invitation creation event

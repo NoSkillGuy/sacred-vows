@@ -12,6 +12,8 @@ var (
 	activeUsersMonthly           = sync.Map{}
 	activeInvitations      int64 = 0
 	activeInvitationsMutex sync.Mutex
+	trackerCancel          context.CancelFunc
+	trackerWg              sync.WaitGroup
 )
 
 // MarkUserActive marks a user as active (called from tracking functions)
@@ -100,58 +102,125 @@ func SetActiveInvitations(count int64) {
 }
 
 // StartActiveUsersTracker starts the background goroutine that manages active user tracking
-func StartActiveUsersTracker() {
+// It accepts a context for graceful shutdown. The tracker will stop when the context is cancelled.
+func StartActiveUsersTracker(ctx context.Context) {
+	// Create a cancellable context for the tracker
+	trackerCtx, cancel := context.WithCancel(ctx)
+	trackerCancel = cancel
+
 	// Update gauges every hour
 	ticker := time.NewTicker(1 * time.Hour)
+	trackerWg.Add(1)
 	go func() {
-		for range ticker.C {
-			updateActiveUserGauges()
+		defer trackerWg.Done()
+		defer ticker.Stop()
+		for {
+			select {
+			case <-trackerCtx.Done():
+				return
+			case <-ticker.C:
+				updateActiveUserGauges()
+			}
 		}
 	}()
 
 	// Reset daily set at midnight
+	trackerWg.Add(1)
 	go func() {
+		defer trackerWg.Done()
 		for {
-			now := time.Now()
-			nextMidnight := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, now.Location())
-			duration := nextMidnight.Sub(now)
-			time.Sleep(duration)
-
-			// Clear daily set
-			activeUsersDaily = sync.Map{}
-			updateActiveUserGauges()
+			select {
+			case <-trackerCtx.Done():
+				return
+			default:
+				now := time.Now()
+				nextMidnight := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, now.Location())
+				duration := nextMidnight.Sub(now)
+				timer := time.NewTimer(duration)
+				select {
+				case <-trackerCtx.Done():
+					timer.Stop()
+					return
+				case <-timer.C:
+					// Clear daily set by iterating and deleting (fixes race condition)
+					activeUsersDaily.Range(func(key, value interface{}) bool {
+						activeUsersDaily.Delete(key)
+						return true
+					})
+					updateActiveUserGauges()
+				}
+			}
 		}
 	}()
 
 	// Reset weekly set on Monday at midnight
+	trackerWg.Add(1)
 	go func() {
+		defer trackerWg.Done()
 		for {
-			now := time.Now()
-			daysUntilMonday := (8 - int(now.Weekday())) % 7
-			if daysUntilMonday == 0 {
-				daysUntilMonday = 7 // If it's Monday, reset next Monday
+			select {
+			case <-trackerCtx.Done():
+				return
+			default:
+				now := time.Now()
+				daysUntilMonday := (8 - int(now.Weekday())) % 7
+				if daysUntilMonday == 0 {
+					daysUntilMonday = 7 // If it's Monday, reset next Monday
+				}
+				nextMonday := time.Date(now.Year(), now.Month(), now.Day()+daysUntilMonday, 0, 0, 0, 0, now.Location())
+				duration := nextMonday.Sub(now)
+				timer := time.NewTimer(duration)
+				select {
+				case <-trackerCtx.Done():
+					timer.Stop()
+					return
+				case <-timer.C:
+					// Clear weekly set by iterating and deleting (fixes race condition)
+					activeUsersWeekly.Range(func(key, value interface{}) bool {
+						activeUsersWeekly.Delete(key)
+						return true
+					})
+					updateActiveUserGauges()
+				}
 			}
-			nextMonday := time.Date(now.Year(), now.Month(), now.Day()+daysUntilMonday, 0, 0, 0, 0, now.Location())
-			duration := nextMonday.Sub(now)
-			time.Sleep(duration)
-
-			// Clear weekly set
-			activeUsersWeekly = sync.Map{}
-			updateActiveUserGauges()
 		}
 	}()
 
 	// Reset monthly set on 1st of month at midnight
+	trackerWg.Add(1)
 	go func() {
+		defer trackerWg.Done()
 		for {
-			now := time.Now()
-			nextMonth := time.Date(now.Year(), now.Month()+1, 1, 0, 0, 0, 0, now.Location())
-			duration := nextMonth.Sub(now)
-			time.Sleep(duration)
-
-			// Clear monthly set
-			activeUsersMonthly = sync.Map{}
-			updateActiveUserGauges()
+			select {
+			case <-trackerCtx.Done():
+				return
+			default:
+				now := time.Now()
+				nextMonth := time.Date(now.Year(), now.Month()+1, 1, 0, 0, 0, 0, now.Location())
+				duration := nextMonth.Sub(now)
+				timer := time.NewTimer(duration)
+				select {
+				case <-trackerCtx.Done():
+					timer.Stop()
+					return
+				case <-timer.C:
+					// Clear monthly set by iterating and deleting (fixes race condition)
+					activeUsersMonthly.Range(func(key, value interface{}) bool {
+						activeUsersMonthly.Delete(key)
+						return true
+					})
+					updateActiveUserGauges()
+				}
+			}
 		}
 	}()
+}
+
+// StopActiveUsersTracker stops the active users tracker gracefully
+func StopActiveUsersTracker() {
+	if trackerCancel != nil {
+		trackerCancel()
+		trackerCancel = nil
+	}
+	trackerWg.Wait()
 }

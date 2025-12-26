@@ -99,18 +99,18 @@ func (uc *PublishInvitationUseCase) Execute(ctx context.Context, invitationID, o
 	}
 
 	version = site.CurrentVersion + 1
-	// Track publish attempt
-	observability.RecordPublishAttempt(false) // Will update to success if publish completes
 
 	// Generate snapshot bundle first. If this fails, do not advance any published pointers.
 	bundle, err := uc.snapshotGen.GenerateBundle(ctx, invitationID)
 	if err != nil {
+		observability.RecordPublishAttempt(false)
 		return "", 0, "", err
 	}
 
 	prefix := fmt.Sprintf("sites/%s/v%d", subdomain, version)
 	indexKey := prefix + "/index.html"
 	if err := uc.artifactStore.Put(ctx, indexKey, "text/html; charset=utf-8", "public, max-age=60", bundle.IndexHTML); err != nil {
+		observability.RecordPublishAttempt(false)
 		return "", 0, "", err
 	}
 
@@ -122,6 +122,7 @@ func (uc *PublishInvitationUseCase) Execute(ctx context.Context, invitationID, o
 	cssKey := prefix + "/styles.css"
 	if len(bundle.StylesCSS) > 0 {
 		if err := uc.artifactStore.Put(ctx, cssKey, "text/css; charset=utf-8", "public, max-age=31536000, immutable", bundle.StylesCSS); err != nil {
+			observability.RecordPublishAttempt(false)
 			return "", 0, "", err
 		}
 	}
@@ -130,6 +131,7 @@ func (uc *PublishInvitationUseCase) Execute(ctx context.Context, invitationID, o
 	jsBody := []byte("// placeholder\n")
 	// Optional placeholder (can be removed once layouts no longer reference app.js)
 	if err := uc.artifactStore.Put(ctx, jsKey, "application/javascript; charset=utf-8", "public, max-age=31536000, immutable", jsBody); err != nil {
+		observability.RecordPublishAttempt(false)
 		return "", 0, "", err
 	}
 
@@ -144,6 +146,7 @@ func (uc *PublishInvitationUseCase) Execute(ctx context.Context, invitationID, o
 			ct = "application/octet-stream"
 		}
 		if err := uc.artifactStore.Put(ctx, key, ct, cc, a.Body); err != nil {
+			observability.RecordPublishAttempt(false)
 			return "", 0, "", err
 		}
 	}
@@ -154,6 +157,7 @@ func (uc *PublishInvitationUseCase) Execute(ctx context.Context, invitationID, o
 	site.PublishedAt = &now
 	site.UpdatedAt = now
 	if err := uc.publishedRepo.Update(ctx, site); err != nil {
+		observability.RecordPublishAttempt(false)
 		return "", 0, "", err
 	}
 

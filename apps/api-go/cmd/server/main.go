@@ -321,8 +321,8 @@ func main() {
 			if err := observability.InitMetrics(meter); err != nil {
 				logger.GetLogger().Warn("Failed to initialize metrics", zap.Error(err))
 			} else {
-				// Start active users tracker
-				observability.StartActiveUsersTracker()
+				// Start active users tracker with context for graceful shutdown
+				observability.StartActiveUsersTracker(ctx)
 				logger.GetLogger().Info("Active users tracker started")
 			}
 		}
@@ -365,6 +365,10 @@ func main() {
 
 	// Shutdown observability (flush telemetry)
 	if cfg.Observability.Enabled {
+		// Stop active users tracker gracefully
+		observability.StopActiveUsersTracker()
+		logger.GetLogger().Info("Active users tracker stopped")
+
 		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer shutdownCancel()
 		if err := observability.Shutdown(shutdownCtx); err != nil {
