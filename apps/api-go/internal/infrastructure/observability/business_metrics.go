@@ -6,36 +6,36 @@ import (
 
 var (
 	// User Metrics
-	businessUserSignupsTotal      otelmetric.Int64Counter
-	businessUserLoginsTotal       otelmetric.Int64Counter
-	businessUsersActiveDaily      otelmetric.Int64Gauge
-	businessUsersActiveWeekly     otelmetric.Int64Gauge
-	businessUsersActiveMonthly    otelmetric.Int64Gauge
+	businessUserSignupsTotal   otelmetric.Int64Counter
+	businessUserLoginsTotal    otelmetric.Int64Counter
+	businessUsersActiveDaily   otelmetric.Int64Gauge
+	businessUsersActiveWeekly  otelmetric.Int64Gauge
+	businessUsersActiveMonthly otelmetric.Int64Gauge
 
 	// Invitation Metrics
 	businessInvitationsCreatedTotal           otelmetric.Int64Counter
-	businessInvitationsPublishedTotal        otelmetric.Int64Counter
-	businessInvitationsActive                otelmetric.Int64Gauge
+	businessInvitationsPublishedTotal         otelmetric.Int64Counter
+	businessInvitationsActive                 otelmetric.Int64Gauge
 	businessInvitationCreationDurationSeconds otelmetric.Float64Histogram
 
 	// Engagement Metrics
-	businessBuilderSessionsTotal            otelmetric.Int64Counter
-	businessBuilderSessionDurationSeconds  otelmetric.Float64Histogram
-	businessAssetUploadsTotal              otelmetric.Int64Counter
+	businessBuilderSessionsTotal          otelmetric.Int64Counter
+	businessBuilderSessionDurationSeconds otelmetric.Float64Histogram
+	businessAssetUploadsTotal             otelmetric.Int64Counter
 	businessLayoutSelectionsTotal         otelmetric.Int64Counter
 
 	// Conversion Metrics
-	businessPublishAttemptsTotal  otelmetric.Int64Counter
-	businessPublishSuccessTotal   otelmetric.Int64Counter
-	businessPublishFailuresTotal  otelmetric.Int64Counter
+	businessPublishAttemptsTotal otelmetric.Int64Counter
+	businessPublishSuccessTotal  otelmetric.Int64Counter
+	businessPublishFailuresTotal otelmetric.Int64Counter
 
 	// Guest Engagement Metrics
-	businessInvitationViewsTotal  otelmetric.Int64Counter
-	businessRSVPSubmissionsTotal  otelmetric.Int64Counter
+	businessInvitationViewsTotal otelmetric.Int64Counter
+	businessRSVPSubmissionsTotal otelmetric.Int64Counter
 
 	// Feature Usage Metrics
 	businessThemeChangesTotal     otelmetric.Int64Counter
-	businessSectionTogglesTotal  otelmetric.Int64Counter
+	businessSectionTogglesTotal   otelmetric.Int64Counter
 	businessLanguageSwitchesTotal otelmetric.Int64Counter
 )
 

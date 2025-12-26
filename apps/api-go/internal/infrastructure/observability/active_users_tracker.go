@@ -7,10 +7,10 @@ import (
 )
 
 var (
-	activeUsersDaily   = sync.Map{} // map[string]bool - user ID -> true
-	activeUsersWeekly  = sync.Map{}
-	activeUsersMonthly = sync.Map{}
-	activeInvitations  int64 = 0
+	activeUsersDaily             = sync.Map{} // map[string]bool - user ID -> true
+	activeUsersWeekly            = sync.Map{}
+	activeUsersMonthly           = sync.Map{}
+	activeInvitations      int64 = 0
 	activeInvitationsMutex sync.Mutex
 )
 

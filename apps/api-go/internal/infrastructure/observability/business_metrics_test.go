@@ -10,7 +10,6 @@ import (
 	otelmetric "go.opentelemetry.io/otel/metric"
 )
 
-
 func TestInitBusinessMetrics_Success_InitializesAllMetrics(t *testing.T) {
 	// Arrange
 	ResetMetrics()

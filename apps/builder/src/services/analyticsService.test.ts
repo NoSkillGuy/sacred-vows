@@ -43,8 +43,11 @@ describe("analyticsService", () => {
     vi.clearAllMocks();
     localStorageMock.clear();
     // Reset window.location mock
-    delete (window as any).location;
-    (window as any).location = { pathname: "/test" };
+    Object.defineProperty(window, "location", {
+      value: { pathname: "/test" },
+      writable: true,
+      configurable: true,
+    });
   });
 
   describe("trackPageView", () => {

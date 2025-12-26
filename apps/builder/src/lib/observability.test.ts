@@ -91,10 +91,7 @@ describe("observability", () => {
       import.meta.env.VITE_OTEL_EXPORTER_OTLP_ENDPOINT = "http://localhost:4318";
       initObservability();
 
-      // Act
-      const provider = getMeterProvider();
-
-      // Assert
+      // Act & Assert
       // Provider may be null if initialization failed or is disabled
       // We just verify the function doesn't throw
       expect(() => getMeterProvider()).not.toThrow();

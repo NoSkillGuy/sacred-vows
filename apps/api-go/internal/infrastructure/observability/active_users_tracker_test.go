@@ -57,17 +57,17 @@ func TestMarkUserActiveWithID_EmptyID_NoOp(t *testing.T) {
 	provider, _ := setupTestMetrics(t)
 	defer provider.Shutdown(context.Background())
 
-	initialDailyCount := countActiveUsers(activeUsersDaily)
-	initialWeeklyCount := countActiveUsers(activeUsersWeekly)
-	initialMonthlyCount := countActiveUsers(activeUsersMonthly)
+	initialDailyCount := countActiveUsers(&activeUsersDaily)
+	initialWeeklyCount := countActiveUsers(&activeUsersWeekly)
+	initialMonthlyCount := countActiveUsers(&activeUsersMonthly)
 
 	// Act
 	MarkUserActiveWithID("")
 
 	// Assert - counts should not change
-	assert.Equal(t, initialDailyCount, countActiveUsers(activeUsersDaily))
-	assert.Equal(t, initialWeeklyCount, countActiveUsers(activeUsersWeekly))
-	assert.Equal(t, initialMonthlyCount, countActiveUsers(activeUsersMonthly))
+	assert.Equal(t, initialDailyCount, countActiveUsers(&activeUsersDaily))
+	assert.Equal(t, initialWeeklyCount, countActiveUsers(&activeUsersWeekly))
+	assert.Equal(t, initialMonthlyCount, countActiveUsers(&activeUsersMonthly))
 }
 
 func TestMarkUserActive_NoOp(t *testing.T) {
@@ -232,7 +232,7 @@ func TestActiveUsersTracker_ThreadSafety(t *testing.T) {
 	wg.Wait()
 
 	// Assert - verify all users were added (may be slightly more due to test setup)
-	totalUsers := countActiveUsers(activeUsersDaily)
+	totalUsers := countActiveUsers(&activeUsersDaily)
 	// Allow some variance due to test setup/teardown, but should be close to expected
 	assert.GreaterOrEqual(t, totalUsers, numGoroutines*usersPerGoroutine, "Should have at least expected number of users")
 	assert.LessOrEqual(t, totalUsers, numGoroutines*usersPerGoroutine+10, "Should not have significantly more users than expected")
@@ -273,7 +273,7 @@ func TestActiveUsersTracker_ConcurrentInvitationUpdates(t *testing.T) {
 }
 
 // Helper function to count users in a sync.Map
-func countActiveUsers(m sync.Map) int {
+func countActiveUsers(m *sync.Map) int {
 	count := 0
 	m.Range(func(key, value interface{}) bool {
 		count++

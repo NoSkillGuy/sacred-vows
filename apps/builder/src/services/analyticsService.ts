@@ -3,7 +3,6 @@ import {
   trackPageView as trackPageViewMetric,
   trackButtonClick,
   trackLayoutView as trackLayoutViewMetric,
-  trackBuilderAction,
 } from "../lib/metrics";
 
 const STORAGE_KEY = "sv_analytics_events";

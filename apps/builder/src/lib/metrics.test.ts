@@ -7,6 +7,7 @@ import {
   trackBuilderAction,
 } from "./metrics";
 import * as observability from "./observability";
+import type { MeterProvider } from "@opentelemetry/sdk-metrics";
 
 // Mock observability module
 vi.mock("./observability", () => ({
@@ -51,16 +52,16 @@ describe("metrics", () => {
   });
 
   describe("trackPageView", () => {
-    it("records metric with page label when counter is initialized", () => {
+    it("records metric with page label when counter is initialized", async () => {
       // Mock meter provider
       const mockProvider = {
         getMeter: vi.fn(() => mockMeter),
-      };
-      vi.mocked(observability.getMeterProvider).mockReturnValue(mockProvider as any);
+      } as unknown as MeterProvider;
+      vi.mocked(observability.getMeterProvider).mockReturnValue(mockProvider);
 
       // Re-import to trigger initialization
       vi.resetModules();
-      const metrics = require("./metrics");
+      const metrics = await import("./metrics");
 
       // Act
       metrics.trackPageView("dashboard");
@@ -79,14 +80,14 @@ describe("metrics", () => {
   });
 
   describe("trackButtonClick", () => {
-    it("records metric with button_id and page labels", () => {
+    it("records metric with button_id and page labels", async () => {
       const mockProvider = {
         getMeter: vi.fn(() => mockMeter),
-      };
-      vi.mocked(observability.getMeterProvider).mockReturnValue(mockProvider as any);
+      } as unknown as MeterProvider;
+      vi.mocked(observability.getMeterProvider).mockReturnValue(mockProvider);
 
       vi.resetModules();
-      const metrics = require("./metrics");
+      const metrics = await import("./metrics");
 
       // Act
       metrics.trackButtonClick("signup-button", "landing");
@@ -103,14 +104,14 @@ describe("metrics", () => {
   });
 
   describe("recordSessionDuration", () => {
-    it("records histogram value", () => {
+    it("records histogram value", async () => {
       const mockProvider = {
         getMeter: vi.fn(() => mockMeter),
-      };
-      vi.mocked(observability.getMeterProvider).mockReturnValue(mockProvider as any);
+      } as unknown as MeterProvider;
+      vi.mocked(observability.getMeterProvider).mockReturnValue(mockProvider);
 
       vi.resetModules();
-      const metrics = require("./metrics");
+      const metrics = await import("./metrics");
 
       // Act
       metrics.recordSessionDuration(30.5);
@@ -127,14 +128,14 @@ describe("metrics", () => {
   });
 
   describe("trackLayoutView", () => {
-    it("records metric with layout_id label", () => {
+    it("records metric with layout_id label", async () => {
       const mockProvider = {
         getMeter: vi.fn(() => mockMeter),
-      };
-      vi.mocked(observability.getMeterProvider).mockReturnValue(mockProvider as any);
+      } as unknown as MeterProvider;
+      vi.mocked(observability.getMeterProvider).mockReturnValue(mockProvider);
 
       vi.resetModules();
-      const metrics = require("./metrics");
+      const metrics = await import("./metrics");
 
       // Act
       metrics.trackLayoutView("classic-scroll");
@@ -151,14 +152,14 @@ describe("metrics", () => {
   });
 
   describe("trackBuilderAction", () => {
-    it("records metric with action_type label", () => {
+    it("records metric with action_type label", async () => {
       const mockProvider = {
         getMeter: vi.fn(() => mockMeter),
-      };
-      vi.mocked(observability.getMeterProvider).mockReturnValue(mockProvider as any);
+      } as unknown as MeterProvider;
+      vi.mocked(observability.getMeterProvider).mockReturnValue(mockProvider);
 
       vi.resetModules();
-      const metrics = require("./metrics");
+      const metrics = await import("./metrics");
 
       // Act
       metrics.trackBuilderAction("theme_change");
