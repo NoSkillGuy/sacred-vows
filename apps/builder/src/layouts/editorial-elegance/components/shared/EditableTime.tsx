@@ -85,17 +85,24 @@ function EditableTime({
     return `${hours}:${minutes} ${ampm}`;
   };
 
+  // Update display value when external value changes (only when not editing)
+  useEffect(() => {
+    if (!isEditing) {
+      // Keep original 12-hour format for display
+      setDisplayValue(value || "");
+    }
+  }, [value, isEditing]);
+
   // Initialize display value when entering edit mode
+  // Note: Only depends on isEditing to avoid updating when value changes while editing
   useEffect(() => {
     if (isEditing) {
       // Convert to 24-hour format for the input
       const time24h = convertTo24Hour(value || "");
       setDisplayValue(time24h);
-    } else {
-      // Keep original 12-hour format for display
-      setDisplayValue(value || "");
     }
-  }, [value, isEditing]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEditing]);
 
   // Focus input when entering edit mode
   useEffect(() => {

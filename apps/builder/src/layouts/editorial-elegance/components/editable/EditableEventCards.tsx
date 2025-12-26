@@ -73,6 +73,17 @@ function EditableEventCards({
     });
   };
 
+  // Helper function to get the current index of an event by ID
+  // This ensures paths always point to the correct event even after reordering
+  const getEventPath = (eventId: string, field: string): string => {
+    const eventIndex = eventList.findIndex((e) => e.id === eventId);
+    if (eventIndex === -1) {
+      // Fallback to first event if ID not found (shouldn't happen)
+      return `events.events.0.${field}`;
+    }
+    return `events.events.${eventIndex}.${field}`;
+  };
+
   return (
     <section className="ee-section ee-events-section">
       <div className="ee-section-header">
@@ -95,8 +106,8 @@ function EditableEventCards({
       ) : (
         <>
           <div className="ee-event-cards">
-            {eventList.map((event, index) => {
-              const eventId = event.id || `event-${index}`;
+            {eventList.map((event) => {
+              const eventId = event.id || `event-${eventList.indexOf(event)}`;
               return (
                 <div
                   key={eventId}
@@ -122,14 +133,14 @@ function EditableEventCards({
                     <EditableText
                       value={event.label}
                       onUpdate={onUpdate}
-                      path={`events.events.${index}.label`}
+                      path={getEventPath(eventId, "label")}
                       className="ee-event-name"
                       tag="h3"
                     />
                     <EditableDate
                       value={event.date}
                       onUpdate={onUpdate}
-                      path={`events.events.${index}.date`}
+                      path={getEventPath(eventId, "date")}
                       className="ee-meta-text ee-event-date"
                       placeholder="Click to set date..."
                     />
@@ -137,14 +148,14 @@ function EditableEventCards({
                       <EditableText
                         value={event.venue || "Venue TBD"}
                         onUpdate={onUpdate}
-                        path={`events.events.${index}.venue`}
+                        path={getEventPath(eventId, "venue")}
                         className="ee-event-venue"
                         tag="p"
                       />
                       <EditableTime
                         value={event.time}
                         onUpdate={onUpdate}
-                        path={`events.events.${index}.time`}
+                        path={getEventPath(eventId, "time")}
                         className="ee-event-time"
                         placeholder="Click to set time..."
                       />
