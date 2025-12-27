@@ -63,61 +63,61 @@ func TestPublishedSiteResolveHandler_R2StorageRedirect(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	tests := []struct {
-		name         string
-		r2PublicBase string
+		name          string
+		r2PublicBase  string
 		artifactStore string
-		subdomain    string
-		site         *domain.PublishedSite
-		wantCode     int
-		wantLocation string
+		subdomain     string
+		site          *domain.PublishedSite
+		wantCode      int
+		wantLocation  string
 	}{
 		{
-			name:         "redirects to R2 when artifactStore is r2 and r2PublicBase is set",
-			r2PublicBase: "http://localhost:9000/sacred-vows-published-local",
+			name:          "redirects to R2 when artifactStore is r2 and r2PublicBase is set",
+			r2PublicBase:  "http://localhost:9000/sacred-vows-published-local",
 			artifactStore: "r2",
-			subdomain:    "test",
+			subdomain:     "test",
 			site: &domain.PublishedSite{
-				Subdomain:     "test",
-				Published:     true,
+				Subdomain:      "test",
+				Published:      true,
 				CurrentVersion: 1,
 			},
 			wantCode:     http.StatusFound,
 			wantLocation: "http://localhost:9000/sacred-vows-published-local/sites/test/v1/index.html",
 		},
 		{
-			name:         "redirects to filesystem when artifactStore is not r2",
-			r2PublicBase: "http://localhost:9000/sacred-vows-published-local",
+			name:          "redirects to filesystem when artifactStore is not r2",
+			r2PublicBase:  "http://localhost:9000/sacred-vows-published-local",
 			artifactStore: "filesystem",
-			subdomain:    "test",
+			subdomain:     "test",
 			site: &domain.PublishedSite{
-				Subdomain:     "test",
-				Published:     true,
+				Subdomain:      "test",
+				Published:      true,
 				CurrentVersion: 1,
 			},
 			wantCode:     http.StatusFound,
 			wantLocation: "/published/sites/test/v1/index.html",
 		},
 		{
-			name:         "redirects to filesystem when r2PublicBase is empty",
-			r2PublicBase: "",
+			name:          "redirects to filesystem when r2PublicBase is empty",
+			r2PublicBase:  "",
 			artifactStore: "r2",
-			subdomain:    "test",
+			subdomain:     "test",
 			site: &domain.PublishedSite{
-				Subdomain:     "test",
-				Published:     true,
+				Subdomain:      "test",
+				Published:      true,
 				CurrentVersion: 1,
 			},
 			wantCode:     http.StatusFound,
 			wantLocation: "/published/sites/test/v1/index.html",
 		},
 		{
-			name:         "redirects to filesystem when artifactStore is empty",
-			r2PublicBase: "http://localhost:9000/sacred-vows-published-local",
+			name:          "redirects to filesystem when artifactStore is empty",
+			r2PublicBase:  "http://localhost:9000/sacred-vows-published-local",
 			artifactStore: "",
-			subdomain:    "test",
+			subdomain:     "test",
 			site: &domain.PublishedSite{
-				Subdomain:     "test",
-				Published:     true,
+				Subdomain:      "test",
+				Published:      true,
 				CurrentVersion: 1,
 			},
 			wantCode:     http.StatusFound,
@@ -163,58 +163,58 @@ func TestPublishedSiteResolveHandler_EdgeCases(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	tests := []struct {
-		name         string
-		r2PublicBase string
+		name          string
+		r2PublicBase  string
 		artifactStore string
-		subdomain    string
-		site         *domain.PublishedSite
-		siteError    error
+		subdomain     string
+		site          *domain.PublishedSite
+		siteError     error
 		wantCode      int
 	}{
 		{
-			name:         "returns 404 when site not found",
-			r2PublicBase: "http://localhost:9000/sacred-vows-published-local",
+			name:          "returns 404 when site not found",
+			r2PublicBase:  "http://localhost:9000/sacred-vows-published-local",
 			artifactStore: "r2",
-			subdomain:    "nonexistent",
-			site:         nil,
-			siteError:    nil, // Repository returns nil, nil for not found
-			wantCode:     http.StatusNotFound,
+			subdomain:     "nonexistent",
+			site:          nil,
+			siteError:     nil, // Repository returns nil, nil for not found
+			wantCode:      http.StatusNotFound,
 		},
 		{
-			name:         "returns 404 when site not published",
-			r2PublicBase: "http://localhost:9000/sacred-vows-published-local",
+			name:          "returns 404 when site not published",
+			r2PublicBase:  "http://localhost:9000/sacred-vows-published-local",
 			artifactStore: "r2",
-			subdomain:    "test",
+			subdomain:     "test",
 			site: &domain.PublishedSite{
-				Subdomain:     "test",
-				Published:     false,
+				Subdomain:      "test",
+				Published:      false,
 				CurrentVersion: 1,
 			},
 			wantCode: http.StatusNotFound,
 		},
 		{
-			name:         "returns 404 when current version is 0",
-			r2PublicBase: "http://localhost:9000/sacred-vows-published-local",
+			name:          "returns 404 when current version is 0",
+			r2PublicBase:  "http://localhost:9000/sacred-vows-published-local",
 			artifactStore: "r2",
-			subdomain:    "test",
+			subdomain:     "test",
 			site: &domain.PublishedSite{
-				Subdomain:     "test",
-				Published:     true,
+				Subdomain:      "test",
+				Published:      true,
 				CurrentVersion: 0,
 			},
 			wantCode: http.StatusNotFound,
 		},
 		{
-			name:         "handles version 2 correctly",
-			r2PublicBase: "http://localhost:9000/sacred-vows-published-local",
+			name:          "handles version 2 correctly",
+			r2PublicBase:  "http://localhost:9000/sacred-vows-published-local",
 			artifactStore: "r2",
-			subdomain:    "test",
+			subdomain:     "test",
 			site: &domain.PublishedSite{
-				Subdomain:     "test",
-				Published:     true,
+				Subdomain:      "test",
+				Published:      true,
 				CurrentVersion: 2,
 			},
-			wantCode:     http.StatusFound,
+			wantCode: http.StatusFound,
 		},
 	}
 
@@ -252,4 +252,3 @@ func TestPublishedSiteResolveHandler_EdgeCases(t *testing.T) {
 		})
 	}
 }
-
