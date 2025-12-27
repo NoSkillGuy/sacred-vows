@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -197,13 +198,39 @@ func (r *Router) Setup() *gin.Engine {
 			r2PublicBase := os.Getenv("R2_PUBLIC_BASE")
 			if r2PublicBase != "" {
 				// Redirect to MinIO public URL
+				// Sanitize the path to prevent path traversal attacks
 				key := strings.TrimPrefix(path, "/")
+				// Remove any path traversal attempts
+				key = filepath.Clean(key)
+				// Ensure no directory traversal (should not start with ..)
+				if strings.HasPrefix(key, "..") || strings.Contains(key, "../") {
+					c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid path"})
+					return
+				}
 				c.Redirect(http.StatusFound, fmt.Sprintf("%s/%s", r2PublicBase, key))
 				return
 			}
 
 			// For filesystem: serve from local directory (fallback to Static handler behavior)
-			c.File("./published" + path)
+			// Sanitize the path to prevent path traversal attacks
+			// Remove leading slash and clean the path
+			sanitizedPath := strings.TrimPrefix(path, "/")
+			sanitizedPath = filepath.Clean(sanitizedPath)
+			// Ensure no directory traversal (should not start with ..)
+			if strings.HasPrefix(sanitizedPath, "..") || strings.Contains(sanitizedPath, "../") {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid path"})
+				return
+			}
+			// Construct safe file path within published directory
+			fullPath := filepath.Join("./published", sanitizedPath)
+			// Verify the resolved path is still within published directory (prevent absolute paths)
+			absPublished, _ := filepath.Abs("./published")
+			absFullPath, _ := filepath.Abs(fullPath)
+			if !strings.HasPrefix(absFullPath, absPublished) {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid path"})
+				return
+			}
+			c.File(fullPath)
 		})
 	}
 
