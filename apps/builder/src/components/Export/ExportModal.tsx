@@ -87,11 +87,16 @@ function PublishModal({ isOpen, onClose }) {
         setAvailable(!!res.available);
         setReason(res.reason || "");
         setErrorMsg("");
-      } catch {
+      } catch (error) {
         if (!isOpen || reqId !== validateReqIdRef.current) return;
+        console.error("Subdomain validation failed:", error);
         setAvailable(false);
         setReason("error");
-        setErrorMsg("Failed to validate subdomain. Please try again.");
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : "Failed to validate subdomain. Please try again.";
+        setErrorMsg(errorMessage);
       }
     }, 350);
     return () => clearTimeout(t);

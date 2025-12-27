@@ -291,7 +291,7 @@ func main() {
 	rsvpHandler := handlers.NewRSVPHandler(submitRSVPUC, getRSVPByInvitationUC)
 	analyticsHandler := handlers.NewAnalyticsHandler(trackViewUC, getAnalyticsByInvitationUC)
 	publishHandler := handlers.NewPublishHandler(validateSubdomainUC, publishInvitationUC, listVersionsUC, rollbackUC, cfg.Publishing.BaseDomain, cfg.Publishing.SubdomainSuffix, cfg.Server.Port)
-	resolveHandler := handlers.NewPublishedSiteResolveHandler(publishedSiteRepo, cfg.Publishing.BaseDomain)
+	resolveHandler := handlers.NewPublishedSiteResolveHandler(publishedSiteRepo, cfg.Publishing.BaseDomain, cfg.Publishing.R2PublicBase, cfg.Publishing.ArtifactStore)
 	resolveAPIHandler := handlers.NewPublishedResolveAPIHandler(publishedSiteRepo, cfg.Publishing.BaseDomain)
 
 	// Initialize observability if enabled

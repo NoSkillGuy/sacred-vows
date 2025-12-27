@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -11,10 +12,17 @@ import (
 type PublishedSiteResolveHandler struct {
 	publishedRepo repository.PublishedSiteRepository
 	baseDomain    string
+	r2PublicBase  string // R2/MinIO public base URL (e.g., http://localhost:9000/sacred-vows-published-local)
+	artifactStore string // "filesystem" or "r2"
 }
 
-func NewPublishedSiteResolveHandler(publishedRepo repository.PublishedSiteRepository, baseDomain string) *PublishedSiteResolveHandler {
-	return &PublishedSiteResolveHandler{publishedRepo: publishedRepo, baseDomain: baseDomain}
+func NewPublishedSiteResolveHandler(publishedRepo repository.PublishedSiteRepository, baseDomain string, r2PublicBase string, artifactStore string) *PublishedSiteResolveHandler {
+	return &PublishedSiteResolveHandler{
+		publishedRepo: publishedRepo,
+		baseDomain:    baseDomain,
+		r2PublicBase:  r2PublicBase,
+		artifactStore: artifactStore,
+	}
 }
 
 func (h *PublishedSiteResolveHandler) Handle(c *gin.Context) {
@@ -55,7 +63,17 @@ func (h *PublishedSiteResolveHandler) Handle(c *gin.Context) {
 
 	// Redirect to the published artifact index.html for current version.
 	key := "sites/" + subdomain + "/v" + itoa(site.CurrentVersion) + "/index.html"
-	c.Redirect(http.StatusFound, "/published/"+key)
+
+	// For R2/MinIO storage, redirect to MinIO public URL; for filesystem, use /published/ path
+	var redirectURL string
+	if h.artifactStore == "r2" && h.r2PublicBase != "" {
+		// R2/MinIO: redirect to public base URL (MinIO is now public)
+		redirectURL = fmt.Sprintf("%s/%s", h.r2PublicBase, key)
+	} else {
+		// Filesystem: redirect to /published/ path (served by router)
+		redirectURL = "/published/" + key
+	}
+	c.Redirect(http.StatusFound, redirectURL)
 }
 
 func itoa(v int) string {

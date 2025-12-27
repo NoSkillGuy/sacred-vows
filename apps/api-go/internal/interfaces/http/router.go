@@ -1,7 +1,10 @@
 package http
 
 import (
+	"fmt"
+	"net/http"
 	"os"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sacred-vows/api-go/internal/infrastructure/auth"
@@ -173,8 +176,36 @@ func (r *Router) Setup() *gin.Engine {
 	// Swagger documentation
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	// Serve published artifacts (dev/local implementation)
-	router.Static("/published", "./published")
+	// Serve published artifacts
+	// For filesystem storage: serve from local directory
+	// For R2/MinIO storage: proxy to MinIO public URL
+	publishedGroup := router.Group("/published")
+	{
+		// Exclude /published/resolve, /published/versions, /published/rollback (handled by API routes above)
+		publishedGroup.GET("/*path", func(c *gin.Context) {
+			// Check if this is an API route (shouldn't happen due to route ordering, but safety check)
+			path := c.Param("path")
+			if path == "/resolve" || strings.HasPrefix(path, "/versions") || strings.HasPrefix(path, "/rollback") {
+				c.Next()
+				return
+			}
+
+			// For R2/MinIO: redirect to MinIO public URL
+			// The r2PublicBase is passed via resolveHandler, but we need it here too
+			// For now, redirect to MinIO if r2PublicBase is configured
+			// This is a simple solution - a full proxy would require passing artifactStore to router
+			r2PublicBase := os.Getenv("R2_PUBLIC_BASE")
+			if r2PublicBase != "" {
+				// Redirect to MinIO public URL
+				key := strings.TrimPrefix(path, "/")
+				c.Redirect(http.StatusFound, fmt.Sprintf("%s/%s", r2PublicBase, key))
+				return
+			}
+
+			// For filesystem: serve from local directory (fallback to Static handler behavior)
+			c.File("./published" + path)
+		})
+	}
 
 	// 404 handler
 	router.NoRoute(func(c *gin.Context) {
