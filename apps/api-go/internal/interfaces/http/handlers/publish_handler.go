@@ -78,10 +78,8 @@ func (h *PublishHandler) ValidateSubdomain(c *gin.Context) {
 			zap.String("reason", reason),
 			zap.Error(err),
 		)
-		// Ensure available is false when there's an error
-		if available {
-			available = false
-		}
+		// When there's an error, available should always be false
+		available = false
 		// If reason is empty, set it to "error"
 		if reason == "" {
 			reason = "error"

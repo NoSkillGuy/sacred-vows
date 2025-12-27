@@ -3,6 +3,7 @@ package http
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -31,6 +32,8 @@ type Router struct {
 	jwtService        *auth.JWTService
 	frontendURL       string
 	observabilityCfg  config.ObservabilityConfig
+	r2PublicBase      string // R2/MinIO public base URL (e.g., http://localhost:9000/sacred-vows-published-local)
+	artifactStore     string // "filesystem" or "r2"
 }
 
 func NewRouter(
@@ -46,6 +49,8 @@ func NewRouter(
 	jwtService *auth.JWTService,
 	frontendURL string,
 	observabilityCfg config.ObservabilityConfig,
+	r2PublicBase string,
+	artifactStore string,
 ) *Router {
 	return &Router{
 		authHandler:       authHandler,
@@ -60,6 +65,8 @@ func NewRouter(
 		jwtService:        jwtService,
 		frontendURL:       frontendURL,
 		observabilityCfg:  observabilityCfg,
+		r2PublicBase:      r2PublicBase,
+		artifactStore:     artifactStore,
 	}
 }
 
@@ -192,11 +199,14 @@ func (r *Router) Setup() *gin.Engine {
 			}
 
 			// For R2/MinIO: redirect to MinIO public URL
-			// The r2PublicBase is passed via resolveHandler, but we need it here too
-			// For now, redirect to MinIO if r2PublicBase is configured
-			// This is a simple solution - a full proxy would require passing artifactStore to router
-			r2PublicBase := os.Getenv("R2_PUBLIC_BASE")
-			if r2PublicBase != "" {
+			if r.artifactStore == "r2" && r.r2PublicBase != "" {
+				// Validate r2PublicBase URL format
+				baseURL, err := url.Parse(r.r2PublicBase)
+				if err != nil || (baseURL.Scheme != "http" && baseURL.Scheme != "https") {
+					c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid R2 public base URL configuration"})
+					return
+				}
+
 				// Redirect to MinIO public URL
 				// Sanitize the path to prevent path traversal attacks
 				key := strings.TrimPrefix(path, "/")
@@ -207,7 +217,7 @@ func (r *Router) Setup() *gin.Engine {
 					c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid path"})
 					return
 				}
-				c.Redirect(http.StatusFound, fmt.Sprintf("%s/%s", r2PublicBase, key))
+				c.Redirect(http.StatusFound, fmt.Sprintf("%s/%s", r.r2PublicBase, key))
 				return
 			}
 

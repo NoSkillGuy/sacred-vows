@@ -329,7 +329,7 @@ func main() {
 	}
 
 	// Setup router
-	router := httpRouter.NewRouter(authHandler, invitationHandler, layoutHandler, assetHandler, rsvpHandler, analyticsHandler, publishHandler, resolveHandler, resolveAPIHandler, jwtService, cfg.Google.FrontendURL, cfg.Observability)
+	router := httpRouter.NewRouter(authHandler, invitationHandler, layoutHandler, assetHandler, rsvpHandler, analyticsHandler, publishHandler, resolveHandler, resolveAPIHandler, jwtService, cfg.Google.FrontendURL, cfg.Observability, cfg.Publishing.R2PublicBase, cfg.Publishing.ArtifactStore)
 	engine := router.Setup()
 
 	// Create HTTP server
