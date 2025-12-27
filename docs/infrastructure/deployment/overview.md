@@ -32,18 +32,18 @@ The Sacred Vows deployment pipeline automatically deploys three components:
 ```mermaid
 flowchart TD
     GitHub[GitHub Repository<br/>Push to main branch triggers deployments]
-    
+
     GitHub -->|GitHub Actions| GHA[GitHub Actions Workflow<br/>.github/workflows/deploy.yml]
     GitHub -->|Cloudflare Pages Integration| CFPages[Cloudflare Pages<br/>Automatic Detection<br/>• Monitors main branch<br/>• Builds apps/builder<br/>• Deploys automatically]
-    
+
     GHA --> APIJob[deploy-api-go Job]
     GHA --> WorkerJob[deploy-edge-worker Job]
-    
+
     APIJob --> CloudRun[Google Cloud Run<br/>api-go-dev<br/>api.dev.sacredvows.io]
     WorkerJob --> CFWorkers[Cloudflare Workers<br/>dev-published-sites<br/>*-dev.sacredvows.io]
-    
+
     CFPages --> CFPagesApp[Cloudflare Pages<br/>builder app<br/>dev.sacredvows.io]
-    
+
     style GitHub fill:#e1f5ff
     style GHA fill:#f0f0f0
     style CFPages fill:#f0f0f0
@@ -72,7 +72,9 @@ flowchart TD
 #### builder (Cloudflare Pages)
 - **Deployment**: Automatic via Cloudflare Pages integration
 - **No GitHub Actions**: Cloudflare Pages automatically detects and deploys on push to `main`
+- **Preview Deployments**: Disabled (only deploys on `main` branch merges, not on PRs)
 - **Domain**: Configured in Cloudflare Pages dashboard
+- **Configuration**: See [Cloudflare Setup Guide](./cloudflare-setup.md#step-4-configure-deployment-settings-disable-pr-deployments) for deployment settings
 
 ---
 
@@ -81,11 +83,11 @@ flowchart TD
 ### 1. Required Accounts
 
 - **GitHub Account**: Repository access
-- **Google Cloud Platform Account**: 
+- **Google Cloud Platform Account**:
   - Project ID: `sacred-vows`
   - Billing enabled
   - Required APIs enabled (see below)
-- **Cloudflare Account**: 
+- **Cloudflare Account**:
   - Domain `sacredvows.io` added
   - API token with Workers permissions
 
@@ -174,22 +176,22 @@ Configure the following secrets in your GitHub repository:
 3. **Token Name**: Enter `github-actions-workers-deploy` (or similar descriptive name)
 4. Use "Edit Cloudflare Workers" template or create custom token with:
    - **Resources**: Select `Account` (for Workers permissions)
-   - **Permissions**: 
+   - **Permissions**:
      - Select `Workers Scripts` → `Edit` (required for deploying Workers)
      - Optionally: `Workers R2 Storage` → `Read` (if worker needs R2 access)
    - **Account Resources**: Include your account
    - **Additional Permissions** (add another permission group):
      - **Resources**: Select `User`
-     - **Permissions**: 
+     - **Permissions**:
        - Select `User Details` → `Read` (required for Wrangler authentication)
    - **Zone Permissions** (add another permission group):
      - **Resources**: Select `Zone` → Include `sacredvows.io`
-     - **Permissions**: 
+     - **Permissions**:
        - Select `Zone` → `Read` (required to get zone ID)
        - Select `Cache Purge` → `Edit` (required to purge DNS cache after deployments)
 5. Copy token and paste as secret value
 
-**Note**: 
+**Note**:
 - Token should start with a long alphanumeric string
 - **Required permissions**:
   - `Workers Scripts` → `Edit` (required for deploying Workers)
@@ -198,7 +200,7 @@ Configure the following secrets in your GitHub repository:
   - `Cache Purge` → `Edit` (required to purge DNS cache after Cloud Run deployments)
 - **Optional permissions**:
   - `Workers R2 Storage` → `Read` (if worker needs R2 access)
-- **Important**: 
+- **Important**:
   - Make sure to add `User Details` → `Read` as a separate permission group by clicking "Add more" and selecting `User` as the resource type
   - Make sure to add `Cache Purge` → `Edit` as a separate permission group with `Zone` resource scoped to `sacredvows.io`
 
@@ -278,7 +280,7 @@ These files contain:
 
 Sensitive configuration comes from:
 - **Local Development**: `.env` file (copy from `env.example`)
-- **Deployed Environments**: 
+- **Deployed Environments**:
   - Secret Manager (for secrets like JWT_SECRET, API keys)
   - Terraform (for infrastructure-derived values like GCP_PROJECT_ID)
   - GitHub Actions (loads YAML and sets non-sensitive env vars in Cloud Run)
@@ -582,7 +584,7 @@ on:
 jobs:
   deploy-api-go-dev:
     # ... existing dev job ...
-  
+
   deploy-api-go-prod:
     if: startsWith(github.ref, 'refs/tags/v')
     # ... production job ...
