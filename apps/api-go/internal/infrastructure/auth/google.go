@@ -22,7 +22,16 @@ var (
 	globalStateStore = newOAuthStateStore(10 * time.Minute)
 )
 
+// NewGoogleOAuthService creates a new GoogleOAuthService with the default state store.
+// For testing, use NewGoogleOAuthServiceWithStateStore to inject a custom state store.
 func NewGoogleOAuthService(cfg *config.GoogleConfig) *GoogleOAuthService {
+	return NewGoogleOAuthServiceWithStateStore(cfg, globalStateStore)
+}
+
+// NewGoogleOAuthServiceWithStateStore creates a new GoogleOAuthService with a custom state store.
+// This allows for better testability by injecting a state store with different timeout values
+// or a mock state store for integration tests.
+func NewGoogleOAuthServiceWithStateStore(cfg *config.GoogleConfig, stateStore *oauthStateStore) *GoogleOAuthService {
 	oauthConfig := &oauth2.Config{
 		ClientID:     cfg.ClientID,
 		ClientSecret: cfg.ClientSecret,
@@ -37,7 +46,7 @@ func NewGoogleOAuthService(cfg *config.GoogleConfig) *GoogleOAuthService {
 	return &GoogleOAuthService{
 		config:      oauthConfig,
 		frontendURL: cfg.FrontendURL,
-		stateStore:  globalStateStore,
+		stateStore:  stateStore,
 	}
 }
 

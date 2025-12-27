@@ -50,7 +50,7 @@ func TestValidateSubdomain(t *testing.T) {
 		// Invalid: invalid characters
 		{"reject_underscore", "example_site", false},
 		{"reject_space", "example site", false},
-		{"valid_uppercase", "EXAMPLE", true}, // Uppercase is valid (converted to lowercase)
+		{"valid_uppercase", "EXAMPLE", true},       // Uppercase is valid (converted to lowercase)
 		{"valid_mixed_case", "Example-Site", true}, // Mixed case is valid (converted to lowercase)
 		{"reject_special_chars", "example@site", false},
 		{"reject_unicode", "example-ñ-site", false},
@@ -79,4 +79,3 @@ func TestValidateSubdomain(t *testing.T) {
 		})
 	}
 }
-

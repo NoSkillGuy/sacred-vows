@@ -7,13 +7,13 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"go.uber.org/zap"
 	"github.com/sacred-vows/api-go/internal/domain"
 	authinfra "github.com/sacred-vows/api-go/internal/infrastructure/auth"
 	"github.com/sacred-vows/api-go/internal/interfaces/repository"
 	authuc "github.com/sacred-vows/api-go/internal/usecase/auth"
 	"github.com/sacred-vows/api-go/pkg/errors"
 	"github.com/sacred-vows/api-go/pkg/logger"
+	"go.uber.org/zap"
 )
 
 type AuthHandler struct {

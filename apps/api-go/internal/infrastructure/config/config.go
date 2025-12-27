@@ -395,8 +395,7 @@ func getEnvAsInt16(key string, defaultValue int16) int16 {
 	const minInt16 = -32768
 	const maxInt16 = 32767
 	if value < minInt16 || value > maxInt16 {
-		// Log warning but don't fail - use default value
-		// In production, this should be logged as a configuration error
+		// Value is out of range, use default value
 		return defaultValue
 	}
 	return int16(value)

@@ -16,16 +16,16 @@ func setupTestRouter(r2PublicBase, artifactStore string) *Router {
 	gin.SetMode(gin.TestMode)
 	// Create minimal router with only the fields needed for published artifacts tests
 	return NewRouter(
-		nil, // authHandler
-		nil, // invitationHandler
-		nil, // layoutHandler
-		nil, // assetHandler
-		nil, // rsvpHandler
-		nil, // analyticsHandler
-		nil, // publishHandler
-		nil, // resolveHandler
-		nil, // resolveAPIHandler
-		nil, // jwtService
+		nil,                     // authHandler
+		nil,                     // invitationHandler
+		nil,                     // layoutHandler
+		nil,                     // assetHandler
+		nil,                     // rsvpHandler
+		nil,                     // analyticsHandler
+		nil,                     // publishHandler
+		nil,                     // resolveHandler
+		nil,                     // resolveAPIHandler
+		nil,                     // jwtService
 		"http://localhost:5173", // frontendURL
 		config.ObservabilityConfig{Enabled: false}, // observabilityCfg
 		r2PublicBase,
@@ -88,48 +88,48 @@ func TestRouter_PublishedArtifacts_PathTraversalProtection(t *testing.T) {
 
 func TestRouter_PublishedArtifacts_R2Redirect(t *testing.T) {
 	tests := []struct {
-		name         string
-		r2PublicBase string
+		name          string
+		r2PublicBase  string
 		artifactStore string
-		path         string
-		wantCode     int
-		wantLocation string
+		path          string
+		wantCode      int
+		wantLocation  string
 	}{
 		{
-			name:         "redirects to R2 when artifactStore is r2",
-			r2PublicBase: "http://localhost:9000/sacred-vows-published-local",
+			name:          "redirects to R2 when artifactStore is r2",
+			r2PublicBase:  "http://localhost:9000/sacred-vows-published-local",
 			artifactStore: "r2",
-			path:         "/published/sites/test/v1/index.html",
-			wantCode:     http.StatusFound,
-			wantLocation: "http://localhost:9000/sacred-vows-published-local/sites/test/v1/index.html",
+			path:          "/published/sites/test/v1/index.html",
+			wantCode:      http.StatusFound,
+			wantLocation:  "http://localhost:9000/sacred-vows-published-local/sites/test/v1/index.html",
 		},
 		{
-			name:         "rejects invalid R2 URL scheme",
-			r2PublicBase: "javascript:alert(1)",
+			name:          "rejects invalid R2 URL scheme",
+			r2PublicBase:  "javascript:alert(1)",
 			artifactStore: "r2",
-			path:         "/published/sites/test/v1/index.html",
-			wantCode:     http.StatusInternalServerError,
+			path:          "/published/sites/test/v1/index.html",
+			wantCode:      http.StatusInternalServerError,
 		},
 		{
-			name:         "rejects invalid R2 URL format",
-			r2PublicBase: "not-a-valid-url",
+			name:          "rejects invalid R2 URL format",
+			r2PublicBase:  "not-a-valid-url",
 			artifactStore: "r2",
-			path:         "/published/sites/test/v1/index.html",
-			wantCode:     http.StatusInternalServerError,
+			path:          "/published/sites/test/v1/index.html",
+			wantCode:      http.StatusInternalServerError,
 		},
 		{
-			name:         "rejects non-http/https scheme",
-			r2PublicBase: "ftp://localhost:9000/published",
+			name:          "rejects non-http/https scheme",
+			r2PublicBase:  "ftp://localhost:9000/published",
 			artifactStore: "r2",
-			path:         "/published/sites/test/v1/index.html",
-			wantCode:     http.StatusInternalServerError,
+			path:          "/published/sites/test/v1/index.html",
+			wantCode:      http.StatusInternalServerError,
 		},
 		{
-			name:         "handles empty r2PublicBase with r2 store",
-			r2PublicBase: "",
+			name:          "handles empty r2PublicBase with r2 store",
+			r2PublicBase:  "",
 			artifactStore: "r2",
-			path:         "/published/sites/test/v1/index.html",
-			wantCode:     http.StatusMovedPermanently, // Falls back to filesystem, c.File() may return 301
+			path:          "/published/sites/test/v1/index.html",
+			wantCode:      http.StatusMovedPermanently, // Falls back to filesystem, c.File() may return 301
 		},
 	}
 
@@ -234,4 +234,3 @@ func TestRouter_PublishedArtifacts_RouteExclusion(t *testing.T) {
 		})
 	}
 }
-
