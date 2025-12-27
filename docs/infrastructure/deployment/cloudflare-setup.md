@@ -240,7 +240,36 @@ curl -I https://api.dev.sacredvows.io/health
    - Check that the domain shows as "Active" in Cloudflare Pages
    - SSL certificate should be "Active" (may take a few minutes)
 
-### Step 4: Set Up Production Deployment
+### Step 4: Configure Deployment Settings (Disable PR Deployments)
+
+By default, Cloudflare Pages creates preview deployments for every pull request. To deploy only when changes are merged into `main`:
+
+1. **Go to Cloudflare Pages Project Settings**
+   - Log in to [dash.cloudflare.com](https://dash.cloudflare.com)
+   - Navigate to **Workers & Pages** → Your Pages project
+   - Click **Settings** → **Builds & deployments**
+
+2. **Configure Production Branch Deployment**
+   - Under **Production deployments**:
+     - Set **Production branch** to `main`
+     - Enable **Automatic production branch deployments** (checkbox)
+   - This ensures deployments happen automatically when code is merged to `main`
+
+3. **Disable Preview Deployments**
+   - Under **Preview deployments**:
+     - Set **Preview branch** to **None**
+     - This disables automatic deployments for all non-production branches, including PRs
+
+4. **Save Changes**
+   - Click **Save** to apply the configuration
+
+**Result**: Cloudflare Pages will now:
+- ✅ Deploy automatically when code is merged to `main`
+- ❌ Skip deployments for pull requests and other branches
+
+**Note**: You can still manually trigger deployments from the Cloudflare dashboard if needed.
+
+### Step 5: Set Up Production Deployment
 
 For production, you can either:
 
@@ -254,7 +283,7 @@ For production, you can either:
 - Configure preview deployments for different branches
 - Set production domain to `main` branch
 
-### Step 5: Configure Build Settings (Advanced)
+### Step 6: Configure Build Settings (Advanced)
 
 If you need custom build settings, create a `wrangler.toml` or use Cloudflare Pages configuration:
 
