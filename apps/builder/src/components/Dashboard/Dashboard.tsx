@@ -379,11 +379,6 @@ function Dashboard(): JSX.Element {
           </div>
 
           <div className="header-actions">
-            <Link to="/layouts" className="btn btn-primary">
-              <PlusIcon />
-              <span>New Invitation</span>
-            </Link>
-
             <div className="user-menu" ref={dropdownRef}>
               <div className="user-avatar" onClick={() => setDropdownOpen(!dropdownOpen)}>
                 {getInitials(user?.name)}
