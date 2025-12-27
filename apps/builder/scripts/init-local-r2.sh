@@ -93,32 +93,57 @@ mc anonymous set-json /tmp/public-policy.json "$ALIAS_NAME/$PUBLIC_ASSETS_BUCKET
   mc anonymous set download "$ALIAS_NAME/$PUBLIC_ASSETS_BUCKET" 2>/dev/null || true
 }
 rm -f /tmp/public-policy.json
-echo -e "${GREEN}✓ Public access policy set${NC}"
+echo -e "${GREEN}✓ Public access policy set for public assets bucket${NC}"
+
+# Set public access policy for published bucket (for local development)
+echo -e "${YELLOW}Setting public access policy for published bucket...${NC}"
+cat > /tmp/published-policy.json <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": ["*"]
+      },
+      "Action": ["s3:GetObject"],
+      "Resource": ["arn:aws:s3:::$PUBLISHED_BUCKET/*"]
+    }
+  ]
+}
+EOF
+
+mc anonymous set-json /tmp/published-policy.json "$ALIAS_NAME/$PUBLISHED_BUCKET" 2>/dev/null || {
+  # Alternative: use mc anonymous set download
+  mc anonymous set download "$ALIAS_NAME/$PUBLISHED_BUCKET" 2>/dev/null || true
+}
+rm -f /tmp/published-policy.json
+echo -e "${GREEN}✓ Public access policy set for published bucket${NC}"
 
 # Upload default assets if assets directory exists (relative to this script's location)
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 if [ -d "$SCRIPT_DIR/assets" ]; then
   echo -e "${YELLOW}Uploading default assets...${NC}"
   echo "   This may take a while..."
-  
+
   # Upload photos
   if [ -d "$SCRIPT_DIR/assets/photos" ]; then
     echo "   Uploading photos..."
     mc cp --recursive "$SCRIPT_DIR/assets/photos/" "$ALIAS_NAME/$PUBLIC_ASSETS_BUCKET/defaults/" --exclude "*.DS_Store" 2>/dev/null || true
   fi
-  
+
   # Upload layouts
   if [ -d "$SCRIPT_DIR/layouts" ]; then
     echo "   Uploading layouts..."
     mc cp --recursive "$SCRIPT_DIR/layouts/" "$ALIAS_NAME/$PUBLIC_ASSETS_BUCKET/defaults/layouts/" --exclude "*.DS_Store" 2>/dev/null || true
   fi
-  
+
   # Upload music
   if [ -d "$SCRIPT_DIR/assets/music" ]; then
     echo "   Uploading music..."
     mc cp --recursive "$SCRIPT_DIR/assets/music/" "$ALIAS_NAME/$PUBLIC_ASSETS_BUCKET/defaults/music/" --exclude "*.DS_Store" 2>/dev/null || true
   fi
-  
+
   echo -e "${GREEN}✓ Default assets uploaded${NC}"
 else
   echo -e "${YELLOW}⚠ Assets directory not found, skipping asset upload${NC}"

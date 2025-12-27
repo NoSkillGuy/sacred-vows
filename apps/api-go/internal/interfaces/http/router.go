@@ -1,7 +1,12 @@
 package http
 
 import (
+	"fmt"
+	"net/http"
+	"net/url"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sacred-vows/api-go/internal/infrastructure/auth"
@@ -27,6 +32,8 @@ type Router struct {
 	jwtService        *auth.JWTService
 	frontendURL       string
 	observabilityCfg  config.ObservabilityConfig
+	r2PublicBase      string // R2/MinIO public base URL (e.g., http://localhost:9000/sacred-vows-published-local)
+	artifactStore     string // "filesystem" or "r2"
 }
 
 func NewRouter(
@@ -42,6 +49,8 @@ func NewRouter(
 	jwtService *auth.JWTService,
 	frontendURL string,
 	observabilityCfg config.ObservabilityConfig,
+	r2PublicBase string,
+	artifactStore string,
 ) *Router {
 	return &Router{
 		authHandler:       authHandler,
@@ -56,6 +65,8 @@ func NewRouter(
 		jwtService:        jwtService,
 		frontendURL:       frontendURL,
 		observabilityCfg:  observabilityCfg,
+		r2PublicBase:      r2PublicBase,
+		artifactStore:     artifactStore,
 	}
 }
 
@@ -173,8 +184,65 @@ func (r *Router) Setup() *gin.Engine {
 	// Swagger documentation
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	// Serve published artifacts (dev/local implementation)
-	router.Static("/published", "./published")
+	// Serve published artifacts
+	// For filesystem storage: serve from local directory
+	// For R2/MinIO storage: proxy to MinIO public URL
+	publishedGroup := router.Group("/published")
+	{
+		// Exclude /published/resolve, /published/versions, /published/rollback (handled by API routes above)
+		publishedGroup.GET("/*path", func(c *gin.Context) {
+			// Check if this is an API route (shouldn't happen due to route ordering, but safety check)
+			path := c.Param("path")
+			if path == "/resolve" || strings.HasPrefix(path, "/versions") || strings.HasPrefix(path, "/rollback") {
+				c.Next()
+				return
+			}
+
+			// For R2/MinIO: redirect to MinIO public URL
+			if r.artifactStore == "r2" && r.r2PublicBase != "" {
+				// Validate r2PublicBase URL format
+				baseURL, err := url.Parse(r.r2PublicBase)
+				if err != nil || (baseURL.Scheme != "http" && baseURL.Scheme != "https") {
+					c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid R2 public base URL configuration"})
+					return
+				}
+
+				// Redirect to MinIO public URL
+				// Sanitize the path to prevent path traversal attacks
+				key := strings.TrimPrefix(path, "/")
+				// Remove any path traversal attempts
+				key = filepath.Clean(key)
+				// Ensure no directory traversal (should not start with ..)
+				if strings.HasPrefix(key, "..") || strings.Contains(key, "../") {
+					c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid path"})
+					return
+				}
+				c.Redirect(http.StatusFound, fmt.Sprintf("%s/%s", r.r2PublicBase, key))
+				return
+			}
+
+			// For filesystem: serve from local directory (fallback to Static handler behavior)
+			// Sanitize the path to prevent path traversal attacks
+			// Remove leading slash and clean the path
+			sanitizedPath := strings.TrimPrefix(path, "/")
+			sanitizedPath = filepath.Clean(sanitizedPath)
+			// Ensure no directory traversal (should not start with ..)
+			if strings.HasPrefix(sanitizedPath, "..") || strings.Contains(sanitizedPath, "../") {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid path"})
+				return
+			}
+			// Construct safe file path within published directory
+			fullPath := filepath.Join("./published", sanitizedPath)
+			// Verify the resolved path is still within published directory (prevent absolute paths)
+			absPublished, _ := filepath.Abs("./published")
+			absFullPath, _ := filepath.Abs(fullPath)
+			if !strings.HasPrefix(absFullPath, absPublished) {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid path"})
+				return
+			}
+			c.File(fullPath)
+		})
+	}
 
 	// 404 handler
 	router.NoRoute(func(c *gin.Context) {

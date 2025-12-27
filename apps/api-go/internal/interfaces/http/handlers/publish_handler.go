@@ -70,8 +70,20 @@ func (h *PublishHandler) ValidateSubdomain(c *gin.Context) {
 	}
 
 	normalized, available, reason, err := h.validateUC.Execute(c.Request.Context(), req.Subdomain)
-	if err != nil && available {
+	if err != nil {
+		// Log the error for debugging
+		logger.GetLogger().Warn("subdomain validation error",
+			zap.String("subdomain", req.Subdomain),
+			zap.String("normalized", normalized),
+			zap.String("reason", reason),
+			zap.Error(err),
+		)
+		// When there's an error, available should always be false
 		available = false
+		// If reason is empty, set it to "error"
+		if reason == "" {
+			reason = "error"
+		}
 	}
 
 	c.JSON(http.StatusOK, validateSubdomainResponse{

@@ -8,7 +8,8 @@ WORKDIR /app
 RUN apk add --no-cache git ca-certificates tzdata nodejs npm wget && \
     go install github.com/air-verse/air@latest && \
     go install github.com/swaggo/swag/cmd/swag@latest && \
-    npm install -g tsx
+    npm install -g tsx && \
+    npm cache clean --force
 
 # Copy go mod files for dependency caching
 COPY apps/api-go/go.mod apps/api-go/go.sum ./

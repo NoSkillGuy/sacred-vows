@@ -5,8 +5,9 @@ interface ErrorResponse {
 }
 
 interface ValidateResponse {
-  valid: boolean;
-  message?: string;
+  available: boolean;
+  normalizedSubdomain: string;
+  reason?: string;
   [key: string]: unknown;
 }
 
@@ -34,17 +35,28 @@ export async function validateSubdomain(
   invitationId: string,
   subdomain: string
 ): Promise<ValidateResponse> {
-  const response = await apiRequest("/publish/validate", {
-    method: "POST",
-    body: JSON.stringify({ invitationId, subdomain }),
-  });
-  if (!response.ok) {
-    const err = (await response
-      .json()
-      .catch(() => ({ error: "Validation failed" }))) as ErrorResponse;
-    throw new Error(err.error || "Validation failed");
+  try {
+    const response = await apiRequest("/publish/validate", {
+      method: "POST",
+      body: JSON.stringify({ invitationId, subdomain }),
+    });
+    if (!response.ok) {
+      const err = (await response
+        .json()
+        .catch(() => ({ error: "Validation failed" }))) as ErrorResponse;
+      throw new Error(err.error || "Validation failed");
+    }
+    const data = (await response.json()) as ValidateResponse;
+    // Ensure the response has the expected structure
+    if (typeof data.available !== "boolean" || !data.normalizedSubdomain) {
+      console.error("Invalid validation response structure:", data);
+      throw new Error("Invalid response from validation service");
+    }
+    return data;
+  } catch (error) {
+    console.error("Subdomain validation error:", error);
+    throw error;
   }
-  return (await response.json()) as ValidateResponse;
 }
 
 export async function publishInvitation(
