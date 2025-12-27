@@ -55,6 +55,10 @@ func (s *FilesystemArtifactStorage) PublicURL(key string) string {
 // ListVersions lists all version numbers for a given subdomain.
 // It scans the filesystem for directories matching "sites/{subdomain}/v{version}/" and extracts version numbers.
 func (s *FilesystemArtifactStorage) ListVersions(ctx context.Context, subdomain string) ([]int, error) {
+	// Validate subdomain to prevent path injection
+	if err := validateSubdomain(subdomain); err != nil {
+		return nil, fmt.Errorf("invalid subdomain: %w", err)
+	}
 	subdomainPath := filepath.Join(s.rootDir, "sites", subdomain)
 	versionMap := make(map[int]bool)
 
@@ -97,6 +101,10 @@ func (s *FilesystemArtifactStorage) ListVersions(ctx context.Context, subdomain 
 // DeleteVersion deletes all artifacts for a specific version of a subdomain.
 // It removes the entire version directory "sites/{subdomain}/v{version}/".
 func (s *FilesystemArtifactStorage) DeleteVersion(ctx context.Context, subdomain string, version int) error {
+	// Validate subdomain to prevent path injection
+	if err := validateSubdomain(subdomain); err != nil {
+		return fmt.Errorf("invalid subdomain: %w", err)
+	}
 	versionPath := filepath.Join(s.rootDir, "sites", subdomain, fmt.Sprintf("v%d", version))
 
 	// Check if version directory exists

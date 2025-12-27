@@ -9,6 +9,9 @@ jobs:
   deploy-api-go:
     name: Deploy API (Go) to Cloud Run
     runs-on: self-hosted
+    permissions:
+      contents: read
+      id-token: write
     environment:
       name: dev
     steps:
@@ -125,6 +128,8 @@ jobs:
   deploy-edge-worker:
     name: Deploy Edge Worker to Cloudflare
     runs-on: self-hosted
+    permissions:
+      contents: read
     environment:
       name: dev
     steps:

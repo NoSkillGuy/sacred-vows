@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/sacred-vows/api-go/internal/infrastructure/config"
 	"golang.org/x/oauth2"
@@ -13,7 +14,13 @@ import (
 type GoogleOAuthService struct {
 	config      *oauth2.Config
 	frontendURL string
+	stateStore  *oauthStateStore
 }
+
+var (
+	// Global state store instance (10 minute expiration)
+	globalStateStore = newOAuthStateStore(10 * time.Minute)
+)
 
 func NewGoogleOAuthService(cfg *config.GoogleConfig) *GoogleOAuthService {
 	oauthConfig := &oauth2.Config{
@@ -30,6 +37,7 @@ func NewGoogleOAuthService(cfg *config.GoogleConfig) *GoogleOAuthService {
 	return &GoogleOAuthService{
 		config:      oauthConfig,
 		frontendURL: cfg.FrontendURL,
+		stateStore:  globalStateStore,
 	}
 }
 
@@ -37,8 +45,19 @@ func (s *GoogleOAuthService) GetOAuthConfig() *oauth2.Config {
 	return s.config
 }
 
-func (s *GoogleOAuthService) GetAuthURL() string {
-	return s.config.AuthCodeURL("state", oauth2.AccessTypeOffline, oauth2.ApprovalForce)
+// GetAuthURL generates a secure OAuth authorization URL with a cryptographically random state parameter
+// to prevent CSRF attacks. The state is stored and will be verified on callback.
+func (s *GoogleOAuthService) GetAuthURL() (string, error) {
+	state, err := s.stateStore.generateState()
+	if err != nil {
+		return "", fmt.Errorf("failed to generate OAuth state: %w", err)
+	}
+	return s.config.AuthCodeURL(state, oauth2.AccessTypeOffline, oauth2.ApprovalForce), nil
+}
+
+// VerifyState verifies that the OAuth state parameter is valid and not expired
+func (s *GoogleOAuthService) VerifyState(state string) bool {
+	return s.stateStore.verifyState(state)
 }
 
 func (s *GoogleOAuthService) ExchangeCode(ctx context.Context, code string) (*oauth2.Token, error) {
