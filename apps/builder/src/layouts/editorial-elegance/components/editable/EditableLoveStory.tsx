@@ -24,6 +24,13 @@ function EditableLoveStory({ _translations, _currentLang, config = {}, onUpdate 
     }
   };
 
+  const handleDeleteChapter = (index) => {
+    const updated = chapters.filter((_, i) => i !== index);
+    if (onUpdate) {
+      onUpdate("story.chapters", updated);
+    }
+  };
+
   const handleAddPullQuote = () => {
     const newQuotes = [...pullQuotes, { text: "", attribution: "" }];
     if (onUpdate) {
@@ -34,6 +41,13 @@ function EditableLoveStory({ _translations, _currentLang, config = {}, onUpdate 
   const handleUpdatePullQuote = (index, field, value) => {
     const updated = [...pullQuotes];
     updated[index] = { ...updated[index], [field]: value };
+    if (onUpdate) {
+      onUpdate("story.pullQuotes", updated);
+    }
+  };
+
+  const handleDeletePullQuote = (index) => {
+    const updated = pullQuotes.filter((_, i) => i !== index);
     if (onUpdate) {
       onUpdate("story.pullQuotes", updated);
     }
@@ -61,12 +75,22 @@ function EditableLoveStory({ _translations, _currentLang, config = {}, onUpdate 
         <div className="ee-story-chapters">
           {chapters.map((chapter, index) => (
             <div key={index} className="ee-story-chapter">
-              <EditableText
-                value={chapter.title || ""}
-                onUpdate={(path, value) => handleUpdateChapter(index, "title", value)}
-                className="ee-story-chapter-title"
-                tag="h3"
-              />
+              <div className="ee-story-chapter-header">
+                <EditableText
+                  value={chapter.title || ""}
+                  onUpdate={(path, value) => handleUpdateChapter(index, "title", value)}
+                  className="ee-story-chapter-title"
+                  tag="h3"
+                />
+                <button
+                  onClick={() => handleDeleteChapter(index)}
+                  className="ee-delete-icon"
+                  type="button"
+                  aria-label="Delete chapter"
+                >
+                  ×
+                </button>
+              </div>
               <EditableText
                 value={chapter.text || ""}
                 onUpdate={(path, value) => handleUpdateChapter(index, "text", value)}
@@ -85,19 +109,29 @@ function EditableLoveStory({ _translations, _currentLang, config = {}, onUpdate 
         <div className="ee-story-pull-quotes">
           {pullQuotes.map((quote, index) => (
             <blockquote key={index} className="ee-pull-quote">
-              <EditableText
-                value={quote.text || ""}
-                onUpdate={(path, value) => handleUpdatePullQuote(index, "text", value)}
-                className="ee-pull-quote-text"
-                tag="span"
-                multiline={true}
-              />
-              <EditableText
-                value={quote.attribution || ""}
-                onUpdate={(path, value) => handleUpdatePullQuote(index, "attribution", value)}
-                className="ee-pull-quote-attribution"
-                tag="cite"
-              />
+              <div className="ee-pull-quote-content">
+                <EditableText
+                  value={quote.text || ""}
+                  onUpdate={(path, value) => handleUpdatePullQuote(index, "text", value)}
+                  className="ee-pull-quote-text"
+                  tag="span"
+                  multiline={true}
+                />
+                <EditableText
+                  value={quote.attribution || ""}
+                  onUpdate={(path, value) => handleUpdatePullQuote(index, "attribution", value)}
+                  className="ee-pull-quote-attribution"
+                  tag="cite"
+                />
+              </div>
+              <button
+                onClick={() => handleDeletePullQuote(index)}
+                className="ee-delete-icon"
+                type="button"
+                aria-label="Delete pull quote"
+              >
+                ×
+              </button>
             </blockquote>
           ))}
           <button onClick={handleAddPullQuote} className="ee-add-button">

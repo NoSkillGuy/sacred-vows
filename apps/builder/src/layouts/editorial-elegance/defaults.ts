@@ -323,29 +323,25 @@ export const editorialEleganceDefaults: EditorialEleganceDefaults = {
   },
   quote: {
     text: "In you, I found my home. In your smile, I found my joy. In your love, I found my heart.",
-    attribution: "Rumi",
+    attribution: "Siva Praveen", // Default to groom's name, can be edited to bride's name or custom
   },
   story: {
-    text: "It all started with a missed train. What seemed like an inconvenience turned into the most beautiful delay of our lives. Pooja was running late, her heels clicking against the platform as the train pulled away. Siva, already seated, noticed her through the window—a flurry of silk and frustration. He stepped off at the next station and waited. When she finally arrived, breathless and apologetic, he simply smiled and said, 'I think we were meant to miss that train together.'\n\nThree years later, we still laugh about that day. The universe has a funny way of bringing people together when they least expect it. What began as a chance encounter in a railway station has become a love story written in shared dreams, morning coffees, and quiet Sunday afternoons. We've traveled across India together, from the mountains of Himachal to the beaches of Goa, collecting memories like treasures. Every adventure has taught us that home isn't a place—it's the person you choose to build your life with.",
+    text: "It all started with a missed train. Pooja was running late, her train pulling away as she reached the platform. Siva, already seated, noticed her through the window and stepped off at the next station to wait. When she finally arrived, he simply smiled and said, 'I think we were meant to miss that train together.'\n\nWhat began as a chance encounter has become a love story written in shared dreams and quiet moments. We've traveled together, collecting memories like treasures, and learned that home isn't a place—it's the person you choose to build your life with.",
     chapters: [
       {
         title: "How We Met",
-        text: "March 2018. The Bangalore Central Railway Station was chaos—crowds, announcements, the smell of fresh samosas. Pooja was heading to Mysore for a friend's wedding, running late as usual. Her train had just left platform 3. As she stood there, phone in hand, trying to figure out her next move, a gentle voice asked if she needed help. Siva had seen her from his window seat and something made him get off. 'There's another train in an hour,' he said. 'Would you like to grab a coffee while we wait?' That coffee turned into a three-hour conversation about books, travel, and dreams. By the time her train arrived, they had exchanged numbers and made plans for the following weekend.",
+        text: "March 2018. Bangalore Central Railway Station. Pooja's train had just left. As she stood there, phone in hand, a gentle voice asked if she needed help. Siva had seen her from his window seat and something made him get off. 'There's another train in an hour,' he said. 'Would you like to grab a coffee while we wait?' That coffee turned into a three-hour conversation. By the time her train arrived, they had exchanged numbers.",
       },
       {
         title: "The First Date",
-        text: "Cubbon Park on a Sunday morning. Siva brought homemade idlis and filter coffee in a thermos. Pooja brought her favorite book to share. They walked for hours, talking about everything and nothing. The conversation flowed so naturally it felt like they'd known each other for years. When the afternoon sun got too warm, they found a quiet spot under a banyan tree and read poetry to each other. That day, they both knew this was different. This was the beginning of something beautiful.",
+        text: "Cubbon Park on a Sunday morning. Siva brought homemade idlis and filter coffee. Pooja brought her favorite book. They walked for hours, talking about everything. The conversation flowed so naturally it felt like they'd known each other for years. That day, they both knew this was different.",
       },
       {
         title: "The Proposal",
-        text: "December 2020. They were in Udaipur, celebrating three years together. Siva had planned everything—a sunset boat ride on Lake Pichola, dinner at a rooftop restaurant overlooking the City Palace. As the sun dipped below the horizon, painting the sky in shades of gold and pink, he got down on one knee. 'Pooja, you are my home, my adventure, my everything. Will you marry me?' The answer was yes, of course. Surrounded by the lights of the palace and the sound of water, they made a promise to spend forever together.",
+        text: "December 2020. Udaipur. A sunset boat ride on Lake Pichola. As the sun dipped below the horizon, Siva got down on one knee. 'Pooja, you are my home, my adventure, my everything. Will you marry me?' The answer was yes. Surrounded by the lights of the palace, they made a promise to spend forever together.",
       },
     ],
     pullQuotes: [
-      {
-        text: "It all started with a missed train...",
-        attribution: "Pooja",
-      },
       {
         text: "I think we were meant to miss that train together.",
         attribution: "Siva",
@@ -652,6 +648,22 @@ export function mergeWithDefaults(
     quote: {
       ...editorialEleganceDefaults.quote,
       ...(existingData.quote as Record<string, unknown>),
+      // If attribution is "Rumi" or "RUMI", replace with groom's name
+      attribution: (() => {
+        const existingAttribution = (existingData.quote as Record<string, unknown>)?.attribution as
+          | string
+          | undefined;
+        const groomName =
+          ((existingData.couple as Record<string, unknown>)?.groom?.name as string | undefined) ||
+          editorialEleganceDefaults.couple.groom.name;
+        if (
+          existingAttribution &&
+          (existingAttribution.toLowerCase() === "rumi" || existingAttribution === "RUMI")
+        ) {
+          return groomName;
+        }
+        return existingAttribution || groomName;
+      })(),
     },
     story: {
       ...editorialEleganceDefaults.story,
