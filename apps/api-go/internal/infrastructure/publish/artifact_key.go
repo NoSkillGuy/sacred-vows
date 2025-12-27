@@ -42,9 +42,6 @@ func validateSubdomain(subdomain string) error {
 	if len(subdomain) > 63 {
 		return fmt.Errorf("subdomain is too long (max 63 characters)")
 	}
-	if len(subdomain) < 1 {
-		return fmt.Errorf("subdomain is too short")
-	}
 
 	// Reject path traversal sequences explicitly
 	if strings.Contains(subdomain, "..") {
