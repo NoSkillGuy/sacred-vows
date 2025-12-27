@@ -226,7 +226,7 @@ func Load() (*Config, error) {
 			JWTIssuer:                   getEnv("JWT_ISSUER", getYAMLString(yamlConfig, "auth.jwt_issuer", "sacred-vows-api")),
 			JWTAudience:                 getEnv("JWT_AUDIENCE", getYAMLString(yamlConfig, "auth.jwt_audience", "sacred-vows-client")),
 			ClockSkewTolerance:          parseDuration(getEnv("JWT_CLOCK_SKEW", getYAMLString(yamlConfig, "auth.jwt_clock_skew", "60s")), 60*time.Second),
-			RefreshTokenHMACActiveKeyID: int16(getEnvAsInt("REFRESH_TOKEN_HMAC_ACTIVE_KEY_ID", 1)), // Always from env (sensitive)
+			RefreshTokenHMACActiveKeyID: getEnvAsInt16("REFRESH_TOKEN_HMAC_ACTIVE_KEY_ID", 1), // Always from env (sensitive)
 		},
 		Storage: StorageConfig{
 			MaxFileSize:         getYAMLInt64(yamlConfig, "storage.max_file_size", 10*1024*1024),
@@ -377,6 +377,28 @@ func getEnvAsInt(key string, defaultValue int) int {
 		return value
 	}
 	return defaultValue
+}
+
+// getEnvAsInt16 gets an environment variable as int16 with bounds checking.
+// int16 range: -32768 to 32767
+// If the value is out of range or cannot be parsed, returns the default value.
+func getEnvAsInt16(key string, defaultValue int16) int16 {
+	valueStr := os.Getenv(key)
+	if valueStr == "" {
+		return defaultValue
+	}
+	value, err := strconv.Atoi(valueStr)
+	if err != nil {
+		return defaultValue
+	}
+	// Check bounds for int16
+	const minInt16 = -32768
+	const maxInt16 = 32767
+	if value < minInt16 || value > maxInt16 {
+		// Value is out of range, use default value
+		return defaultValue
+	}
+	return int16(value)
 }
 
 func parseDuration(value string, defaultValue time.Duration) time.Duration {

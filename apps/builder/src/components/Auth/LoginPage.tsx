@@ -67,6 +67,8 @@ function LoginPage(): JSX.Element {
       const errorMessages: Record<string, string> = {
         no_code: "Google OAuth did not return an authorization code. Please try again.",
         oauth_failed: "Google OAuth authentication failed. Please try again.",
+        oauth_init_failed: "Failed to initialize Google OAuth. Please try again.",
+        invalid_state: "OAuth security verification failed. Please try again.",
         token_failed: "Failed to generate authentication token. Please try again.",
       };
       setError(errorMessages[oauthError] || "OAuth authentication failed. Please try again.");
