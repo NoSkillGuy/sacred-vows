@@ -37,6 +37,8 @@
   height: 1px;
   background-color: var(--ee-color-accent);
   margin: var(--ee-space-sm) auto;
+  cursor: default;
+  pointer-events: none;
 }
 
 /* Accent usage - borders only */

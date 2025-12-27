@@ -1,7 +1,7 @@
 // useState, useEffect removed - unused
 import EditableText from "../shared/EditableText";
 import EditableImage from "../shared/EditableImage";
-import { formatWeddingDate } from "../../utils/dateFormatter";
+import EditableDate from "../shared/EditableDate";
 
 /**
  * EditableEditorialHero - WYSIWYG editable version of Editorial Hero
@@ -65,16 +65,20 @@ function EditableEditorialHero({ _translations, _currentLang, config = {}, onUpd
             />
           </h1>
           <div className="ee-divider" />
-          {formatWeddingDate(weddingDate) && (
-            <p className="ee-meta-text ee-hero-date">{formatWeddingDate(weddingDate)}</p>
-          )}
-          <p className="ee-meta-text ee-hero-location">
-            <EditableText value={city} onUpdate={onUpdate} path="wedding.venue.city" tag="span" />
-          </p>
-        </div>
-
-        <div className="ee-scroll-indicator">
-          <span className="ee-scroll-line" />
+          <EditableDate
+            value={weddingDate}
+            onUpdate={onUpdate}
+            path="wedding.dates.0"
+            className="ee-meta-text ee-hero-date"
+            placeholder="Click to set date..."
+          />
+          <EditableText
+            value={city}
+            onUpdate={onUpdate}
+            path="wedding.venue.city"
+            className="ee-meta-text ee-hero-location"
+            tag="p"
+          />
         </div>
       </div>
     </section>

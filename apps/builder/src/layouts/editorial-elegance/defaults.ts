@@ -159,10 +159,18 @@ export const editorialEleganceDefaults: EditorialEleganceDefaults = {
     bride: {
       name: "Pooja Singh",
       image: getLayoutAssetUrl(LAYOUT_ID, "/assets/photos/couple2/bride/1.jpeg"),
+      parents: {
+        mother: "Mrs. Geeta Singh",
+        father: "Mr. Sanjay Singh",
+      },
     },
     groom: {
       name: "Siva Praveen",
       image: getLayoutAssetUrl(LAYOUT_ID, "/assets/photos/couple2/groom/1.jpeg"),
+      parents: {
+        mother: "Mrs. Rayapudi Lakshmi",
+        father: "Mr. Rayapudi Sathi Raju",
+      },
     },
   },
   wedding: {
@@ -240,16 +248,6 @@ export const editorialEleganceDefaults: EditorialEleganceDefaults = {
     ],
   },
   weddingParty: {
-    bride: {
-      name: "Pooja Singh",
-      image: getLayoutAssetUrl(LAYOUT_ID, "/assets/photos/couple2/bride/1.jpeg"),
-      bio: "",
-    },
-    groom: {
-      name: "Siva Praveen",
-      image: getLayoutAssetUrl(LAYOUT_ID, "/assets/photos/couple2/groom/1.jpeg"),
-      bio: "",
-    },
     members: [],
     showBios: false,
     filter: "bw",
@@ -562,10 +560,42 @@ export function mergeWithDefaults(
       bride: {
         ...editorialEleganceDefaults.couple.bride,
         ...((existingData.couple as Record<string, unknown>)?.bride as Record<string, unknown>),
+        parents: {
+          ...editorialEleganceDefaults.couple.bride.parents,
+          ...((((existingData.couple as Record<string, unknown>)?.bride as Record<string, unknown>)
+            ?.parents as Record<string, unknown>) || {}),
+          // Ensure defaults are used if existing values are empty strings
+          mother:
+            ((
+              ((existingData.couple as Record<string, unknown>)?.bride as Record<string, unknown>)
+                ?.parents as Record<string, unknown>
+            )?.mother as string) || editorialEleganceDefaults.couple.bride.parents.mother,
+          father:
+            ((
+              ((existingData.couple as Record<string, unknown>)?.bride as Record<string, unknown>)
+                ?.parents as Record<string, unknown>
+            )?.father as string) || editorialEleganceDefaults.couple.bride.parents.father,
+        },
       },
       groom: {
         ...editorialEleganceDefaults.couple.groom,
         ...((existingData.couple as Record<string, unknown>)?.groom as Record<string, unknown>),
+        parents: {
+          ...editorialEleganceDefaults.couple.groom.parents,
+          ...((((existingData.couple as Record<string, unknown>)?.groom as Record<string, unknown>)
+            ?.parents as Record<string, unknown>) || {}),
+          // Ensure defaults are used if existing values are empty strings
+          mother:
+            ((
+              ((existingData.couple as Record<string, unknown>)?.groom as Record<string, unknown>)
+                ?.parents as Record<string, unknown>
+            )?.mother as string) || editorialEleganceDefaults.couple.groom.parents.mother,
+          father:
+            ((
+              ((existingData.couple as Record<string, unknown>)?.groom as Record<string, unknown>)
+                ?.parents as Record<string, unknown>
+            )?.father as string) || editorialEleganceDefaults.couple.groom.parents.father,
+        },
       },
     },
     wedding: {

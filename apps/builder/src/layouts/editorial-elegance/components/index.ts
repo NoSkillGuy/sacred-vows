@@ -13,6 +13,7 @@ import Countdown from "./view/Countdown";
 import EditorialQuote from "./view/EditorialQuote";
 import LoveStory from "./view/LoveStory";
 import EventCards from "./view/EventCards";
+import Couple from "./view/Couple";
 import WeddingParty from "./view/WeddingParty";
 import Location from "./view/Location";
 import Travel from "./view/Travel";
@@ -34,6 +35,7 @@ import EditableCountdown from "./editable/EditableCountdown";
 import EditableEditorialQuote from "./editable/EditableEditorialQuote";
 import EditableLoveStory from "./editable/EditableLoveStory";
 import EditableEventCards from "./editable/EditableEventCards";
+import EditableCouple from "./editable/EditableCouple";
 import EditableWeddingParty from "./editable/EditableWeddingParty";
 import EditableLocation from "./editable/EditableLocation";
 import EditableTravel from "./editable/EditableTravel";
@@ -60,6 +62,7 @@ export const view: Record<string, ComponentType<Record<string, unknown>>> = {
   countdown: Countdown,
   quote: EditorialQuote,
   "editorial-intro": EditorialIntro,
+  couple: Couple,
   story: LoveStory,
   events: EventCards,
   "wedding-party": WeddingParty,
@@ -81,6 +84,7 @@ export const editable: Record<string, ComponentType<Record<string, unknown>>> = 
   countdown: EditableCountdown,
   quote: EditableEditorialQuote,
   "editorial-intro": EditableEditorialIntro,
+  couple: EditableCouple,
   story: EditableLoveStory,
   events: EditableEventCards,
   "wedding-party": EditableWeddingParty,

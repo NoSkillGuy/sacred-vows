@@ -342,6 +342,88 @@
   line-height: 1.6;
 }
 
+/* Couple Section */
+.ee-couple-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--ee-space-lg);
+  max-width: var(--ee-max-width-card);
+  margin: var(--ee-space-lg) auto 0;
+}
+
+.ee-couple-member {
+  text-align: center;
+}
+
+.ee-couple-image-wrapper {
+  width: 100%;
+  height: 400px;
+  margin-bottom: var(--ee-space-sm);
+  overflow: hidden;
+}
+
+.ee-couple-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ee-couple-label {
+  margin: var(--ee-space-sm) 0 var(--ee-space-xs);
+}
+
+.ee-couple-name {
+  font-family: var(--font-heading, "Playfair Display", serif);
+  font-size: clamp(20px, 2.5vw, 28px);
+  margin: 0 0 var(--ee-space-sm);
+  font-weight: var(--ee-weight-regular);
+  letter-spacing: -0.02em;
+}
+
+.ee-couple-parents {
+  margin-top: var(--ee-space-sm);
+  display: block;
+  visibility: visible;
+}
+
+.ee-couple-parents-label {
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ee-color-secondary);
+  margin: 0 0 var(--ee-space-xs);
+  font-weight: var(--ee-weight-medium);
+}
+
+.ee-couple-parent-name {
+  font-family: var(--font-body, "Inter", sans-serif);
+  font-size: 14px;
+  color: var(--ee-color-text);
+  margin: 2px 0;
+  line-height: 1.6;
+  min-height: 1.2em;
+}
+
+/* Ensure placeholder is visible in couple section */
+.ee-couple-parent-name .editable-placeholder {
+  color: var(--ee-color-secondary);
+  font-style: italic;
+  opacity: 0.7;
+}
+
+/* Mobile Responsive - Couple Section */
+@media (max-width: 768px) {
+  .ee-couple-grid {
+    grid-template-columns: 1fr;
+    gap: var(--ee-space-md);
+  }
+
+  .ee-couple-image-wrapper {
+    height: 350px;
+  }
+}
+
 /* Gallery Layouts */
 .ee-gallery-container {
   max-width: 1440px;

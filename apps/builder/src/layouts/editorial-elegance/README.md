@@ -101,7 +101,24 @@ Rooted in tradition, bound by love,
 we invite you to celebrate the beginning of forever.
 ```
 
-### 3. Event Schedule
+### 3. The Couple (Optional)
+
+**Purpose**: Minimal editorial section for bride and groom
+
+**Design**:
+- Side-by-side layout with two photos
+- Clean, minimal presentation
+- No family details - keep it editorial
+- Serif heading font for names
+- Meta text labels ("THE BRIDE", "THE GROOM")
+
+**Features**:
+- Two-column grid layout
+- Consistent photo sizing (400px height)
+- Responsive: stacks to single column on mobile
+- Follows editorial-elegance color palette and typography
+
+### 4. Event Schedule
 
 **Purpose**: Horizontal card-based event schedule
 
@@ -123,9 +140,9 @@ City
 Time
 ```
 
-### 4. Wedding Party (Optional)
+### 5. Wedding Party (Optional)
 
-**Purpose**: Bride, groom, and optional party members
+**Purpose**: Optional party members (bridesmaids, groomsmen, etc.)
 
 **Features**:
 - 2-4 photos in grid
@@ -134,7 +151,9 @@ Time
 - Keep it editorial, not ceremonial
 - Optional 1-line bios (max 100 chars)
 
-### 5. Location
+**Note**: Bride and groom are shown in the separate "The Couple" section.
+
+### 6. Location
 
 **Purpose**: Venue details with embedded map
 

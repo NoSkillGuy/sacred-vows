@@ -3,22 +3,15 @@ import EditableImage from "../shared/EditableImage";
 
 /**
  * EditableWeddingParty - WYSIWYG editable Wedding Party
+ * Party members only (bridesmaids, groomsmen, etc.)
  */
 function EditableWeddingParty({ _translations, _currentLang, config = {}, onUpdate }) {
   const weddingParty = config.weddingParty || {};
-  const bride = weddingParty.bride || config.couple?.bride;
-  const groom = weddingParty.groom || config.couple?.groom;
   const members = weddingParty.members || [];
   const showBios = weddingParty.showBios || false;
   const filter = weddingParty.filter || "none";
 
-  if (!bride && !groom) return null;
-
-  const allMembers = [
-    bride && { ...bride, title: "THE BRIDE", path: "couple.bride" },
-    groom && { ...groom, title: "THE GROOM", path: "couple.groom" },
-    ...members.map((m, i) => ({ ...m, path: `weddingParty.members.${i}` })),
-  ].filter(Boolean);
+  if (members.length === 0) return null;
 
   return (
     <section className="ee-section ee-wedding-party-section">
@@ -28,7 +21,7 @@ function EditableWeddingParty({ _translations, _currentLang, config = {}, onUpda
       </div>
 
       <div className="ee-party-grid">
-        {allMembers.map((member, index) => (
+        {members.map((member, index) => (
           <div key={index} className="ee-party-member">
             <div className={`ee-party-image-wrapper ee-filter-${filter}`}>
               <EditableImage
@@ -36,14 +29,14 @@ function EditableWeddingParty({ _translations, _currentLang, config = {}, onUpda
                 alt={member.name}
                 className="ee-party-image"
                 onUpdate={onUpdate}
-                path={`${member.path}.image`}
+                path={`weddingParty.members.${index}.image`}
               />
             </div>
-            <p className="ee-meta-text ee-party-title">{member.title}</p>
+            {member.title && <p className="ee-meta-text ee-party-title">{member.title}</p>}
             <EditableText
               value={member.name}
               onUpdate={onUpdate}
-              path={`${member.path}.name`}
+              path={`weddingParty.members.${index}.name`}
               className="ee-party-name"
               tag="h3"
             />
@@ -51,7 +44,7 @@ function EditableWeddingParty({ _translations, _currentLang, config = {}, onUpda
               <EditableText
                 value={member.bio}
                 onUpdate={onUpdate}
-                path={`${member.path}.bio`}
+                path={`weddingParty.members.${index}.bio`}
                 className="ee-party-bio"
                 tag="p"
               />

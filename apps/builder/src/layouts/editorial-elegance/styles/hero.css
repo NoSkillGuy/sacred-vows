@@ -99,6 +99,16 @@
   letter-spacing: -0.02em;
 }
 
+.ee-hero-text {
+  cursor: default;
+  user-select: none;
+}
+
+.ee-hero-text .editable-text,
+.ee-hero-text .editable-date {
+  user-select: auto;
+}
+
 .ee-hero-date,
 .ee-hero-location {
   color: rgba(255, 255, 255, 0.95);

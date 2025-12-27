@@ -595,12 +595,13 @@ func migration001LoadLayouts(ctx context.Context, client *Client) error {
   "sections": [
     {"id": "hero", "name": "Editorial Cover", "icon": "📰", "description": "Full-height hero with image or video background", "required": true, "enabled": true, "order": 0, "config": {"alignment": "center", "mediaType": "image"}},
     {"id": "editorial-intro", "name": "Editorial Intro", "icon": "✍️", "description": "Magazine-style opening paragraph with portrait", "required": false, "enabled": true, "order": 1, "config": {"layout": "two-column"}},
-    {"id": "events", "name": "Event Schedule", "icon": "📅", "description": "Horizontal card-based event schedule", "required": false, "enabled": true, "order": 2, "config": {}},
-    {"id": "wedding-party", "name": "Wedding Party", "icon": "👥", "description": "Bride, groom, and optional party members (2-4 photos)", "required": false, "enabled": false, "order": 3, "config": {"showBios": false, "filter": "bw"}},
-    {"id": "location", "name": "Location", "icon": "📍", "description": "Venue details with embedded map", "required": false, "enabled": true, "order": 4, "config": {"mapStyle": "desaturated"}},
-    {"id": "gallery", "name": "Gallery", "icon": "🖼️", "description": "Editorial-style masonry or single-column gallery (8-12 images)", "required": false, "enabled": true, "order": 5, "config": {"layout": "masonry", "maxImages": 12}},
-    {"id": "rsvp", "name": "RSVP", "icon": "✉️", "description": "Ultra-minimal centered RSVP form", "required": false, "enabled": true, "order": 6, "config": {}},
-    {"id": "footer", "name": "Footer", "icon": "📄", "description": "Minimal footer with couple names", "required": true, "enabled": true, "order": 7, "config": {}}
+    {"id": "couple", "name": "The Couple", "icon": "💑", "description": "Bride and groom photos and names", "required": false, "enabled": false, "order": 2, "config": {}},
+    {"id": "events", "name": "Event Schedule", "icon": "📅", "description": "Horizontal card-based event schedule", "required": false, "enabled": true, "order": 3, "config": {}},
+    {"id": "wedding-party", "name": "Wedding Party", "icon": "👥", "description": "Optional party members (bridesmaids, groomsmen, etc.)", "required": false, "enabled": false, "order": 4, "config": {"showBios": false, "filter": "bw"}},
+    {"id": "location", "name": "Location", "icon": "📍", "description": "Venue details with embedded map", "required": false, "enabled": true, "order": 5, "config": {"mapStyle": "desaturated"}},
+    {"id": "gallery", "name": "Gallery", "icon": "🖼️", "description": "Editorial-style masonry or single-column gallery (8-12 images)", "required": false, "enabled": true, "order": 6, "config": {"layout": "masonry", "maxImages": 12}},
+    {"id": "rsvp", "name": "RSVP", "icon": "✉️", "description": "Ultra-minimal centered RSVP form", "required": false, "enabled": true, "order": 7, "config": {}},
+    {"id": "footer", "name": "Footer", "icon": "📄", "description": "Minimal footer with couple names", "required": true, "enabled": true, "order": 8, "config": {}}
   ],
   "themes": [
     {
@@ -697,8 +698,9 @@ func migration001LoadLayouts(ctx context.Context, client *Client) error {
   "sections": [
     {"id": "hero", "name": "Editorial Cover", "description": "Full-height hero with image or video background", "icon": "📰", "required": true, "defaultEnabled": true},
     {"id": "editorial-intro", "name": "Editorial Intro", "description": "Magazine-style opening paragraph with portrait", "icon": "✍️", "required": false, "defaultEnabled": true},
+    {"id": "couple", "name": "The Couple", "description": "Bride and groom photos and names", "icon": "💑", "required": false, "defaultEnabled": false},
     {"id": "events", "name": "Event Schedule", "description": "Horizontal card-based event schedule", "icon": "📅", "required": false, "defaultEnabled": true},
-    {"id": "wedding-party", "name": "Wedding Party", "description": "Bride, groom, and optional party members (2-4 photos)", "icon": "👥", "required": false, "defaultEnabled": false},
+    {"id": "wedding-party", "name": "Wedding Party", "description": "Optional party members (bridesmaids, groomsmen, etc.)", "icon": "👥", "required": false, "defaultEnabled": false},
     {"id": "location", "name": "Location", "description": "Venue details with embedded map", "icon": "📍", "required": false, "defaultEnabled": true},
     {"id": "gallery", "name": "Gallery", "description": "Editorial-style masonry or single-column gallery (8-12 images)", "icon": "🖼️", "required": false, "defaultEnabled": true},
     {"id": "rsvp", "name": "RSVP", "description": "Ultra-minimal centered RSVP form", "icon": "✉️", "required": false, "defaultEnabled": true},
@@ -707,6 +709,7 @@ func migration001LoadLayouts(ctx context.Context, client *Client) error {
   "defaultSectionOrder": [
     "hero",
     "editorial-intro",
+    "couple",
     "events",
     "wedding-party",
     "location",
