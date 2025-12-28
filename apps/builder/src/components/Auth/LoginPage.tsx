@@ -99,10 +99,10 @@ function LoginPage(): JSX.Element {
   }, [navigate]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
     setError("");
   };
 

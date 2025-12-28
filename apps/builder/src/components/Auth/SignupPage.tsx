@@ -68,10 +68,10 @@ function SignupPage(): JSX.Element {
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
 
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [name]: value,
-    });
+    }));
     setError("");
 
     if (name === "password") {
