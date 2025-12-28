@@ -7,6 +7,7 @@ import { useLayoutsQuery } from "../../hooks/queries/useLayouts";
 import { useCreateInvitationMutation } from "../../hooks/queries/useInvitations";
 import { presetToSectionConfigs } from "../../config/layout-presets";
 import type { LayoutPreset } from "@shared/types/layout";
+import type { UniversalWeddingData, LayoutConfig } from "@shared/types/wedding-data";
 import "./Dashboard.css";
 
 // SVG Icons
@@ -94,6 +95,7 @@ function LayoutGallery(): JSX.Element {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [presetModalOpen, setPresetModalOpen] = useState(false);
   const [selectedLayout, setSelectedLayout] = useState<LayoutWithStatus | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Query hooks
   const {
@@ -246,12 +248,12 @@ function LayoutGallery(): JSX.Element {
       setCreating(layoutToUse.id);
 
       // Initialize data with layout-specific defaults if available
-      let initialData: Record<string, unknown> = {};
+      let initialData: Partial<UniversalWeddingData> = {};
       if (layoutToUse.id === "editorial-elegance") {
         try {
           const { editorialEleganceDefaults } =
             await import("../../layouts/editorial-elegance/defaults");
-          initialData = editorialEleganceDefaults as Record<string, unknown>;
+          initialData = editorialEleganceDefaults as Partial<UniversalWeddingData>;
         } catch (error) {
           console.warn("Failed to load editorial-elegance defaults for new invitation:", error);
         }
@@ -259,9 +261,7 @@ function LayoutGallery(): JSX.Element {
 
       // Prepare layout config with preset sections
       // Always include sections - either from preset or default from manifest
-      let layoutConfig:
-        | { sections: Array<{ id: string; enabled: boolean; order: number }>; theme?: unknown }
-        | undefined;
+      let layoutConfig: LayoutConfig | undefined;
       if (
         layoutToUse.sections &&
         Array.isArray(layoutToUse.sections) &&
@@ -293,7 +293,7 @@ function LayoutGallery(): JSX.Element {
       }
 
       // Merge layoutConfig into data for backend (backend stores everything in data field)
-      const dataWithLayoutConfig = {
+      const dataWithLayoutConfig: Partial<UniversalWeddingData> = {
         ...initialData,
         ...(layoutConfig ? { layoutConfig } : {}),
       };
@@ -307,8 +307,8 @@ function LayoutGallery(): JSX.Element {
       const invitation = await createMutation.mutateAsync({
         layoutId: layoutToUse.id,
         title: "My Wedding Invitation",
-        data: dataWithLayoutConfig as never,
-        layoutConfig: layoutConfig as never,
+        data: dataWithLayoutConfig as UniversalWeddingData,
+        layoutConfig: layoutConfig,
       });
 
       if (!invitation || !invitation.id) {
@@ -320,7 +320,9 @@ function LayoutGallery(): JSX.Element {
       console.error("Failed to create invitation:", error);
       const errorMessage =
         error instanceof Error ? error.message : "Failed to create invitation. Please try again.";
-      alert(errorMessage);
+      setError(errorMessage);
+      // Auto-dismiss error after 5 seconds
+      setTimeout(() => setError(null), 5000);
     } finally {
       setCreating(null);
       setSelectedLayout(null);
@@ -426,8 +428,8 @@ function LayoutGallery(): JSX.Element {
           ))}
         </div>
 
-        {/* Error State */}
-        {error && (
+        {/* Query Error State */}
+        {error && queryError && (
           <div className="gallery-error">
             <div className="error-icon">⚠️</div>
             <h3>Unable to Load Layouts</h3>
@@ -438,8 +440,25 @@ function LayoutGallery(): JSX.Element {
           </div>
         )}
 
+        {/* Invitation Creation Error State */}
+        {error && !queryError && (
+          <div className="gallery-error" role="alert">
+            <div className="error-icon">⚠️</div>
+            <h3>Failed to Create Invitation</h3>
+            <p>{error}</p>
+            <button
+              className="btn btn-primary"
+              onClick={() => {
+                setError(null);
+              }}
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
+
         {/* Empty State */}
-        {!error && !loading && layouts.length === 0 && (
+        {!error && !queryError && !loading && layouts.length === 0 && (
           <div className="gallery-empty">
             <div className="empty-icon">
               <LayoutIcon />
@@ -450,7 +469,7 @@ function LayoutGallery(): JSX.Element {
         )}
 
         {/* Layout Grid */}
-        {!error && layouts.length > 0 && (
+        {!error && !queryError && layouts.length > 0 && (
           <div className="layout-grid">
             {layouts.map((layout) => {
               const isCreating = creating === layout.id;
@@ -481,11 +500,14 @@ function LayoutGallery(): JSX.Element {
             role="dialog"
             aria-modal="true"
             aria-labelledby="preset-modal-title"
+            aria-describedby="preset-modal-description"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="preset-modal-header">
               <h2 id="preset-modal-title">Choose Your Invitation Flow</h2>
-              <p>Select a preset to get started, or start from scratch</p>
+              <p id="preset-modal-description">
+                Select a preset to get started, or start from scratch
+              </p>
               <button
                 className="preset-modal-close"
                 onClick={() => setPresetModalOpen(false)}

@@ -16,6 +16,32 @@ import type { LayoutPreset } from "@shared/types/layout";
  * @param preset - The preset to convert (null for default/all enabled)
  * @param manifestSections - Available sections from layout manifest
  * @returns Array of SectionConfig with all sections, preset ones enabled and ordered
+ *
+ * @example
+ * ```typescript
+ * const manifestSections = [
+ *   { id: 'hero', required: true },
+ *   { id: 'countdown', required: false },
+ *   { id: 'quote', required: false },
+ * ];
+ * const preset = {
+ *   id: 'modern-editorial',
+ *   name: 'Modern Editorial',
+ *   sectionIds: ['hero', 'countdown', 'quote'],
+ * };
+ * const sections = presetToSectionConfigs(preset, manifestSections);
+ * // Returns all sections with preset ones enabled and ordered
+ * // sections[0] = { id: 'hero', enabled: true, order: 0, config: {} }
+ * // sections[1] = { id: 'countdown', enabled: true, order: 1, config: {} }
+ * // sections[2] = { id: 'quote', enabled: true, order: 2, config: {} }
+ * ```
+ *
+ * @example
+ * ```typescript
+ * // Start from scratch (null preset) - enables all sections
+ * const sections = presetToSectionConfigs(null, manifestSections);
+ * // All sections are enabled in manifest order
+ * ```
  */
 export function presetToSectionConfigs(
   preset: LayoutPreset | null,

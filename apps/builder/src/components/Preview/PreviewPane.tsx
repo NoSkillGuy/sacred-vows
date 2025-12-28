@@ -129,7 +129,10 @@ function PreviewPane({ editMode = true, deviceMode = "desktop" }) {
     let sections = getEnabledSections();
 
     // Only fallback to manifest if sections haven't been configured yet
-    // (i.e., layoutConfig.sections is empty or undefined, not when user has disabled all)
+    // This handles the case where:
+    // 1. New invitation created (no sections in layoutConfig yet)
+    // 2. Layout switched (sections reset)
+    // We DON'T fallback if user has explicitly disabled all sections (hasConfiguredSections = true)
     const hasConfiguredSections =
       currentInvitation.layoutConfig?.sections &&
       currentInvitation.layoutConfig.sections.length > 0;
