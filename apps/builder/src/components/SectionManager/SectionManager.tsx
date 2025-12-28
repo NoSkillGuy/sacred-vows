@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useBuilderStore } from "../../store/builderStore";
 import { SECTION_METADATA } from "@shared/types/wedding-data";
 import "./SectionManager.css";
@@ -104,17 +104,24 @@ const ChevronDownIcon = () => (
   </svg>
 );
 
-function SectionManager({ isOpen, onClose }) {
-  const { getAllSections, toggleSection, reorderSections, currentLayoutManifest } =
-    useBuilderStore();
+interface SectionManagerProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+function SectionManager({ isOpen, onClose }: SectionManagerProps) {
+  // Select the underlying state that getAllSections depends on
+  // Zustand's default reactivity will handle updates automatically
+  const currentLayoutManifest = useBuilderStore((state) => state.currentLayoutManifest);
+  const getAllSections = useBuilderStore((state) => state.getAllSections);
+  const toggleSection = useBuilderStore((state) => state.toggleSection);
+  const reorderSections = useBuilderStore((state) => state.reorderSections);
+
+  // Derive sections from store state - Zustand will re-render when store state changes
+  const sections = isOpen ? getAllSections() : [];
 
   const [draggedItem, setDraggedItem] = useState(null);
   const [dragOverItem, setDragOverItem] = useState(null);
-
-  // Derive sections from store - no need for state
-  const sections = useMemo(() => {
-    return getAllSections();
-  }, [getAllSections]);
 
   // Get section metadata (name, icon, description)
   const getSectionInfo = (sectionId) => {
@@ -175,8 +182,6 @@ function SectionManager({ isOpen, onClose }) {
     const [draggedSection] = newSections.splice(draggedItem, 1);
     newSections.splice(dropIndex, 0, draggedSection);
 
-    setSections(newSections);
-
     // Update store with new order
     const newOrder = newSections.map((s) => s.id);
     reorderSections(newOrder);
@@ -189,10 +194,7 @@ function SectionManager({ isOpen, onClose }) {
   const handleToggle = (sectionId) => {
     if (isRequired(sectionId)) return;
     toggleSection(sectionId);
-    // Update local state
-    setSections((prev) =>
-      prev.map((s) => (s.id === sectionId ? { ...s, enabled: !s.enabled } : s))
-    );
+    // State will update automatically via useMemo when getAllSections changes
   };
 
   // Move section up/down
@@ -202,8 +204,6 @@ function SectionManager({ isOpen, onClose }) {
 
     const newSections = [...sections];
     [newSections[index], newSections[newIndex]] = [newSections[newIndex], newSections[index]];
-
-    setSections(newSections);
 
     const newOrder = newSections.map((s) => s.id);
     reorderSections(newOrder);

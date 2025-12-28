@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -428,6 +428,165 @@ describe("LayoutGallery", () => {
 
       await waitFor(() => {
         expect(mockNavigate).toHaveBeenCalledWith("/builder/inv-123");
+      });
+    });
+
+    it("should apply Modern Editorial preset sections in correct order", async () => {
+      const user = userEvent.setup();
+      render(<LayoutGallery />, { wrapper: createWrapper() });
+
+      const selectButton = screen.getAllByText("Select Layout")[0];
+      await user.click(selectButton);
+
+      await waitFor(() => {
+        expect(screen.getByText("Modern Editorial")).toBeInTheDocument();
+      });
+
+      const presetButton = screen.getByText("Modern Editorial").closest("button");
+      if (presetButton) {
+        await user.click(presetButton);
+      }
+
+      await waitFor(() => {
+        expect(mockCreateInvitation).toHaveBeenCalled();
+      });
+
+      const callArgs = mockCreateInvitation.mock.calls[0][0];
+      const sections = callArgs.layoutConfig.sections;
+
+      // Expected section order for Modern Editorial preset
+      const expectedSectionIds = [
+        "hero",
+        "countdown",
+        "quote",
+        "editorial-intro",
+        "couple",
+        "events",
+        "location",
+        "gallery",
+        "rsvp",
+        "footer",
+      ];
+
+      // Verify preset sections are enabled and in correct order
+      const presetSections = sections.filter((s: { id: string; enabled: boolean }) =>
+        expectedSectionIds.includes(s.id)
+      );
+
+      expect(presetSections.length).toBeGreaterThan(0);
+
+      // Verify order matches preset order
+      presetSections.forEach((section: { id: string; order: number }) => {
+        const expectedIndex = expectedSectionIds.indexOf(section.id);
+        expect(section.order).toBe(expectedIndex);
+        expect(section.enabled).toBe(true);
+      });
+    });
+
+    it("should apply Love Story Feature preset sections correctly", async () => {
+      const user = userEvent.setup();
+      render(<LayoutGallery />, { wrapper: createWrapper() });
+
+      const selectButton = screen.getAllByText("Select Layout")[0];
+      await user.click(selectButton);
+
+      await waitFor(() => {
+        expect(screen.getByText("Love Story Feature")).toBeInTheDocument();
+      });
+
+      const presetButton = screen.getByText("Love Story Feature").closest("button");
+      if (presetButton) {
+        await user.click(presetButton);
+      }
+
+      await waitFor(() => {
+        expect(mockCreateInvitation).toHaveBeenCalled();
+      });
+
+      const callArgs = mockCreateInvitation.mock.calls[0][0];
+      const sections = callArgs.layoutConfig.sections;
+
+      // Expected section IDs for Love Story Feature preset
+      const expectedSectionIds = [
+        "hero",
+        "quote",
+        "editorial-intro",
+        "story",
+        "couple",
+        "wedding-party",
+        "events",
+        "location",
+        "travel",
+        "things-to-do",
+        "gallery",
+        "dress-code",
+        "rsvp",
+        "footer",
+      ];
+
+      // Verify preset sections exist and are enabled
+      const presetSections = sections.filter((s: { id: string; enabled: boolean }) =>
+        expectedSectionIds.includes(s.id)
+      );
+
+      expect(presetSections.length).toBeGreaterThan(0);
+
+      // Verify all preset sections are enabled
+      presetSections.forEach((section: { id: string; enabled: boolean }) => {
+        expect(section.enabled).toBe(true);
+      });
+    });
+
+    it("should apply Guest Experience preset sections correctly", async () => {
+      const user = userEvent.setup();
+      render(<LayoutGallery />, { wrapper: createWrapper() });
+
+      const selectButton = screen.getAllByText("Select Layout")[0];
+      await user.click(selectButton);
+
+      await waitFor(() => {
+        expect(screen.getByText("Guest Experience")).toBeInTheDocument();
+      });
+
+      const presetButton = screen.getByText("Guest Experience").closest("button");
+      if (presetButton) {
+        await user.click(presetButton);
+      }
+
+      await waitFor(() => {
+        expect(mockCreateInvitation).toHaveBeenCalled();
+      });
+
+      const callArgs = mockCreateInvitation.mock.calls[0][0];
+      const sections = callArgs.layoutConfig.sections;
+
+      // Expected section IDs for Guest Experience preset
+      const expectedSectionIds = [
+        "hero",
+        "countdown",
+        "editorial-intro",
+        "events",
+        "location",
+        "travel",
+        "dress-code",
+        "faq",
+        "registry",
+        "gallery",
+        "rsvp",
+        "contact",
+        "footer",
+      ];
+
+      // Verify preset sections exist and are enabled
+      const presetSections = sections.filter((s: { id: string; enabled: boolean }) =>
+        expectedSectionIds.includes(s.id)
+      );
+
+      expect(presetSections.length).toBeGreaterThan(0);
+
+      // Verify all preset sections are enabled
+      presetSections.forEach((section: { id: string; enabled: boolean }) => {
+        expect(section.enabled).toBe(true);
       });
     });
   });
