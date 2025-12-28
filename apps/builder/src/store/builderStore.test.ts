@@ -256,6 +256,67 @@ describe("builderStore", () => {
       expect(sections[2].id).toBe("couple");
     });
 
+    it("should allow customization after preset is applied", () => {
+      const store = useBuilderStore.getState();
+
+      // Simulate preset being applied - sections from Modern Editorial preset
+      const presetSections: SectionConfig[] = [
+        { id: "hero", enabled: true, order: 0, config: {} },
+        { id: "countdown", enabled: true, order: 1, config: {} },
+        { id: "quote", enabled: true, order: 2, config: {} },
+        { id: "editorial-intro", enabled: true, order: 3, config: {} },
+        { id: "couple", enabled: true, order: 4, config: {} },
+        { id: "events", enabled: true, order: 5, config: {} },
+        { id: "location", enabled: true, order: 6, config: {} },
+        { id: "gallery", enabled: true, order: 7, config: {} },
+        { id: "rsvp", enabled: true, order: 8, config: {} },
+        { id: "footer", enabled: true, order: 9, config: {} },
+      ];
+
+      // Set invitation with preset sections
+      store.setCurrentInvitation({
+        layoutId: "editorial-elegance",
+        layoutConfig: {
+          sections: presetSections,
+        },
+        data: {},
+      });
+
+      // Verify preset sections are set
+      let sections = store.getAllSections();
+      expect(sections.length).toBe(10);
+      expect(sections.find((s) => s.id === "countdown")?.enabled).toBe(true);
+
+      // User can disable a section
+      store.disableSection("countdown");
+      sections = store.getAllSections();
+      expect(sections.find((s) => s.id === "countdown")?.enabled).toBe(false);
+
+      // User can reorder sections
+      const newOrder = [
+        "hero",
+        "quote",
+        "editorial-intro",
+        "couple",
+        "events",
+        "location",
+        "gallery",
+        "rsvp",
+        "countdown",
+        "footer",
+      ];
+      store.reorderSections(newOrder);
+      sections = store.getAllSections();
+      expect(sections[0].id).toBe("hero");
+      expect(sections[1].id).toBe("quote");
+      expect(sections[8].id).toBe("countdown"); // countdown moved to end
+
+      // User can enable a disabled section
+      store.enableSection("countdown");
+      sections = store.getAllSections();
+      expect(sections.find((s) => s.id === "countdown")?.enabled).toBe(true);
+    });
+
     it("should validate sections against manifest", () => {
       const store = useBuilderStore.getState();
 

@@ -5,6 +5,9 @@ import type { LayoutManifest } from "@shared/types/layout";
 import LayoutCardUnified from "../Layouts/LayoutCardUnified";
 import { useLayoutsQuery } from "../../hooks/queries/useLayouts";
 import { useCreateInvitationMutation } from "../../hooks/queries/useInvitations";
+import { presetToSectionConfigs } from "../../config/layout-presets";
+import type { LayoutPreset } from "@shared/types/layout";
+import type { UniversalWeddingData, LayoutConfig } from "@shared/types/wedding-data";
 import "./Dashboard.css";
 
 // SVG Icons
@@ -90,6 +93,9 @@ function LayoutGallery(): JSX.Element {
   const [user, setUser] = useState<User | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [presetModalOpen, setPresetModalOpen] = useState(false);
+  const [selectedLayout, setSelectedLayout] = useState<LayoutWithStatus | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Query hooks
   const {
@@ -104,7 +110,7 @@ function LayoutGallery(): JSX.Element {
 
   const layouts = layoutsData?.layouts || [];
   const categories = layoutsData?.categories || ["all"];
-  const error = queryError
+  const queryErrorMessage = queryError
     ? (queryError as Error).message || "Failed to load layouts. Please try again."
     : null;
 
@@ -122,6 +128,74 @@ function LayoutGallery(): JSX.Element {
     return () => document.removeEventListener("mousedown", handleClickOutside as EventListener);
   }, []);
 
+  // Handle Escape key to close modal
+  useEffect(() => {
+    if (!presetModalOpen) return;
+
+    const handleEscape = (e: KeyboardEvent): void => {
+      if (e.key === "Escape") {
+        setPresetModalOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [presetModalOpen]);
+
+  // Focus trap for modal
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previousActiveElementRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!presetModalOpen) return;
+
+    // Store the previously focused element
+    previousActiveElementRef.current = document.activeElement as HTMLElement;
+
+    // Focus trap logic
+    const modal = modalRef.current;
+    if (!modal) return;
+
+    const focusableElements = modal.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+
+    if (focusableElements.length === 0) return;
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    // Focus the first element
+    firstElement.focus();
+
+    const handleTab = (e: KeyboardEvent): void => {
+      if (e.key !== "Tab") return;
+
+      if (e.shiftKey) {
+        // Shift + Tab
+        if (document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement.focus();
+        }
+      } else {
+        // Tab
+        if (document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement.focus();
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleTab);
+    return () => {
+      document.removeEventListener("keydown", handleTab);
+      // Restore focus to previously focused element
+      if (previousActiveElementRef.current) {
+        previousActiveElementRef.current.focus();
+      }
+    };
+  }, [presetModalOpen]);
+
   function loadUser(): void {
     const currentUser = getCurrentUser();
     setUser(currentUser);
@@ -130,32 +204,128 @@ function LayoutGallery(): JSX.Element {
   async function handleSelectLayout(layout: LayoutWithStatus): Promise<void> {
     if (!layout.isAvailable) return;
 
+    // If layout doesn't have presets from API, try loading from local manifest
+    let layoutWithPresets = layout;
+    if ((!layout.presets || layout.presets.length === 0) && layout.id === "editorial-elegance") {
+      try {
+        const { editorialEleganceManifest } =
+          await import("../../layouts/editorial-elegance/manifest");
+        if (editorialEleganceManifest.presets && editorialEleganceManifest.presets.length > 0) {
+          layoutWithPresets = {
+            ...layout,
+            presets: editorialEleganceManifest.presets,
+          };
+        }
+      } catch (error) {
+        console.warn("Failed to load local manifest for presets:", error);
+      }
+    }
+
+    // If no presets exist, directly create invitation without showing modal
+    if (!layoutWithPresets.presets || layoutWithPresets.presets.length === 0) {
+      await handlePresetSelection(null, layoutWithPresets);
+      return;
+    }
+
+    // Show preset selection modal only if presets exist
+    setSelectedLayout(layoutWithPresets);
+    setPresetModalOpen(true);
+  }
+
+  async function handlePresetSelection(
+    preset: LayoutPreset | null,
+    layoutOverride?: LayoutWithStatus
+  ): Promise<void> {
+    const layoutToUse = layoutOverride || selectedLayout;
+    if (!layoutToUse) {
+      console.error("No layout available for preset selection");
+      return;
+    }
+
+    setPresetModalOpen(false);
+
     try {
-      setCreating(layout.id);
+      setCreating(layoutToUse.id);
 
       // Initialize data with layout-specific defaults if available
-      let initialData: Record<string, unknown> = {};
-      if (layout.id === "editorial-elegance") {
+      let initialData: Partial<UniversalWeddingData> = {};
+      if (layoutToUse.id === "editorial-elegance") {
         try {
           const { editorialEleganceDefaults } =
             await import("../../layouts/editorial-elegance/defaults");
-          initialData = editorialEleganceDefaults as Record<string, unknown>;
+          initialData = editorialEleganceDefaults as Partial<UniversalWeddingData>;
         } catch (error) {
           console.warn("Failed to load editorial-elegance defaults for new invitation:", error);
         }
       }
 
-      const invitation = await createMutation.mutateAsync({
-        layoutId: layout.id,
-        title: "My Wedding Invitation",
-        data: initialData as never,
+      // Prepare layout config with preset sections
+      // Always include sections - either from preset or default from manifest
+      let layoutConfig: LayoutConfig | undefined;
+      if (
+        layoutToUse.sections &&
+        Array.isArray(layoutToUse.sections) &&
+        layoutToUse.sections.length > 0
+      ) {
+        try {
+          const presetSections = presetToSectionConfigs(preset, layoutToUse.sections);
+          layoutConfig = {
+            sections: presetSections,
+          };
+        } catch (error) {
+          console.error("Failed to convert preset to section configs:", error);
+          // Fallback: create sections from manifest
+          layoutConfig = {
+            sections: layoutToUse.sections.map((section, index) => ({
+              id: section.id,
+              enabled: true,
+              order: section.order !== undefined ? section.order : index,
+              config: {},
+            })),
+          };
+        }
+      } else {
+        // No sections in manifest, create empty config
+        console.warn(`Layout ${layoutToUse.id} has no sections defined`);
+        layoutConfig = {
+          sections: [],
+        };
+      }
+
+      // Merge layoutConfig into data for backend (backend stores everything in data field)
+      const dataWithLayoutConfig: Partial<UniversalWeddingData> = {
+        ...initialData,
+        ...(layoutConfig ? { layoutConfig } : {}),
+      };
+
+      console.log("Creating invitation with:", {
+        layoutId: layoutToUse.id,
+        sectionsCount: layoutConfig?.sections?.length || 0,
+        hasInitialData: Object.keys(initialData).length > 0,
       });
+
+      const invitation = await createMutation.mutateAsync({
+        layoutId: layoutToUse.id,
+        title: "My Wedding Invitation",
+        data: dataWithLayoutConfig as UniversalWeddingData,
+        layoutConfig: layoutConfig,
+      });
+
+      if (!invitation || !invitation.id) {
+        throw new Error("Invitation created but missing ID");
+      }
+
       navigate(`/builder/${invitation.id}`);
     } catch (error) {
       console.error("Failed to create invitation:", error);
-      alert("Failed to create invitation. Please try again.");
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to create invitation. Please try again.";
+      setError(errorMessage);
+      // Auto-dismiss error after 5 seconds
+      setTimeout(() => setError(null), 5000);
     } finally {
       setCreating(null);
+      setSelectedLayout(null);
     }
   }
 
@@ -258,20 +428,37 @@ function LayoutGallery(): JSX.Element {
           ))}
         </div>
 
-        {/* Error State */}
-        {error && (
+        {/* Query Error State */}
+        {queryErrorMessage && queryError && (
           <div className="gallery-error">
             <div className="error-icon">⚠️</div>
             <h3>Unable to Load Layouts</h3>
-            <p>{error}</p>
+            <p>{queryErrorMessage}</p>
             <button className="btn btn-primary" onClick={() => refetch()}>
               Try Again
             </button>
           </div>
         )}
 
+        {/* Invitation Creation Error State */}
+        {error && !queryError && (
+          <div className="gallery-error" role="alert">
+            <div className="error-icon">⚠️</div>
+            <h3>Failed to Create Invitation</h3>
+            <p>{error}</p>
+            <button
+              className="btn btn-primary"
+              onClick={() => {
+                setError(null);
+              }}
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
+
         {/* Empty State */}
-        {!error && !loading && layouts.length === 0 && (
+        {!error && !queryError && !loading && layouts.length === 0 && (
           <div className="gallery-empty">
             <div className="empty-icon">
               <LayoutIcon />
@@ -282,7 +469,7 @@ function LayoutGallery(): JSX.Element {
         )}
 
         {/* Layout Grid */}
-        {!error && layouts.length > 0 && (
+        {!error && !queryError && layouts.length > 0 && (
           <div className="layout-grid">
             {layouts.map((layout) => {
               const isCreating = creating === layout.id;
@@ -303,6 +490,69 @@ function LayoutGallery(): JSX.Element {
           </div>
         )}
       </div>
+
+      {/* Preset Selection Modal */}
+      {presetModalOpen && selectedLayout && (
+        <div className="preset-modal-overlay" onClick={() => setPresetModalOpen(false)}>
+          <div
+            className="preset-modal"
+            ref={modalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="preset-modal-title"
+            aria-describedby="preset-modal-description"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="preset-modal-header">
+              <h2 id="preset-modal-title">Choose Your Invitation Flow</h2>
+              <p id="preset-modal-description">
+                Select a preset to get started, or start from scratch
+              </p>
+              <button
+                className="preset-modal-close"
+                onClick={() => setPresetModalOpen(false)}
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="preset-grid">
+              {selectedLayout.presets && selectedLayout.presets.length > 0 ? (
+                selectedLayout.presets.map((preset) => (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    className="preset-card"
+                    onClick={() => handlePresetSelection(preset)}
+                  >
+                    <div className="preset-emoji">{preset.emoji}</div>
+                    <h3>{preset.name}</h3>
+                    <p className="preset-description">{preset.description}</p>
+                    <p className="preset-use-case">{preset.useCase}</p>
+                    <div className="preset-best-for">
+                      <strong>Best for:</strong> {preset.bestFor}
+                    </div>
+                    <div className="preset-sections">
+                      <strong>{preset.sectionIds.length} sections</strong>
+                    </div>
+                  </button>
+                ))
+              ) : (
+                <div className="preset-empty">
+                  <p>No presets available for this layout.</p>
+                </div>
+              )}
+            </div>
+
+            <div className="preset-modal-actions">
+              <button className="btn btn-secondary" onClick={() => handlePresetSelection(null)}>
+                Start from Scratch
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

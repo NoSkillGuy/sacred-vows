@@ -2,9 +2,11 @@ package firestore
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
+	"cloud.google.com/go/firestore"
 	"github.com/sacred-vows/api-go/pkg/logger"
 	"go.uber.org/zap"
 )
@@ -244,8 +246,9 @@ func validateMigrationSequence(applied map[int]bool, migrations []Migration) err
 // Firestore doesn't require schema migrations (collections are created automatically)
 func getAllMigrations() []Migration {
 	return []Migration{
-		{Version: 1, Name: "load_layouts", Up: migration001LoadLayouts},                               // Seeds classic-scroll and editorial-elegance layouts
-		{Version: 2, Name: "create_password_reset_tokens", Up: migration002CreatePasswordResetTokens}, // Creates password_reset_tokens collection structure
+		{Version: 1, Name: "load_layouts", Up: migration001LoadLayouts},                                   // Seeds classic-scroll and editorial-elegance layouts
+		{Version: 2, Name: "create_password_reset_tokens", Up: migration002CreatePasswordResetTokens},     // Creates password_reset_tokens collection structure
+		{Version: 3, Name: "add_editorial_elegance_presets", Up: migration003AddEditorialElegancePresets}, // Adds presets to existing editorial-elegance layouts
 	}
 }
 
@@ -769,12 +772,48 @@ func migration001LoadLayouts(ctx context.Context, client *Client) error {
         "script": "Playfair Display"
       }
     }
+  ],
+  "presets": [
+    {
+      "id": "modern-editorial",
+      "name": "Modern Editorial",
+      "emoji": "🖤",
+      "description": "Minimal & Luxe",
+      "useCase": "For couples who want elegance, restraint, and strong visual impact.",
+      "bestFor": "City weddings, intimate guest lists, design-forward couples",
+      "sectionIds": ["hero", "countdown", "quote", "editorial-intro", "couple", "events", "location", "gallery", "rsvp", "footer"]
+    },
+    {
+      "id": "love-story-feature",
+      "name": "Love Story Feature",
+      "emoji": "🤍",
+      "description": "Romantic & Narrative",
+      "useCase": "Feels like a full magazine wedding spread. Perfect for couples who love storytelling.",
+      "bestFor": "Couples who love storytelling, emotional depth, destination weddings",
+      "sectionIds": ["hero", "quote", "editorial-intro", "story", "couple", "wedding-party", "events", "location", "travel", "things-to-do", "gallery", "dress-code", "rsvp", "footer"]
+    },
+    {
+      "id": "guest-experience",
+      "name": "Guest Experience",
+      "emoji": "✨",
+      "description": "Clean & Thoughtful",
+      "useCase": "Designed around guest clarity without killing elegance.",
+      "bestFor": "Larger weddings, mixed-age guests, practical planners",
+      "sectionIds": ["hero", "countdown", "editorial-intro", "events", "location", "travel", "dress-code", "faq", "registry", "gallery", "rsvp", "contact", "footer"]
+    }
   ]
 }`, editorialEleganceID)
 
 	editorialEleganceDoc, err := client.Collection("layouts").Doc(editorialEleganceID).Get(ctx)
 	if err == nil && editorialEleganceDoc.Exists() {
-		// Layout already exists, skip (idempotent)
+		// Layout already exists, update manifest to include presets
+		_, err = client.Collection("layouts").Doc(editorialEleganceID).Update(ctx, []firestore.Update{
+			{Path: "manifest", Value: editorialEleganceManifestJSON},
+			{Path: "updated_at", Value: now},
+		})
+		if err != nil {
+			return fmt.Errorf("failed to update editorial-elegance layout manifest: %w", err)
+		}
 		return nil
 	}
 
@@ -831,6 +870,92 @@ func migration002CreatePasswordResetTokens(ctx context.Context, client *Client) 
 	_, err = client.Collection("password_reset_tokens").Doc(placeholderID).Delete(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to delete schema placeholder: %w", err)
+	}
+
+	return nil
+}
+
+// Migration 003: Add Presets to Editorial Elegance Layout
+// Updates existing editorial-elegance layouts to include presets in their manifest
+func migration003AddEditorialElegancePresets(ctx context.Context, client *Client) error {
+	const editorialEleganceID = "editorial-elegance"
+
+	// Get existing layout
+	doc, err := client.Collection("layouts").Doc(editorialEleganceID).Get(ctx)
+	if err != nil {
+		// Layout doesn't exist, nothing to update
+		return nil
+	}
+
+	if !doc.Exists() {
+		// Layout doesn't exist, nothing to update
+		return nil
+	}
+
+	// Get current manifest
+	data := doc.Data()
+	manifestStr, ok := data["manifest"].(string)
+	if !ok || manifestStr == "" {
+		// No manifest to update
+		return nil
+	}
+
+	// Parse existing manifest to check if presets already exist
+	var manifest map[string]interface{}
+	if err := json.Unmarshal([]byte(manifestStr), &manifest); err != nil {
+		return fmt.Errorf("failed to parse existing manifest: %w", err)
+	}
+
+	// Check if presets already exist
+	if presets, ok := manifest["presets"].([]interface{}); ok && len(presets) > 0 {
+		// Presets already exist, skip update
+		return nil
+	}
+
+	// Add presets to manifest
+	manifest["presets"] = []map[string]interface{}{
+		{
+			"id":          "modern-editorial",
+			"name":        "Modern Editorial",
+			"emoji":       "🖤",
+			"description": "Minimal & Luxe",
+			"useCase":     "For couples who want elegance, restraint, and strong visual impact.",
+			"bestFor":     "City weddings, intimate guest lists, design-forward couples",
+			"sectionIds":  []string{"hero", "countdown", "quote", "editorial-intro", "couple", "events", "location", "gallery", "rsvp", "footer"},
+		},
+		{
+			"id":          "love-story-feature",
+			"name":        "Love Story Feature",
+			"emoji":       "🤍",
+			"description": "Romantic & Narrative",
+			"useCase":     "Feels like a full magazine wedding spread. Perfect for couples who love storytelling.",
+			"bestFor":     "Couples who love storytelling, emotional depth, destination weddings",
+			"sectionIds":  []string{"hero", "quote", "editorial-intro", "story", "couple", "wedding-party", "events", "location", "travel", "things-to-do", "gallery", "dress-code", "rsvp", "footer"},
+		},
+		{
+			"id":          "guest-experience",
+			"name":        "Guest Experience",
+			"emoji":       "✨",
+			"description": "Clean & Thoughtful",
+			"useCase":     "Designed around guest clarity without killing elegance.",
+			"bestFor":     "Larger weddings, mixed-age guests, practical planners",
+			"sectionIds":  []string{"hero", "countdown", "editorial-intro", "events", "location", "travel", "dress-code", "faq", "registry", "gallery", "rsvp", "contact", "footer"},
+		},
+	}
+
+	// Marshal updated manifest
+	updatedManifestJSON, err := json.Marshal(manifest)
+	if err != nil {
+		return fmt.Errorf("failed to marshal updated manifest: %w", err)
+	}
+
+	// Update the layout document
+	_, err = client.Collection("layouts").Doc(editorialEleganceID).Update(ctx, []firestore.Update{
+		{Path: "manifest", Value: string(updatedManifestJSON)},
+		{Path: "updated_at", Value: time.Now()},
+	})
+	if err != nil {
+		return fmt.Errorf("failed to update editorial-elegance layout manifest: %w", err)
 	}
 
 	return nil

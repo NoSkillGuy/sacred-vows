@@ -5,6 +5,7 @@ import GalleryModal from "../Toolbar/GalleryModal";
 import LayoutSwitcher from "../Toolbar/LayoutSwitcher";
 import PublishModal from "../Export/ExportModal";
 import SectionManager from "../SectionManager/SectionManager";
+import PresetModal from "../Toolbar/PresetModal";
 import { useBuilderStore } from "../../store/builderStore";
 import SidebarSection from "./SidebarSection";
 import "./BuilderSidebar.css";
@@ -104,6 +105,19 @@ const SectionsIcon = (): ReactElement => (
     <rect x="3" y="3" width="18" height="5" rx="1" stroke="currentColor" strokeWidth="1.5" />
     <rect x="3" y="10" width="18" height="4" rx="1" stroke="currentColor" strokeWidth="1.5" />
     <rect x="3" y="16" width="18" height="5" rx="1" stroke="currentColor" strokeWidth="1.5" />
+  </svg>
+);
+
+const PresetIcon = (): ReactElement => (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="3" y="3" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.5" />
+    <rect x="13" y="3" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.5" />
+    <rect x="3" y="13" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.5" />
+    <rect x="13" y="13" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.5" />
+    <circle cx="7" cy="7" r="1.5" fill="currentColor" />
+    <circle cx="17" cy="7" r="1.5" fill="currentColor" />
+    <circle cx="7" cy="17" r="1.5" fill="currentColor" />
+    <circle cx="17" cy="17" r="1.5" fill="currentColor" />
   </svg>
 );
 
@@ -258,6 +272,7 @@ export default function BuilderSidebar({
   const [showPublishModal, setShowPublishModal] = useState<boolean>(false);
   const [showSectionManager, setShowSectionManager] = useState<boolean>(false);
   const [showLayoutSwitcher, setShowLayoutSwitcher] = useState<boolean>(false);
+  const [showPresetModal, setShowPresetModal] = useState<boolean>(false);
 
   const [collapsed, setCollapsed] = useState<boolean>(() => {
     try {
@@ -497,6 +512,16 @@ export default function BuilderSidebar({
                   <button
                     type="button"
                     className="sidebar-btn"
+                    onClick={() => setShowPresetModal(true)}
+                  >
+                    <span className="btn-icon" aria-hidden="true">
+                      <PresetIcon />
+                    </span>
+                    <span className="btn-label">Presets</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="sidebar-btn"
                     onClick={() => setShowSectionManager(true)}
                   >
                     <span className="btn-icon" aria-hidden="true">
@@ -594,6 +619,15 @@ export default function BuilderSidebar({
                 aria-label="Layout"
               >
                 <LayoutIcon />
+              </button>
+              <button
+                type="button"
+                className="rail-btn"
+                onClick={() => setShowPresetModal(true)}
+                title="Presets"
+                aria-label="Presets"
+              >
+                <PresetIcon />
               </button>
               <button
                 type="button"
@@ -730,6 +764,19 @@ export default function BuilderSidebar({
                         type="button"
                         className="sidebar-btn"
                         onClick={() => {
+                          setShowPresetModal(true);
+                          setDrawerOpen(false);
+                        }}
+                      >
+                        <span className="btn-icon" aria-hidden="true">
+                          <PresetIcon />
+                        </span>
+                        <span className="btn-label">Presets</span>
+                      </button>
+                      <button
+                        type="button"
+                        className="sidebar-btn"
+                        onClick={() => {
                           setShowSectionManager(true);
                           setDrawerOpen(false);
                         }}
@@ -793,6 +840,7 @@ export default function BuilderSidebar({
       )}
 
       <LayoutSwitcher isOpen={showLayoutSwitcher} onClose={() => setShowLayoutSwitcher(false)} />
+      <PresetModal isOpen={showPresetModal} onClose={() => setShowPresetModal(false)} />
       <SectionManager isOpen={showSectionManager} onClose={() => setShowSectionManager(false)} />
       <ThemeModal isOpen={showThemeModal} onClose={() => setShowThemeModal(false)} />
       <GalleryModal isOpen={showGalleryModal} onClose={() => setShowGalleryModal(false)} />
