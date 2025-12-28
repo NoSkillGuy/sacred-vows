@@ -110,7 +110,7 @@ function LayoutGallery(): JSX.Element {
 
   const layouts = layoutsData?.layouts || [];
   const categories = layoutsData?.categories || ["all"];
-  const error = queryError
+  const queryErrorMessage = queryError
     ? (queryError as Error).message || "Failed to load layouts. Please try again."
     : null;
 
@@ -429,11 +429,11 @@ function LayoutGallery(): JSX.Element {
         </div>
 
         {/* Query Error State */}
-        {error && queryError && (
+        {queryErrorMessage && queryError && (
           <div className="gallery-error">
             <div className="error-icon">⚠️</div>
             <h3>Unable to Load Layouts</h3>
-            <p>{error}</p>
+            <p>{queryErrorMessage}</p>
             <button className="btn btn-primary" onClick={() => refetch()}>
               Try Again
             </button>

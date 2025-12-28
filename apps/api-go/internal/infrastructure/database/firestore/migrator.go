@@ -246,8 +246,8 @@ func validateMigrationSequence(applied map[int]bool, migrations []Migration) err
 // Firestore doesn't require schema migrations (collections are created automatically)
 func getAllMigrations() []Migration {
 	return []Migration{
-		{Version: 1, Name: "load_layouts", Up: migration001LoadLayouts},                               // Seeds classic-scroll and editorial-elegance layouts
-		{Version: 2, Name: "create_password_reset_tokens", Up: migration002CreatePasswordResetTokens}, // Creates password_reset_tokens collection structure
+		{Version: 1, Name: "load_layouts", Up: migration001LoadLayouts},                                   // Seeds classic-scroll and editorial-elegance layouts
+		{Version: 2, Name: "create_password_reset_tokens", Up: migration002CreatePasswordResetTokens},     // Creates password_reset_tokens collection structure
 		{Version: 3, Name: "add_editorial_elegance_presets", Up: migration003AddEditorialElegancePresets}, // Adds presets to existing editorial-elegance layouts
 	}
 }
