@@ -20,7 +20,9 @@ When the user invokes `/fix-pr`, fetch the GitHub PR, read all PR comments, chec
 
 Most GitHub operations should use these MCP functions:
 
+- **List PRs**: `mcp_github_list_pull_requests` (to find PR by branch name)
 - **Get PR details**: `mcp_github_pull_request_read` with method `get`
+- **Get PR diff**: `mcp_github_pull_request_read` with method `get_diff`
 - **Get PR comments**: `mcp_github_pull_request_read` with method `get_comments`
 - **Get review comments**: `mcp_github_pull_request_read` with method `get_review_comments`
 - **Get reviews**: `mcp_github_pull_request_read` with method `get_reviews`
@@ -607,7 +609,7 @@ This helps ensure all feedback is properly addressed and acknowledged.
 
 1. **Parse PR number**:
    - If user provided PR number: use it directly
-   - Otherwise: try to detect from current git branch
+   - Otherwise: try to detect from current branch using `mcp_github_list_pull_requests` filtered by head branch
    - If still not found: ask user for PR number
    - Repository: Detect from git remote using: `git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/'`
 

@@ -305,6 +305,7 @@ function PreviewPane({ editMode = true, deviceMode = "desktop" }) {
         <div
           className={`preview-device-frame device-${deviceMode}`}
           data-edit-mode={editMode}
+          data-testid="preview-device-frame"
           style={{
             maxWidth: deviceWidths[deviceMode],
             margin: deviceMode !== "desktop" ? "20px auto" : "0 auto",
