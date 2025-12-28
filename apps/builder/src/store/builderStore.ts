@@ -32,6 +32,10 @@ import "../layouts/editorial-elegance";
  */
 const STORAGE_KEY = "wedding-builder-autosave";
 
+// Constants for preset detection and ordering
+// Preset sections typically have order 0-N, so we use this threshold to detect preset sections
+const MAX_PRESET_ORDER_THRESHOLD = 100;
+
 // Load from localStorage on initialization
 function loadFromStorage(): InvitationData {
   try {
@@ -478,11 +482,17 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
       const maxPresetOrder =
         enabledSections.length > 0 ? Math.max(...enabledSections.map((s) => s.order ?? 0)) : -1;
       const looksLikePreset =
-        hasExistingSections && enabledSections.length > 0 && maxPresetOrder < 100;
+        hasExistingSections &&
+        enabledSections.length > 0 &&
+        maxPresetOrder < MAX_PRESET_ORDER_THRESHOLD;
 
       // If sections exist (preset applied), preserve their order. Otherwise use manifest order.
       // For preset sections, we want to preserve the preset order, not manifest order.
       const shouldPreserveOrder = hasExistingSections && looksLikePreset;
+
+      // Calculate max order from existing sections to place new sections after preset sections
+      const maxExistingOrder =
+        currentSections.length > 0 ? Math.max(...currentSections.map((s) => s.order ?? 0)) : -1;
 
       const validatedSections = manifest.sections.map((manifestSection, index) => {
         const existingSection = currentSectionsMap.get(manifestSection.id);
@@ -508,8 +518,8 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
           return {
             id: manifestSection.id,
             enabled,
-            // For new sections added after preset, use a high order so they appear after preset sections
-            order: shouldPreserveOrder ? 1000 + index : index,
+            // For new sections added after preset, place them after existing sections
+            order: shouldPreserveOrder ? maxExistingOrder + 1 + index : index,
             config: {},
           };
         }

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useBuilderStore } from "../../store/builderStore";
 import { presetToSectionConfigs } from "../../config/layout-presets";
+import { useToast } from "../Toast/ToastProvider";
 import type { LayoutPreset } from "@shared/types/layout";
 import "./PresetModal.css";
 
@@ -11,6 +12,7 @@ interface PresetModalProps {
 
 function PresetModal({ isOpen, onClose }: PresetModalProps) {
   const { currentLayoutManifest, currentInvitation, setCurrentInvitation } = useBuilderStore();
+  const { addToast } = useToast();
   const modalRef = useRef<HTMLDivElement>(null);
   const [flippedPresetId, setFlippedPresetId] = useState<string | null>(null);
 
@@ -32,7 +34,12 @@ function PresetModal({ isOpen, onClose }: PresetModalProps) {
   // Handle preset selection
   const handlePresetSelection = async (preset: LayoutPreset | null) => {
     if (!currentLayoutManifest?.sections) {
-      console.warn("No sections available in layout manifest");
+      addToast({
+        tone: "error",
+        title: "Preset Application Failed",
+        description: "No sections available in layout manifest. Please try again.",
+        icon: "bell",
+      });
       return;
     }
 
@@ -53,19 +60,18 @@ function PresetModal({ isOpen, onClose }: PresetModalProps) {
       onClose();
     } catch (error) {
       console.error("Failed to apply preset:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to apply preset. Please try again.";
+      addToast({
+        tone: "error",
+        title: "Preset Application Failed",
+        description: errorMessage,
+        icon: "bell",
+      });
     }
   };
 
-  // Reset flipped state when modal closes
-  useEffect(() => {
-    if (!isOpen) {
-      // Use setTimeout to avoid synchronous setState in effect
-      const timeoutId = setTimeout(() => {
-        setFlippedPresetId(null);
-      }, 0);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [isOpen]);
+  // Reset flipped state when modal closes - handle in close handler instead of effect
 
   // Handle Escape key
   useEffect(() => {
@@ -124,7 +130,13 @@ function PresetModal({ isOpen, onClose }: PresetModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="preset-modal-overlay" onClick={onClose}>
+    <div
+      className="preset-modal-overlay"
+      onClick={() => {
+        setFlippedPresetId(null);
+        onClose();
+      }}
+    >
       <div
         className="preset-modal"
         ref={modalRef}
@@ -140,7 +152,15 @@ function PresetModal({ isOpen, onClose }: PresetModalProps) {
             Apply a preset to quickly configure your invitation sections. You can customize them
             later.
           </p>
-          <button className="preset-modal-close" onClick={onClose} aria-label="Close" type="button">
+          <button
+            className="preset-modal-close"
+            onClick={() => {
+              setFlippedPresetId(null);
+              onClose();
+            }}
+            aria-label="Close"
+            type="button"
+          >
             ×
           </button>
         </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useBuilderStore } from "../../store/builderStore";
 import { SECTION_METADATA } from "@shared/types/wedding-data";
 import "./SectionManager.css";
@@ -105,61 +105,18 @@ const ChevronDownIcon = () => (
 );
 
 function SectionManager({ isOpen, onClose }) {
-  // Subscribe to the entire currentInvitation to ensure we detect all changes
-  // Use a selector that returns a serialized version to force re-renders
-  const invitationId = useBuilderStore((state) => state.currentInvitation?.id);
-  const sectionsKey = useBuilderStore((state) => {
-    const sections = state.currentInvitation?.layoutConfig?.sections || [];
-    // Return a string that changes when sections change
-    return JSON.stringify(sections.map((s) => ({ id: s.id, enabled: s.enabled, order: s.order })));
-  });
+  // Select the underlying state that getAllSections depends on
+  // Zustand's default reactivity will handle updates automatically
   const currentLayoutManifest = useBuilderStore((state) => state.currentLayoutManifest);
   const getAllSections = useBuilderStore((state) => state.getAllSections);
   const toggleSection = useBuilderStore((state) => state.toggleSection);
   const reorderSections = useBuilderStore((state) => state.reorderSections);
 
+  // Derive sections from store state - Zustand will re-render when store state changes
+  const sections = isOpen ? getAllSections() : [];
+
   const [draggedItem, setDraggedItem] = useState(null);
   const [dragOverItem, setDragOverItem] = useState(null);
-  const [sections, setSections] = useState([]);
-
-  // Update sections when store changes or modal opens - always refresh when modal opens
-  useEffect(() => {
-    if (!isOpen) return; // Don't update if modal is closed
-
-    // Use setTimeout to avoid synchronous setState in effect
-    const timeoutId = setTimeout(() => {
-      const allSections = getAllSections();
-      setSections(allSections);
-    }, 0);
-    return () => clearTimeout(timeoutId);
-  }, [getAllSections, sectionsKey, invitationId, currentLayoutManifest, isOpen]);
-
-  // Also subscribe to store changes using Zustand's subscribe API as a fallback
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const unsubscribe = useBuilderStore.subscribe(
-      (state) => state.currentInvitation?.layoutConfig?.sections,
-      (_sections) => {
-        const allSections = getAllSections();
-        setSections(allSections);
-      },
-      {
-        equalityFn: (a, b) => {
-          // Custom equality - compare JSON strings to detect any changes
-          const aStr = JSON.stringify(
-            a?.map((s) => ({ id: s.id, enabled: s.enabled, order: s.order })) || []
-          );
-          const bStr = JSON.stringify(
-            b?.map((s) => ({ id: s.id, enabled: s.enabled, order: s.order })) || []
-          );
-          return aStr === bStr;
-        },
-      }
-    );
-
-    return unsubscribe;
-  }, [isOpen, getAllSections]);
 
   // Get section metadata (name, icon, description)
   const getSectionInfo = (sectionId) => {
