@@ -1,9 +1,31 @@
 import EditableText from "../shared/EditableText";
 
+interface EditableThingsToDoProps {
+  _translations?: unknown;
+  _currentLang?: string;
+  config?: {
+    thingsToDo?: {
+      intro?: string;
+      activities?: Array<{
+        name?: string;
+        category?: string;
+        description?: string;
+        address?: string;
+      }>;
+    };
+  };
+  onUpdate?: (path: string, value: unknown) => void;
+}
+
 /**
  * EditableThingsToDo - List editor for activities, restaurants, landmarks
  */
-function EditableThingsToDo({ _translations, _currentLang, config = {}, onUpdate }) {
+function EditableThingsToDo({
+  _translations,
+  _currentLang,
+  config = {},
+  onUpdate,
+}: EditableThingsToDoProps) {
   const thingsToDo = config.thingsToDo || {};
   const intro = thingsToDo.intro || "While you're in the city...";
   const activities = thingsToDo.activities || [];
@@ -15,7 +37,7 @@ function EditableThingsToDo({ _translations, _currentLang, config = {}, onUpdate
     }
   };
 
-  const handleUpdateActivity = (index, field, value) => {
+  const handleUpdateActivity = (index: number, field: string, value: string) => {
     const updated = [...activities];
     updated[index] = { ...updated[index], [field]: value };
     if (onUpdate) {
@@ -70,7 +92,7 @@ function EditableThingsToDo({ _translations, _currentLang, config = {}, onUpdate
               />
             </div>
           ))}
-          <button onClick={handleAddActivity} className="ee-add-button">
+          <button onClick={handleAddActivity} className="ee-add-button" type="button">
             + Add Activity
           </button>
         </div>

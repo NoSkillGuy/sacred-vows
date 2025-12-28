@@ -1,8 +1,32 @@
+interface DressCodeProps {
+  _translations?: unknown;
+  _currentLang?: string;
+  config?: {
+    dressCode?: {
+      colors?: Array<
+        | {
+            value?: string;
+            label?: string;
+          }
+        | string
+      >;
+      styleText?: string;
+      inspirationImages?: Array<
+        | {
+            src?: string;
+            alt?: string;
+          }
+        | string
+      >;
+    };
+  };
+}
+
 /**
  * DressCode - Color palette swatches, style guide with inspiration grid
  * Fashion editorial aesthetic
  */
-function DressCode({ _translations, _currentLang, config = {} }) {
+function DressCode({ _translations, _currentLang, config = {} }: DressCodeProps) {
   const dressCode = config.dressCode || {};
   const colors = dressCode.colors || [];
   const styleText = dressCode.styleText || "";

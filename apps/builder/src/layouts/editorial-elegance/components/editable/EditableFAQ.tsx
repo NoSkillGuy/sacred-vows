@@ -1,13 +1,27 @@
 import { useState } from "react";
 import EditableText from "../shared/EditableText";
 
+interface EditableFAQProps {
+  _translations?: unknown;
+  _currentLang?: string;
+  config?: {
+    faq?: {
+      questions?: Array<{
+        question: string;
+        answer: string;
+      }>;
+    };
+  };
+  onUpdate?: (path: string, value: unknown) => void;
+}
+
 /**
  * EditableFAQ - Accordion Q&A editor
  */
-function EditableFAQ({ _translations, _currentLang, config = {}, onUpdate }) {
+function EditableFAQ({ _translations, _currentLang, config = {}, onUpdate }: EditableFAQProps) {
   const faq = config.faq || {};
   const questions = faq.questions || [];
-  const [openIndex, setOpenIndex] = useState(null);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const handleAddQuestion = () => {
     const newQuestions = [...questions, { question: "", answer: "" }];
@@ -16,7 +30,7 @@ function EditableFAQ({ _translations, _currentLang, config = {}, onUpdate }) {
     }
   };
 
-  const handleUpdateQuestion = (index, field, value) => {
+  const handleUpdateQuestion = (index: number, field: string, value: string) => {
     const updated = [...questions];
     updated[index] = { ...updated[index], [field]: value };
     if (onUpdate) {
@@ -24,7 +38,7 @@ function EditableFAQ({ _translations, _currentLang, config = {}, onUpdate }) {
     }
   };
 
-  const handleDeleteQuestion = (index) => {
+  const handleDeleteQuestion = (index: number) => {
     const updated = questions.filter((_, i) => i !== index);
     if (onUpdate) {
       onUpdate("faq.questions", updated);
@@ -74,7 +88,7 @@ function EditableFAQ({ _translations, _currentLang, config = {}, onUpdate }) {
             </div>
           ))}
         </div>
-        <button onClick={handleAddQuestion} className="ee-add-button">
+        <button onClick={handleAddQuestion} className="ee-add-button" type="button">
           + Add Question
         </button>
       </div>

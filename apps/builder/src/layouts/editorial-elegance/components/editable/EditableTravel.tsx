@@ -1,9 +1,31 @@
 import EditableText from "../shared/EditableText";
 
+interface EditableTravelProps {
+  _translations?: unknown;
+  _currentLang?: string;
+  config?: {
+    travel?: {
+      cityIntro?: string;
+      hotels?: Array<{
+        name?: string;
+        description?: string;
+        address?: string;
+        website?: string;
+      }>;
+    };
+  };
+  onUpdate?: (path: string, value: unknown) => void;
+}
+
 /**
  * EditableTravel - Hotel cards editor, city intro text
  */
-function EditableTravel({ _translations, _currentLang, config = {}, onUpdate }) {
+function EditableTravel({
+  _translations,
+  _currentLang,
+  config = {},
+  onUpdate,
+}: EditableTravelProps) {
   const travel = config.travel || {};
   const cityIntro = travel.cityIntro || "";
   const hotels = travel.hotels || [];
@@ -15,7 +37,7 @@ function EditableTravel({ _translations, _currentLang, config = {}, onUpdate }) 
     }
   };
 
-  const handleUpdateHotel = (index, field, value) => {
+  const handleUpdateHotel = (index: number, field: string, value: string) => {
     const updated = [...hotels];
     updated[index] = { ...updated[index], [field]: value };
     if (onUpdate) {
@@ -70,7 +92,7 @@ function EditableTravel({ _translations, _currentLang, config = {}, onUpdate }) 
               />
             </div>
           ))}
-          <button onClick={handleAddHotel} className="ee-add-button">
+          <button onClick={handleAddHotel} className="ee-add-button" type="button">
             + Add Hotel
           </button>
         </div>

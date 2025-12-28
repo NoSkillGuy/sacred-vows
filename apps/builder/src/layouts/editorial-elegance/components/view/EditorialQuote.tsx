@@ -1,8 +1,24 @@
+interface EditorialQuoteProps {
+  _translations?: unknown;
+  _currentLang?: string;
+  config?: {
+    quote?: {
+      text?: string;
+      attribution?: string;
+    };
+    couple?: {
+      groom?: {
+        name?: string;
+      };
+    };
+  };
+}
+
 /**
  * EditorialQuote - Oversized typography, centered minimal pull quote
  * Magazine-style visual break in content
  */
-function EditorialQuote({ _translations, _currentLang, config = {} }) {
+function EditorialQuote({ _translations, _currentLang, config = {} }: EditorialQuoteProps) {
   const quote = config.quote || {};
   const text = quote.text || "Together is our favorite place to be";
 

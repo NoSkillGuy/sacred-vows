@@ -1,8 +1,26 @@
+interface LoveStoryProps {
+  _translations?: unknown;
+  _currentLang?: string;
+  config?: {
+    story?: {
+      text?: string;
+      chapters?: Array<{
+        title?: string;
+        text?: string;
+      }>;
+      pullQuotes?: Array<{
+        text?: string;
+        attribution?: string;
+      }>;
+    };
+  };
+}
+
 /**
  * LoveStory - Two-column magazine layout with drop caps, pull quotes, timeline chapters
  * The feature article of the layout
  */
-function LoveStory({ _translations, _currentLang, config = {} }) {
+function LoveStory({ _translations, _currentLang, config = {} }: LoveStoryProps) {
   const story = config.story || {};
   const chapters = story.chapters || [];
   const pullQuotes = story.pullQuotes || [];

@@ -1,8 +1,24 @@
+interface ThingsToDoProps {
+  _translations?: unknown;
+  _currentLang?: string;
+  config?: {
+    thingsToDo?: {
+      intro?: string;
+      activities?: Array<{
+        name?: string;
+        category?: string;
+        description?: string;
+        address?: string;
+      }>;
+    };
+  };
+}
+
 /**
  * ThingsToDo - Magazine-style "While you're in..." with restaurants, cafés, landmarks
  * Lifestyle editorial framing
  */
-function ThingsToDo({ _translations, _currentLang, config = {} }) {
+function ThingsToDo({ _translations, _currentLang, config = {} }: ThingsToDoProps) {
   const thingsToDo = config.thingsToDo || {};
   const intro = thingsToDo.intro || "While you're in the city...";
   const activities = thingsToDo.activities || [];

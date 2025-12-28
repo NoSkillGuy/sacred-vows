@@ -1,9 +1,33 @@
 import EditableText from "../shared/EditableText";
 
+interface EditableLoveStoryProps {
+  _translations?: unknown;
+  _currentLang?: string;
+  config?: {
+    story?: {
+      text?: string;
+      chapters?: Array<{
+        title?: string;
+        text?: string;
+      }>;
+      pullQuotes?: Array<{
+        text?: string;
+        attribution?: string;
+      }>;
+    };
+  };
+  onUpdate?: (path: string, value: unknown) => void;
+}
+
 /**
  * EditableLoveStory - WYSIWYG editing for story content, chapters, pull quotes
  */
-function EditableLoveStory({ _translations, _currentLang, config = {}, onUpdate }) {
+function EditableLoveStory({
+  _translations,
+  _currentLang,
+  config = {},
+  onUpdate,
+}: EditableLoveStoryProps) {
   const story = config.story || {};
   const mainText = story.text || "";
   const chapters = story.chapters || [];
@@ -16,7 +40,7 @@ function EditableLoveStory({ _translations, _currentLang, config = {}, onUpdate 
     }
   };
 
-  const handleUpdateChapter = (index, field, value) => {
+  const handleUpdateChapter = (index: number, field: string, value: string) => {
     const updated = [...chapters];
     updated[index] = { ...updated[index], [field]: value };
     if (onUpdate) {
@@ -24,7 +48,7 @@ function EditableLoveStory({ _translations, _currentLang, config = {}, onUpdate 
     }
   };
 
-  const handleDeleteChapter = (index) => {
+  const handleDeleteChapter = (index: number) => {
     const updated = chapters.filter((_, i) => i !== index);
     if (onUpdate) {
       onUpdate("story.chapters", updated);
@@ -38,7 +62,7 @@ function EditableLoveStory({ _translations, _currentLang, config = {}, onUpdate 
     }
   };
 
-  const handleUpdatePullQuote = (index, field, value) => {
+  const handleUpdatePullQuote = (index: number, field: string, value: string) => {
     const updated = [...pullQuotes];
     updated[index] = { ...updated[index], [field]: value };
     if (onUpdate) {
@@ -46,7 +70,7 @@ function EditableLoveStory({ _translations, _currentLang, config = {}, onUpdate 
     }
   };
 
-  const handleDeletePullQuote = (index) => {
+  const handleDeletePullQuote = (index: number) => {
     const updated = pullQuotes.filter((_, i) => i !== index);
     if (onUpdate) {
       onUpdate("story.pullQuotes", updated);
@@ -100,7 +124,7 @@ function EditableLoveStory({ _translations, _currentLang, config = {}, onUpdate 
               />
             </div>
           ))}
-          <button onClick={handleAddChapter} className="ee-add-button">
+          <button onClick={handleAddChapter} className="ee-add-button" type="button">
             + Add Chapter
           </button>
         </div>
@@ -134,7 +158,7 @@ function EditableLoveStory({ _translations, _currentLang, config = {}, onUpdate 
               </button>
             </blockquote>
           ))}
-          <button onClick={handleAddPullQuote} className="ee-add-button">
+          <button onClick={handleAddPullQuote} className="ee-add-button" type="button">
             + Add Pull Quote
           </button>
         </div>

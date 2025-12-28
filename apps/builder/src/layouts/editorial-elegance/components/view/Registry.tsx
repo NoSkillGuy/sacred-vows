@@ -1,8 +1,22 @@
+interface RegistryProps {
+  _translations?: unknown;
+  _currentLang?: string;
+  config?: {
+    registry?: {
+      introText?: string;
+      links?: Array<{
+        label?: string;
+        url?: string;
+      }>;
+    };
+  };
+}
+
 /**
  * Registry - Minimal gift registry with soft copy
  * "Your presence is our present" editorial angle
  */
-function Registry({ _translations, _currentLang, config = {} }) {
+function Registry({ _translations, _currentLang, config = {} }: RegistryProps) {
   const registry = config.registry || {};
   const introText = registry.introText || "Your presence is our present";
   const links = registry.links || [];

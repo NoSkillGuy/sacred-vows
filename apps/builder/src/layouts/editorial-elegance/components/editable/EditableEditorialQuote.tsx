@@ -1,10 +1,32 @@
 import { useEffect } from "react";
 import EditableText from "../shared/EditableText";
 
+interface EditableEditorialQuoteProps {
+  _translations?: unknown;
+  _currentLang?: string;
+  config?: {
+    quote?: {
+      text?: string;
+      attribution?: string;
+    };
+    couple?: {
+      groom?: {
+        name?: string;
+      };
+    };
+  };
+  onUpdate?: (path: string, value: unknown) => void;
+}
+
 /**
  * EditableEditorialQuote - Editable quote text
  */
-function EditableEditorialQuote({ _translations, _currentLang, config = {}, onUpdate }) {
+function EditableEditorialQuote({
+  _translations,
+  _currentLang,
+  config = {},
+  onUpdate,
+}: EditableEditorialQuoteProps) {
   const quote = config.quote || {};
   const text = quote.text || "Together is our favorite place to be";
 

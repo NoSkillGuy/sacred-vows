@@ -4,7 +4,32 @@
  */
 import { getDefaultAssetUrl } from "../../../../services/defaultAssetService";
 
-function Couple({ _translations, _currentLang, config = {} }) {
+interface CoupleProps {
+  _translations?: unknown;
+  _currentLang?: string;
+  config?: {
+    couple?: {
+      bride?: {
+        name?: string;
+        image?: string;
+        parents?: {
+          mother?: string;
+          father?: string;
+        };
+      };
+      groom?: {
+        name?: string;
+        image?: string;
+        parents?: {
+          mother?: string;
+          father?: string;
+        };
+      };
+    };
+  };
+}
+
+function Couple({ _translations, _currentLang, config = {} }: CoupleProps) {
   const couple = config.couple || {};
   const bride = couple.bride || {
     name: "Bride",

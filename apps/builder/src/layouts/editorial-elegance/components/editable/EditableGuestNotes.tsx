@@ -1,9 +1,28 @@
 import EditableText from "../shared/EditableText";
 
+interface EditableGuestNotesProps {
+  _translations?: unknown;
+  _currentLang?: string;
+  config?: {
+    guestNotes?: {
+      messages?: Array<{
+        text?: string;
+        author?: string;
+      }>;
+    };
+  };
+  onUpdate?: (path: string, value: unknown) => void;
+}
+
 /**
  * EditableGuestNotes - Guest message moderation interface
  */
-function EditableGuestNotes({ _translations, _currentLang, config = {}, onUpdate }) {
+function EditableGuestNotes({
+  _translations,
+  _currentLang,
+  config = {},
+  onUpdate,
+}: EditableGuestNotesProps) {
   const guestNotes = config.guestNotes || {};
   const messages = guestNotes.messages || [];
 
@@ -14,7 +33,7 @@ function EditableGuestNotes({ _translations, _currentLang, config = {}, onUpdate
     }
   };
 
-  const handleUpdateMessage = (index, field, value) => {
+  const handleUpdateMessage = (index: number, field: string, value: string) => {
     const updated = [...messages];
     updated[index] = { ...updated[index], [field]: value };
     if (onUpdate) {
@@ -22,7 +41,7 @@ function EditableGuestNotes({ _translations, _currentLang, config = {}, onUpdate
     }
   };
 
-  const handleDeleteMessage = (index) => {
+  const handleDeleteMessage = (index: number) => {
     const updated = messages.filter((_, i) => i !== index);
     if (onUpdate) {
       onUpdate("guestNotes.messages", updated);
@@ -61,7 +80,7 @@ function EditableGuestNotes({ _translations, _currentLang, config = {}, onUpdate
             </div>
           ))}
         </div>
-        <button onClick={handleAddMessage} className="ee-add-button">
+        <button onClick={handleAddMessage} className="ee-add-button" type="button">
           + Add Guest Message
         </button>
       </div>

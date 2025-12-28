@@ -1,8 +1,21 @@
+interface GuestNotesProps {
+  _translations?: unknown;
+  _currentLang?: string;
+  config?: {
+    guestNotes?: {
+      messages?: Array<{
+        text?: string;
+        author?: string;
+      }>;
+    };
+  };
+}
+
 /**
  * GuestNotes - Polaroid-style guest messages, minimal moderation
  * Intimate, handwritten, and human
  */
-function GuestNotes({ _translations, _currentLang, config = {} }) {
+function GuestNotes({ _translations, _currentLang, config = {} }: GuestNotesProps) {
   const guestNotes = config.guestNotes || {};
   const messages = guestNotes.messages || [];
 

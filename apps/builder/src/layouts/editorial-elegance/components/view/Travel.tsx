@@ -1,8 +1,24 @@
+interface TravelProps {
+  _translations?: unknown;
+  _currentLang?: string;
+  config?: {
+    travel?: {
+      cityIntro?: string;
+      hotels?: Array<{
+        name?: string;
+        description?: string;
+        address?: string;
+        website?: string;
+      }>;
+    };
+  };
+}
+
 /**
  * Travel - City intro, curated hotel cards, "Editor's picks" tone
  * Especially important for destination weddings
  */
-function Travel({ _translations, _currentLang, config = {} }) {
+function Travel({ _translations, _currentLang, config = {} }: TravelProps) {
   const travel = config.travel || {};
   const cityIntro = travel.cityIntro || "";
   const hotels = travel.hotels || [];

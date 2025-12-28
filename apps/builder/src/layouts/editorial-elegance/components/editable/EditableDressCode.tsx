@@ -1,10 +1,40 @@
 import EditableText from "../shared/EditableText";
 import EditableImage from "../shared/EditableImage";
 
+interface EditableDressCodeProps {
+  _translations?: unknown;
+  _currentLang?: string;
+  config?: {
+    dressCode?: {
+      colors?: Array<
+        | {
+            value?: string;
+            label?: string;
+          }
+        | string
+      >;
+      styleText?: string;
+      inspirationImages?: Array<
+        | {
+            src?: string;
+            alt?: string;
+          }
+        | string
+      >;
+    };
+  };
+  onUpdate?: (path: string, value: unknown) => void;
+}
+
 /**
  * EditableDressCode - Color picker, style text, inspiration images
  */
-function EditableDressCode({ _translations, _currentLang, config = {}, onUpdate }) {
+function EditableDressCode({
+  _translations,
+  _currentLang,
+  config = {},
+  onUpdate,
+}: EditableDressCodeProps) {
   const dressCode = config.dressCode || {};
   const colors = dressCode.colors || [];
   const styleText = dressCode.styleText || "";
@@ -17,7 +47,7 @@ function EditableDressCode({ _translations, _currentLang, config = {}, onUpdate 
     }
   };
 
-  const handleUpdateColor = (index, field, value) => {
+  const handleUpdateColor = (index: number, field: string, value: string) => {
     const updated = [...colors];
     updated[index] = { ...updated[index], [field]: value };
     if (onUpdate) {
@@ -32,7 +62,7 @@ function EditableDressCode({ _translations, _currentLang, config = {}, onUpdate 
     }
   };
 
-  const handleUpdateImage = (index, field, value) => {
+  const handleUpdateImage = (index: number, field: string, value: string) => {
     const updated = [...inspirationImages];
     updated[index] = { ...updated[index], [field]: value };
     if (onUpdate) {
@@ -78,7 +108,7 @@ function EditableDressCode({ _translations, _currentLang, config = {}, onUpdate 
               />
             </div>
           ))}
-          <button onClick={handleAddColor} className="ee-add-button">
+          <button onClick={handleAddColor} className="ee-add-button" type="button">
             + Add Color
           </button>
         </div>
@@ -95,7 +125,7 @@ function EditableDressCode({ _translations, _currentLang, config = {}, onUpdate 
               />
             </div>
           ))}
-          <button onClick={handleAddImage} className="ee-add-button">
+          <button onClick={handleAddImage} className="ee-add-button" type="button">
             + Add Inspiration Image
           </button>
         </div>

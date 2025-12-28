@@ -2,10 +2,41 @@ import EditableText from "../shared/EditableText";
 import EditableImage from "../shared/EditableImage";
 import { getDefaultAssetUrl } from "../../../../services/defaultAssetService";
 
+interface EditableCoupleProps {
+  _translations?: unknown;
+  _currentLang?: string;
+  config?: {
+    couple?: {
+      bride?: {
+        name?: string;
+        image?: string;
+        parents?: {
+          mother?: string;
+          father?: string;
+        };
+      };
+      groom?: {
+        name?: string;
+        image?: string;
+        parents?: {
+          mother?: string;
+          father?: string;
+        };
+      };
+    };
+  };
+  onUpdate?: (path: string, value: unknown) => void;
+}
+
 /**
  * EditableCouple - WYSIWYG editable Couple section
  */
-function EditableCouple({ _translations, _currentLang, config = {}, onUpdate }) {
+function EditableCouple({
+  _translations,
+  _currentLang,
+  config = {},
+  onUpdate,
+}: EditableCoupleProps) {
   const couple = config.couple || {};
   const bride = couple.bride || {
     name: "Bride",

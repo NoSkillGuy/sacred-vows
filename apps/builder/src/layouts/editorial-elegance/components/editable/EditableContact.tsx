@@ -1,9 +1,33 @@
 import EditableText from "../shared/EditableText";
 
+interface EditableContactProps {
+  _translations?: unknown;
+  _currentLang?: string;
+  config?: {
+    contact?: {
+      title?: string;
+      contacts?: Array<{
+        name?: string;
+        role?: string;
+        email?: string;
+        phone?: string;
+      }>;
+      email?: string;
+      phone?: string;
+    };
+  };
+  onUpdate?: (path: string, value: unknown) => void;
+}
+
 /**
  * EditableContact - Contact information editor
  */
-function EditableContact({ _translations, _currentLang, config = {}, onUpdate }) {
+function EditableContact({
+  _translations,
+  _currentLang,
+  config = {},
+  onUpdate,
+}: EditableContactProps) {
   const contact = config.contact || {};
   const title = contact.title || "Reach out to our wedding concierge";
   const contacts = contact.contacts || [];
@@ -17,7 +41,7 @@ function EditableContact({ _translations, _currentLang, config = {}, onUpdate })
     }
   };
 
-  const handleUpdateContact = (index, field, value) => {
+  const handleUpdateContact = (index: number, field: string, value: string) => {
     const updated = [...contacts];
     updated[index] = { ...updated[index], [field]: value };
     if (onUpdate) {
@@ -71,7 +95,7 @@ function EditableContact({ _translations, _currentLang, config = {}, onUpdate })
               />
             </div>
           ))}
-          <button onClick={handleAddContact} className="ee-add-button">
+          <button onClick={handleAddContact} className="ee-add-button" type="button">
             + Add Contact
           </button>
         </div>

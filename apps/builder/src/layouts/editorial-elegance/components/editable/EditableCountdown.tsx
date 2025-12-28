@@ -1,10 +1,26 @@
 import { useState, useEffect } from "react";
 
+interface EditableCountdownProps {
+  _translations?: unknown;
+  _currentLang?: string;
+  config?: {
+    wedding?: {
+      countdownTarget?: string;
+    };
+  };
+  onUpdate?: (path: string, value: unknown) => void;
+}
+
 /**
  * EditableCountdown - Uses existing countdownTarget from wedding data
  * Shows preview of countdown in edit mode
  */
-function EditableCountdown({ _translations, _currentLang, config = {}, onUpdate }) {
+function EditableCountdown({
+  _translations,
+  _currentLang,
+  config = {},
+  onUpdate,
+}: EditableCountdownProps) {
   const [countdown, setCountdown] = useState("");
   const wedding = config.wedding || {};
   const countdownTarget = wedding.countdownTarget;

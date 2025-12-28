@@ -1,10 +1,20 @@
 import { useState, useEffect } from "react";
 
+interface CountdownProps {
+  _translations?: unknown;
+  _currentLang?: string;
+  config?: {
+    wedding?: {
+      countdownTarget?: string;
+    };
+  };
+}
+
 /**
  * Countdown - Minimal numeric countdown with "The Big Day" headline
  * Keeps the site feeling alive and time-bound
  */
-function Countdown({ _translations, _currentLang, config = {} }) {
+function Countdown({ _translations, _currentLang, config = {} }: CountdownProps) {
   const [countdown, setCountdown] = useState("");
   const wedding = config.wedding || {};
   const countdownTarget = wedding.countdownTarget;

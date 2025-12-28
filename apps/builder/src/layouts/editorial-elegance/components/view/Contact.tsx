@@ -1,8 +1,26 @@
+interface ContactProps {
+  _translations?: unknown;
+  _currentLang?: string;
+  config?: {
+    contact?: {
+      title?: string;
+      contacts?: Array<{
+        name?: string;
+        role?: string;
+        email?: string;
+        phone?: string;
+      }>;
+      email?: string;
+      phone?: string;
+    };
+  };
+}
+
 /**
  * Contact - Premium "wedding concierge" contact section
  * Feels premium, not utilitarian
  */
-function Contact({ _translations, _currentLang, config = {} }) {
+function Contact({ _translations, _currentLang, config = {} }: ContactProps) {
   const contact = config.contact || {};
   const title = contact.title || "Reach out to our wedding concierge";
   const contacts = contact.contacts || [];

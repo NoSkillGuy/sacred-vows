@@ -1,9 +1,29 @@
 import EditableText from "../shared/EditableText";
 
+interface EditableRegistryProps {
+  _translations?: unknown;
+  _currentLang?: string;
+  config?: {
+    registry?: {
+      introText?: string;
+      links?: Array<{
+        label?: string;
+        url?: string;
+      }>;
+    };
+  };
+  onUpdate?: (path: string, value: unknown) => void;
+}
+
 /**
  * EditableRegistry - Registry links editor with soft copy
  */
-function EditableRegistry({ _translations, _currentLang, config = {}, onUpdate }) {
+function EditableRegistry({
+  _translations,
+  _currentLang,
+  config = {},
+  onUpdate,
+}: EditableRegistryProps) {
   const registry = config.registry || {};
   const introText = registry.introText || "Your presence is our present";
   const links = registry.links || [];
@@ -15,7 +35,7 @@ function EditableRegistry({ _translations, _currentLang, config = {}, onUpdate }
     }
   };
 
-  const handleUpdateLink = (index, field, value) => {
+  const handleUpdateLink = (index: number, field: string, value: string) => {
     const updated = [...links];
     updated[index] = { ...updated[index], [field]: value };
     if (onUpdate) {
@@ -57,7 +77,7 @@ function EditableRegistry({ _translations, _currentLang, config = {}, onUpdate }
               />
             </div>
           ))}
-          <button onClick={handleAddLink} className="ee-add-button">
+          <button onClick={handleAddLink} className="ee-add-button" type="button">
             + Add Registry Link
           </button>
         </div>
