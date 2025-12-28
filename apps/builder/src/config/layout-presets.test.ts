@@ -276,11 +276,11 @@ describe("presetToSectionConfigs", () => {
 
       const result = presetToSectionConfigs(preset, manifestSections);
 
-      // Should return all manifest sections
-      expect(result).toHaveLength(manifestSections.length);
+      // Should return only required sections (no valid preset sections)
+      const requiredSections = manifestSections.filter((s) => s.required === true);
+      expect(result).toHaveLength(requiredSections.length);
 
       // Required sections should still be enabled
-      const requiredSections = manifestSections.filter((s) => s.required === true);
       requiredSections.forEach((requiredSection) => {
         const section = result.find((s) => s.id === requiredSection.id);
         expect(section?.enabled).toBe(true);
@@ -300,18 +300,18 @@ describe("presetToSectionConfigs", () => {
 
       const result = presetToSectionConfigs(preset, manifestSections);
 
-      // Should return all manifest sections
-      expect(result).toHaveLength(manifestSections.length);
+      // Should return only required sections (no preset sections)
+      const requiredSections = manifestSections.filter((s) => s.required === true);
+      expect(result).toHaveLength(requiredSections.length);
 
       // Required sections should be enabled
-      const requiredSections = manifestSections.filter((s) => s.required === true);
       requiredSections.forEach((requiredSection) => {
         const section = result.find((s) => s.id === requiredSection.id);
         expect(section?.enabled).toBe(true);
       });
     });
 
-    it("should maintain section order from manifest for non-preset sections", () => {
+    it("should return only preset sections plus required sections", () => {
       const preset: LayoutPreset = {
         id: "test",
         name: "Test",
@@ -324,12 +324,17 @@ describe("presetToSectionConfigs", () => {
 
       const result = presetToSectionConfigs(preset, manifestSections);
 
-      // Find non-preset sections
+      // Should return only preset sections (hero, footer) plus any required sections not in preset
       const presetIds = new Set(preset.sectionIds);
-      const nonPresetSections = result.filter((s) => !presetIds.has(s.id));
+      const requiredSections = manifestSections.filter(
+        (s) => s.required === true && !presetIds.has(s.id)
+      );
+      const expectedLength = preset.sectionIds.length + requiredSections.length;
 
-      // Non-preset sections should maintain their relative order
-      expect(nonPresetSections.length).toBeGreaterThan(0);
+      expect(result).toHaveLength(expectedLength);
+      expect(
+        result.every((s) => presetIds.has(s.id) || s.id === "header" || s.id === "footer")
+      ).toBe(true);
     });
   });
 

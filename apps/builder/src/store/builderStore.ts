@@ -293,12 +293,17 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
      * @param invitation - Invitation object from backend
      */
     setCurrentInvitation: async (invitation: Partial<InvitationData>): Promise<void> => {
-      // Support migration from layoutConfig to layoutConfig
-      const layoutConfig = invitation.layoutConfig || {};
       const layoutId = invitation.layoutId || "classic-scroll";
 
       // Parse data if it's a string
       let invitationData = parseInvitationData(invitation.data || {}, {}) as UniversalWeddingData;
+
+      // Extract layoutConfig from data if it exists (API stores layoutConfig inside data field)
+      // Also check invitation.layoutConfig as fallback (for backward compatibility)
+      const layoutConfigFromData = (invitationData as Record<string, unknown>)?.layoutConfig as
+        | LayoutConfig
+        | undefined;
+      const layoutConfig = invitation.layoutConfig || layoutConfigFromData || {};
 
       // Merge editorial-elegance defaults if needed (always merge for empty or minimal data, or when missing new fields)
       if (layoutId === "editorial-elegance") {
@@ -339,48 +344,74 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
       }
 
       // Preserve existing sections from current state if they exist and layout ID matches
-      // This ensures user's section visibility preferences are maintained on reload
+      // IMPORTANT: Only preserve existing sections if it's the SAME invitation (same ID)
+      // For NEW invitations, always use API sections to preserve preset behavior
       const { currentInvitation: existingInvitation } = get();
       const existingSections = existingInvitation.layoutConfig?.sections || [];
       const apiSections = layoutConfig.sections || [];
+      const isSameInvitation = existingInvitation.id === invitation.id && invitation.id !== null;
 
       // Determine which sections to use, preserving user's enabled/disabled preferences
       let finalSections: SectionConfig[] = [];
 
-      if (existingSections.length > 0 && existingInvitation.layoutId === layoutId) {
-        // We have existing sections - preserve their enabled state
+      // Only preserve existing sections if it's the SAME invitation being reloaded
+      // For new invitations, always use API sections (preserves preset sections)
+      if (
+        isSameInvitation &&
+        existingSections.length > 0 &&
+        existingInvitation.layoutId === layoutId
+      ) {
+        // Same invitation - check if this is a preset change (different enabled sections)
         if (apiSections.length > 0) {
-          // API has sections - merge: use API as base but preserve enabled state from existing
-          const existingSectionsMap = new Map<string, SectionConfig>();
-          existingSections.forEach((section) => {
-            existingSectionsMap.set(section.id, section);
-          });
+          // Check if enabled sections differ - if so, this is likely a preset change, use new sections directly
+          const existingEnabledIds = existingSections
+            .filter((s) => s.enabled)
+            .map((s) => s.id)
+            .sort()
+            .join(",");
+          const apiEnabledIds = apiSections
+            .filter((s) => s.enabled)
+            .map((s) => s.id)
+            .sort()
+            .join(",");
+          const isPresetChange = existingEnabledIds !== apiEnabledIds;
 
-          // Merge: use API sections as base, but preserve enabled state from existing sections
-          finalSections = apiSections.map((apiSection) => {
-            const existingSection = existingSectionsMap.get(apiSection.id);
-            if (existingSection) {
-              // Preserve the user's enabled/disabled preference
-              return {
-                ...apiSection,
-                enabled: existingSection.enabled,
-              };
-            }
-            return apiSection;
-          });
+          if (isPresetChange) {
+            // Preset change detected - use new sections directly (preserves preset order and enabled state)
+            finalSections = apiSections;
+          } else {
+            // No preset change - merge: use API as base but preserve enabled state from existing
+            const existingSectionsMap = new Map<string, SectionConfig>();
+            existingSections.forEach((section) => {
+              existingSectionsMap.set(section.id, section);
+            });
 
-          // Also include any existing sections that aren't in the API response
-          existingSections.forEach((existingSection) => {
-            if (!apiSections.find((s) => s.id === existingSection.id)) {
-              finalSections.push(existingSection);
-            }
-          });
+            // Merge: use API sections as base, but preserve enabled state from existing sections
+            finalSections = apiSections.map((apiSection) => {
+              const existingSection = existingSectionsMap.get(apiSection.id);
+              if (existingSection) {
+                // Preserve the user's enabled/disabled preference
+                return {
+                  ...apiSection,
+                  enabled: existingSection.enabled,
+                };
+              }
+              return apiSection;
+            });
+
+            // Also include any existing sections that aren't in the API response
+            existingSections.forEach((existingSection) => {
+              if (!apiSections.find((s) => s.id === existingSection.id)) {
+                finalSections.push(existingSection);
+              }
+            });
+          }
         } else {
           // API has no sections - use existing sections (they're more up-to-date)
           finalSections = existingSections;
         }
       } else if (apiSections.length > 0) {
-        // No existing sections, but API has sections - use API sections
+        // New invitation OR no existing sections - use API sections (preserves preset sections)
         finalSections = apiSections;
       } else {
         // Fallback to default sections if neither exists
@@ -436,25 +467,56 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
         currentSectionsMap.set(section.id, section);
       });
 
-      // Build validated sections array based on manifest order
+      // Build validated sections array
+      // IMPORTANT: If currentSections exist (preset was applied), missing sections should be DISABLED
+      // to preserve preset behavior. Only add them as enabled if no sections exist yet (fresh start).
+      const hasExistingSections = currentSections.length > 0;
+
+      // Check if current sections look like they came from a preset (all enabled sections have low order numbers)
+      // Preset sections typically have order 0-N, while manifest-ordered sections might have different patterns
+      const enabledSections = currentSections.filter((s) => s.enabled);
+      const maxPresetOrder =
+        enabledSections.length > 0 ? Math.max(...enabledSections.map((s) => s.order ?? 0)) : -1;
+      const looksLikePreset =
+        hasExistingSections && enabledSections.length > 0 && maxPresetOrder < 100;
+
+      // If sections exist (preset applied), preserve their order. Otherwise use manifest order.
+      // For preset sections, we want to preserve the preset order, not manifest order.
+      const shouldPreserveOrder = hasExistingSections && looksLikePreset;
+
       const validatedSections = manifest.sections.map((manifestSection, index) => {
         const existingSection = currentSectionsMap.get(manifestSection.id);
 
         if (existingSection) {
-          // Preserve user's enabled/disabled state, but ensure order matches manifest
+          // Preserve existing section's order if preset was applied, otherwise use manifest order
           return {
             ...existingSection,
-            order: index,
+            order: shouldPreserveOrder ? existingSection.order : index,
           };
         } else {
-          // Add missing section with default enabled state from manifest
+          // Add missing section
+          // If sections already exist (preset applied), disable non-preset sections unless required
+          // If no sections exist (fresh start), use default enabled state from manifest
+          let enabled: boolean;
+          if (hasExistingSections) {
+            // Preset was applied - only enable required sections, disable all others
+            enabled = manifestSection.required === true;
+          } else {
+            // Fresh start - use default enabled state from manifest
+            enabled = calculateSectionEnabled(manifestSection);
+          }
           return {
             id: manifestSection.id,
-            enabled: calculateSectionEnabled(manifestSection),
-            order: index,
+            enabled,
+            // For new sections added after preset, use a high order so they appear after preset sections
+            order: shouldPreserveOrder ? 1000 + index : index,
+            config: {},
           };
         }
       });
+
+      // Sort by order property to ensure preset order is respected
+      validatedSections.sort((a, b) => a.order - b.order);
 
       // Update invitation if sections changed
       const currentIds = currentSections
@@ -511,35 +573,57 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
 
     /**
      * Get all sections (enabled and disabled)
-     * Filters sections to only include those defined in current layout manifest
+     * Merges sections from config with sections from manifest to ensure all available sections are shown
+     * This allows the section manager to show all sections even if a preset only includes some
      */
     getAllSections: (): SectionConfig[] => {
       const { currentInvitation, currentLayoutManifest } = get();
-      let sections = currentInvitation.layoutConfig?.sections || [];
+      const configSections = currentInvitation.layoutConfig?.sections || [];
+      const configSectionMap = new Map(configSections.map((s) => [s.id, s]));
 
-      // Filter by manifest if available
+      // If manifest is available, merge config sections with manifest sections
       if (currentLayoutManifest?.sections && Array.isArray(currentLayoutManifest.sections)) {
-        const manifestSectionIds = new Set(currentLayoutManifest.sections.map((s) => s.id));
-        sections = sections.filter((s) => manifestSectionIds.has(s.id));
-
-        // Use order property first (respects user reordering), fallback to manifest order
         const manifestOrder = new Map<string, number>();
         currentLayoutManifest.sections.forEach((s, index) => {
-          manifestOrder.set(s.id, index);
+          manifestOrder.set(s.id, s.order !== undefined ? s.order : index);
         });
 
-        sections = sections.sort((a, b) => {
-          // Prioritize order property over manifest order to respect user reordering
+        // Build merged sections: use config section if exists, otherwise create from manifest
+        const mergedSections: SectionConfig[] = currentLayoutManifest.sections.map(
+          (manifestSection) => {
+            const configSection = configSectionMap.get(manifestSection.id);
+            if (configSection) {
+              // Use config section (preserves enabled state and order from config)
+              return configSection;
+            } else {
+              // Section not in config (e.g., not in preset) - create disabled section from manifest
+              // IMPORTANT: When a preset is selected, only preset sections are in the config.
+              // Sections not in the preset should be DISABLED (enabled: false) unless they're required.
+              // We explicitly ignore defaultEnabled here to ensure preset behavior is respected.
+              const isRequired = manifestSection.required === true;
+              return {
+                id: manifestSection.id,
+                enabled: isRequired, // Only required sections (header/footer) enabled when not in preset
+                order:
+                  manifestSection.order !== undefined
+                    ? manifestSection.order
+                    : (manifestOrder.get(manifestSection.id) ?? 0),
+                config: {},
+              };
+            }
+          }
+        );
+
+        // Sort by order property (respects user reordering from config)
+        return mergedSections.sort((a, b) => {
           const orderA = a.order ?? manifestOrder.get(a.id) ?? 0;
           const orderB = b.order ?? manifestOrder.get(b.id) ?? 0;
           return orderA - orderB;
         });
       } else {
         // Fallback to current behavior if manifest not loaded
-        sections = sections.slice().sort((a, b) => a.order - b.order);
+        return configSections.slice().sort((a, b) => a.order - b.order);
       }
-
-      return sections;
     },
 
     /**

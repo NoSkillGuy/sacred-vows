@@ -8,6 +8,7 @@ import { useCreateInvitationMutation } from "../../hooks/queries/useInvitations"
 import { presetToSectionConfigs } from "../../config/layout-presets";
 import type { LayoutPreset } from "@shared/types/layout";
 import type { UniversalWeddingData, LayoutConfig } from "@shared/types/wedding-data";
+import { getLayoutManifest, hasLayout } from "../../layouts/registry";
 import "./Dashboard.css";
 
 // SVG Icons
@@ -260,15 +261,31 @@ function LayoutGallery(): JSX.Element {
       }
 
       // Prepare layout config with preset sections
-      // Always include sections - either from preset or default from manifest
+      // IMPORTANT: Get full manifest from registry (not API) to ensure all sections are available
+      // The API might only return a subset of sections, but presets need the full manifest
       let layoutConfig: LayoutConfig | undefined;
-      if (
-        layoutToUse.sections &&
-        Array.isArray(layoutToUse.sections) &&
-        layoutToUse.sections.length > 0
-      ) {
+      let manifestSections: Array<{ id: string; required?: boolean; order?: number }> = [];
+
+      // Try to get full manifest from registry first (has all sections)
+      if (hasLayout(layoutToUse.id)) {
         try {
-          const presetSections = presetToSectionConfigs(preset, layoutToUse.sections);
+          const fullManifest = getLayoutManifest(layoutToUse.id);
+          manifestSections = fullManifest.sections || [];
+        } catch (error) {
+          console.warn(
+            `Failed to get manifest from registry for ${layoutToUse.id}, using API sections:`,
+            error
+          );
+          manifestSections = layoutToUse.sections || [];
+        }
+      } else {
+        // Fallback to API sections if layout not in registry
+        manifestSections = layoutToUse.sections || [];
+      }
+
+      if (manifestSections.length > 0) {
+        try {
+          const presetSections = presetToSectionConfigs(preset, manifestSections);
           layoutConfig = {
             sections: presetSections,
           };
@@ -276,7 +293,7 @@ function LayoutGallery(): JSX.Element {
           console.error("Failed to convert preset to section configs:", error);
           // Fallback: create sections from manifest
           layoutConfig = {
-            sections: layoutToUse.sections.map((section, index) => ({
+            sections: manifestSections.map((section, index) => ({
               id: section.id,
               enabled: true,
               order: section.order !== undefined ? section.order : index,

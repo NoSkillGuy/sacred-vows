@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useBuilderStore } from "../../store/builderStore";
 import { SECTION_METADATA } from "@shared/types/wedding-data";
 import "./SectionManager.css";
@@ -105,16 +105,57 @@ const ChevronDownIcon = () => (
 );
 
 function SectionManager({ isOpen, onClose }) {
-  const { getAllSections, toggleSection, reorderSections, currentLayoutManifest } =
-    useBuilderStore();
+  // Subscribe to the entire currentInvitation to ensure we detect all changes
+  // Use a selector that returns a serialized version to force re-renders
+  const invitationId = useBuilderStore((state) => state.currentInvitation?.id);
+  const sectionsKey = useBuilderStore((state) => {
+    const sections = state.currentInvitation?.layoutConfig?.sections || [];
+    // Return a string that changes when sections change
+    return JSON.stringify(sections.map((s) => ({ id: s.id, enabled: s.enabled, order: s.order })));
+  });
+  const currentLayoutManifest = useBuilderStore((state) => state.currentLayoutManifest);
+  const getAllSections = useBuilderStore((state) => state.getAllSections);
+  const toggleSection = useBuilderStore((state) => state.toggleSection);
+  const reorderSections = useBuilderStore((state) => state.reorderSections);
 
   const [draggedItem, setDraggedItem] = useState(null);
   const [dragOverItem, setDragOverItem] = useState(null);
+  const [sections, setSections] = useState([]);
 
-  // Derive sections from store - no need for state
-  const sections = useMemo(() => {
-    return getAllSections();
-  }, [getAllSections]);
+  // Update sections when store changes or modal opens - always refresh when modal opens
+  useEffect(() => {
+    if (!isOpen) return; // Don't update if modal is closed
+
+    const allSections = getAllSections();
+    setSections(allSections);
+  }, [getAllSections, sectionsKey, invitationId, currentLayoutManifest, isOpen]);
+
+  // Also subscribe to store changes using Zustand's subscribe API as a fallback
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const unsubscribe = useBuilderStore.subscribe(
+      (state) => state.currentInvitation?.layoutConfig?.sections,
+      (sections) => {
+        const allSections = getAllSections();
+        setSections(allSections);
+      },
+      {
+        equalityFn: (a, b) => {
+          // Custom equality - compare JSON strings to detect any changes
+          const aStr = JSON.stringify(
+            a?.map((s) => ({ id: s.id, enabled: s.enabled, order: s.order })) || []
+          );
+          const bStr = JSON.stringify(
+            b?.map((s) => ({ id: s.id, enabled: s.enabled, order: s.order })) || []
+          );
+          return aStr === bStr;
+        },
+      }
+    );
+
+    return unsubscribe;
+  }, [isOpen, getAllSections]);
 
   // Get section metadata (name, icon, description)
   const getSectionInfo = (sectionId) => {
@@ -175,8 +216,6 @@ function SectionManager({ isOpen, onClose }) {
     const [draggedSection] = newSections.splice(draggedItem, 1);
     newSections.splice(dropIndex, 0, draggedSection);
 
-    setSections(newSections);
-
     // Update store with new order
     const newOrder = newSections.map((s) => s.id);
     reorderSections(newOrder);
@@ -189,10 +228,7 @@ function SectionManager({ isOpen, onClose }) {
   const handleToggle = (sectionId) => {
     if (isRequired(sectionId)) return;
     toggleSection(sectionId);
-    // Update local state
-    setSections((prev) =>
-      prev.map((s) => (s.id === sectionId ? { ...s, enabled: !s.enabled } : s))
-    );
+    // State will update automatically via useMemo when getAllSections changes
   };
 
   // Move section up/down
@@ -202,8 +238,6 @@ function SectionManager({ isOpen, onClose }) {
 
     const newSections = [...sections];
     [newSections[index], newSections[newIndex]] = [newSections[newIndex], newSections[index]];
-
-    setSections(newSections);
 
     const newOrder = newSections.map((s) => s.id);
     reorderSections(newOrder);
