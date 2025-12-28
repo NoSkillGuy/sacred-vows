@@ -107,7 +107,7 @@ describe("presetToSectionConfigs", () => {
       const presetSectionIds = new Set(modernEditorialPreset.sectionIds);
       let foundNonPresetSection = false;
 
-      result.forEach((section, index) => {
+      result.forEach((section) => {
         if (presetSectionIds.has(section.id)) {
           // Preset sections should come first
           expect(foundNonPresetSection).toBe(false);

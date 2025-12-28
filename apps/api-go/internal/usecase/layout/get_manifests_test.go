@@ -138,4 +138,3 @@ func TestGetManifestsUseCase_Execute_FiltersNonReadyLayouts(t *testing.T) {
 	assert.Len(t, output.Manifests, 1, "Should only return ready layouts")
 	assert.Equal(t, "ready-layout", output.Manifests[0]["id"], "Should return ready layout")
 }
-

@@ -59,7 +59,11 @@ function PresetModal({ isOpen, onClose }: PresetModalProps) {
   // Reset flipped state when modal closes
   useEffect(() => {
     if (!isOpen) {
-      setFlippedPresetId(null);
+      // Use setTimeout to avoid synchronous setState in effect
+      const timeoutId = setTimeout(() => {
+        setFlippedPresetId(null);
+      }, 0);
+      return () => clearTimeout(timeoutId);
     }
   }, [isOpen]);
 

@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { render, screen, waitFor, fireEvent } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -476,7 +476,7 @@ describe("LayoutGallery", () => {
       expect(presetSections.length).toBeGreaterThan(0);
 
       // Verify order matches preset order
-      presetSections.forEach((section: { id: string; order: number }, index: number) => {
+      presetSections.forEach((section: { id: string; order: number }) => {
         const expectedIndex = expectedSectionIds.indexOf(section.id);
         expect(section.order).toBe(expectedIndex);
         expect(section.enabled).toBe(true);

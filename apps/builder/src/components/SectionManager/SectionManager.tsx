@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useBuilderStore } from "../../store/builderStore";
 import { SECTION_METADATA } from "@shared/types/wedding-data";
 import "./SectionManager.css";
@@ -126,8 +126,12 @@ function SectionManager({ isOpen, onClose }) {
   useEffect(() => {
     if (!isOpen) return; // Don't update if modal is closed
 
-    const allSections = getAllSections();
-    setSections(allSections);
+    // Use setTimeout to avoid synchronous setState in effect
+    const timeoutId = setTimeout(() => {
+      const allSections = getAllSections();
+      setSections(allSections);
+    }, 0);
+    return () => clearTimeout(timeoutId);
   }, [getAllSections, sectionsKey, invitationId, currentLayoutManifest, isOpen]);
 
   // Also subscribe to store changes using Zustand's subscribe API as a fallback
@@ -136,7 +140,7 @@ function SectionManager({ isOpen, onClose }) {
 
     const unsubscribe = useBuilderStore.subscribe(
       (state) => state.currentInvitation?.layoutConfig?.sections,
-      (sections) => {
+      (_sections) => {
         const allSections = getAllSections();
         setSections(allSections);
       },
