@@ -5,6 +5,11 @@ import type { LayoutManifest } from "@shared/types/layout";
 import LayoutCardUnified from "../Layouts/LayoutCardUnified";
 import { useLayoutsQuery } from "../../hooks/queries/useLayouts";
 import { useCreateInvitationMutation } from "../../hooks/queries/useInvitations";
+import {
+  LAYOUT_PRESETS,
+  type LayoutPreset,
+  presetToSectionConfigs,
+} from "../../config/layout-presets";
 import "./Dashboard.css";
 
 // SVG Icons
@@ -90,6 +95,8 @@ function LayoutGallery(): JSX.Element {
   const [user, setUser] = useState<User | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [presetModalOpen, setPresetModalOpen] = useState(false);
+  const [selectedLayout, setSelectedLayout] = useState<LayoutWithStatus | null>(null);
 
   // Query hooks
   const {
@@ -130,12 +137,22 @@ function LayoutGallery(): JSX.Element {
   async function handleSelectLayout(layout: LayoutWithStatus): Promise<void> {
     if (!layout.isAvailable) return;
 
+    // Show preset selection modal
+    setSelectedLayout(layout);
+    setPresetModalOpen(true);
+  }
+
+  async function handlePresetSelection(preset: LayoutPreset | null): Promise<void> {
+    if (!selectedLayout) return;
+
+    setPresetModalOpen(false);
+
     try {
-      setCreating(layout.id);
+      setCreating(selectedLayout.id);
 
       // Initialize data with layout-specific defaults if available
       let initialData: Record<string, unknown> = {};
-      if (layout.id === "editorial-elegance") {
+      if (selectedLayout.id === "editorial-elegance") {
         try {
           const { editorialEleganceDefaults } =
             await import("../../layouts/editorial-elegance/defaults");
@@ -145,10 +162,29 @@ function LayoutGallery(): JSX.Element {
         }
       }
 
+      // Prepare layout config with preset sections
+      // Always include sections - either from preset or default from manifest
+      let layoutConfig:
+        | { sections: Array<{ id: string; enabled: boolean; order: number }>; theme?: unknown }
+        | undefined;
+      if (selectedLayout.sections) {
+        const presetSections = presetToSectionConfigs(preset, selectedLayout.sections);
+        layoutConfig = {
+          sections: presetSections,
+        };
+      }
+
+      // Merge layoutConfig into data for backend (backend stores everything in data field)
+      const dataWithLayoutConfig = {
+        ...initialData,
+        ...(layoutConfig ? { layoutConfig } : {}),
+      };
+
       const invitation = await createMutation.mutateAsync({
-        layoutId: layout.id,
+        layoutId: selectedLayout.id,
         title: "My Wedding Invitation",
-        data: initialData as never,
+        data: dataWithLayoutConfig as never,
+        layoutConfig: layoutConfig as never,
       });
       navigate(`/builder/${invitation.id}`);
     } catch (error) {
@@ -156,6 +192,7 @@ function LayoutGallery(): JSX.Element {
       alert("Failed to create invitation. Please try again.");
     } finally {
       setCreating(null);
+      setSelectedLayout(null);
     }
   }
 
@@ -303,6 +340,52 @@ function LayoutGallery(): JSX.Element {
           </div>
         )}
       </div>
+
+      {/* Preset Selection Modal */}
+      {presetModalOpen && selectedLayout && (
+        <div className="preset-modal-overlay" onClick={() => setPresetModalOpen(false)}>
+          <div className="preset-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="preset-modal-header">
+              <h2>Choose Your Invitation Flow</h2>
+              <p>Select a preset to get started, or start from scratch</p>
+              <button
+                className="preset-modal-close"
+                onClick={() => setPresetModalOpen(false)}
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="preset-grid">
+              {LAYOUT_PRESETS.map((preset) => (
+                <div
+                  key={preset.id}
+                  className="preset-card"
+                  onClick={() => handlePresetSelection(preset)}
+                >
+                  <div className="preset-emoji">{preset.emoji}</div>
+                  <h3>{preset.name}</h3>
+                  <p className="preset-description">{preset.description}</p>
+                  <p className="preset-use-case">{preset.useCase}</p>
+                  <div className="preset-best-for">
+                    <strong>Best for:</strong> {preset.bestFor}
+                  </div>
+                  <div className="preset-sections">
+                    <strong>{preset.sectionIds.length} sections</strong>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="preset-modal-actions">
+              <button className="btn btn-secondary" onClick={() => handlePresetSelection(null)}>
+                Start from Scratch
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

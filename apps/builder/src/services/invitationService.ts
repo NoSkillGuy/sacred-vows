@@ -4,10 +4,7 @@
  */
 
 import { apiRequest } from "./apiClient";
-import type {
-  // UniversalWeddingData removed - unused
-  LayoutConfig,
-} from "@shared/types/wedding-data";
+import type { UniversalWeddingData, LayoutConfig } from "@shared/types/wedding-data";
 
 export interface Invitation {
   id: string;
