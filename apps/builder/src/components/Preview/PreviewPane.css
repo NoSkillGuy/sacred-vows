@@ -42,17 +42,27 @@
 
 /* Device Frame */
 .preview-device-frame {
-  background: var(--white);
   min-height: 100%;
   transition: all 0.4s var(--ease-out-expo);
   position: relative;
   display: flex;
   flex-direction: column;
-  box-shadow: var(--shadow-sm);
+  width: 100%;
+}
+
+/* Desktop mode - full width, no frame styling
+ * Desktop mode uses transparent background for true WYSIWYG accuracy,
+ * allowing the actual website background to show through without extra visual chrome.
+ * Tablet/mobile modes use frame styling to provide device preview context.
+ */
+.preview-device-frame.device-desktop {
+  background: transparent;
+  box-shadow: none;
 }
 
 .preview-device-frame.device-tablet,
 .preview-device-frame.device-mobile {
+  background: var(--white);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-xl);
   min-height: auto;
@@ -89,32 +99,8 @@
   z-index: 100;
 }
 
-/* Preview wrapper - matches actual website body */
-.preview-wrapper {
-  width: 100%;
-  min-height: 100vh;
-  background:
-    radial-gradient(
-      circle at top left,
-      color-mix(in srgb, var(--accent-blush, var(--bg-page)) 35%, transparent),
-      transparent 60%
-    ),
-    radial-gradient(
-      circle at bottom right,
-      color-mix(in srgb, var(--accent-sage, var(--bg-page)) 35%, transparent),
-      transparent 60%
-    ),
-    var(--bg-page);
-  overflow: visible;
-  position: relative;
-  margin: 0;
-  padding: 0;
-  border: none;
-  box-shadow: none;
-}
-
 /* Ensure invitation button styles take precedence - match exact website styles */
-.preview-wrapper .btn {
+.preview-device-frame .btn {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -131,7 +117,7 @@
   font-weight: normal !important;
 }
 
-.preview-wrapper .btn-primary {
+.preview-device-frame .btn-primary {
   background: linear-gradient(
     135deg,
     var(--button-primary),
@@ -144,7 +130,7 @@
     0 0 10px rgba(212, 175, 55, 0.25) !important;
 }
 
-.preview-wrapper .btn-primary:hover {
+.preview-device-frame .btn-primary:hover {
   background: linear-gradient(
     135deg,
     var(--button-primary-hover),
@@ -156,38 +142,44 @@
     0 0 14px rgba(212, 175, 55, 0.35) !important;
 }
 
-.preview-wrapper .btn-ghost {
+.preview-device-frame .btn-ghost {
   background: rgba(255, 255, 255, 0.8) !important;
   border-color: rgba(212, 175, 55, 0.7) !important;
   color: var(--text-main) !important;
   box-shadow: none !important;
 }
 
-.preview-wrapper .btn-ghost:hover {
+.preview-device-frame .btn-ghost:hover {
   background: #fff7eb !important;
   transform: translateY(-1px) !important;
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.06) !important;
 }
 
-.preview-wrapper .btn-icon {
+.preview-device-frame .btn-icon {
   font-size: 14px !important;
 }
 
 /* Ensure invitation styles work properly in preview */
-.preview-wrapper * {
+.preview-device-frame * {
   box-sizing: border-box;
 }
 
 /* Make sure page-shell works correctly */
-.preview-wrapper .page-shell {
+.preview-device-frame .page-shell {
   max-width: 1080px;
   margin: 0 auto;
   padding: 16px 16px 80px;
   width: 100%;
 }
 
+/* Editorial Elegance layout - remove extra padding, let layout handle spacing */
+.preview-device-frame .page-shell.editorial-elegance {
+  padding: 0;
+  max-width: 100%;
+}
+
 /* Ensure header is full width and sticky */
-.preview-wrapper .site-header {
+.preview-device-frame .site-header {
   width: 100%;
   max-width: 100%;
   position: sticky;
@@ -196,19 +188,14 @@
 }
 
 /* Ensure all sections render correctly */
-.preview-wrapper section {
+.preview-device-frame section {
   width: 100%;
   max-width: 100%;
 }
 
-.preview-wrapper .card {
+.preview-device-frame .card {
   width: 100%;
   max-width: 100%;
-}
-
-/* Ensure celebrate button floats at bottom-right of visible preview area */
-.preview-device-frame .preview-wrapper {
-  flex: 1;
 }
 
 .preview-device-frame .celebrate-button {
@@ -223,8 +210,8 @@
   height: fit-content;
 }
 
-/* Ensure confetti layer is positioned relative to preview wrapper */
-.preview-wrapper .confetti-layer {
+/* Ensure confetti layer is positioned relative to preview device frame */
+.preview-device-frame .confetti-layer {
   position: absolute !important;
   inset: 0;
   z-index: 3000;

@@ -304,66 +304,66 @@ function PreviewPane({ editMode = true, deviceMode = "desktop" }) {
       <div className="preview-content" data-preview-scroll-container>
         <div
           className={`preview-device-frame device-${deviceMode}`}
+          data-edit-mode={editMode}
+          data-testid="preview-device-frame"
           style={{
             maxWidth: deviceWidths[deviceMode],
             margin: deviceMode !== "desktop" ? "20px auto" : "0 auto",
           }}
         >
-          <div className="preview-wrapper" data-edit-mode={editMode}>
-            {/* Header is always rendered (required section) */}
-            {Header && (
-              <Header
-                onLanguageClick={handleLanguageClick}
-                translations={translations}
-                currentLang={currentLang}
-                config={currentInvitation.data}
-              />
-            )}
-            {Blessings && <Blessings />}
-            {/* Initialize scroll animations for editorial-elegance layout */}
-            {ScrollAnimationsInit && layoutId === "editorial-elegance" && <ScrollAnimationsInit />}
-            <main
-              className={`page-shell ${layoutId === "editorial-elegance" ? "editorial-elegance" : ""}`}
-              key={editMode ? "edit" : `view-${modeKey}`}
-            >
-              {/* Dynamically render enabled sections in order */}
-              {mainSections.map((section, index) => renderSection(section, index))}
+          {/* Header is always rendered (required section) */}
+          {Header && (
+            <Header
+              onLanguageClick={handleLanguageClick}
+              translations={translations}
+              currentLang={currentLang}
+              config={currentInvitation.data}
+            />
+          )}
+          {Blessings && <Blessings />}
+          {/* Initialize scroll animations for editorial-elegance layout */}
+          {ScrollAnimationsInit && layoutId === "editorial-elegance" && <ScrollAnimationsInit />}
+          <main
+            className={`page-shell ${layoutId === "editorial-elegance" ? "editorial-elegance" : ""}`}
+            key={editMode ? "edit" : `view-${modeKey}`}
+          >
+            {/* Dynamically render enabled sections in order */}
+            {mainSections.map((section, index) => renderSection(section, index))}
 
-              {/* Footer is always rendered if enabled (required section) */}
-              {isFooterEnabled &&
-                Footer &&
-                EditableFooter &&
-                (editMode ? <EditableFooter {...editableProps} /> : <Footer {...viewProps} />)}
-            </main>
+            {/* Footer is always rendered if enabled (required section) */}
+            {isFooterEnabled &&
+              Footer &&
+              EditableFooter &&
+              (editMode ? <EditableFooter {...editableProps} /> : <Footer {...viewProps} />)}
+          </main>
 
-            {ConfettiLayer && <ConfettiLayer />}
-            {LanguageModal && (
-              <LanguageModal
-                isOpen={showLanguageModal}
-                onClose={() => setShowLanguageModal(false)}
-                onSelect={handleLanguageSelect}
-                currentLang={currentLang}
-                translations={translations}
-              />
-            )}
-            {GuestNameModal && (
-              <GuestNameModal
-                isOpen={showGuestNameModal}
-                onClose={() => setShowGuestNameModal(false)}
-                translations={translations}
-                currentLang={currentLang}
-              />
-            )}
-            {RSVPModal && (
-              <RSVPModal
-                isOpen={showRSVPModal}
-                onClose={() => setShowRSVPModal(false)}
-                translations={translations}
-                currentLang={currentLang}
-                config={currentInvitation.data}
-              />
-            )}
-          </div>
+          {ConfettiLayer && <ConfettiLayer />}
+          {LanguageModal && (
+            <LanguageModal
+              isOpen={showLanguageModal}
+              onClose={() => setShowLanguageModal(false)}
+              onSelect={handleLanguageSelect}
+              currentLang={currentLang}
+              translations={translations}
+            />
+          )}
+          {GuestNameModal && (
+            <GuestNameModal
+              isOpen={showGuestNameModal}
+              onClose={() => setShowGuestNameModal(false)}
+              translations={translations}
+              currentLang={currentLang}
+            />
+          )}
+          {RSVPModal && (
+            <RSVPModal
+              isOpen={showRSVPModal}
+              onClose={() => setShowRSVPModal(false)}
+              translations={translations}
+              currentLang={currentLang}
+              config={currentInvitation.data}
+            />
+          )}
           {CelebrateButton && <CelebrateButton />}
         </div>
       </div>
