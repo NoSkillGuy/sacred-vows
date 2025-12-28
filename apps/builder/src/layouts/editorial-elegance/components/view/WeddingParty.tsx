@@ -1,25 +1,14 @@
 /**
- * WeddingParty - Bride, Groom, and optional party members
+ * WeddingParty - Party members only (bridesmaids, groomsmen, etc.)
  * Black & white photos recommended
  */
-import { getDefaultAssetUrl } from "../../../../services/defaultAssetService";
-
 function WeddingParty({ _translations, _currentLang, config = {} }) {
   const weddingParty = config.weddingParty || {};
-  const couple = config.couple || {};
-  const bride = weddingParty.bride ||
-    couple.bride || { name: "Bride", image: getDefaultAssetUrl("couple2", "bride", "1.jpeg") };
-  const groom = weddingParty.groom ||
-    couple.groom || { name: "Groom", image: getDefaultAssetUrl("couple2", "groom", "1.jpeg") };
   const members = weddingParty.members || [];
   const showBios = weddingParty.showBios || false;
   const filter = weddingParty.filter || "bw"; // 'none' | 'bw'
 
-  const allMembers = [
-    bride && { ...bride, title: "THE BRIDE" },
-    groom && { ...groom, title: "THE GROOM" },
-    ...members,
-  ].filter(Boolean);
+  if (members.length === 0) return null;
 
   return (
     <section className="ee-section ee-wedding-party-section">
@@ -31,7 +20,7 @@ function WeddingParty({ _translations, _currentLang, config = {} }) {
 
       {/* Party Grid */}
       <div className="ee-party-grid">
-        {allMembers.map((member, index) => (
+        {members.map((member, index) => (
           <div key={index} className="ee-party-member">
             <div className={`ee-party-image-wrapper ee-filter-${filter}`}>
               <img src={member.image} alt={member.name} className="ee-party-image" />

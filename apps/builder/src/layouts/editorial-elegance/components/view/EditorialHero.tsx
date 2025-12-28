@@ -54,11 +54,6 @@ function EditorialHero({ _translations, _currentLang, config = {} }) {
           )}
           <p className="ee-meta-text ee-hero-location">{city}</p>
         </div>
-
-        {/* Scroll Indicator */}
-        <div className="ee-scroll-indicator">
-          <span className="ee-scroll-line" />
-        </div>
       </div>
     </section>
   );

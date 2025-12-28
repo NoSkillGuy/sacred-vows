@@ -46,10 +46,27 @@ function loadFromStorage(): InvitationData {
       // Ensure data is an object, not an array or string
       parsed.data = parseInvitationData(parsed.data, { ...defaultWeddingConfig });
 
-      // If layout is editorial-elegance and data is minimal, merge defaults
-      if (parsed.layoutId === "editorial-elegance" && Object.keys(parsed.data).length < 5) {
-        // Note: We can't do async import here, so we'll rely on setCurrentInvitation to merge
-        // But we can at least ensure it's an object
+      // If layout is editorial-elegance, check if countdownTarget needs updating
+      if (parsed.layoutId === "editorial-elegance" && parsed.data) {
+        const wedding = (parsed.data as Record<string, unknown>)?.wedding as
+          | Record<string, unknown>
+          | undefined;
+        const countdownTarget = wedding?.countdownTarget as string | undefined;
+
+        // If countdownTarget is missing or in the past, mark it for update
+        if (!countdownTarget) {
+          // Will be merged in setCurrentInvitation
+        } else {
+          const targetDate = new Date(countdownTarget);
+          const now = new Date();
+          if (Number.isNaN(targetDate.getTime()) || targetDate <= now) {
+            // Date is invalid or in the past, will be updated in setCurrentInvitation
+            // Remove the old date so mergeWithDefaults will use the default
+            if (wedding) {
+              delete wedding.countdownTarget;
+            }
+          }
+        }
       }
 
       // Fallback for unsupported layouts
@@ -283,16 +300,35 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
       // Parse data if it's a string
       let invitationData = parseInvitationData(invitation.data || {}, {}) as UniversalWeddingData;
 
-      // Merge editorial-elegance defaults if needed (always merge for empty or minimal data)
+      // Merge editorial-elegance defaults if needed (always merge for empty or minimal data, or when missing new fields)
       if (layoutId === "editorial-elegance") {
         const dataKeys = Object.keys(invitationData).length;
+        const wedding = invitationData.wedding as Record<string, unknown> | undefined;
+        const countdownTarget = wedding?.countdownTarget as string | undefined;
+
+        // Check if countdownTarget exists and is valid and in the future
+        let hasValidCountdownTarget = false;
+        if (countdownTarget) {
+          const targetDate = new Date(countdownTarget);
+          const now = new Date();
+          hasValidCountdownTarget = !Number.isNaN(targetDate.getTime()) && targetDate > now;
+        }
+
         const shouldMerge =
-          dataKeys === 0 || dataKeys < 5 || !invitationData.couple || !invitationData.wedding;
+          dataKeys === 0 ||
+          dataKeys < 5 ||
+          !invitationData.couple ||
+          !invitationData.wedding ||
+          !hasValidCountdownTarget;
 
         if (shouldMerge) {
           try {
             const { mergeWithDefaults } = await import("../layouts/editorial-elegance/defaults");
             invitationData = mergeWithDefaults(invitationData) as UniversalWeddingData;
+            console.log(
+              "Merged editorial-elegance defaults. countdownTarget:",
+              (invitationData.wedding as Record<string, unknown>)?.countdownTarget
+            );
           } catch (error) {
             console.warn(
               "Failed to load editorial-elegance defaults in setCurrentInvitation:",
@@ -302,6 +338,55 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
         }
       }
 
+      // Preserve existing sections from current state if they exist and layout ID matches
+      // This ensures user's section visibility preferences are maintained on reload
+      const { currentInvitation: existingInvitation } = get();
+      const existingSections = existingInvitation.layoutConfig?.sections || [];
+      const apiSections = layoutConfig.sections || [];
+
+      // Determine which sections to use, preserving user's enabled/disabled preferences
+      let finalSections: SectionConfig[] = [];
+
+      if (existingSections.length > 0 && existingInvitation.layoutId === layoutId) {
+        // We have existing sections - preserve their enabled state
+        if (apiSections.length > 0) {
+          // API has sections - merge: use API as base but preserve enabled state from existing
+          const existingSectionsMap = new Map<string, SectionConfig>();
+          existingSections.forEach((section) => {
+            existingSectionsMap.set(section.id, section);
+          });
+
+          // Merge: use API sections as base, but preserve enabled state from existing sections
+          finalSections = apiSections.map((apiSection) => {
+            const existingSection = existingSectionsMap.get(apiSection.id);
+            if (existingSection) {
+              // Preserve the user's enabled/disabled preference
+              return {
+                ...apiSection,
+                enabled: existingSection.enabled,
+              };
+            }
+            return apiSection;
+          });
+
+          // Also include any existing sections that aren't in the API response
+          existingSections.forEach((existingSection) => {
+            if (!apiSections.find((s) => s.id === existingSection.id)) {
+              finalSections.push(existingSection);
+            }
+          });
+        } else {
+          // API has no sections - use existing sections (they're more up-to-date)
+          finalSections = existingSections;
+        }
+      } else if (apiSections.length > 0) {
+        // No existing sections, but API has sections - use API sections
+        finalSections = apiSections;
+      } else {
+        // Fallback to default sections if neither exists
+        finalSections = defaultLayoutConfig.sections || [];
+      }
+
       const invitationWithConfig: InvitationData = {
         id: invitation.id ?? null,
         layoutId,
@@ -309,6 +394,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
         layoutConfig: {
           ...defaultLayoutConfig,
           ...layoutConfig,
+          sections: finalSections,
         },
         translations: invitation.translations ?? null,
       };

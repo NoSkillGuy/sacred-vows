@@ -128,8 +128,14 @@ function PreviewPane({ editMode = true, deviceMode = "desktop" }) {
   const enabledSections = useMemo(() => {
     let sections = getEnabledSections();
 
-    // If no sections are enabled, try to get them from manifest
-    if (sections.length === 0) {
+    // Only fallback to manifest if sections haven't been configured yet
+    // (i.e., layoutConfig.sections is empty or undefined, not when user has disabled all)
+    const hasConfiguredSections =
+      currentInvitation.layoutConfig?.sections &&
+      currentInvitation.layoutConfig.sections.length > 0;
+
+    if (sections.length === 0 && !hasConfiguredSections) {
+      // No sections configured at all - use manifest defaults (first time loading layout)
       if (currentLayoutManifest?.sections) {
         sections = currentLayoutManifest.sections
           .filter((s) => s.enabled !== false)
@@ -155,7 +161,7 @@ function PreviewPane({ editMode = true, deviceMode = "desktop" }) {
     }
 
     return sections;
-  }, [currentLayoutManifest, layout, getEnabledSections]);
+  }, [currentLayoutManifest, layout, getEnabledSections, currentInvitation.layoutConfig]);
 
   // Apply theme to CSS variables
   useEffect(() => {

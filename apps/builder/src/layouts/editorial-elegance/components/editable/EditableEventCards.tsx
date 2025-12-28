@@ -51,6 +51,8 @@ function EditableEventCards({
     [events.events]
   );
   const [hoveredEventId, setHoveredEventId] = useState<string | null>(null);
+  const [expandedContentEventIds, setExpandedContentEventIds] = useState<Set<string>>(new Set());
+  const [expandedWidthEventIds, setExpandedWidthEventIds] = useState<Set<string>>(new Set());
 
   const handleAddEvent = () => {
     const wedding = currentInvitation.data.wedding || config.wedding || {};
@@ -84,6 +86,30 @@ function EditableEventCards({
     return `events.events.${eventIndex}.${field}`;
   };
 
+  const toggleContent = (eventId: string) => {
+    setExpandedContentEventIds((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(eventId)) {
+        newSet.delete(eventId);
+      } else {
+        newSet.add(eventId);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleWidth = (eventId: string) => {
+    setExpandedWidthEventIds((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(eventId)) {
+        newSet.delete(eventId);
+      } else {
+        newSet.add(eventId);
+      }
+      return newSet;
+    });
+  };
+
   return (
     <section className="ee-section ee-events-section">
       <div className="ee-section-header">
@@ -109,10 +135,12 @@ function EditableEventCards({
             {eventList.map((event) => {
               // event.id is guaranteed to exist from useMemo mapping
               const eventId = event.id!;
+              const isContentExpanded = expandedContentEventIds.has(eventId);
+              const isWidthExpanded = expandedWidthEventIds.has(eventId);
               return (
                 <div
                   key={eventId}
-                  className="ee-event-card"
+                  className={`ee-event-card ${isWidthExpanded ? "ee-event-card-width-expanded" : ""}`}
                   onMouseEnter={() => setHoveredEventId(eventId)}
                   onMouseLeave={() => setHoveredEventId(null)}
                 >
@@ -131,21 +159,47 @@ function EditableEventCards({
                     </button>
                   )}
                   <div className="ee-event-card-inner">
-                    <EditableText
-                      value={event.label}
-                      onUpdate={onUpdate}
-                      path={getEventPath(eventId, "label")}
-                      className="ee-event-name"
-                      tag="h3"
-                    />
-                    <EditableDate
-                      value={event.date}
-                      onUpdate={onUpdate}
-                      path={getEventPath(eventId, "date")}
-                      className="ee-meta-text ee-event-date"
-                      placeholder="Click to set date..."
-                    />
-                    <div className="ee-event-details">
+                    <div className="ee-event-card-header">
+                      <div className="ee-event-card-header-content">
+                        <EditableText
+                          value={event.label}
+                          onUpdate={onUpdate}
+                          path={getEventPath(eventId, "label")}
+                          className="ee-event-name"
+                          tag="h3"
+                        />
+                        <EditableDate
+                          value={event.date}
+                          onUpdate={onUpdate}
+                          path={getEventPath(eventId, "date")}
+                          className="ee-meta-text ee-event-date"
+                          placeholder="Click to set date..."
+                        />
+                      </div>
+                      <div className="ee-event-controls">
+                        <button
+                          type="button"
+                          className="ee-event-toggle-btn"
+                          onClick={() => toggleContent(eventId)}
+                          aria-label={isContentExpanded ? "Hide details" : "Show details"}
+                          title={isContentExpanded ? "Hide details" : "Show details"}
+                        >
+                          {isContentExpanded ? "−" : "+"}
+                        </button>
+                        <button
+                          type="button"
+                          className="ee-event-width-toggle-btn"
+                          onClick={() => toggleWidth(eventId)}
+                          aria-label={isWidthExpanded ? "Compact width" : "Full width"}
+                          title={isWidthExpanded ? "Compact width" : "Full width"}
+                        >
+                          ⇄
+                        </button>
+                      </div>
+                    </div>
+                    <div
+                      className={`ee-event-details ${isContentExpanded ? "ee-event-details-expanded" : ""}`}
+                    >
                       <EditableText
                         value={event.venue || "Venue TBD"}
                         onUpdate={onUpdate}

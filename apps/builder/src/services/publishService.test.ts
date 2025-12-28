@@ -5,10 +5,6 @@ import {
   listVersions,
   rollbackToVersion,
 } from "./publishService";
-import { server } from "../tests/mocks/server";
-import { http, HttpResponse } from "msw";
-
-const API_BASE_URL = "http://localhost:3000/api";
 
 // Mock apiClient to avoid token refresh side effects
 vi.mock("./apiClient", async () => {
