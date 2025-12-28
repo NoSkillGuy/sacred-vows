@@ -1145,7 +1145,7 @@
   justify-content: center;
   z-index: 2000;
   padding: 1rem;
-  animation: fadeIn 0.2s ease-out;
+  animation: fadeIn 0.2s var(--ease-out-quart);
 }
 
 @keyframes fadeIn {
@@ -1167,7 +1167,7 @@
   box-shadow: var(--shadow-xl);
   display: flex;
   flex-direction: column;
-  animation: slideUp 0.3s ease-out;
+  animation: slideUp 0.3s var(--ease-out-expo);
   position: relative;
 }
 
@@ -1184,7 +1184,7 @@
 
 .preset-modal-header {
   padding: 2rem 2rem 1rem;
-  border-bottom: 1px solid rgba(232, 180, 184, 0.3);
+  border-bottom: 1px solid rgba(var(--rose-rgb), 0.3);
   background: linear-gradient(180deg, var(--blush-light) 0%, var(--white) 100%);
   position: relative;
 }
@@ -1200,7 +1200,8 @@
 .preset-modal-header p {
   margin: 0;
   color: var(--text-muted);
-  font-size: 0.95rem;
+  font-size: 1rem;
+  line-height: 1.7;
 }
 
 .preset-modal-close {
@@ -1209,15 +1210,17 @@
   right: 1.5rem;
   background: none;
   border: none;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   color: var(--text-muted);
-  transition: all 0.2s ease;
+  transition: all 0.2s var(--ease-out-quart);
   font-size: 1.75rem;
   line-height: 1;
 }
@@ -1225,6 +1228,12 @@
 .preset-modal-close:hover {
   background: var(--blush);
   color: var(--text-dark);
+}
+
+.preset-modal-close:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.3);
 }
 
 .preset-grid {
@@ -1236,20 +1245,28 @@
 
 .preset-card {
   background: var(--white);
-  border: 2px solid rgba(232, 180, 184, 0.3);
+  border: 2px solid rgba(var(--rose-rgb), 0.3);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s var(--ease-out-quart);
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  text-align: left;
+  font-family: inherit;
 }
 
 .preset-card:hover {
   border-color: var(--champagne);
   box-shadow: var(--shadow-md);
   transform: translateY(-2px);
+}
+
+.preset-card:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.3);
 }
 
 .preset-emoji {
@@ -1275,17 +1292,17 @@
 .preset-use-case {
   margin: 0;
   color: var(--text-muted);
-  font-size: 0.85rem;
-  line-height: 1.5;
+  font-size: 0.875rem;
+  line-height: 1.7;
 }
 
 .preset-best-for {
   margin-top: 0.5rem;
   padding-top: 0.75rem;
-  border-top: 1px solid rgba(232, 180, 184, 0.2);
-  font-size: 0.85rem;
+  border-top: 1px solid rgba(var(--rose-rgb), 0.2);
+  font-size: 0.875rem;
   color: var(--text-muted);
-  line-height: 1.5;
+  line-height: 1.7;
 }
 
 .preset-best-for strong {
@@ -1319,9 +1336,25 @@
 
 .preset-modal-actions {
   padding: 1.5rem 2rem 2rem;
-  border-top: 1px solid rgba(232, 180, 184, 0.3);
+  border-top: 1px solid rgba(var(--rose-rgb), 0.3);
   display: flex;
   justify-content: center;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .preset-modal-overlay,
+  .preset-modal {
+    animation: none;
+  }
+
+  .preset-card {
+    transition: none;
+  }
+
+  .preset-modal-close {
+    transition: none;
+  }
 }
 
 @media (max-width: 768px) {

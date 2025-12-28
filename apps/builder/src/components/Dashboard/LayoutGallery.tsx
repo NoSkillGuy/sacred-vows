@@ -126,6 +126,74 @@ function LayoutGallery(): JSX.Element {
     return () => document.removeEventListener("mousedown", handleClickOutside as EventListener);
   }, []);
 
+  // Handle Escape key to close modal
+  useEffect(() => {
+    if (!presetModalOpen) return;
+
+    const handleEscape = (e: KeyboardEvent): void => {
+      if (e.key === "Escape") {
+        setPresetModalOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [presetModalOpen]);
+
+  // Focus trap for modal
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previousActiveElementRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!presetModalOpen) return;
+
+    // Store the previously focused element
+    previousActiveElementRef.current = document.activeElement as HTMLElement;
+
+    // Focus trap logic
+    const modal = modalRef.current;
+    if (!modal) return;
+
+    const focusableElements = modal.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+
+    if (focusableElements.length === 0) return;
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    // Focus the first element
+    firstElement.focus();
+
+    const handleTab = (e: KeyboardEvent): void => {
+      if (e.key !== "Tab") return;
+
+      if (e.shiftKey) {
+        // Shift + Tab
+        if (document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement.focus();
+        }
+      } else {
+        // Tab
+        if (document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement.focus();
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleTab);
+    return () => {
+      document.removeEventListener("keydown", handleTab);
+      // Restore focus to previously focused element
+      if (previousActiveElementRef.current) {
+        previousActiveElementRef.current.focus();
+      }
+    };
+  }, [presetModalOpen]);
+
   function loadUser(): void {
     const currentUser = getCurrentUser();
     setUser(currentUser);
@@ -407,9 +475,16 @@ function LayoutGallery(): JSX.Element {
       {/* Preset Selection Modal */}
       {presetModalOpen && selectedLayout && (
         <div className="preset-modal-overlay" onClick={() => setPresetModalOpen(false)}>
-          <div className="preset-modal" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="preset-modal"
+            ref={modalRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="preset-modal-title"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="preset-modal-header">
-              <h2>Choose Your Invitation Flow</h2>
+              <h2 id="preset-modal-title">Choose Your Invitation Flow</h2>
               <p>Select a preset to get started, or start from scratch</p>
               <button
                 className="preset-modal-close"
@@ -423,8 +498,9 @@ function LayoutGallery(): JSX.Element {
             <div className="preset-grid">
               {selectedLayout.presets && selectedLayout.presets.length > 0 ? (
                 selectedLayout.presets.map((preset) => (
-                  <div
+                  <button
                     key={preset.id}
+                    type="button"
                     className="preset-card"
                     onClick={() => handlePresetSelection(preset)}
                   >
@@ -438,7 +514,7 @@ function LayoutGallery(): JSX.Element {
                     <div className="preset-sections">
                       <strong>{preset.sectionIds.length} sections</strong>
                     </div>
-                  </div>
+                  </button>
                 ))
               ) : (
                 <div className="preset-empty">
