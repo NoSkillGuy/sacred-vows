@@ -12,26 +12,28 @@ When the user invokes `/review-pr`, fetch the GitHub PR, perform a thorough code
 2. **Repository information**:
    - Repository: Detect from git remote using: `git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/'`
    - Owner and Repo: Extract from the detected repository string (format: `owner/repo`)
-   - Use `gh` CLI for all GitHub operations
+   - **Use GitHub MCP server for all GitHub operations** (not `gh` CLI)
 
 ## Review Process
 
 ### Step 1: Fetch PR Information
 
+Use GitHub MCP server to fetch PR information:
+
 1. **Get PR details**:
-   ```bash
-   gh pr view <PR_NUMBER> --json number,title,body,author,state,baseRefName,headRefName,files,commits
-   ```
+   - Use `mcp_github_pull_request_read` with method `get`
+   - Repository: Detect from git remote (see Step 1.2)
+   - Extract: number, title, body, author, state, baseRefName, headRefName, headRefOid, files, commits
 
 2. **Get PR diff**:
-   ```bash
-   gh pr diff <PR_NUMBER>
-   ```
+   - Use `mcp_github_pull_request_read` with method `get_diff`
+   - Repository: Detect from git remote (see Step 1.2)
+   - This returns the full diff of the PR
 
 3. **Get PR files**:
-   ```bash
-   gh pr view <PR_NUMBER> --json files --jq '.files[] | {path: .path, additions: .additions, deletions: .deletions, status: .status}'
-   ```
+   - Use `mcp_github_pull_request_read` with method `get_files`
+   - Repository: Detect from git remote (see Step 1.2)
+   - Extract: path, additions, deletions, status for each file
 
 ### Step 2: Comprehensive Code Review
 
@@ -165,48 +167,60 @@ For each issue found, create a review comment with:
 
 ### Step 4: Post Review Comments
 
-Use `gh` CLI to post review comments. For inline comments on specific lines, use `gh api`:
+Use GitHub MCP server to post review comments. The recommended approach is to create a pending review and add comments to it, then submit the review.
 
-1. **For inline comments on specific lines** (recommended for code review):
-   ```bash
-   # First, get the head commit SHA for the PR (the latest commit in the PR branch)
-   COMMIT_SHA=$(gh pr view <PR_NUMBER> --json headRefOid --jq '.headRefOid')
-
-   # Post inline comment on a specific line
-   REPO=$(git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/')
-   gh api repos/$REPO/pulls/<PR_NUMBER>/comments \
-     -X POST \
-     -f body="Comment text" \
-     -f commit_id="$COMMIT_SHA" \
-     -f path="<file_path>" \
-     -f line=<line_number> \
-     -f side="RIGHT"
-   ```
+1. **Create a pending review with inline comments** (recommended for code review):
+   - Use `mcp_github_pull_request_review_write` with method `create` (without `event` parameter to create a pending review)
+   - Repository: Detect from git remote (see Step 1.2)
+   - Get the head commit SHA from PR data (`headRefOid`)
+   - For each inline comment, use `mcp_github_add_comment_to_pending_review`:
+     - `path`: File path
+     - `line`: Line number (for single-line comments)
+     - `startLine`: Start line (for multi-line comments)
+     - `side`: `"RIGHT"` (for comments on the new code in the PR)
+     - `body`: Comment text
+   - After adding all comments, submit the review using `mcp_github_pull_request_review_write` with method `submit_pending`:
+     - `event`: `"COMMENT"` (for review with comments only), `"APPROVE"` (to approve), or `"REQUEST_CHANGES"` (to request changes)
+     - `body`: Overall review summary
 
 2. **For general PR comments** (not tied to specific lines):
-   ```bash
-   REPO=$(git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/')
-   gh pr comment <PR_NUMBER> --body "Comment text" --repo $REPO
-   ```
+   - Use `mcp_github_add_issue_comment` (PRs are issues in GitHub)
+   - Repository: Detect from git remote (see Step 1.2)
+   - Issue number: PR number
+   - Body: Comment text
 
-3. **For review summary** (overall review comment):
-   ```bash
-   REPO=$(git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/')
-   gh pr review <PR_NUMBER> --comment --body "Review summary" --repo $REPO
-   ```
+3. **Alternative: Single review with all comments**:
+   - If you want to post all comments at once, you can use `gh api` as a fallback:
+     ```bash
+     # Get the head commit SHA
+     COMMIT_SHA=$(gh pr view <PR_NUMBER> --json headRefOid --jq '.headRefOid')
 
-4. **For review with approval/rejection**:
-   ```bash
-   REPO=$(git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/')
-   gh pr review <PR_NUMBER> --approve --body "Review summary" --repo $REPO
-   gh pr review <PR_NUMBER> --request-changes --body "Review summary" --repo $REPO
-   ```
+     # Create review JSON with all comments
+     cat > /tmp/review.json <<EOF
+     {
+       "body": "Review summary",
+       "event": "COMMENT",
+       "commit_id": "$COMMIT_SHA",
+       "comments": [
+         {
+           "path": "file/path.go",
+           "line": 123,
+           "body": "Comment text",
+           "side": "RIGHT"
+         }
+       ]
+     }
+     EOF
+
+     REPO=$(git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/')
+     gh api repos/$REPO/pulls/<PR_NUMBER>/reviews -X POST --input /tmp/review.json
+     ```
 
 **Note**:
-- For inline comments, use `gh api` with the commit SHA, file path, and line number
-- The `side` parameter should be `"RIGHT"` for comments on the new code (the PR branch)
-- Get the commit SHA from `gh pr view --json commits`
-- Multiple inline comments can be posted in a single review by creating a review with multiple comments
+- **Preferred approach**: Use MCP `pull_request_review_write` with `create` (pending), then `add_comment_to_pending_review` for each comment, then `submit_pending` to submit
+- For inline comments, the `side` parameter should be `"RIGHT"` for comments on the new code (the PR branch)
+- Get the commit SHA from PR data (`headRefOid` from `pull_request_read`)
+- Multiple inline comments can be added to a single pending review before submitting
 
 ### Step 5: Create Review Summary
 
@@ -234,15 +248,15 @@ Post a comprehensive review summary that includes:
 
 1. **Parse PR number**:
    - Check if user provided PR number: `/review-pr 123`
-   - If not, try to detect from current branch: `gh pr view --json number`
+   - If not, try to detect from current branch using `mcp_github_list_pull_requests` filtered by head branch
    - If still not found, ask user for PR number
+   - Repository: Detect from git remote using: `git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/'`
 
-2. **Fetch PR data**:
-   ```bash
-   PR_NUMBER=<number>
-   gh pr view $PR_NUMBER --json number,title,body,author,state,baseRefName,headRefName,files,commits > /tmp/pr_info.json
-   gh pr diff $PR_NUMBER > /tmp/pr_diff.patch
-   ```
+2. **Fetch PR data using GitHub MCP**:
+   - Use `mcp_github_pull_request_read` with method `get` to get PR details
+   - Use `mcp_github_pull_request_read` with method `get_diff` to get PR diff
+   - Use `mcp_github_pull_request_read` with method `get_files` to get changed files
+   - Repository: Detect from git remote (see Step 1.2)
 
 3. **Analyze changes**:
    - Read the diff file
@@ -250,45 +264,20 @@ Post a comprehensive review summary that includes:
    - For each file, check against review criteria
    - Identify issues and create review comments
 
-4. **Post comments**:
+4. **Post comments using GitHub MCP**:
    - Collect all inline comments first
-   - Create a review with all inline comments at once (more efficient)
-   - Post summary review comment
-   - Use this approach for creating a review with inline comments:
-     ```bash
-     # Get the head commit SHA
-     COMMIT_SHA=$(gh pr view <PR_NUMBER> --json headRefOid --jq '.headRefOid')
-
-     # Create a review with inline comments
-     # First, create a JSON file with the review data
-     cat > /tmp/review.json <<EOF
-     {
-       "body": "Review summary with overall assessment",
-       "event": "COMMENT",
-       "commit_id": "$COMMIT_SHA",
-       "comments": [
-         {
-           "path": "file/path.go",
-           "line": 123,
-           "body": "Comment text",
-           "side": "RIGHT"
-         },
-         {
-           "path": "file/path.go",
-           "line": 145,
-           "body": "Another comment",
-           "side": "RIGHT"
-         }
-       ]
-     }
-     EOF
-
-     # Post the review using --input to preserve JSON array structure
-     REPO=$(git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/')
-     gh api repos/$REPO/pulls/<PR_NUMBER>/reviews \
-       -X POST \
-       --input /tmp/review.json
-     ```
+   - Create a pending review using `mcp_github_pull_request_review_write` with method `create` (without `event` parameter)
+   - For each inline comment, use `mcp_github_add_comment_to_pending_review`:
+     - Repository: Detect from git remote (see Step 1.2)
+     - Pull number: PR number
+     - Path: File path
+     - Line: Line number (or startLine/endLine for multi-line)
+     - Side: `"RIGHT"` (for PR branch code)
+     - Body: Comment text
+   - After adding all comments, submit the review using `mcp_github_pull_request_review_write` with method `submit_pending`:
+     - Event: `"COMMENT"` (for review with comments), `"APPROVE"`, or `"REQUEST_CHANGES"`
+     - Body: Overall review summary
+   - For general comments (not inline), use `mcp_github_add_issue_comment` (PR number as issue number)
 
 5. **Provide feedback to user**:
    - Show summary of review
@@ -514,6 +503,22 @@ if err := validator.Validate(req); err != nil {
 \`\`\`
 ```
 
+## GitHub MCP Functions to Use
+
+Most GitHub operations should use these MCP functions:
+
+- **Get PR details**: `mcp_github_pull_request_read` with method `get`
+- **Get PR diff**: `mcp_github_pull_request_read` with method `get_diff`
+- **Get PR files**: `mcp_github_pull_request_read` with method `get_files`
+- **Get commit details**: `mcp_github_get_commit`
+- **List PRs**: `mcp_github_list_pull_requests` (to find PR by branch)
+- **Create pending review**: `mcp_github_pull_request_review_write` with method `create` (without `event`)
+- **Add comment to pending review**: `mcp_github_add_comment_to_pending_review`
+- **Submit review**: `mcp_github_pull_request_review_write` with method `submit_pending`
+- **Add general PR comment**: `mcp_github_add_issue_comment` (use PR number as issue number)
+
+**Note**: For operations not available in MCP (like creating a review with all comments in one API call), you can use `gh api` as a fallback.
+
 ## Notes
 
 - Always be constructive and helpful in comments
@@ -521,9 +526,8 @@ if err := validator.Validate(req); err != nil {
 - Reference repository patterns and examples
 - Acknowledge good work when appropriate
 - Focus on important issues first (blockers, critical, major)
-- Use `gh` CLI for all GitHub operations
-- If `gh` is not authenticated, prompt user to run `gh auth login`
-- For inline comments, you may need to use `gh api` for more control
+- **Use GitHub MCP server for all GitHub operations** (not `gh` CLI)
+- Repository: Always detect dynamically from git remote using: `git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/'`
 - Group related comments when possible to avoid spam
 - Post a summary comment at the end with overall assessment
 - **Test quality is critical**: Reject tests that exist only for coverage metrics. Every test must validate meaningful business logic, user flows, or edge cases. Ensure proper test pyramid: unit tests for isolated logic, integration tests for component interactions, and e2e tests for critical user journeys.
