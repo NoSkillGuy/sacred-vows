@@ -193,7 +193,7 @@ export const editorialEleganceManifest: LayoutManifest = {
       description: "Romantic & Narrative",
       useCase:
         "Feels like a full magazine wedding spread. Perfect for couples who love storytelling.",
-      bestFor: "Couples who love storytelling, emotional depth, destination weddings",
+      bestFor: "Storytelling couples, destination weddings",
       sectionIds: [
         "hero", // Editorial Cover
         "quote", // Editorial Quote

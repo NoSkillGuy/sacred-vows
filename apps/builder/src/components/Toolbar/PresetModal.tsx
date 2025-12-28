@@ -143,92 +143,93 @@ function PresetModal({ isOpen, onClose }: PresetModalProps) {
 
         <div className="preset-modal-content">
           {presets.length > 0 ? (
-            <>
-              <div className="preset-grid">
-                {presets.map((preset) => {
-                  const isFlipped = flippedPresetId === preset.id;
-                  return (
-                    <div
-                      key={preset.id}
-                      className={`preset-card-wrapper ${isFlipped ? "flipped" : ""}`}
-                    >
-                      <div className="preset-card-inner">
-                        {/* Front of card */}
-                        <div className="preset-card-front">
-                          <div className="preset-emoji">{preset.emoji}</div>
-                          <h3>{preset.name}</h3>
-                          <p className="preset-description">{preset.description}</p>
-                          <p className="preset-use-case">{preset.useCase}</p>
-                          <div className="preset-best-for">
+            <div className="preset-grid">
+              {presets.map((preset) => {
+                const isFlipped = flippedPresetId === preset.id;
+                return (
+                  <div
+                    key={preset.id}
+                    className={`preset-card-wrapper ${isFlipped ? "flipped" : ""}`}
+                  >
+                    <div className="preset-card-inner">
+                      {/* Front of card */}
+                      <div className="preset-card-front">
+                        <h3>{preset.name}</h3>
+                        <p className="preset-description">{preset.description}</p>
+                        <p className="preset-use-case">{preset.useCase}</p>
+                        <div className="preset-best-for">
+                          <div className="preset-best-for-text">
                             <strong>Best for:</strong> {preset.bestFor}
                           </div>
-                          <div className="preset-sections">
-                            <strong>{preset.sectionIds.length} sections</strong>
-                          </div>
+                        </div>
+                        <div className="preset-sections">
+                          <strong>{preset.sectionIds.length} sections</strong>
+                        </div>
+                        <button
+                          type="button"
+                          className="preset-flip-btn"
+                          onClick={(e) => handleCardClick(preset.id, e)}
+                          aria-label="View sections"
+                        >
+                          View Sections →
+                        </button>
+                      </div>
+
+                      {/* Back of card */}
+                      <div className="preset-card-back">
+                        <h3>{preset.name}</h3>
+                        <div className="preset-sections-list">
+                          <strong>Sections included:</strong>
+                          <ul className="preset-sections-list-items">
+                            {preset.sectionIds.map((sectionId) => (
+                              <li key={sectionId}>{getSectionName(sectionId)}</li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div className="preset-card-back-actions">
                           <button
                             type="button"
                             className="preset-flip-btn"
                             onClick={(e) => handleCardClick(preset.id, e)}
-                            aria-label="View sections"
+                            aria-label="Back"
                           >
-                            View Sections →
+                            ← Back
                           </button>
-                        </div>
-
-                        {/* Back of card */}
-                        <div className="preset-card-back">
-                          <h3>{preset.name}</h3>
-                          <div className="preset-sections-list">
-                            <strong>Sections included:</strong>
-                            <ul className="preset-sections-list-items">
-                              {preset.sectionIds.map((sectionId) => (
-                                <li key={sectionId}>{getSectionName(sectionId)}</li>
-                              ))}
-                            </ul>
-                          </div>
-                          <div className="preset-card-back-actions">
-                            <button
-                              type="button"
-                              className="preset-flip-btn"
-                              onClick={(e) => handleCardClick(preset.id, e)}
-                              aria-label="Back"
-                            >
-                              ← Back
-                            </button>
-                            <button
-                              type="button"
-                              className="preset-apply-btn"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handlePresetSelection(preset);
-                              }}
-                            >
-                              Apply Preset
-                            </button>
-                          </div>
+                          <button
+                            type="button"
+                            className="preset-apply-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handlePresetSelection(preset);
+                            }}
+                          >
+                            Apply Preset
+                          </button>
                         </div>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-
-              <div className="preset-modal-actions">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => handlePresetSelection(null)}
-                >
-                  Reset to Default
-                </button>
-              </div>
-            </>
+                  </div>
+                );
+              })}
+            </div>
           ) : (
             <div className="preset-empty">
               <p>No presets available for this layout.</p>
             </div>
           )}
         </div>
+
+        {presets.length > 0 && (
+          <div className="preset-modal-actions">
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => handlePresetSelection(null)}
+            >
+              Reset to Default
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
