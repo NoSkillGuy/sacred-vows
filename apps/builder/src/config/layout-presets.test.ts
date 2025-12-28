@@ -92,12 +92,33 @@ describe("presetToSectionConfigs", () => {
       });
     });
 
-    it("should include all manifest sections", () => {
+    it("should include only preset sections plus required sections", () => {
       const result = presetToSectionConfigs(modernEditorialPreset, manifestSections);
 
-      manifestSections.forEach((manifestSection) => {
-        const section = result.find((s) => s.id === manifestSection.id);
+      // All preset sections should be present and enabled
+      modernEditorialPreset.sectionIds.forEach((presetId) => {
+        const section = result.find((s) => s.id === presetId);
         expect(section).toBeDefined();
+        expect(section?.enabled).toBe(true);
+      });
+
+      // Required sections not in preset should be included
+      const requiredNotInPreset = manifestSections.filter(
+        (s) => s.required && !modernEditorialPreset.sectionIds.includes(s.id)
+      );
+      requiredNotInPreset.forEach((requiredSection) => {
+        const section = result.find((s) => s.id === requiredSection.id);
+        expect(section).toBeDefined();
+        expect(section?.enabled).toBe(true);
+      });
+
+      // Non-preset, non-required sections should NOT be included
+      const nonPresetNonRequired = manifestSections.filter(
+        (s) => !s.required && !modernEditorialPreset.sectionIds.includes(s.id)
+      );
+      nonPresetNonRequired.forEach((nonPresetSection) => {
+        const section = result.find((s) => s.id === nonPresetSection.id);
+        expect(section).toBeUndefined();
       });
     });
 

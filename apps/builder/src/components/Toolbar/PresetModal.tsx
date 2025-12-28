@@ -21,7 +21,10 @@ function PresetModal({ isOpen, onClose }: PresetModalProps) {
 
   // Get section names from manifest
   const getSectionName = (sectionId: string): string => {
-    const section = currentLayoutManifest?.sections?.find((s) => s.id === sectionId);
+    if (!currentLayoutManifest?.sections) {
+      return sectionId;
+    }
+    const section = currentLayoutManifest.sections.find((s) => s.id === sectionId);
     return section?.name || sectionId;
   };
 
@@ -172,6 +175,15 @@ function PresetModal({ isOpen, onClose }: PresetModalProps) {
                   <div
                     key={preset.id}
                     className={`preset-card-wrapper ${isFlipped ? "flipped" : ""}`}
+                    tabIndex={0}
+                    role="button"
+                    aria-label={`${preset.name} preset card. Press Enter or Space to flip.`}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleCardClick(preset.id, e as unknown as React.MouseEvent);
+                      }
+                    }}
                   >
                     <div className="preset-card-inner">
                       {/* Front of card */}
@@ -236,7 +248,10 @@ function PresetModal({ isOpen, onClose }: PresetModalProps) {
             </div>
           ) : (
             <div className="preset-empty">
-              <p>No presets available for this layout.</p>
+              <p>No presets are available for this layout.</p>
+              <p style={{ fontSize: "0.875rem", marginTop: "0.5rem", color: "var(--text-muted)" }}>
+                You can still customize sections manually using the Section Manager.
+              </p>
             </div>
           )}
         </div>
