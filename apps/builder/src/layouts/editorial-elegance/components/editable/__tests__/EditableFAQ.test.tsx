@@ -81,7 +81,6 @@ describe("EditableFAQ", () => {
 
   describe("Accordion Behavior", () => {
     it("should expand question when clicked", async () => {
-      const user = userEvent.setup();
       const questions = [{ question: "What time is the ceremony?", answer: "4 PM" }];
 
       const { container } = render(
