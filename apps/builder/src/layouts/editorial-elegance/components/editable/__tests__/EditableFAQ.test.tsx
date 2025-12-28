@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import EditableFAQ from "../EditableFAQ";
 
@@ -53,17 +53,28 @@ describe("EditableFAQ", () => {
         { question: "Question 2?", answer: "Answer 2" },
       ];
 
-      render(<EditableFAQ config={{ faq: { questions } }} onUpdate={mockOnUpdate} />);
+      const { container } = render(
+        <EditableFAQ config={{ faq: { questions } }} onUpdate={mockOnUpdate} />
+      );
 
       // Expand first question to show delete button
-      const questionButton = screen.getByText("Question 1?");
-      await user.click(questionButton);
+      // Find the button by its role and text, or by class
+      const questionButtons = container.querySelectorAll("button.ee-faq-question");
+      expect(questionButtons.length).toBeGreaterThan(0);
+      const questionButton = questionButtons[0];
+      fireEvent.click(questionButton);
+
+      // Wait for the answer section to appear
+      await waitFor(() => {
+        const answerSection = container.querySelector(".ee-faq-answer");
+        expect(answerSection).toBeInTheDocument();
+      });
 
       const deleteButton = screen.getByText("Delete");
       await user.click(deleteButton);
 
       expect(mockOnUpdate).toHaveBeenCalledWith("faq.questions", [
-        { question: "Question 2", answer: "Answer 2" },
+        { question: "Question 2?", answer: "Answer 2" },
       ]);
     });
   });
@@ -73,13 +84,33 @@ describe("EditableFAQ", () => {
       const user = userEvent.setup();
       const questions = [{ question: "What time is the ceremony?", answer: "4 PM" }];
 
-      render(<EditableFAQ config={{ faq: { questions } }} onUpdate={mockOnUpdate} />);
+      const { container } = render(
+        <EditableFAQ config={{ faq: { questions } }} onUpdate={mockOnUpdate} />
+      );
 
-      const questionButton = screen.getByText("What time is the ceremony?");
-      await user.click(questionButton);
+      // Initially, the toggle should show "+"
+      const toggle = screen.getByText("+");
+      expect(toggle).toBeInTheDocument();
 
-      // Answer should be visible (as EditableText)
-      expect(screen.getByText("4 PM")).toBeInTheDocument();
+      // Find the button element directly
+      const questionButtons = container.querySelectorAll("button.ee-faq-question");
+      expect(questionButtons.length).toBeGreaterThan(0);
+      const questionButton = questionButtons[0];
+      fireEvent.click(questionButton);
+
+      // Wait for the toggle to change to "−" and answer section to appear
+      await waitFor(
+        () => {
+          // Toggle should change to "−"
+          expect(screen.getByText("−")).toBeInTheDocument();
+          // Answer section should appear
+          const answerSection = container.querySelector(".ee-faq-answer");
+          expect(answerSection).toBeInTheDocument();
+          // The answer text should be in the answer section
+          expect(answerSection?.textContent).toContain("4 PM");
+        },
+        { timeout: 1000 }
+      );
     });
   });
 });

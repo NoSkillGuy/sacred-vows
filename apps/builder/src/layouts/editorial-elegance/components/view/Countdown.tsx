@@ -84,7 +84,7 @@ function Countdown({ _translations, _currentLang, config = {} }: CountdownProps)
     return () => clearInterval(interval);
   }, [countdownTarget]);
 
-  if (!countdownTarget) {
+  if (!countdownTarget || !countdown) {
     return null;
   }
 
