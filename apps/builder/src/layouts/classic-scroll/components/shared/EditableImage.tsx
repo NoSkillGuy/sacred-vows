@@ -1,6 +1,5 @@
 import { useState, useRef } from "react";
 import "./EditableImage.css";
-import ImageDeletionNotice from "../../../../components/AssetManager/ImageDeletionNotice";
 import { uploadImage } from "../../../../services/assetService";
 import { useToast } from "../../../../components/Toast/ToastProvider";
 
@@ -121,7 +120,6 @@ function EditableImage({ src, alt, onUpdate, path, className = "", ...props }) {
           <div className="editable-image-overlay-content">
             <span className="editable-image-icon">📷</span>
             <span className="editable-image-text">Click to change image</span>
-            <ImageDeletionNotice variant="inline" />
           </div>
         </div>
       )}
