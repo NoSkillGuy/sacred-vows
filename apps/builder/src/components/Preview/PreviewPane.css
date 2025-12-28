@@ -50,7 +50,11 @@
   width: 100%;
 }
 
-/* Desktop mode - full width, no frame styling */
+/* Desktop mode - full width, no frame styling
+ * Desktop mode uses transparent background for true WYSIWYG accuracy,
+ * allowing the actual website background to show through without extra visual chrome.
+ * Tablet/mobile modes use frame styling to provide device preview context.
+ */
 .preview-device-frame.device-desktop {
   background: transparent;
   box-shadow: none;

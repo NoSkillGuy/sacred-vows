@@ -169,9 +169,7 @@ describe("PreviewPane", () => {
     it("should render desktop mode with transparent background", () => {
       render(<PreviewPane editMode={true} deviceMode="desktop" />);
 
-      const deviceFrame =
-        screen.getByTestId("preview-device-frame") ||
-        document.querySelector(".preview-device-frame.device-desktop");
+      const deviceFrame = screen.getByTestId("preview-device-frame");
       expect(deviceFrame).toBeInTheDocument();
       expect(deviceFrame).toHaveClass("device-desktop");
     });
@@ -225,22 +223,31 @@ describe("PreviewPane", () => {
     });
 
     it("should render editable components in edit mode", () => {
+      // Ensure sections are enabled
+      mockGetEnabledSections.mockReturnValue([
+        { id: "hero", enabled: true, order: 0 },
+        { id: "couple", enabled: true, order: 1 },
+      ]);
+
       render(<PreviewPane editMode={true} deviceMode="desktop" />);
 
-      // Check for editable components (they should be rendered)
-      const heroEditable = screen.queryByTestId("hero-editable");
-      const coupleEditable = screen.queryByTestId("couple-editable");
-
-      // Components may not render if sections are not enabled, but the structure should exist
-      expect(document.querySelector(".preview-device-frame")).toBeInTheDocument();
+      // Verify editable components are rendered
+      expect(screen.getByTestId("hero-editable")).toBeInTheDocument();
+      expect(screen.getByTestId("couple-editable")).toBeInTheDocument();
     });
 
     it("should render view components in view mode", () => {
+      // Ensure sections are enabled
+      mockGetEnabledSections.mockReturnValue([
+        { id: "hero", enabled: true, order: 0 },
+        { id: "couple", enabled: true, order: 1 },
+      ]);
+
       render(<PreviewPane editMode={false} deviceMode="desktop" />);
 
-      // Check for view components (they should be rendered)
-      const deviceFrame = document.querySelector(".preview-device-frame");
-      expect(deviceFrame).toBeInTheDocument();
+      // Verify view components are rendered
+      expect(screen.getByTestId("hero")).toBeInTheDocument();
+      expect(screen.getByTestId("couple")).toBeInTheDocument();
     });
   });
 
@@ -248,24 +255,26 @@ describe("PreviewPane", () => {
     it("should render confetti layer inside preview-device-frame", () => {
       render(<PreviewPane editMode={true} deviceMode="desktop" />);
 
-      const deviceFrame = document.querySelector(".preview-device-frame");
-      const confettiLayer = deviceFrame?.querySelector(".confetti-layer");
+      const deviceFrame = screen.getByTestId("preview-device-frame");
+      const confettiLayer = screen.getByTestId("confetti-layer");
 
       expect(deviceFrame).toBeInTheDocument();
-      // Confetti layer should be a child of preview-device-frame
-      expect(confettiLayer || screen.queryByTestId("confetti-layer")).toBeTruthy();
+      expect(confettiLayer).toBeInTheDocument();
+      // Verify it's a child of device frame
+      expect(deviceFrame).toContainElement(confettiLayer);
     });
 
     it("should position confetti layer relative to preview-device-frame", () => {
       render(<PreviewPane editMode={true} deviceMode="desktop" />);
 
-      const deviceFrame = document.querySelector(".preview-device-frame");
-      expect(deviceFrame).toBeInTheDocument();
+      const deviceFrame = screen.getByTestId("preview-device-frame");
+      const confettiLayer = screen.getByTestId("confetti-layer");
 
+      expect(deviceFrame).toBeInTheDocument();
+      expect(confettiLayer).toBeInTheDocument();
       // The CSS should position confetti-layer absolutely within preview-device-frame
-      // This is verified by the component structure
-      const confettiLayer = deviceFrame?.querySelector(".confetti-layer");
-      expect(confettiLayer || screen.queryByTestId("confetti-layer")).toBeTruthy();
+      // This is verified by the component structure - confetti layer is a child of device frame
+      expect(deviceFrame).toContainElement(confettiLayer);
     });
   });
 
