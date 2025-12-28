@@ -1,162 +1,157 @@
-# Dashboard Navigation Flow
+# Dashboard Flow
 
-*Note: This flow is inferred based on the application structure and redirects observed. Direct exploration of authenticated flows requires a valid user account.*
+**URL:** `/dashboard`
 
-**Expected URL:** `/dashboard` or `/`
+**Description:** The main dashboard for authenticated users to view and manage their wedding invitations.
 
-## Expected Features
+## Key Features
 
-### Invitation List
-- **Display Options:**
-  - Grid view of invitations
-  - List view of invitations
-  - Sortable by date, name, status
+### Header
+- **Logo:** Sacred Vows logo (links to home)
+- **User Menu Dropdown:**
+  - User avatar with initials
+  - User name and email display
+  - Profile link (to `/profile`)
+  - Sign Out button
+
+### Quick Start Section
+- **Section Label:** "Quick start"
+- **Heading:** "Launch your invitation in 3 steps"
+- **Subtitle:** "Pick a layout, add details, share your link."
+- **Action Buttons:**
+  - "Choose layout" (primary) - navigates to `/layouts`
+  - "Preview later" (secondary) - stays on dashboard
+  - "See examples" (ghost) - navigates to `/layouts`
+
+### Statistics Cards (when invitations exist)
+- **Total Invitations:** Count of all invitations
+- **Published:** Count of published invitations
+- **Drafts:** Count of draft invitations
+
+### Invitations Display
+
+#### Empty State (No Invitations)
+- Heart icon
+- Heading: "No Invitations Yet"
+- Description: "Start creating your beautiful wedding invitation. Choose from our premium layouts."
+- CTA Button: "Create Your First Invitation" (links to `/layouts`)
+
+#### Invitations Grid (When invitations exist)
+- **Create New Card:**
+  - Plus icon
+  - "Create New" text
+  - "Start from a layout" subtext
+  - Links to `/layouts`
 
 - **Invitation Cards:**
-  - Preview thumbnail
-  - Invitation name/title
-  - Status indicator (draft, published, archived)
-  - Last modified date
-  - Creation date
-  - Action buttons (edit, delete, share, publish)
+  - **Preview Section:**
+    - Layout preview placeholder with rings icon
+    - Status badge (Draft/Published)
+  - **Info Section:**
+    - **Editable Title:** Click to edit invitation name inline
+    - **Wedding Date:** Calendar icon with formatted date (falls back to creation date)
+    - **Layout Name:** Shows layout ID (e.g., "Classic Scroll")
+    - **Action Buttons:**
+      - "Edit" (primary) - navigates to `/builder/:invitationId`
+      - "Preview" (secondary) - navigates to `/builder/:invitationId`
+      - "Delete" (icon button) - opens delete confirmation modal
 
-### Navigation
-- **User Profile:**
-  - User profile/settings access
-  - Account information
-  - Subscription status (if applicable)
+### Delete Confirmation Modal
+- Shows when user clicks delete button
+- Displays invitation details
+- Confirmation and cancel buttons
+- Toast notification on successful deletion
 
-- **Logout Option:**
-  - Sign out functionality
-  - Session termination
-
-- **Create New Invitation:**
-  - Prominent "Create New" button
-  - Quick access to layout selection
-  - New invitation wizard
-
-### Quick Actions
-- **Create New Invitation:**
-  - Start new invitation
-  - Browse layouts
-  - Quick create from template
-
-- **Browse Layouts:**
-  - Access to layout gallery
-  - Search and filter layouts
-  - Preview layouts
-
-- **View Published Invitations:**
-  - Filter by published status
-  - View live invitations
-  - Access sharing options
-
-- **Manage Account Settings:**
-  - Profile settings
-  - Account preferences
-  - Billing/subscription (if applicable)
-  - Notification settings
+### Welcome Toast
+- Shown once per user session
+- Message: "Welcome back, [FirstName] — Everything you need to wow your guests."
+- Auto-dismisses after 5-6 seconds
+- Stored in sessionStorage to prevent repeat display
 
 ## User Flow
 
 1. User signs in successfully
-2. User is redirected to dashboard
+2. User is redirected to `/dashboard` (or `/app` which redirects to dashboard)
 3. Dashboard loads user's invitations:
+   - Loading state shown while fetching
    - If new user: Shows empty state with "Create Your First Invitation" CTA
-   - If existing user: Shows grid/list of invitations
-4. User can perform actions:
-   - Click "Create New" to start a new invitation
-   - Click on existing invitation to edit
-   - Delete invitations (with confirmation)
-   - Share/publish invitations
-   - Access account settings
-   - Sign out
-
-## Dashboard Layout (Expected)
-
-### Header
-- Logo/Brand name
-- User profile menu
-- Notification icon (if applicable)
-- Settings icon
-- Logout option
-
-### Main Content Area
-- **Empty State (New Users):**
-  - Welcome message
-  - "Create Your First Invitation" button
-  - Quick start guide
-  - Layout browsing option
-
-- **Invitation Grid/List (Existing Users):**
-  - Invitation cards
-  - Filter and sort options
-  - Search functionality
-  - Pagination (if many invitations)
-
-### Sidebar (If Applicable)
-- Quick stats
-- Recent activity
-- Quick actions
-- Help/resources
-
-### Footer
-- Links to help center
-- Support contact
-- Legal links
+   - If existing user: Shows quick start section, stats, and invitations grid
+4. Welcome toast appears (once per session)
+5. User can perform actions:
+   - Click "Create New" card or "Choose layout" to start new invitation
+   - Click on invitation card "Edit" or "Preview" to open builder
+   - Click on invitation title to edit inline
+   - Click delete icon to remove invitation (with confirmation)
+   - Click user avatar to access profile or sign out
 
 ## Invitation Card Details
 
-Each invitation card likely shows:
-- **Thumbnail:** Preview image of the invitation
-- **Title:** Invitation name
-- **Status Badge:** Draft, Published, Archived
-- **Metadata:**
-  - Created date
-  - Last modified date
-  - Number of views (if published)
-- **Actions:**
-  - Edit button
-  - Share button
-  - Delete button
-  - More options menu
+Each invitation card displays:
+- **Preview Section:**
+  - Layout preview placeholder (rings icon)
+  - Status badge (Draft/Published) in top-right corner
+- **Info Section:**
+  - **Editable Title:** Inline editable text field
+    - Placeholder: "Click to name your invitation"
+    - Auto-saves on blur
+    - Falls back to couple names or "Untitled Invitation"
+  - **Wedding Date:** Calendar icon with formatted date
+    - Format: "DD MMM YYYY" (e.g., "15 Dec 2024")
+    - Falls back to creation date if wedding date not set
+  - **Layout Name:** Shows layout ID (e.g., "Layout: Classic Scroll")
+  - **Action Buttons:**
+    - "Edit" (primary) - navigates to `/builder/:invitationId`
+    - "Preview" (secondary) - navigates to `/builder/:invitationId`
+    - Delete icon button - opens confirmation modal
 
-## Filtering and Sorting
+## Title Editing
 
-- **Filter Options:**
-  - All invitations
-  - Drafts only
-  - Published only
-  - Archived only
+- Click on invitation title to edit inline
+- Uses `EditableText` component
+- Auto-saves on blur or Enter key
+- Shows toast notification on success/failure
+- Trims whitespace and defaults to "Untitled Invitation" if empty
 
-- **Sort Options:**
-  - Recently modified
-  - Recently created
-  - Alphabetical
-  - Status
+## Delete Flow
 
-## Empty State
+1. User clicks delete icon on invitation card
+2. Delete confirmation modal opens
+3. Modal shows invitation details
+4. User confirms or cancels
+5. On confirm:
+   - Invitation is deleted via API
+   - Toast notification shown: "Invitation Deleted"
+   - Modal closes
+   - Invitation removed from grid
+6. On error: Toast shows "Delete Failed" message
 
-For new users, the dashboard likely shows:
-- Welcome message
-- "Create Your First Invitation" prominent CTA
-- Quick start tips
-- Link to browse layouts
-- Example invitations or templates
+## Statistics Calculation
+
+- **Total Invitations:** Count of all invitations
+- **Published:** Count where `status === "published"`
+- **Drafts:** Count where `status === "draft"` or `status` is undefined/null
 
 ## Integration Points
 
-- **Invitation Editor:** Clicking invitation opens editor
-- **Layout Selection:** "Create New" opens layout browser
-- **Account Settings:** Profile/settings access
-- **Sharing:** Share published invitations
-- **Analytics:** View invitation statistics (if available)
+- **Layout Gallery:** "Create New" and "Choose layout" navigate to `/layouts`
+- **Invitation Builder:** Edit/Preview buttons navigate to `/builder/:invitationId`
+- **Profile:** User dropdown links to `/profile`
+- **Logout:** Sign out button in user dropdown
+- **Home:** Logo links to `/` (landing page)
+
+## Loading States
+
+- Initial load shows spinner with "Loading your invitations..." message
+- Uses React Query for data fetching
+- Handles loading and error states gracefully
 
 ## Notes
 
 - Dashboard is the central hub for authenticated users
 - All user invitations are accessible from dashboard
-- Quick actions provide easy access to common tasks
-- Empty state guides new users
-- Invitation management is the primary function
+- Quick start section provides guidance for new users
+- Statistics provide overview of invitation status
+- Inline editing improves UX for quick title changes
+- Delete confirmation prevents accidental deletions
+- Welcome toast provides friendly greeting (once per session)
 

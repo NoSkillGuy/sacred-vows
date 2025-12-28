@@ -1,97 +1,147 @@
 # Creating a New Invitation Flow
 
-*Note: This flow is inferred based on the application structure and redirects observed. Direct exploration of authenticated flows requires a valid user account.*
+**URL:** `/layouts` (Layout Gallery - authenticated)
+
+**Description:** Users browse and select layouts to create new wedding invitations.
 
 ## Entry Points
 
-- After successful signup
-- From dashboard "Create New" button
+- After successful signup (redirected via `/app` smart redirect)
+- From dashboard "Create New" card or "Choose layout" button
 - Clicking "Customize This Design" while authenticated
 - Clicking "Start with this layout" in demo modal while authenticated
-- From layout browsing page while authenticated
+- Direct navigation to `/layouts`
 
-## Expected Flow
+## Layout Gallery Features
+
+### Header
+- **Logo:** Sacred Vows logo (links to home)
+- **Navigation:**
+  - Dashboard link (if applicable)
+  - User menu dropdown (same as dashboard)
+    - Profile link
+    - Sign Out button
+
+### Layout Selection Interface
+- **Category Filtering:**
+  - Category tabs (All, Traditional, Modern, Minimal, Floral, etc.)
+  - Filter by selected category
+  - "All" shows all layouts
+
+- **Layout Cards:**
+  - Layout preview image
+  - Layout name
+  - Layout description
+  - "Select" or "Use This Layout" button
+
+- **Preset Selection Modal:**
+  - Opens when user selects a layout
+  - Shows available presets for the layout
+  - Preset previews
+  - "Start with this preset" button
+  - "Start with blank" option
+  - Can be closed with Escape key
+
+## User Flow
 
 1. **Layout Selection:**
-   - User selects a layout (from landing page or dashboard)
-   - Layout ID is passed to the creation flow
+   - User navigates to `/layouts` (authenticated)
+   - User browses available layouts
+   - User can filter by category
+   - User clicks on a layout card
 
-2. **Invitation Creation:**
-   - System creates a new invitation record
-   - User is redirected to invitation editor/customization page
-   - Invitation is in "draft" status
+2. **Preset Selection (Optional):**
+   - Preset selection modal opens
+   - User can choose a preset or start blank
+   - User selects preset or clicks "Start with blank"
 
-3. **Initial Customization:**
-   - User can customize the invitation:
-     - Add photos
-     - Edit text content (names, dates, locations, etc.)
-     - Choose colors
-     - Modify layout elements
+3. **Invitation Creation:**
+   - System creates new invitation via API:
+     - `POST /api/invitations`
+     - Includes selected `layoutId`
+     - Includes preset data (if selected) converted to section configs
+     - Initial status: "draft"
+   - Loading state shown during creation
 
-4. **Preview:**
-   - User can preview the invitation
-   - See how it looks on different devices
-   - Make adjustments as needed
+4. **Redirect to Builder:**
+   - On success: User redirected to `/builder/:invitationId`
+   - On error: Error message displayed, user can retry
 
-5. **Save:**
-   - User can save the invitation as draft
-   - Changes are persisted
-   - User can return to edit later
+## API Integration
 
-6. **Publish/Share:**
-   - User can publish the invitation
-   - Invitation becomes accessible via shareable link
-   - User can share the invitation with guests
+### Create Invitation Request
+```typescript
+{
+  layoutId: string,
+  data?: UniversalWeddingData,  // From preset if selected
+  title?: string,
+  status?: "draft" | "published"
+}
+```
 
-## URL Pattern
+### Preset to Data Conversion
+- Presets are converted to `UniversalWeddingData` format
+- Section configs are generated from preset
+- Data structure matches layout requirements
 
-Likely one of the following:
-- `/editor/:invitationId`
-- `/create/:layoutId`
-- `/invitations/new/:layoutId`
-- `/editor/new/:layoutId`
+## Error Handling
 
-## Expected Features
+- **Layout Loading Errors:**
+  - Error message displayed
+  - Retry option available
+  - Fallback to default layouts
 
-### Layout Selection
-- Browse available layouts
-- Filter by category
-- Search for specific layouts
-- Preview layouts before selection
+- **Creation Errors:**
+  - Error toast notification
+  - User can retry selection
+  - Error details logged
 
-### Invitation Setup
-- Create invitation with selected layout
-- Set invitation name/title
-- Initialize with default content
-- Set initial status as "draft"
+- **Network Errors:**
+  - Connection error messages
+  - Retry mechanisms
 
-### Quick Start
-- Pre-filled template content
-- Default color scheme
-- Placeholder images
-- Sample text that can be edited
+## Layout Data Structure
 
-## User Journey
+Layouts include:
+- `id`: Unique layout identifier
+- `name`: Display name
+- `description`: Layout description
+- `category`: Category for filtering
+- `previewImage`: Preview image URL
+- `isAvailable`: Availability status
+- `status`: Layout status
 
-1. User is authenticated
-2. User selects a layout
-3. System creates new invitation
-4. User is taken to editor
-5. User customizes invitation
-6. User saves/publishes invitation
+## Preset System
+
+- **Preset Selection:**
+  - Modal shows available presets for selected layout
+  - Each preset has preview and description
+  - "Start with blank" option always available
+
+- **Preset Data:**
+  - Presets contain pre-filled wedding data
+  - Converted to `UniversalWeddingData` format
+  - Includes couple info, dates, locations, etc.
 
 ## Integration Points
 
-- **Layout Selection:** Connects to layout browsing flow
-- **Editor:** Connects to customizing invitation flow
-- **Dashboard:** New invitation appears in user's dashboard
-- **Publishing:** Connects to sharing/publishing flow
+- **Dashboard:** "Create New" and "Choose layout" buttons navigate here
+- **Builder:** After selection, redirects to `/builder/:invitationId`
+- **Landing Page:** "Customize This Design" redirects here (if authenticated)
+- **Demo Modal:** "Start with this layout" navigates here
+
+## Loading States
+
+- Layout gallery shows loading spinner while fetching layouts
+- Creation shows loading state during API call
+- Preset modal shows loading when fetching preset data
 
 ## Notes
 
-- New invitations start as drafts
-- Users can create multiple invitations
-- Each invitation is independent
-- Layout can be changed (if supported)
-- Invitations can be deleted before publishing
+- All layouts are fetched from API
+- Categories are dynamically generated from layout data
+- Preset selection is optional - users can start with blank
+- New invitations are created with "draft" status
+- Layout selection is required before creating invitation
+- Error handling ensures users can retry failed operations
 

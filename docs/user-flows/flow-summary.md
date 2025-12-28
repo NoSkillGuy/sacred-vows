@@ -22,42 +22,66 @@ This document provides an overview of the complete user journeys through the Sac
 11. **Authentication:** User is authenticated and session is created
 
 ### Onboarding Phase
-12. **Redirect:** User is redirected to dashboard or invitation creation
-13. **First Invitation:** User starts creating their first invitation
-14. **Customization:** User customizes invitation content and design
-15. **Publishing:** User publishes their first invitation
+12. **Redirect:** User is redirected via `/app` (SmartRedirect) to dashboard or layouts
+13. **First Invitation:** User clicks "Create Your First Invitation" or "Choose layout"
+14. **Layout Selection:** User browses layouts at `/layouts` and selects one
+15. **Preset Selection:** User chooses preset or starts blank
+16. **Invitation Created:** System creates invitation with "draft" status
+17. **Editor:** User is redirected to `/builder/:invitationId`
+18. **Customization:** User customizes invitation content and design
+19. **Publishing:** User publishes invitation when ready
 
 ---
 
 ## Authenticated User Journey
 
 ### Access Phase
-1. **Sign In:** User signs in with credentials or OAuth
-2. **Dashboard:** User is redirected to dashboard
-3. **Overview:** User sees their invitations (or empty state)
+1. **Sign In:** User signs in with credentials or OAuth at `/login`
+2. **Redirect:** User is redirected to `/dashboard` (or `/app` which redirects)
+3. **Dashboard:** User sees welcome toast and invitation overview
+4. **Overview:** User sees:
+   - Quick start section with 3-step guide
+   - Statistics (total, published, drafts) if invitations exist
+   - Invitations grid or empty state
 
 ### Creation Phase
-4. **New Invitation:** User clicks "Create New" or selects layout
-5. **Layout Selection:** User chooses a layout template
-6. **Editor:** User is taken to invitation editor
-7. **Customization:** User customizes:
-   - Text content (names, dates, locations)
-   - Images and photos
-   - Colors and fonts
-   - Layout adjustments
+5. **New Invitation:** User clicks "Create New" card or "Choose layout" button
+6. **Layout Gallery:** User navigates to `/layouts` (authenticated)
+7. **Layout Selection:** User browses and filters layouts by category
+8. **Preset Selection:** User selects layout, chooses preset or starts blank
+9. **Invitation Created:** System creates invitation via API, status: "draft"
+10. **Editor:** User is redirected to `/builder/:invitationId`
+11. **Customization:** User customizes in split-pane editor:
+    - Left sidebar: Form controls and editing fields
+    - Right pane: Live preview with device mode switching
+    - Text content (names, dates, locations)
+    - Images and photos
+    - Colors and fonts
+    - Layout adjustments
 
 ### Management Phase
-8. **Save:** User saves invitation as draft
-9. **Preview:** User previews invitation on different devices
-10. **Refinement:** User makes additional edits
-11. **Publishing:** User publishes invitation when ready
-12. **Sharing:** User shares invitation link with guests
+12. **Save:** Changes auto-save or user manually saves as draft
+13. **Preview:** User toggles device modes (desktop, tablet, mobile)
+14. **Edit Mode:** User toggles edit mode on/off
+15. **Refinement:** User makes additional edits with real-time preview
+16. **Publishing:** User publishes invitation when ready (status: "published")
+17. **Sharing:** User shares invitation link with guests
+
+### Profile Management
+18. **Profile Access:** User clicks profile link in user dropdown
+19. **Account Info:** User views account information
+20. **Password Change:** User changes password with OTP verification:
+    - Requests OTP via email
+    - Enters 6-digit code
+    - Verifies and updates password
 
 ### Ongoing Use
-13. **Dashboard:** User returns to dashboard to manage invitations
-14. **Editing:** User can edit existing invitations
-15. **New Invitations:** User creates additional invitations
-16. **Management:** User manages multiple invitations
+21. **Dashboard:** User returns to dashboard to manage invitations
+22. **Editing:** User clicks "Edit" on invitation card to open builder
+23. **Title Editing:** User edits invitation titles inline on dashboard
+24. **Deletion:** User deletes invitations with confirmation modal
+25. **New Invitations:** User creates additional invitations
+26. **Management:** User manages multiple invitations with statistics
 
 ---
 
@@ -66,23 +90,33 @@ This document provides an overview of the complete user journeys through the Sac
 ### Sign Up → Create Invitation Flow
 
 ```
-Landing Page
+Landing Page (/)
     ↓
 [Click "Start Free" or "Customize This Design"]
     ↓
-Sign Up Page
+Sign Up Page (/signup)
     ↓
 [Fill form / OAuth]
     ↓
 Account Created
     ↓
-Dashboard / Invitation Creation
+Smart Redirect (/app)
     ↓
-Layout Selection
+Dashboard (/dashboard) or Layout Gallery (/layouts)
     ↓
-Invitation Editor
+[Click "Create New" or "Choose layout"]
     ↓
-Customization
+Layout Gallery (/layouts)
+    ↓
+[Select layout]
+    ↓
+[Select preset or start blank]
+    ↓
+Invitation Created (API)
+    ↓
+Invitation Editor (/builder/:invitationId)
+    ↓
+Customization (Split-pane: Sidebar + Preview)
     ↓
 Save / Publish
 ```
@@ -90,27 +124,35 @@ Save / Publish
 ### Sign In → Edit Invitation Flow
 
 ```
-Login Page
+Login Page (/login)
     ↓
 [Enter credentials / OAuth]
     ↓
 Authentication
     ↓
-Dashboard
+Dashboard (/dashboard)
     ↓
-[Click on invitation]
+[Welcome toast shown]
     ↓
-Invitation Editor
+[View invitations grid]
     ↓
-Edit & Customize
+[Click "Edit" on invitation card]
     ↓
-Save Changes
+Invitation Editor (/builder/:invitationId)
+    ↓
+Edit & Customize (Sidebar controls + Live preview)
+    ↓
+[Toggle device modes: desktop/tablet/mobile]
+    ↓
+[Toggle edit mode on/off]
+    ↓
+Save Changes (Auto-save or manual)
 ```
 
 ### Browse → Preview → Create Flow
 
 ```
-Landing Page
+Landing Page (/)
     ↓
 Layout Browsing Section
     ↓
@@ -124,27 +166,44 @@ Preview Modal
     ↓
 [Click "Start with this layout"]
     ↓
-Invitation Editor
+Layout Gallery (/layouts)
+    ↓
+[Select preset or start blank]
+    ↓
+Invitation Created
+    ↓
+Invitation Editor (/builder/:invitationId)
     ↓
 [If not authenticated]
     ↓
-Sign Up Page
+Sign Up Page (/signup)
     ↓
 Account Creation
     ↓
-Invitation Editor
+Smart Redirect (/app)
+    ↓
+Layout Gallery (/layouts)
+    ↓
+Invitation Created
+    ↓
+Invitation Editor (/builder/:invitationId)
 ```
 
 ---
 
 ## Authentication Gate Points
 
-The following actions require authentication and redirect to signup if user is not logged in:
+The following actions require authentication and redirect to `/signup` if user is not logged in:
 
 - Clicking "Customize This Design" on any layout
 - Clicking "Start with this layout" in demo modal
 - Clicking "Create Your Invitation" buttons
-- Direct navigation to editor/dashboard routes
+- Direct navigation to protected routes:
+  - `/dashboard` - User dashboard
+  - `/layouts` - Authenticated layout gallery
+  - `/builder/:invitationId` - Invitation editor
+  - `/profile` - User profile and settings
+  - `/app` - Smart redirect
 - Accessing user account settings
 
 ---
@@ -230,32 +289,64 @@ Published Invitations
 
 ---
 
-## Future Exploration Needed
+## Additional Flows
 
-To complete this documentation, the following authenticated flows should be explored:
+### Profile Settings Flow
+1. **Access:** User clicks profile link in user dropdown
+2. **View Info:** User sees account information (email, name)
+3. **Password Change:** User changes password with OTP:
+   - Enters new password and confirmation
+   - Requests OTP via email
+   - Receives 6-digit code
+   - Enters code to verify
+   - Password updated successfully
 
-1. **Invitation Editor:**
-   - Full customization interface
-   - Save/publish workflow
-   - Preview functionality
+### Layout Gallery Flow (Authenticated)
+1. **Access:** User navigates to `/layouts`
+2. **Browse:** User sees available layouts with category filtering
+3. **Select:** User clicks on layout card
+4. **Preset:** User chooses preset or starts blank
+5. **Create:** System creates invitation and redirects to builder
 
-2. **Dashboard:**
-   - Invitation management
-   - Settings/account management
-   - Analytics/statistics (if available)
+### Static Pages
+- **Support:** `/pricing`, `/faqs`, `/help`, `/tutorials`, `/api-docs`
+- **Company:** `/about`, `/contact`, `/blog`, `/careers`, `/press`
+- **Legal:** `/privacy`, `/terms`, `/cookies`
+- **Layouts:** `/layouts-gallery`, `/layouts/:category`
 
-3. **Published Invitation View:**
-   - Guest-facing invitation page
-   - RSVP functionality (if available)
-   - Sharing options
+All static pages are publicly accessible without authentication.
 
-4. **Account Settings:**
-   - Profile management
-   - Password change
-   - Account deletion
-   - Subscription/billing (if applicable)
+## Key Implementation Details
+
+### Routes
+- **Public:** `/`, `/login`, `/signup`, `/forgot-password`, `/reset-password`, static pages
+- **Protected:** `/dashboard`, `/layouts`, `/builder/:invitationId`, `/profile`, `/app`
+
+### Smart Redirect (`/app`)
+- Redirects authenticated users based on state
+- Typically redirects to `/dashboard` or `/layouts`
+
+### Builder Interface
+- Split-pane layout: Sidebar (controls) + Preview pane
+- Device modes: Desktop, Tablet, Mobile
+- Edit mode toggle: Show/hide sidebar
+- Real-time preview updates
+
+### Dashboard Features
+- Statistics: Total, Published, Drafts
+- Inline title editing
+- Delete confirmation modal
+- Welcome toast (once per session)
+- Empty state for new users
+
+### Password Change
+- OTP-based verification
+- 5-minute expiry
+- 5 attempt limit
+- 30-second cooldown
+- Email-based delivery
 
 ---
 
-*This summary provides a high-level overview of user flows. For detailed information about each flow, refer to the individual flow documentation files.*
+*This summary provides a high-level overview of user flows based on the actual codebase implementation. For detailed information about each flow, refer to the individual flow documentation files.*
 
