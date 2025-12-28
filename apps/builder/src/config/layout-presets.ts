@@ -1,125 +1,12 @@
 /**
- * Layout Presets for Invitation Flows
+ * Layout Preset Utilities
  *
- * Defines curated presets that provide starting points for invitation layouts.
- * Each preset specifies which sections are enabled and their order.
+ * Utility functions for working with layout-specific presets.
+ * Presets are now defined in each layout's manifest (see LayoutManifest.presets).
  */
 
 import type { SectionConfig } from "@shared/types/wedding-data";
-
-export interface LayoutPreset {
-  id: string;
-  name: string;
-  emoji: string;
-  description: string;
-  useCase: string;
-  bestFor: string;
-  sectionIds: string[];
-}
-
-/**
- * Modern Editorial (Minimal & Luxe)
- * For couples who want elegance, restraint, and strong visual impact.
- * Vibe: Vogue cover → short feature → RSVP
- * Best for: City weddings, intimate guest lists, design-forward couples
- */
-export const MODERN_EDITORIAL_PRESET: LayoutPreset = {
-  id: "modern-editorial",
-  name: "Modern Editorial",
-  emoji: "🖤",
-  description: "Minimal & Luxe",
-  useCase: "For couples who want elegance, restraint, and strong visual impact.",
-  bestFor: "City weddings, intimate guest lists, design-forward couples",
-  sectionIds: [
-    "hero", // Editorial Cover
-    "countdown", // Save the Date
-    "quote", // Editorial Quote
-    "editorial-intro", // Editorial Intro
-    "couple", // The Couple
-    "events", // Event Schedule
-    "location", // Location
-    "gallery", // Gallery
-    "rsvp", // RSVP
-    "footer", // Footer
-  ],
-};
-
-/**
- * Love Story Feature (Romantic & Narrative)
- * Feels like a full magazine wedding spread.
- * Vibe: Long-form editorial article
- * Best for: Couples who love storytelling, emotional depth, destination weddings
- */
-export const LOVE_STORY_FEATURE_PRESET: LayoutPreset = {
-  id: "love-story-feature",
-  name: "Love Story Feature",
-  emoji: "🤍",
-  description: "Romantic & Narrative",
-  useCase: "Feels like a full magazine wedding spread. Perfect for couples who love storytelling.",
-  bestFor: "Couples who love storytelling, emotional depth, destination weddings",
-  sectionIds: [
-    "hero", // Editorial Cover
-    "quote", // Editorial Quote
-    "editorial-intro", // Editorial Intro
-    "story", // Love Story
-    "couple", // The Couple
-    "wedding-party", // Wedding Party
-    "events", // Event Schedule
-    "location", // Location
-    "travel", // Travel & Stay
-    "things-to-do", // Things to Do
-    "gallery", // Gallery
-    "dress-code", // Dress Code
-    "rsvp", // RSVP
-    "footer", // Footer
-  ],
-};
-
-/**
- * Guest Experience (Clean & Thoughtful)
- * Designed around guest clarity without killing elegance.
- * Vibe: Calm, curated, considerate
- * Best for: Larger weddings, mixed-age guests, practical planners
- */
-export const GUEST_EXPERIENCE_PRESET: LayoutPreset = {
-  id: "guest-experience",
-  name: "Guest Experience",
-  emoji: "✨",
-  description: "Clean & Thoughtful",
-  useCase: "Designed around guest clarity without killing elegance.",
-  bestFor: "Larger weddings, mixed-age guests, practical planners",
-  sectionIds: [
-    "hero", // Editorial Cover
-    "countdown", // Save the Date
-    "editorial-intro", // Editorial Intro
-    "events", // Event Schedule
-    "location", // Location
-    "travel", // Travel & Stay
-    "dress-code", // Dress Code
-    "faq", // FAQ
-    "registry", // Registry
-    "gallery", // Gallery
-    "rsvp", // RSVP
-    "contact", // Contact
-    "footer", // Footer
-  ],
-};
-
-/**
- * All available presets
- */
-export const LAYOUT_PRESETS: LayoutPreset[] = [
-  MODERN_EDITORIAL_PRESET,
-  LOVE_STORY_FEATURE_PRESET,
-  GUEST_EXPERIENCE_PRESET,
-];
-
-/**
- * Get a preset by ID
- */
-export function getPresetById(presetId: string): LayoutPreset | undefined {
-  return LAYOUT_PRESETS.find((preset) => preset.id === presetId);
-}
+import type { LayoutPreset } from "@shared/types/layout";
 
 /**
  * Convert preset section IDs to SectionConfig array
@@ -154,7 +41,6 @@ export function presetToSectionConfigs(
   const presetSectionIdsSet = new Set(validPresetSectionIds);
 
   // Build result: include all manifest sections
-  const result: SectionConfig[] = [];
   const presetSections: SectionConfig[] = [];
   const otherSections: SectionConfig[] = [];
 

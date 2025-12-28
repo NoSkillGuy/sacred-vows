@@ -165,6 +165,77 @@ export const editorialEleganceManifest: LayoutManifest = {
     },
   ],
 
+  presets: [
+    {
+      id: "modern-editorial",
+      name: "Modern Editorial",
+      emoji: "🖤",
+      description: "Minimal & Luxe",
+      useCase: "For couples who want elegance, restraint, and strong visual impact.",
+      bestFor: "City weddings, intimate guest lists, design-forward couples",
+      sectionIds: [
+        "hero", // Editorial Cover
+        "countdown", // Save the Date
+        "quote", // Editorial Quote
+        "editorial-intro", // Editorial Intro
+        "couple", // The Couple
+        "events", // Event Schedule
+        "location", // Location
+        "gallery", // Gallery
+        "rsvp", // RSVP
+        "footer", // Footer
+      ],
+    },
+    {
+      id: "love-story-feature",
+      name: "Love Story Feature",
+      emoji: "🤍",
+      description: "Romantic & Narrative",
+      useCase:
+        "Feels like a full magazine wedding spread. Perfect for couples who love storytelling.",
+      bestFor: "Couples who love storytelling, emotional depth, destination weddings",
+      sectionIds: [
+        "hero", // Editorial Cover
+        "quote", // Editorial Quote
+        "editorial-intro", // Editorial Intro
+        "story", // Love Story
+        "couple", // The Couple
+        "wedding-party", // Wedding Party
+        "events", // Event Schedule
+        "location", // Location
+        "travel", // Travel & Stay
+        "things-to-do", // Things to Do
+        "gallery", // Gallery
+        "dress-code", // Dress Code
+        "rsvp", // RSVP
+        "footer", // Footer
+      ],
+    },
+    {
+      id: "guest-experience",
+      name: "Guest Experience",
+      emoji: "✨",
+      description: "Clean & Thoughtful",
+      useCase: "Designed around guest clarity without killing elegance.",
+      bestFor: "Larger weddings, mixed-age guests, practical planners",
+      sectionIds: [
+        "hero", // Editorial Cover
+        "countdown", // Save the Date
+        "editorial-intro", // Editorial Intro
+        "events", // Event Schedule
+        "location", // Location
+        "travel", // Travel & Stay
+        "dress-code", // Dress Code
+        "faq", // FAQ
+        "registry", // Registry
+        "gallery", // Gallery
+        "rsvp", // RSVP
+        "contact", // Contact
+        "footer", // Footer
+      ],
+    },
+  ],
+
   defaultSectionOrder: [
     "hero",
     "countdown",

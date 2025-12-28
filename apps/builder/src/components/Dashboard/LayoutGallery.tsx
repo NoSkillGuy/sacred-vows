@@ -5,11 +5,8 @@ import type { LayoutManifest } from "@shared/types/layout";
 import LayoutCardUnified from "../Layouts/LayoutCardUnified";
 import { useLayoutsQuery } from "../../hooks/queries/useLayouts";
 import { useCreateInvitationMutation } from "../../hooks/queries/useInvitations";
-import {
-  LAYOUT_PRESETS,
-  type LayoutPreset,
-  presetToSectionConfigs,
-} from "../../config/layout-presets";
+import { presetToSectionConfigs } from "../../config/layout-presets";
+import type { LayoutPreset } from "@shared/types/layout";
 import "./Dashboard.css";
 
 // SVG Icons
@@ -137,22 +134,52 @@ function LayoutGallery(): JSX.Element {
   async function handleSelectLayout(layout: LayoutWithStatus): Promise<void> {
     if (!layout.isAvailable) return;
 
-    // Show preset selection modal
-    setSelectedLayout(layout);
+    // If layout doesn't have presets from API, try loading from local manifest
+    let layoutWithPresets = layout;
+    if ((!layout.presets || layout.presets.length === 0) && layout.id === "editorial-elegance") {
+      try {
+        const { editorialEleganceManifest } =
+          await import("../../layouts/editorial-elegance/manifest");
+        if (editorialEleganceManifest.presets && editorialEleganceManifest.presets.length > 0) {
+          layoutWithPresets = {
+            ...layout,
+            presets: editorialEleganceManifest.presets,
+          };
+        }
+      } catch (error) {
+        console.warn("Failed to load local manifest for presets:", error);
+      }
+    }
+
+    // If no presets exist, directly create invitation without showing modal
+    if (!layoutWithPresets.presets || layoutWithPresets.presets.length === 0) {
+      await handlePresetSelection(null, layoutWithPresets);
+      return;
+    }
+
+    // Show preset selection modal only if presets exist
+    setSelectedLayout(layoutWithPresets);
     setPresetModalOpen(true);
   }
 
-  async function handlePresetSelection(preset: LayoutPreset | null): Promise<void> {
-    if (!selectedLayout) return;
+  async function handlePresetSelection(
+    preset: LayoutPreset | null,
+    layoutOverride?: LayoutWithStatus
+  ): Promise<void> {
+    const layoutToUse = layoutOverride || selectedLayout;
+    if (!layoutToUse) {
+      console.error("No layout available for preset selection");
+      return;
+    }
 
     setPresetModalOpen(false);
 
     try {
-      setCreating(selectedLayout.id);
+      setCreating(layoutToUse.id);
 
       // Initialize data with layout-specific defaults if available
       let initialData: Record<string, unknown> = {};
-      if (selectedLayout.id === "editorial-elegance") {
+      if (layoutToUse.id === "editorial-elegance") {
         try {
           const { editorialEleganceDefaults } =
             await import("../../layouts/editorial-elegance/defaults");
@@ -167,10 +194,33 @@ function LayoutGallery(): JSX.Element {
       let layoutConfig:
         | { sections: Array<{ id: string; enabled: boolean; order: number }>; theme?: unknown }
         | undefined;
-      if (selectedLayout.sections) {
-        const presetSections = presetToSectionConfigs(preset, selectedLayout.sections);
+      if (
+        layoutToUse.sections &&
+        Array.isArray(layoutToUse.sections) &&
+        layoutToUse.sections.length > 0
+      ) {
+        try {
+          const presetSections = presetToSectionConfigs(preset, layoutToUse.sections);
+          layoutConfig = {
+            sections: presetSections,
+          };
+        } catch (error) {
+          console.error("Failed to convert preset to section configs:", error);
+          // Fallback: create sections from manifest
+          layoutConfig = {
+            sections: layoutToUse.sections.map((section, index) => ({
+              id: section.id,
+              enabled: true,
+              order: section.order !== undefined ? section.order : index,
+              config: {},
+            })),
+          };
+        }
+      } else {
+        // No sections in manifest, create empty config
+        console.warn(`Layout ${layoutToUse.id} has no sections defined`);
         layoutConfig = {
-          sections: presetSections,
+          sections: [],
         };
       }
 
@@ -180,16 +230,29 @@ function LayoutGallery(): JSX.Element {
         ...(layoutConfig ? { layoutConfig } : {}),
       };
 
+      console.log("Creating invitation with:", {
+        layoutId: layoutToUse.id,
+        sectionsCount: layoutConfig?.sections?.length || 0,
+        hasInitialData: Object.keys(initialData).length > 0,
+      });
+
       const invitation = await createMutation.mutateAsync({
-        layoutId: selectedLayout.id,
+        layoutId: layoutToUse.id,
         title: "My Wedding Invitation",
         data: dataWithLayoutConfig as never,
         layoutConfig: layoutConfig as never,
       });
+
+      if (!invitation || !invitation.id) {
+        throw new Error("Invitation created but missing ID");
+      }
+
       navigate(`/builder/${invitation.id}`);
     } catch (error) {
       console.error("Failed to create invitation:", error);
-      alert("Failed to create invitation. Please try again.");
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to create invitation. Please try again.";
+      alert(errorMessage);
     } finally {
       setCreating(null);
       setSelectedLayout(null);
@@ -358,24 +421,30 @@ function LayoutGallery(): JSX.Element {
             </div>
 
             <div className="preset-grid">
-              {LAYOUT_PRESETS.map((preset) => (
-                <div
-                  key={preset.id}
-                  className="preset-card"
-                  onClick={() => handlePresetSelection(preset)}
-                >
-                  <div className="preset-emoji">{preset.emoji}</div>
-                  <h3>{preset.name}</h3>
-                  <p className="preset-description">{preset.description}</p>
-                  <p className="preset-use-case">{preset.useCase}</p>
-                  <div className="preset-best-for">
-                    <strong>Best for:</strong> {preset.bestFor}
+              {selectedLayout.presets && selectedLayout.presets.length > 0 ? (
+                selectedLayout.presets.map((preset) => (
+                  <div
+                    key={preset.id}
+                    className="preset-card"
+                    onClick={() => handlePresetSelection(preset)}
+                  >
+                    <div className="preset-emoji">{preset.emoji}</div>
+                    <h3>{preset.name}</h3>
+                    <p className="preset-description">{preset.description}</p>
+                    <p className="preset-use-case">{preset.useCase}</p>
+                    <div className="preset-best-for">
+                      <strong>Best for:</strong> {preset.bestFor}
+                    </div>
+                    <div className="preset-sections">
+                      <strong>{preset.sectionIds.length} sections</strong>
+                    </div>
                   </div>
-                  <div className="preset-sections">
-                    <strong>{preset.sectionIds.length} sections</strong>
-                  </div>
+                ))
+              ) : (
+                <div className="preset-empty">
+                  <p>No presets available for this layout.</p>
                 </div>
-              ))}
+              )}
             </div>
 
             <div className="preset-modal-actions">

@@ -1305,6 +1305,18 @@
   color: var(--champagne);
 }
 
+.preset-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem 2rem;
+  color: var(--text-muted);
+}
+
+.preset-empty p {
+  margin: 0;
+  font-size: 1rem;
+}
+
 .preset-modal-actions {
   padding: 1.5rem 2rem 2rem;
   border-top: 1px solid rgba(232, 180, 184, 0.3);

@@ -157,6 +157,16 @@ export interface SectionConfig {
   order?: number;
 }
 
+export interface LayoutPreset {
+  id: string;
+  name: string;
+  emoji: string;
+  description: string;
+  useCase: string;
+  bestFor: string;
+  sectionIds: string[];
+}
+
 export interface LayoutManifest {
   id: string;
   name: string;
@@ -180,6 +190,7 @@ export interface LayoutManifest {
       script?: string;
     };
   }>;
+  presets?: LayoutPreset[];
   defaultSectionOrder?: string[];
   [key: string]: unknown;
 }
