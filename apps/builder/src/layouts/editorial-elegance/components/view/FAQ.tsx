@@ -37,6 +37,7 @@ function FAQ({ _translations, _currentLang, config = {} }: FAQProps) {
             <div key={index} className="ee-faq-item">
               <button
                 type="button"
+                id={`faq-question-${index}`}
                 className="ee-faq-question"
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
                 aria-expanded={openIndex === index}
