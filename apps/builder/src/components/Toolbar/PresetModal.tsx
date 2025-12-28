@@ -71,8 +71,6 @@ function PresetModal({ isOpen, onClose }: PresetModalProps) {
     }
   };
 
-  // Reset flipped state when modal closes - handle in close handler instead of effect
-
   // Handle Escape key
   useEffect(() => {
     if (!isOpen) return;

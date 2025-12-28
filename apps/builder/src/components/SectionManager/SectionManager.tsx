@@ -104,7 +104,12 @@ const ChevronDownIcon = () => (
   </svg>
 );
 
-function SectionManager({ isOpen, onClose }) {
+interface SectionManagerProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+function SectionManager({ isOpen, onClose }: SectionManagerProps) {
   // Select the underlying state that getAllSections depends on
   // Zustand's default reactivity will handle updates automatically
   const currentLayoutManifest = useBuilderStore((state) => state.currentLayoutManifest);

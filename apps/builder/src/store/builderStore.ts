@@ -33,7 +33,17 @@ import "../layouts/editorial-elegance";
 const STORAGE_KEY = "wedding-builder-autosave";
 
 // Constants for preset detection and ordering
-// Preset sections typically have order 0-N, so we use this threshold to detect preset sections
+// NOTE: This is a heuristic-based approach to detect preset sections.
+// Preset sections are typically assigned order 0-N (where N is the number of preset sections, usually < 20).
+// We use a threshold of 100 to distinguish preset sections from manifest-ordered sections.
+// This threshold was chosen based on:
+// - Typical preset sizes: 10-15 sections (order 0-14)
+// - Manifest sections may have higher order numbers
+// - Provides a reasonable buffer for future preset growth
+//
+// TODO: Consider implementing explicit preset tracking with a `presetId` field in SectionConfig
+// and `appliedPresetId` in LayoutConfig for more robust preset detection. This would eliminate
+// the need for heuristic-based detection.
 const MAX_PRESET_ORDER_THRESHOLD = 100;
 
 // Load from localStorage on initialization
@@ -368,17 +378,16 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
         // Same invitation - check if this is a preset change (different enabled sections)
         if (apiSections.length > 0) {
           // Check if enabled sections differ - if so, this is likely a preset change, use new sections directly
-          const existingEnabledIds = existingSections
-            .filter((s) => s.enabled)
-            .map((s) => s.id)
-            .sort()
-            .join(",");
-          const apiEnabledIds = apiSections
-            .filter((s) => s.enabled)
-            .map((s) => s.id)
-            .sort()
-            .join(",");
-          const isPresetChange = existingEnabledIds !== apiEnabledIds;
+          // Use Set comparison for more robust comparison (avoids issues with section IDs containing commas)
+          const existingEnabledSet = new Set(
+            existingSections.filter((s) => s.enabled).map((s) => s.id)
+          );
+          const apiEnabledSet = new Set(apiSections.filter((s) => s.enabled).map((s) => s.id));
+
+          // Compare sets: different size or different members indicates preset change
+          const isPresetChange =
+            existingEnabledSet.size !== apiEnabledSet.size ||
+            [...existingEnabledSet].some((id) => !apiEnabledSet.has(id));
 
           if (isPresetChange) {
             // Preset change detected - use new sections directly (preserves preset order and enabled state)
@@ -478,6 +487,8 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
 
       // Check if current sections look like they came from a preset (all enabled sections have low order numbers)
       // Preset sections typically have order 0-N, while manifest-ordered sections might have different patterns
+      // NOTE: This is a heuristic-based approach. See MAX_PRESET_ORDER_THRESHOLD documentation above.
+      // TODO: Replace with explicit preset tracking (presetId field) for more robust detection.
       const enabledSections = currentSections.filter((s) => s.enabled);
       const maxPresetOrder =
         enabledSections.length > 0 ? Math.max(...enabledSections.map((s) => s.order ?? 0)) : -1;
