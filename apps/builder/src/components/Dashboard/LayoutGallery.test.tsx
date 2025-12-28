@@ -39,6 +39,20 @@ const mockLayouts = [
     category: "Modern",
     isAvailable: true,
     status: "ready",
+    defaultTheme: {
+      colors: {
+        primary: "#C6A15B",
+        secondary: "#6B6B6B",
+        background: {
+          page: "#FAF9F7",
+        },
+        text: {
+          primary: "#1C1C1C",
+          muted: "#6B6B6B",
+        },
+        accent: "#C6A15B",
+      },
+    },
     presets: [
       {
         id: "modern-editorial",
@@ -128,6 +142,20 @@ const mockLayouts = [
     category: "Classic",
     isAvailable: true,
     status: "ready",
+    defaultTheme: {
+      colors: {
+        primary: "#7c2831",
+        secondary: "#6B6B6B",
+        background: {
+          page: "#ffffff",
+        },
+        text: {
+          primary: "#1C1C1C",
+          muted: "#6B6B6B",
+        },
+        accent: "#d4af37",
+      },
+    },
     presets: [], // No presets
     sections: [
       { id: "hero", required: true, order: 0 },
@@ -194,8 +222,8 @@ describe("LayoutGallery", () => {
       render(<LayoutGallery />, { wrapper: createWrapper() });
 
       expect(screen.getByText("all")).toBeInTheDocument();
-      expect(screen.getByText("Modern")).toBeInTheDocument();
-      expect(screen.getByText("Classic")).toBeInTheDocument();
+      expect(screen.getAllByText("Modern").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("Classic").length).toBeGreaterThan(0);
     });
   });
 
