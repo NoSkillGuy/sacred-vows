@@ -62,14 +62,6 @@ function EditableDressCode({
     }
   };
 
-  const handleUpdateImage = (index: number, field: string, value: string) => {
-    const updated = [...inspirationImages];
-    updated[index] = { ...updated[index], [field]: value };
-    if (onUpdate) {
-      onUpdate("dressCode.inspirationImages", updated);
-    }
-  };
-
   return (
     <section className="ee-section ee-dress-code-section">
       <div className="ee-dress-code-container">

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 interface EditableCountdownProps {
   _translations?: unknown;
@@ -19,21 +19,47 @@ function EditableCountdown({
   _translations,
   _currentLang,
   config = {},
-  onUpdate,
+  onUpdate: _onUpdate,
 }: EditableCountdownProps) {
-  const [countdown, setCountdown] = useState("");
   const wedding = config.wedding || {};
   const countdownTarget = wedding.countdownTarget;
 
+  // Compute initial countdown value to avoid setState in effect
+  const initialCountdown = useMemo(() => {
+    if (!countdownTarget) {
+      return "";
+    }
+    const target = new Date(countdownTarget);
+    if (Number.isNaN(target.getTime())) {
+      return "";
+    }
+    const now = new Date();
+    const diff = target - now;
+    if (diff <= 0) {
+      return "Today";
+    }
+    const totalSeconds = Math.floor(diff / 1000);
+    const days = Math.floor(totalSeconds / (3600 * 24));
+    const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+  }, [countdownTarget]);
+
+  const [countdown, setCountdown] = useState(initialCountdown);
+
+  // Sync state with memoized value when countdownTarget changes
+  useEffect(() => {
+    setCountdown(initialCountdown);
+  }, [initialCountdown]);
+
   useEffect(() => {
     if (!countdownTarget) {
-      setCountdown("");
       return;
     }
 
     const target = new Date(countdownTarget);
     if (Number.isNaN(target.getTime())) {
-      setCountdown("");
       return;
     }
 
