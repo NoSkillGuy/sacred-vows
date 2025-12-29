@@ -217,6 +217,7 @@ Use GitHub MCP server to post review comments. The recommended approach is to cr
    - Repository: Detect from git remote (see Context Understanding section)
    - Get the head commit SHA from PR data (`headRefOid`)
    - For each inline comment, use `mcp_github_add_comment_to_pending_review`:
+     - **Note on MCP Functionality**: The `mcp_github_add_comment_to_pending_review` function is designed to add a comment to your pending review. Based on the function's purpose (adding to "the requester's latest pending pull request review"), it creates new comments on specified lines. Verify the current behavior by checking the latest GitHub MCP server documentation, as capabilities may have been updated.
      - `path`: File path
      - `line`: Line number (for single-line comments)
      - `startLine`: Start line (for multi-line comments)
@@ -237,6 +238,7 @@ Use GitHub MCP server to post review comments. The recommended approach is to cr
 - For inline comments, the `side` parameter should be `"RIGHT"` for comments on the new code (the PR branch)
 - Get the commit SHA from PR data (`headRefOid` from `pull_request_read`)
 - Multiple inline comments can be added to a single pending review before submitting
+- **MCP Functionality Note**: The `mcp_github_add_comment_to_pending_review` function adds comments to your pending review. Verify current MCP server capabilities by checking the latest GitHub MCP server documentation, as functionality may have been updated.
 
 ### Step 5: Create Review Summary
 
@@ -541,9 +543,11 @@ Most GitHub operations should use these MCP functions:
 - **Get commit details**: `mcp_github_get_commit`
 - **List PRs**: `mcp_github_list_pull_requests` (to find PR by branch)
 - **Create pending review**: `mcp_github_pull_request_review_write` with method `create` (without `event`)
-- **Add comment to pending review**: `mcp_github_add_comment_to_pending_review`
+- **Add comment to pending review**: `mcp_github_add_comment_to_pending_review` (note: adds comments to your pending review - verify current MCP server capabilities)
 - **Submit review**: `mcp_github_pull_request_review_write` with method `submit_pending`
 - **Add general PR comment**: `mcp_github_add_issue_comment` (use PR number as issue number)
+
+**Note**: While the GitHub REST API supports various review comment operations, verify the current capabilities of the GitHub MCP server by checking the latest documentation, as functionality may have been updated.
 
 ## Notes
 
