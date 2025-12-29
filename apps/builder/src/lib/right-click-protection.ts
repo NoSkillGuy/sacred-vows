@@ -14,6 +14,32 @@
 import { LEGAL_WARNINGS } from "./legal-warnings";
 
 /**
+ * Track blocked attempts with timestamps
+ */
+const blockedAttempts: number[] = [];
+const ATTEMPT_THRESHOLD = 5;
+const TIME_WINDOW_MS = 5000; // 5 seconds
+
+/**
+ * Record a blocked attempt and check if warning should be shown
+ * @returns true if warning should be shown (5 attempts in 5 seconds)
+ */
+function recordBlockedAttempt(): boolean {
+  const now = Date.now();
+
+  // Remove attempts older than the time window
+  while (blockedAttempts.length > 0 && now - blockedAttempts[0] > TIME_WINDOW_MS) {
+    blockedAttempts.shift();
+  }
+
+  // Add current attempt
+  blockedAttempts.push(now);
+
+  // Show warning if threshold is reached
+  return blockedAttempts.length >= ATTEMPT_THRESHOLD;
+}
+
+/**
  * Show right-click warning modal
  */
 function showRightClickWarning(): void {
@@ -47,40 +73,48 @@ function showRightClickWarning(): void {
   const modal = document.createElement("div");
   modal.style.cssText = `
     background: white;
-    padding: 25px;
+    padding: 30px;
     border-radius: 8px;
-    max-width: 400px;
-    text-align: center;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    text-align: left;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   `;
 
-  const message = document.createElement("p");
+  const message = document.createElement("div");
   message.textContent = LEGAL_WARNINGS.rightClick;
-  message.style.cssText = "color: #333; line-height: 1.6; margin: 0 0 15px 0; font-size: 14px;";
+  message.style.cssText =
+    "color: #333; line-height: 1.8; margin: 0 0 20px 0; font-size: 13px; white-space: pre-line;";
 
-  const copyright = document.createElement("p");
+  const copyright = document.createElement("div");
   copyright.textContent = LEGAL_WARNINGS.copyright;
-  copyright.style.cssText = "color: #666; font-size: 11px; margin: 15px 0 0 0;";
+  copyright.style.cssText =
+    "color: #666; font-size: 11px; margin: 20px 0 0 0; padding-top: 15px; border-top: 1px solid #eee; white-space: pre-line;";
+
+  const buttonContainer = document.createElement("div");
+  buttonContainer.style.cssText = "text-align: center; margin-top: 20px;";
 
   const closeBtn = document.createElement("button");
   closeBtn.textContent = "Close";
   closeBtn.style.cssText = `
-    margin-top: 15px;
-    padding: 8px 20px;
+    padding: 10px 30px;
     background: #d4af37;
     color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
+    font-weight: 500;
   `;
   closeBtn.onclick = () => {
     overlay.remove();
   };
 
+  buttonContainer.appendChild(closeBtn);
   modal.appendChild(message);
   modal.appendChild(copyright);
-  modal.appendChild(closeBtn);
+  modal.appendChild(buttonContainer);
   overlay.appendChild(modal);
   document.body.appendChild(overlay);
 
@@ -128,7 +162,10 @@ export function enableRightClickProtection(isProduction = true): void {
     (e) => {
       if (!shouldAllowRightClick(e.target)) {
         e.preventDefault();
-        showRightClickWarning();
+        // Only show warning after multiple attempts
+        if (recordBlockedAttempt()) {
+          showRightClickWarning();
+        }
         return false;
       }
     },
@@ -159,7 +196,10 @@ export function enableRightClickProtection(isProduction = true): void {
         const target = e.target as HTMLElement;
         if (target.tagName === "IMG" || target.tagName === "PICTURE") {
           e.preventDefault();
-          showRightClickWarning();
+          // Only show warning after multiple attempts
+          if (recordBlockedAttempt()) {
+            showRightClickWarning();
+          }
           return false;
         }
       }
@@ -179,7 +219,10 @@ export function enableRightClickProtection(isProduction = true): void {
       ) {
         if (!shouldAllowRightClick(e.target)) {
           e.preventDefault();
-          showRightClickWarning();
+          // Only show warning after multiple attempts
+          if (recordBlockedAttempt()) {
+            showRightClickWarning();
+          }
           return false;
         }
       }
@@ -203,6 +246,26 @@ export function getRightClickProtectionScript(isProduction = true): string {
   const warning = ${JSON.stringify(LEGAL_WARNINGS.rightClick)};
   const copyright = ${JSON.stringify(LEGAL_WARNINGS.copyright)};
 
+  // Track blocked attempts with timestamps
+  const blockedAttempts = [];
+  const ATTEMPT_THRESHOLD = 5;
+  const TIME_WINDOW_MS = 5000; // 5 seconds
+
+  function recordBlockedAttempt() {
+    const now = Date.now();
+
+    // Remove attempts older than the time window
+    while (blockedAttempts.length > 0 && now - blockedAttempts[0] > TIME_WINDOW_MS) {
+      blockedAttempts.shift();
+    }
+
+    // Add current attempt
+    blockedAttempts.push(now);
+
+    // Show warning if threshold is reached
+    return blockedAttempts.length >= ATTEMPT_THRESHOLD;
+  }
+
   function shouldAllowRightClick(target) {
     if (!target || !target.tagName) return false;
     const tagName = target.tagName.toLowerCase();
@@ -219,24 +282,28 @@ export function getRightClickProtectionScript(isProduction = true): string {
     overlay.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 999998; display: flex; align-items: center; justify-content: center; font-family: Arial, sans-serif;';
 
     const modal = document.createElement('div');
-    modal.style.cssText = 'background: white; padding: 25px; border-radius: 8px; max-width: 400px; text-align: center; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);';
+    modal.style.cssText = 'background: white; padding: 30px; border-radius: 8px; max-width: 600px; max-height: 80vh; overflow-y: auto; text-align: left; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);';
 
-    const message = document.createElement('p');
+    const message = document.createElement('div');
     message.textContent = warning;
-    message.style.cssText = 'color: #333; line-height: 1.6; margin: 0 0 15px 0; font-size: 14px;';
+    message.style.cssText = 'color: #333; line-height: 1.8; margin: 0 0 20px 0; font-size: 13px; white-space: pre-line;';
 
-    const copyrightEl = document.createElement('p');
+    const copyrightEl = document.createElement('div');
     copyrightEl.textContent = copyright;
-    copyrightEl.style.cssText = 'color: #666; font-size: 11px; margin: 15px 0 0 0;';
+    copyrightEl.style.cssText = 'color: #666; font-size: 11px; margin: 20px 0 0 0; padding-top: 15px; border-top: 1px solid #eee; white-space: pre-line;';
+
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.cssText = 'text-align: center; margin-top: 20px;';
 
     const closeBtn = document.createElement('button');
     closeBtn.textContent = 'Close';
-    closeBtn.style.cssText = 'margin-top: 15px; padding: 8px 20px; background: #d4af37; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;';
+    closeBtn.style.cssText = 'padding: 10px 30px; background: #d4af37; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500;';
     closeBtn.onclick = function() { overlay.remove(); };
 
+    buttonContainer.appendChild(closeBtn);
     modal.appendChild(message);
     modal.appendChild(copyrightEl);
-    modal.appendChild(closeBtn);
+    modal.appendChild(buttonContainer);
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
 
@@ -248,7 +315,10 @@ export function getRightClickProtectionScript(isProduction = true): string {
   document.addEventListener('contextmenu', function(e) {
     if (!shouldAllowRightClick(e.target)) {
       e.preventDefault();
-      showWarning();
+      // Only show warning after multiple attempts
+      if (recordBlockedAttempt()) {
+        showWarning();
+      }
       return false;
     }
   }, false);
@@ -268,7 +338,10 @@ export function getRightClickProtectionScript(isProduction = true): string {
       const target = e.target;
       if (target.tagName === 'IMG' || target.tagName === 'PICTURE') {
         e.preventDefault();
-        showWarning();
+        // Only show warning after multiple attempts
+        if (recordBlockedAttempt()) {
+          showWarning();
+        }
         return false;
       }
     }
@@ -278,7 +351,10 @@ export function getRightClickProtectionScript(isProduction = true): string {
     if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J')) || (e.ctrlKey && e.key === 'U')) {
       if (!shouldAllowRightClick(e.target)) {
         e.preventDefault();
-        showWarning();
+        // Only show warning after multiple attempts
+        if (recordBlockedAttempt()) {
+          showWarning();
+        }
         return false;
       }
     }

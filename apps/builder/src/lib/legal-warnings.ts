@@ -26,10 +26,27 @@ Copyright © 2024 Sacred Vows. All Rights Reserved.`,
 Developer tools access is monitored. All layouts are protected by copyright law.
 Unauthorized copying or reverse engineering is strictly prohibited.`,
 
-  rightClick: `Copying is prohibited. All content is protected by copyright.
-Unauthorized reproduction may result in legal action.`,
+  rightClick: `⚠️ COPYRIGHT PROTECTION NOTICE ⚠️
 
-  copyright: `© 2024 Sacred Vows. All Rights Reserved. Unauthorized copying prohibited.`,
+This website and all its content, including but not limited to layouts, designs, images, text, graphics, code, and styling, are the exclusive property of Sacred Vows and are protected by United States and international copyright laws, trademark laws, and other intellectual property laws.
+
+UNAUTHORIZED COPYING, REPRODUCTION, DISTRIBUTION, MODIFICATION, OR USE OF ANY CONTENT FROM THIS WEBSITE IS STRICTLY PROHIBITED AND CONSTITUTES COPYRIGHT INFRINGEMENT.
+
+Violators may be subject to:
+• Civil liability for damages, including statutory damages up to $150,000 per work infringed
+• Criminal prosecution under 17 U.S.C. § 506 and 18 U.S.C. § 2319
+• Injunctive relief and attorney's fees
+• Seizure and destruction of infringing materials
+
+This content is proprietary and confidential. Any unauthorized access, copying, or use may result in severe legal consequences, including both civil and criminal penalties.
+
+For licensing inquiries, contact: legal@sacredvows.com`,
+
+  copyright: `© 2024 Sacred Vows. All Rights Reserved.
+
+This website and all its contents are protected by copyright law. Unauthorized copying, reproduction, distribution, modification, or use of any content is strictly prohibited and may result in severe civil and criminal penalties under United States and international copyright laws.
+
+For licensing inquiries: legal@sacredvows.com`,
 } as const;
 
 /**
@@ -55,5 +72,5 @@ export function getLegalHTMLComment(): string {
  * Get meta tag content for copyright notice
  */
 export function getCopyrightMetaContent(): string {
-  return "© 2024 Sacred Vows. All Rights Reserved. Unauthorized copying prohibited.";
+  return "© 2024 Sacred Vows. All Rights Reserved. This website and all its contents are protected by copyright law. Unauthorized copying, reproduction, distribution, or use is strictly prohibited and may result in severe civil and criminal penalties. For licensing inquiries: legal@sacredvows.com";
 }

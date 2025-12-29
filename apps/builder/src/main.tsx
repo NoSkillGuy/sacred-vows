@@ -9,6 +9,8 @@ import { queryClient } from "./lib/queryClient";
 import { initObservability } from "./lib/observability";
 import { ObservabilityRouter } from "./lib/observabilityRouter";
 import { initMetricsAfterObservability } from "./lib/metrics";
+import { enableRightClickProtection } from "./lib/right-click-protection";
+import { startDevToolsDetection } from "./lib/devtools-detection";
 import "./styles/index.css";
 // Invitation styles are loaded in PreviewPane to avoid conflicts with builder UI
 
@@ -16,6 +18,13 @@ import "./styles/index.css";
 Promise.all([initObservability(), initMetricsAfterObservability()]).catch((error) => {
   console.error("[App] Failed to initialize observability:", error);
 });
+
+// Enable protection only in production (not in development)
+const isProduction = import.meta.env.MODE === "production" || import.meta.env.PROD;
+if (isProduction) {
+  enableRightClickProtection(true);
+  startDevToolsDetection(true);
+}
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {
