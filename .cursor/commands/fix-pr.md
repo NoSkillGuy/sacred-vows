@@ -2,19 +2,47 @@
 
 When the user invokes `/fix-pr`, fetch the GitHub PR, read all PR comments, check CI checks for failures, fix all issues found, and commit the fixes. If no fixes are required, inform the user.
 
+## Critical Validation Rules
+
+**BEFORE making any changes, you MUST:**
+
+1. **Get and validate branch name FIRST**:
+   - Always get current branch: `git branch --show-current`
+   - **NEVER make changes if branch name cannot be determined** - prompt user to select branch
+   - **NEVER make changes on `main`, `master`, or any default/protected branch** - stop and inform user
+
+2. **Verify PR exists for branch**:
+   - Use `mcp_github_list_pull_requests` with `head` filter to find PR for the branch
+   - **If no PR found**: Do NOT make any changes - prompt user: "No pull request found for branch '<branch-name>'. Please create a PR first or specify a different branch."
+
+3. **Use GitHub MCP server ONLY**:
+   - **NEVER use `gh` CLI or `gh api` commands**
+   - All GitHub operations must use MCP functions
+   - Repository detection: `git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/'`
+
 ## Context Understanding
 
-1. **Get PR number**: The user may provide a PR number, or you should detect it from:
-   - Current branch name (if it matches a PR)
-   - User input after the command: `/fix-pr 123`
-   - Git remote tracking information
+1. **Get branch name FIRST** (CRITICAL):
+   - **Always detect the current branch name first** using: `git branch --show-current` or `git rev-parse --abbrev-ref HEAD`
+   - **NEVER make changes if you don't know the branch name**
+   - **NEVER make changes on the main branch** (or master, or any protected default branch)
+   - If branch name cannot be determined, **prompt the user to select the branch first**
+   - If the current branch is `main`, `master`, or the default branch, **stop and inform the user that changes cannot be made on the default branch**
 
-2. **Repository information**:
+2. **Get PR number**: The user may provide a PR number, or you should detect it from:
+   - **Branch name** (primary method): Use `mcp_github_list_pull_requests` filtered by `head` parameter to find PRs for the current branch
+   - User input after the command: `/fix-pr 123`
+   - **If no PR exists for the branch**: **Do not make any changes** and prompt the user: "No pull request found for branch '<branch-name>'. Please create a PR first or specify a different branch."
+
+3. **Repository information**:
    - Repository: Detect from git remote using: `git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/'`
-   - **Use GitHub MCP server for all GitHub operations** (not `gh` CLI)
+   - **Use GitHub MCP server for ALL GitHub operations** (never use `gh` CLI)
    - Owner and Repo: Extract from the detected repository string (format: `owner/repo`)
 
-3. **Current branch**: Ensure you're on the PR branch before making fixes
+4. **Current branch validation**:
+   - Ensure you're on the PR branch before making fixes
+   - Verify branch is not a protected/default branch
+   - Verify a PR exists for the branch before proceeding
 
 ## GitHub MCP Functions to Use
 
@@ -33,20 +61,35 @@ Most GitHub operations should use these MCP functions:
 - **Add review comment**: `mcp_github_add_comment_to_pending_review`
 - **Create/update review**: `mcp_github_pull_request_review_write`
 
-**Note**: For replying to review comment threads and resolving them, use `gh api` directly since this functionality is not available in MCP:
-- **Reply to review comment**: `gh api repos/{owner}/{repo}/pulls/{pull_number}/comments/{comment_id}/replies -X POST`
-- **Resolve comment thread**: `gh api repos/{owner}/{repo}/pulls/{pull_number}/comments/{comment_id} -X PATCH -f resolved=true`
+**Note**: For replying to review comment threads, use GitHub MCP server functions:
+- **Add review comment to pending review**: `mcp_github_add_comment_to_pending_review` - Add a comment to your pending review
+- **Create or submit review**: `mcp_github_pull_request_review_write` with method `create` or `submit_pending` - Create a review with comments or submit a pending review
+- **Add general PR comment**: `mcp_github_add_issue_comment` - Add a comment to the PR (PRs are issues in GitHub)
 
 ## Fix Process
 
 ### Step 1: Fetch PR Information
 
-1. **Get PR number**:
-   - If user provided PR number: use it directly
-   - Otherwise: try to detect from current branch using git
+1. **Get and validate branch name** (CRITICAL - DO THIS FIRST):
+   ```bash
+   CURRENT_BRANCH=$(git branch --show-current)
+   # Or: CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+   ```
+   - **If branch name cannot be determined**: Prompt user: "Unable to determine current branch. Please select a branch first."
+   - **If branch is `main`, `master`, or default branch**: Stop and inform user: "Cannot make changes on the default branch. Please checkout a feature branch first."
+   - **Store branch name for later use**
+
+2. **Get PR number**:
+   - If user provided PR number: use it directly, but still validate the branch
+   - Otherwise: **Use branch name to find PR**:
+     - Get repository info: `REPO=$(git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/')`
+     - Extract owner and repo name
+     - Use `mcp_github_list_pull_requests` with `head` parameter set to `owner:branch-name` or just `branch-name` to find PRs for this branch
+     - If no PR found: **Stop and inform user**: "No pull request found for branch '<branch-name>'. Please create a PR first or specify a different branch."
+     - If multiple PRs found: Use the most recent open PR, or ask user to specify
    - If still not found: ask user for PR number
 
-2. **Get PR details** using GitHub MCP:
+3. **Get PR details** using GitHub MCP:
    - Use `mcp_github_pull_request_read` with method `get`
    - Repository: Detect from git remote (see Step 1.2)
    - Extract: number, title, body, author, state, baseRefName, headRefName, headRefOid
@@ -440,44 +483,37 @@ After all fixes are complete and tests pass, respond to review comments explaini
 
 #### 7.2: Reply to Review Comment Threads
 
-For each review comment that has been fixed, reply to the comment thread using the GitHub API:
+For each review comment that has been fixed, reply to the comment thread using GitHub MCP server:
 
 1. **For inline review comments** (comments on specific lines in code):
-   ```bash
-   # Get repository info
-   REPO=$(git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/')
-   OWNER=$(echo $REPO | cut -d'/' -f1)
-   REPO_NAME=$(echo $REPO | cut -d'/' -f2)
+   - Use `mcp_github_add_comment_to_pending_review` to add a reply comment to your pending review
+   - Parameters:
+     - `owner`: Repository owner
+     - `repo`: Repository name
+     - `pullNumber`: PR number
+     - `path`: File path from the original comment
+     - `body`: Reply text explaining the fix (e.g., "✅ Fixed! I've [description of fix]. The changes address your feedback by [explanation].")
+     - `line`: Line number from the original comment (if applicable
+     - `side`: "RIGHT" (the new state) or "LEFT" (the previous state)
+   - **Note**: This adds a comment to your pending review. You may need to create or submit a review first.
 
-   # Reply to a review comment thread
-   # ROOT_COMMENT_ID is the ID of the root comment in the thread (the original review comment)
-   # Find the root comment by looking for comments with no in_reply_to_id
-   # or by following the thread_id to find the first comment
-   gh api repos/$OWNER/$REPO_NAME/pulls/$PR_NUMBER/comments/$ROOT_COMMENT_ID/replies \
-     -X POST \
-     -f body="✅ Fixed! I've [description of fix]. The changes address your feedback by [explanation].
+2. **Create or submit a review with comments**:
+   - Use `mcp_github_pull_request_review_write` with method `create` to create a review with comments
+   - Or use method `submit_pending` to submit an existing pending review
+   - Parameters:
+     - `owner`: Repository owner
+     - `repo`: Repository name
+     - `pullNumber`: PR number
+     - `body`: Review body text (can include summary of fixes)
+     - `event`: "COMMENT" (for comments only) or "APPROVE" (if all issues are resolved)
+   - This will include all comments added via `add_comment_to_pending_review`
 
-   The fix:
-   - [Specific change made]
-   - [How it addresses the concern]
-   - [Any additional context]"
-   ```
-
-2. **Resolve the comment thread** (after replying):
-   ```bash
-   # Resolve the thread by updating the root comment
-   # ROOT_COMMENT_ID is the ID of the root comment in the thread
-   gh api repos/$OWNER/$REPO_NAME/pulls/$PR_NUMBER/comments/$ROOT_COMMENT_ID \
-     -X PATCH \
-     -f body="[Original comment text]" \
-     -f resolved=true
-   ```
-
-   **Note**: If the GitHub API doesn't support `resolved` in the PATCH body, you may need to use a different approach. Check the actual API response structure from `get_review_comments` to see how resolution is handled.
-
-3. **Alternative: Use GitHub web interface markers**:
-   - If direct API resolution isn't available, include "✅ Resolved" or "Fixed" in your reply
-   - The reviewer can manually resolve the thread, or it may auto-resolve
+3. **Thread resolution**:
+   - Review comment threads are typically resolved when:
+     - A new commit addresses the comment
+     - The reviewer manually resolves the thread
+     - The comment author replies indicating the issue is fixed
+   - Include "✅ Fixed" or "✅ Resolved" in your reply to indicate the issue has been addressed
 
 #### 7.3: Reply to General PR Comments
 
@@ -515,36 +551,39 @@ If multiple review comments were addressed, create a summary comment:
 
 #### 7.5: Example Workflow for Replying to Review Comments
 
-```bash
-# 1. Get repository info
-REPO=$(git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/')
-OWNER=$(echo $REPO | cut -d'/' -f1)
-REPO_NAME=$(echo $REPO | cut -d'/' -f2)
+1. **Get repository info**:
+   ```bash
+   REPO=$(git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/')
+   OWNER=$(echo $REPO | cut -d'/' -f1)
+   REPO_NAME=$(echo $REPO | cut -d'/' -f2)
+   ```
 
-# 2. Get all review comments to identify threads
-# Use mcp_github_pull_request_read with method get_review_comments
-# For each comment, check:
-#   - in_reply_to_id: null or missing = root comment
-#   - thread_id: same ID = same thread
-#   - is_resolved: false = needs resolution
+2. **Get all review comments to identify threads**:
+   - Use `mcp_github_pull_request_read` with method `get_review_comments`
+   - For each comment, check:
+     - `in_reply_to_id`: null or missing = root comment
+     - `thread_id`: same ID = same thread
+     - `is_resolved`: false = needs resolution
 
-# 3. For each review comment that was fixed:
-#    - ROOT_COMMENT_ID: The ID of the root comment in the thread
-#      (find by checking in_reply_to_id is null for that thread)
-#    - REPLY_BODY: Your reply explaining the fix
+3. **For each review comment that was fixed**:
+   - Extract: `path`, `line`, `body` from the original comment
+   - Prepare reply body explaining the fix
 
-# 4. Reply to the root comment of the thread
-gh api repos/$OWNER/$REPO_NAME/pulls/$PR_NUMBER/comments/$ROOT_COMMENT_ID/replies \
-  -X POST \
-  -f body="$REPLY_BODY"
+4. **Add reply comments to pending review**:
+   - Use `mcp_github_add_comment_to_pending_review` for each fixed comment
+   - Parameters:
+     - `owner`: $OWNER
+     - `repo`: $REPO_NAME
+     - `pullNumber`: $PR_NUMBER
+     - `path`: File path from original comment
+     - `body`: Reply text with fix explanation
+     - `line`: Line number (if applicable)
+     - `side`: "RIGHT" (new state)
 
-# 5. (Optional) Resolve the thread if the API supports it
-# Try to mark the thread as resolved
-gh api repos/$OWNER/$REPO_NAME/pulls/$PR_NUMBER/comments/$ROOT_COMMENT_ID \
-  -X PATCH \
-  -f resolved=true
-# Note: If this fails, the reply itself indicates the fix is complete
-```
+5. **Submit the review**:
+   - Use `mcp_github_pull_request_review_write` with method `submit_pending`
+   - Or use method `create` with `event: "COMMENT"` to create a new review with all comments
+   - This will include all the reply comments added in step 4
 
 #### 7.6: Track Comment Replies
 
@@ -607,11 +646,21 @@ This helps ensure all feedback is properly addressed and acknowledged.
 
 ## Implementation Steps
 
-1. **Parse PR number**:
-   - If user provided PR number: use it directly
-   - Otherwise: try to detect from current branch using `mcp_github_list_pull_requests` filtered by head branch
+1. **Get and validate branch name** (CRITICAL - MUST DO FIRST):
+   - Get current branch: `git branch --show-current` or `git rev-parse --abbrev-ref HEAD`
+   - **If branch cannot be determined**: Prompt user to select a branch first
+   - **If branch is `main`, `master`, or default branch**: Stop and inform user - no changes on default branch
+   - **Store branch name for validation**
+
+2. **Parse PR number**:
+   - If user provided PR number: use it directly, but validate it matches the current branch
+   - Otherwise: **Use branch name to find PR**:
+     - Repository: Detect from git remote using: `git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/'`
+     - Extract owner and repo name
+     - Use `mcp_github_list_pull_requests` with `head` parameter to find PRs for the current branch
+     - **If no PR found**: Stop and inform user: "No pull request found for branch '<branch-name>'. Please create a PR first or specify a different branch."
+     - If multiple PRs found: Use the most recent open PR
    - If still not found: ask user for PR number
-   - Repository: Detect from git remote using: `git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/'`
 
 2. **Check for merge conflicts**:
    - Fetch base branch
@@ -651,10 +700,10 @@ This helps ensure all feedback is properly addressed and acknowledged.
 
 8. **Address review comments**:
    - Get all review comment threads using `mcp_github_pull_request_read` with method `get_review_comments`
-   - For each fixed comment, reply to the thread using `gh api`:
-     - POST to `/repos/{owner}/{repo}/pulls/{pull_number}/comments/{comment_id}/replies`
-     - Explain how the fix addresses the feedback
-   - Resolve comment threads (if API supports it) or mark as resolved in reply
+   - For each fixed comment, reply using GitHub MCP server:
+     - Use `mcp_github_add_comment_to_pending_review` to add reply comments to your pending review
+     - Include file path, line number, and explanation of the fix
+     - Submit the review using `mcp_github_pull_request_review_write` with method `submit_pending` or `create`
    - For general comments: Use `mcp_github_add_issue_comment` (PR number as issue number)
    - Create summary comment if multiple comments were addressed
 
@@ -707,18 +756,11 @@ npm run format
 - Understand the requested change
 - Apply the fix
 - Verify it addresses the comment
-- **Reply to the comment thread** using GitHub API:
-  ```bash
-  gh api repos/$OWNER/$REPO_NAME/pulls/$PR_NUMBER/comments/$COMMENT_ID/replies \
-    -X POST \
-    -f body="✅ Fixed! [Explanation of fix]"
-  ```
-- **Resolve the thread** (if API supports it):
-  ```bash
-  gh api repos/$OWNER/$REPO_NAME/pulls/$PR_NUMBER/comments/$ROOT_COMMENT_ID \
-    -X PATCH \
-    -f resolved=true
-  ```
+- **Reply to the comment thread** using GitHub MCP server:
+  - Use `mcp_github_add_comment_to_pending_review` to add a reply comment
+  - Include the file path, line number, and explanation of the fix
+  - Submit the review using `mcp_github_pull_request_review_write` with method `submit_pending` or `create`
+  - For general PR comments, use `mcp_github_add_issue_comment`
 - Track which comments have been fixed, replied to, and resolved
 
 ### Merge Conflicts
@@ -774,11 +816,11 @@ npm run format
 - After pushing, CI will automatically re-run
 - Monitor CI status after pushing fixes
 - **Reply to review comment threads** to show that feedback was addressed:
-  - Use `gh api` to POST replies to review comment threads
-  - Resolve threads after replying (if API supports it)
+  - Use `mcp_github_add_comment_to_pending_review` to add reply comments
+  - Use `mcp_github_pull_request_review_write` to submit the review with comments
   - Track which comments have been fixed, replied to, and resolved
-- **Use GitHub MCP server for most GitHub operations** (PR reading, adding comments)
-- **Use `gh api` for replying to and resolving review comment threads** (not available in MCP)
+- **Use GitHub MCP server for ALL GitHub operations** (never use `gh` CLI)
 - Repository: Always detect dynamically from git remote using: `git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/'`
-- Most GitHub API calls should use MCP functions, but review comment thread replies use `gh api`
+- **CRITICAL**: Always validate branch name first - never make changes on default branch (main/master)
+- **CRITICAL**: Never make changes if no PR exists for the branch - prompt user to create PR first
 

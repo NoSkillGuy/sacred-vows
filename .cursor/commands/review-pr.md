@@ -1,38 +1,80 @@
 # Review PR
 
-When the user invokes `/review-pr`, fetch the GitHub PR, perform a thorough code review, and post review comments on GitHub using the `gh` CLI.
+When the user invokes `/review-pr`, fetch the GitHub PR, perform a thorough code review, and post review comments on GitHub using the GitHub MCP server.
+
+## Critical Validation Rules
+
+**BEFORE starting the review, you MUST:**
+
+1. **Get and validate branch name FIRST**:
+   - Always get current branch: `git branch --show-current`
+   - **NEVER proceed if branch name cannot be determined** - prompt user to select branch
+   - **NEVER review PRs on `main`, `master`, or any default/protected branch** - stop and inform user
+
+2. **Verify PR exists for branch**:
+   - Use `mcp_github_list_pull_requests` with `head` filter to find PR for the branch
+   - **If no PR found**: Do NOT proceed - prompt user: "No pull request found for branch '<branch-name>'. Please create a PR first or specify a different branch."
+
+3. **Use GitHub MCP server ONLY**:
+   - **NEVER use `gh` CLI or `gh api` commands**
+   - All GitHub operations must use MCP functions
+   - Repository detection: `git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/'`
 
 ## Context Understanding
 
-1. **Get PR number**: The user may provide a PR number, or you should detect it from:
-   - Current branch name (if it matches a PR)
-   - User input after the command
-   - Git remote tracking information
+1. **Get and validate branch name FIRST** (CRITICAL):
+   - **Always detect the current branch name first** using: `git branch --show-current` or `git rev-parse --abbrev-ref HEAD`
+   - **NEVER proceed if you don't know the branch name**
+   - **NEVER review PRs on the main branch** (or master, or any protected default branch)
+   - If branch name cannot be determined, **prompt the user to select the branch first**
+   - If the current branch is `main`, `master`, or the default branch, **stop and inform the user**
 
-2. **Repository information**:
+2. **Get PR number**: The user may provide a PR number, or you should detect it from:
+   - **Branch name** (primary method): Use `mcp_github_list_pull_requests` filtered by `head` parameter to find PRs for the current branch
+   - User input after the command: `/review-pr 123`
+   - **If no PR exists for the branch**: **Do not proceed** and prompt the user: "No pull request found for branch '<branch-name>'. Please create a PR first or specify a different branch."
+
+3. **Repository information**:
    - Repository: Detect from git remote using: `git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/'`
    - Owner and Repo: Extract from the detected repository string (format: `owner/repo`)
-   - **Use GitHub MCP server for all GitHub operations** (not `gh` CLI)
+   - **Use GitHub MCP server for ALL GitHub operations** (never use `gh` CLI)
 
 ## Review Process
 
 ### Step 1: Fetch PR Information
 
-Use GitHub MCP server to fetch PR information:
+1. **Get and validate branch name** (CRITICAL - DO THIS FIRST):
+   ```bash
+   CURRENT_BRANCH=$(git branch --show-current)
+   # Or: CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+   ```
+   - **If branch name cannot be determined**: Prompt user: "Unable to determine current branch. Please select a branch first."
+   - **If branch is `main`, `master`, or default branch**: Stop and inform user: "Cannot review PRs on the default branch. Please checkout a feature branch first."
+   - **Store branch name for later use**
 
-1. **Get PR details**:
+2. **Get PR number**:
+   - If user provided PR number: use it directly, but still validate the branch
+   - Otherwise: **Use branch name to find PR**:
+     - Get repository info: `REPO=$(git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/')`
+     - Extract owner and repo name
+     - Use `mcp_github_list_pull_requests` with `head` parameter set to `owner:branch-name` or just `branch-name` to find PRs for this branch
+     - If no PR found: **Stop and inform user**: "No pull request found for branch '<branch-name>'. Please create a PR first or specify a different branch."
+     - If multiple PRs found: Use the most recent open PR, or ask user to specify
+   - If still not found: ask user for PR number
+
+3. **Get PR details** using GitHub MCP server:
    - Use `mcp_github_pull_request_read` with method `get`
-   - Repository: Detect from git remote (see Step 1.2)
+   - Repository: Detect from git remote (see Context Understanding section)
    - Extract: number, title, body, author, state, baseRefName, headRefName, headRefOid, files, commits
 
-2. **Get PR diff**:
+4. **Get PR diff**:
    - Use `mcp_github_pull_request_read` with method `get_diff`
-   - Repository: Detect from git remote (see Step 1.2)
+   - Repository: Detect from git remote (see Context Understanding section)
    - This returns the full diff of the PR
 
-3. **Get PR files**:
+5. **Get PR files**:
    - Use `mcp_github_pull_request_read` with method `get_files`
-   - Repository: Detect from git remote (see Step 1.2)
+   - Repository: Detect from git remote (see Context Understanding section)
    - Extract: path, additions, deletions, status for each file
 
 ### Step 2: Comprehensive Code Review
@@ -147,6 +189,7 @@ Perform a thorough review covering:
 - ✅ Uses existing service patterns
 - ✅ Follows existing state management patterns
 - ✅ Uses existing hooks patterns
+- ✅ Layout changes include corresponding export functionality updates (CSV, PDF, Excel, etc.)
 
 #### 8. Breaking Changes
 
@@ -171,7 +214,7 @@ Use GitHub MCP server to post review comments. The recommended approach is to cr
 
 1. **Create a pending review with inline comments** (recommended for code review):
    - Use `mcp_github_pull_request_review_write` with method `create` (without `event` parameter to create a pending review)
-   - Repository: Detect from git remote (see Step 1.2)
+   - Repository: Detect from git remote (see Context Understanding section)
    - Get the head commit SHA from PR data (`headRefOid`)
    - For each inline comment, use `mcp_github_add_comment_to_pending_review`:
      - `path`: File path
@@ -185,36 +228,9 @@ Use GitHub MCP server to post review comments. The recommended approach is to cr
 
 2. **For general PR comments** (not tied to specific lines):
    - Use `mcp_github_add_issue_comment` (PRs are issues in GitHub)
-   - Repository: Detect from git remote (see Step 1.2)
+   - Repository: Detect from git remote (see Context Understanding section)
    - Issue number: PR number
    - Body: Comment text
-
-3. **Alternative: Single review with all comments**:
-   - If you want to post all comments at once, you can use `gh api` as a fallback:
-     ```bash
-     # Get the head commit SHA
-     COMMIT_SHA=$(gh pr view <PR_NUMBER> --json headRefOid --jq '.headRefOid')
-
-     # Create review JSON with all comments
-     cat > /tmp/review.json <<EOF
-     {
-       "body": "Review summary",
-       "event": "COMMENT",
-       "commit_id": "$COMMIT_SHA",
-       "comments": [
-         {
-           "path": "file/path.go",
-           "line": 123,
-           "body": "Comment text",
-           "side": "RIGHT"
-         }
-       ]
-     }
-     EOF
-
-     REPO=$(git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/')
-     gh api repos/$REPO/pulls/<PR_NUMBER>/reviews -X POST --input /tmp/review.json
-     ```
 
 **Note**:
 - **Preferred approach**: Use MCP `pull_request_review_write` with `create` (pending), then `add_comment_to_pending_review` for each comment, then `submit_pending` to submit
@@ -246,29 +262,40 @@ Post a comprehensive review summary that includes:
 
 ## Implementation Steps
 
-1. **Parse PR number**:
-   - Check if user provided PR number: `/review-pr 123`
-   - If not, try to detect from current branch using `mcp_github_list_pull_requests` filtered by head branch
-   - If still not found, ask user for PR number
-   - Repository: Detect from git remote using: `git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/'`
+1. **Get and validate branch name** (CRITICAL - MUST DO FIRST):
+   - Get current branch: `git branch --show-current` or `git rev-parse --abbrev-ref HEAD`
+   - **If branch cannot be determined**: Prompt user to select a branch first
+   - **If branch is `main`, `master`, or default branch**: Stop and inform user - no reviews on default branch
+   - **Store branch name for validation**
 
-2. **Fetch PR data using GitHub MCP**:
+2. **Parse PR number**:
+   - Check if user provided PR number: `/review-pr 123`
+   - If provided: use it directly, but validate it matches the current branch
+   - Otherwise: **Use branch name to find PR**:
+     - Repository: Detect from git remote using: `git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/'`
+     - Extract owner and repo name
+     - Use `mcp_github_list_pull_requests` with `head` parameter to find PRs for the current branch
+     - **If no PR found**: Stop and inform user: "No pull request found for branch '<branch-name>'. Please create a PR first or specify a different branch."
+     - If multiple PRs found: Use the most recent open PR
+   - If still not found: ask user for PR number
+
+3. **Fetch PR data using GitHub MCP**:
    - Use `mcp_github_pull_request_read` with method `get` to get PR details
    - Use `mcp_github_pull_request_read` with method `get_diff` to get PR diff
    - Use `mcp_github_pull_request_read` with method `get_files` to get changed files
-   - Repository: Detect from git remote (see Step 1.2)
+   - Repository: Detect from git remote (see Context Understanding section)
 
-3. **Analyze changes**:
+4. **Analyze changes**:
    - Read the diff file
    - Identify changed files
    - For each file, check against review criteria
    - Identify issues and create review comments
 
-4. **Post comments using GitHub MCP**:
+5. **Post comments using GitHub MCP**:
    - Collect all inline comments first
    - Create a pending review using `mcp_github_pull_request_review_write` with method `create` (without `event` parameter)
    - For each inline comment, use `mcp_github_add_comment_to_pending_review`:
-     - Repository: Detect from git remote (see Step 1.2)
+     - Repository: Detect from git remote (see Context Understanding section)
      - Pull number: PR number
      - Path: File path
      - Line: Line number (or startLine/endLine for multi-line)
@@ -279,7 +306,7 @@ Post a comprehensive review summary that includes:
      - Body: Overall review summary
    - For general comments (not inline), use `mcp_github_add_issue_comment` (PR number as issue number)
 
-5. **Provide feedback to user**:
+6. **Provide feedback to user**:
    - Show summary of review
    - List issues found
    - Confirm comments were posted
@@ -348,6 +375,7 @@ if err != nil {
    - Missing e2e tests for critical user flows (use Playwright)
 7. **Business logic in components**: Should be in hooks/services
 8. **Missing loading states**: Async operations need loading indicators
+9. **Layout and export consistency**: When layout changes are made (e.g., table columns, form fields, display order), ensure corresponding changes are made to export functionality (CSV, PDF, Excel, etc.) to maintain consistency between what users see and what they can export
 
 ## Examples
 
@@ -517,8 +545,6 @@ Most GitHub operations should use these MCP functions:
 - **Submit review**: `mcp_github_pull_request_review_write` with method `submit_pending`
 - **Add general PR comment**: `mcp_github_add_issue_comment` (use PR number as issue number)
 
-**Note**: For operations not available in MCP (like creating a review with all comments in one API call), you can use `gh api` as a fallback.
-
 ## Notes
 
 - Always be constructive and helpful in comments
@@ -526,9 +552,11 @@ Most GitHub operations should use these MCP functions:
 - Reference repository patterns and examples
 - Acknowledge good work when appropriate
 - Focus on important issues first (blockers, critical, major)
-- **Use GitHub MCP server for all GitHub operations** (not `gh` CLI)
+- **Use GitHub MCP server for ALL GitHub operations** (never use `gh` CLI)
 - Repository: Always detect dynamically from git remote using: `git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/'`
 - Group related comments when possible to avoid spam
 - Post a summary comment at the end with overall assessment
 - **Test quality is critical**: Reject tests that exist only for coverage metrics. Every test must validate meaningful business logic, user flows, or edge cases. Ensure proper test pyramid: unit tests for isolated logic, integration tests for component interactions, and e2e tests for critical user journeys.
+- **CRITICAL**: Always validate branch name first - never review PRs on default branch (main/master)
+- **CRITICAL**: Never proceed if no PR exists for the branch - prompt user to create PR first
 
