@@ -35,54 +35,6 @@ function detectByWindowSize(): boolean {
 }
 
 /**
- * Detect DevTools using debugger statement method
- */
-function detectByDebugger(): boolean {
-  let detected = false;
-  const start = performance.now();
-
-  // Use debugger to detect if DevTools is open
-  // When DevTools is open, execution pauses, causing a delay
-  debugger; // eslint-disable-line no-debugger
-
-  const end = performance.now();
-  const elapsed = end - start;
-
-  // If execution took more than 100ms, DevTools is likely open
-  // (normal execution should be < 1ms)
-  if (elapsed > 100) {
-    detected = true;
-  }
-
-  return detected;
-}
-
-/**
- * Detect DevTools using console method
- */
-function detectByConsole(): boolean {
-  if (typeof window === "undefined") {
-    return false;
-  }
-
-  let detected = false;
-  const element = new Image();
-
-  Object.defineProperty(element, "id", {
-    get: function () {
-      detected = true;
-      return "";
-    },
-  });
-
-  // This will trigger the getter if DevTools is open
-  console.log(element);
-  console.clear();
-
-  return detected;
-}
-
-/**
  * Start DevTools detection
  */
 export function startDevToolsDetection(callback: DevToolsCallback, isProduction = true): void {
@@ -96,8 +48,8 @@ export function startDevToolsDetection(callback: DevToolsCallback, isProduction 
 
   onDevToolsOpen = callback;
 
-  // Check immediately
-  if (detectByWindowSize() || detectByDebugger()) {
+  // Check immediately using window size detection (most reliable method)
+  if (detectByWindowSize()) {
     devToolsDetected = true;
     callback();
     return;
