@@ -114,6 +114,22 @@ func findWorkspaceRoot(startPath string) string {
 	return ""
 }
 
+// extractLayoutConfigFromData extracts layoutConfig from the invitation data if it exists
+func extractLayoutConfigFromData(data json.RawMessage) (map[string]any, error) {
+	var dataMap map[string]any
+	if err := json.Unmarshal(data, &dataMap); err != nil {
+		return nil, err
+	}
+
+	// Check if layoutConfig exists in the data
+	if layoutConfig, ok := dataMap["layoutConfig"].(map[string]any); ok {
+		return layoutConfig, nil
+	}
+
+	// Return nil if not found (not an error)
+	return nil, nil
+}
+
 func (g *NodeSnapshotGenerator) GenerateBundle(ctx context.Context, invitationID string) (*publish.SnapshotBundle, error) {
 	inv, err := g.invitationRepo.FindByID(ctx, invitationID)
 	if err != nil {
@@ -123,12 +139,26 @@ func (g *NodeSnapshotGenerator) GenerateBundle(ctx context.Context, invitationID
 		return nil, fmt.Errorf("invitation not found")
 	}
 
+	// Extract layoutConfig from data if it exists (optional enhancement)
+	layoutConfig, err := extractLayoutConfigFromData(inv.Data)
+	if err != nil {
+		// If extraction fails, continue without it (render script will handle it)
+		layoutConfig = nil
+	}
+
 	// Keep invitation payload close to what the builder expects.
+	invitationPayload := map[string]any{
+		"layoutId": inv.LayoutID,
+		"data":     json.RawMessage(inv.Data),
+	}
+
+	// Include layoutConfig if we extracted it
+	if layoutConfig != nil {
+		invitationPayload["layoutConfig"] = layoutConfig
+	}
+
 	payload := map[string]any{
-		"invitation": map[string]any{
-			"layoutId": inv.LayoutID,
-			"data":     json.RawMessage(inv.Data),
-		},
+		"invitation":  invitationPayload,
 		"translations": map[string]any{},
 	}
 
