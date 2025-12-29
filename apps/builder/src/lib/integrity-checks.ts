@@ -52,7 +52,9 @@ export function checkIntegrity(): { valid: boolean; violations: string[] } {
   }
 
   const violations: string[] = [];
-  const expectedHashes = getExpectedHashes();
+  // Note: expectedHashes would be used for hash verification in production
+  // For now, we perform presence checks instead
+  void getExpectedHashes();
 
   // Check if protection scripts are present and unmodified
   const protectionScript = document.querySelector('script[data-protection="true"]');
@@ -68,15 +70,15 @@ export function checkIntegrity(): { valid: boolean; violations: string[] } {
     } else {
       violations.push("Console protection may be disabled");
     }
-  } catch (e) {
+  } catch {
     violations.push("Unable to verify console protection");
   }
 
   // Check if DevTools detection is active
   try {
-    const overlay = document.getElementById("devtools-warning-overlay");
     // If overlay exists, detection is working
-  } catch (e) {
+    void document.getElementById("devtools-warning-overlay");
+  } catch {
     // Silent check
   }
 

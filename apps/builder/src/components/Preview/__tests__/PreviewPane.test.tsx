@@ -320,7 +320,6 @@ describe("PreviewPane", () => {
       render(<PreviewPane editMode={true} deviceMode="desktop" />);
 
       // Should show error or fallback
-      const errorMessage = screen.queryByText(/layout not found/i);
       // Component should still render with fallback
       expect(document.querySelector(".preview-pane")).toBeInTheDocument();
     });
