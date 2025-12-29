@@ -62,11 +62,11 @@ Most GitHub operations should use these MCP functions:
 - **Create/update review**: `mcp_github_pull_request_review_write`
 
 **Note**: For replying to review comment threads, use GitHub MCP server functions:
-- **Add review comment to pending review**: `mcp_github_add_comment_to_pending_review` - Add a comment to your pending review (note: this adds to your pending review, not necessarily as a reply to an existing thread - verify current MCP capabilities)
+- **Add review comment to pending review**: `mcp_github_add_comment_to_pending_review` - Add a comment to your pending review
 - **Create or submit review**: `mcp_github_pull_request_review_write` with method `create` or `submit_pending` - Create a review with comments or submit a pending review
 - **Add general PR comment**: `mcp_github_add_issue_comment` - Add a comment to the PR (PRs are issues in GitHub)
 
-**Important**: While the GitHub REST API supports replying to review comment threads via `/pulls/{pull_number}/comments/{comment_id}/replies`, verify whether the GitHub MCP server exposes this functionality. If not available, use the workarounds described in Step 7.2.
+**Note**: Verify the current capabilities of the GitHub MCP server by checking the latest documentation, as functionality may have been updated.
 
 ## Fix Process
 
@@ -488,7 +488,6 @@ After all fixes are complete and tests pass, respond to review comments explaini
 For each review comment that has been fixed, reply to the comment thread using GitHub MCP server:
 
 1. **For inline review comments** (comments on specific lines in code):
-   - **Note on MCP Functionality**: The `mcp_github_add_comment_to_pending_review` function is designed to add a comment to your pending review. Based on the function's purpose (adding to "the requester's latest pending pull request review"), it appears this creates a new comment on the specified line rather than replying within an existing comment thread. However, MCP server capabilities may have been updated - verify the current behavior by checking the latest GitHub MCP server documentation.
    - Use `mcp_github_add_comment_to_pending_review` to add a reply comment to your pending review
    - Parameters:
      - `owner`: Repository owner
@@ -499,11 +498,10 @@ For each review comment that has been fixed, reply to the comment thread using G
      - `line`: Line number from the original comment (if applicable)
      - `side`: "RIGHT" (the new state) or "LEFT" (the previous state)
    - **Note**: This adds a comment to your pending review. You may need to create or submit a review first.
-   - **If MCP doesn't support replying to existing threads**: If the function creates a new comment thread rather than replying within the existing thread, consider:
-     - Including a reference to the original comment in your reply body (e.g., "✅ Fixed! Addressing @reviewer's feedback on line X...")
-     - Using general PR comments (see Step 7.3) to acknowledge fixes when thread continuity is critical
-     - The reviewer can manually resolve the original thread after seeing your fix acknowledgment
-   - **Alternative**: If the GitHub MCP server has been updated to support replying to existing threads, use that functionality when available. Check the MCP server documentation for the latest capabilities.
+   - **Best practices for replying to review comments**:
+     - Include a reference to the original comment in your reply body (e.g., "✅ Fixed! Addressing @reviewer's feedback on line X...")
+     - Use general PR comments (see Step 7.3) to acknowledge fixes when needed
+     - Verify the current capabilities of the GitHub MCP server by checking the latest documentation
 
 2. **Create or submit a review with comments**:
    - Use `mcp_github_pull_request_review_write` with method `create` to create a review with comments
