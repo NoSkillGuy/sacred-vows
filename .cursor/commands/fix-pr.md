@@ -486,6 +486,7 @@ After all fixes are complete and tests pass, respond to review comments explaini
 For each review comment that has been fixed, reply to the comment thread using GitHub MCP server:
 
 1. **For inline review comments** (comments on specific lines in code):
+   - **Important MCP Limitation**: The `mcp_github_add_comment_to_pending_review` function creates a new comment on the specified line rather than replying within an existing comment thread. This means the reply will appear as a separate comment thread on the same line, not as a reply within the reviewer's original thread.
    - Use `mcp_github_add_comment_to_pending_review` to add a reply comment to your pending review
    - Parameters:
      - `owner`: Repository owner
@@ -493,9 +494,13 @@ For each review comment that has been fixed, reply to the comment thread using G
      - `pullNumber`: PR number
      - `path`: File path from the original comment
      - `body`: Reply text explaining the fix (e.g., "✅ Fixed! I've [description of fix]. The changes address your feedback by [explanation].")
-     - `line`: Line number from the original comment (if applicable
+     - `line`: Line number from the original comment (if applicable)
      - `side`: "RIGHT" (the new state) or "LEFT" (the previous state)
    - **Note**: This adds a comment to your pending review. You may need to create or submit a review first.
+   - **Workaround for thread continuity**: Since MCP cannot reply directly to existing threads, consider:
+     - Including a reference to the original comment in your reply body (e.g., "✅ Fixed! Addressing @reviewer's feedback on line X...")
+     - Using general PR comments (see Step 7.3) to acknowledge fixes when thread continuity is critical
+     - The reviewer can manually resolve the original thread after seeing your fix acknowledgment
 
 2. **Create or submit a review with comments**:
    - Use `mcp_github_pull_request_review_write` with method `create` to create a review with comments
