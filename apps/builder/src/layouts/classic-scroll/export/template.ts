@@ -1,4 +1,17 @@
 /**
+ * Copyright (c) 2024 Sacred Vows. All Rights Reserved.
+ *
+ * PROPRIETARY AND CONFIDENTIAL
+ *
+ * This file and its contents are proprietary to Sacred Vows and protected by
+ * copyright law. Unauthorized copying, reproduction, distribution, or use of
+ * this file, via any medium, is strictly prohibited and may result in severe
+ * civil and criminal penalties.
+ *
+ * For licensing inquiries, contact: legal@sacredvows.com
+ */
+
+/**
  * Classic Scroll Layout Export Template
  *
  * Generates HTML for exporting the classic-scroll layout invitation.
@@ -6,6 +19,8 @@
  */
 
 import type { InvitationData } from "@shared/types/wedding-data";
+import { generateProtectionBundle } from "../../../lib/protection-bundle";
+import { getCopyrightMetaContent } from "../../../lib/legal-warnings";
 
 /**
  * Generate complete HTML for the invitation export
@@ -49,12 +64,19 @@ export async function generateHTML(
     }
   `;
 
+  // Generate protection bundle (enabled in production/published sites)
+  const isProduction = true; // Always enable protection for published HTML
+  const protection = generateProtectionBundle(isProduction);
+
   return `<!DOCTYPE html>
+${protection.htmlComment}
+${protection.decoyComments}
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Wedding invitation for ${brideName} & ${groomName}" />
+  <meta name="copyright" content="${getCopyrightMetaContent()}" />
 
   <!-- PWA Meta Tags -->
   <meta name="theme-color" content="${colors.primary || "#d4af37"}" />
@@ -72,6 +94,8 @@ export async function generateHTML(
   <title>${brideName} & ${groomName} - Wedding Invitation</title>
   <link rel="stylesheet" href="styles.css" />
   <style>${themeStyles}</style>
+  ${protection.protectionScript ? `<script data-protection="true">${protection.protectionScript}</script>` : ""}
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self';" />
 </head>
 <body>
   <div id="root">
@@ -92,6 +116,8 @@ export async function generateHTML(
       </p>
     </div>
   </div>
+
+  ${protection.copyrightFooter}
 
   <script src="app.js"></script>
 </body>
