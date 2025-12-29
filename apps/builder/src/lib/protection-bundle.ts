@@ -48,11 +48,36 @@ function generateDecoyComments(): string {
 }
 
 /**
+ * Generate a CSP nonce for inline scripts
+ * Uses crypto API if available, otherwise falls back to random string
+ */
+export function generateCSPNonce(): string {
+  if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+    const array = new Uint8Array(16);
+    crypto.getRandomValues(array);
+    return btoa(String.fromCharCode(...array))
+      .replace(/[+/=]/g, "")
+      .substring(0, 16);
+  }
+  // Fallback for environments without crypto API
+  return Math.random().toString(36).substring(2, 18);
+}
+
+/**
+ * Generate Content Security Policy header with nonce
+ * @param nonce - Nonce value for inline scripts
+ * @returns CSP header value
+ */
+export function generateCSPHeader(nonce: string): string {
+  return `default-src 'self'; script-src 'self' 'nonce-${nonce}' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self';`;
+}
+
+/**
  * Generate complete protection bundle for injection into published HTML
  * @param isProduction - Whether to enable full protection (default: true)
  * @param userId - Optional user ID for watermarking
  * @param invitationId - Optional invitation ID for watermarking
- * @returns Object containing HTML comment, protection script, copyright footer, and decoy comments
+ * @returns Object containing HTML comment, protection script, copyright footer, decoy comments, nonce, and CSP header
  */
 export function generateProtectionBundle(
   isProduction = true,
@@ -61,6 +86,7 @@ export function generateProtectionBundle(
 ) {
   const htmlComment = getLegalHTMLComment();
   const decoyComments = generateDecoyComments();
+  const nonce = generateCSPNonce();
 
   const protectionScript = isProduction
     ? `
@@ -76,12 +102,15 @@ ${getWatermarkScript(userId, invitationId)}
 `.trim()
     : "";
   const copyrightFooter = getCopyrightFooterHTML();
+  const cspHeader = generateCSPHeader(nonce);
 
   return {
     htmlComment,
     decoyComments,
     protectionScript,
     copyrightFooter,
+    nonce,
+    cspHeader,
   };
 }
 

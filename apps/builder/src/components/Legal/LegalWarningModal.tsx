@@ -11,7 +11,7 @@
  * For licensing inquiries, contact: legal@sacredvows.com
  */
 
-import React from "react";
+import React, { useEffect, useId } from "react";
 import { LEGAL_WARNINGS } from "../../lib/legal-warnings";
 
 interface LegalWarningModalProps {
@@ -30,8 +30,38 @@ export function LegalWarningModal({
   isDismissible = false,
   onClose,
 }: LegalWarningModalProps): JSX.Element {
+  const titleId = useId();
+  const messageId = useId();
+
+  // Handle Escape key and focus trap
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isDismissible && onClose) {
+        onClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscape);
+
+    // Focus the modal container for accessibility
+    const modalContainer = document.getElementById(`legal-warning-modal-${titleId}`);
+    if (modalContainer) {
+      modalContainer.focus();
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [isDismissible, onClose, titleId]);
+
   return (
     <div
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby={titleId}
+      aria-describedby={messageId}
+      id={`legal-warning-modal-${titleId}`}
+      tabIndex={-1}
       style={{
         position: "fixed",
         top: 0,
@@ -57,6 +87,7 @@ export function LegalWarningModal({
         }}
       >
         <h2
+          id={titleId}
           style={{
             color: "#ff0000",
             margin: "0 0 20px 0",
@@ -67,6 +98,7 @@ export function LegalWarningModal({
           {title}
         </h2>
         <p
+          id={messageId}
           style={{
             color: "#333",
             lineHeight: "1.6",
@@ -88,6 +120,7 @@ export function LegalWarningModal({
         {isDismissible && onClose && (
           <button
             onClick={onClose}
+            aria-label="Close warning dialog"
             style={{
               marginTop: "20px",
               padding: "10px 25px",

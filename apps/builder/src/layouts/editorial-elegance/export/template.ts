@@ -63,7 +63,8 @@ export async function generateHTML(
   const css = await generateCSS(invitation);
 
   // Generate protection bundle (enabled in production/published sites)
-  const isProduction = true; // Always enable protection for published HTML
+  // Protection is always enabled for published HTML exports
+  const isProduction = true;
   const protection = generateProtectionBundle(isProduction);
 
   return `<!DOCTYPE html>
@@ -93,8 +94,8 @@ ${protection.decoyComments}
     ${themeStyles}
     ${css}
   </style>
-  ${protection.protectionScript ? `<script data-protection="true">${protection.protectionScript}</script>` : ""}
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self';" />
+  ${protection.protectionScript ? `<script data-protection="true" nonce="${protection.nonce}">${protection.protectionScript}</script>` : ""}
+  <meta http-equiv="Content-Security-Policy" content="${protection.cspHeader}" />
 </head>
 <body class="editorial-elegance">
   ${generateBodyHTML(invitation, translations)}

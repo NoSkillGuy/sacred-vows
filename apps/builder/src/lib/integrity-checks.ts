@@ -52,8 +52,8 @@ export function checkIntegrity(): { valid: boolean; violations: string[] } {
   }
 
   const violations: string[] = [];
-  // Note: expectedHashes would be used for hash verification in production
-  // For now, we perform presence checks instead
+  // TODO: Implement hash verification using getExpectedHashes() in future phase
+  // For now, we perform presence checks instead of hash verification
   void getExpectedHashes();
 
   // Check if protection scripts are present and unmodified
