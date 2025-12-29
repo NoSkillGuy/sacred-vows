@@ -24,23 +24,39 @@ export async function generateHTML(
   const brideName = bride.name || "Bride";
   const groomName = groom.name || "Groom";
   const theme = layoutConfig?.theme || data?.theme || {};
-  const colors = theme.colors || {};
-  const fonts = theme.fonts || {};
+  const colors = (
+    typeof theme.colors === "object" && theme.colors !== null ? theme.colors : {}
+  ) as Record<string, unknown>;
+  const fonts = (
+    typeof theme.fonts === "object" && theme.fonts !== null ? theme.fonts : {}
+  ) as Record<string, unknown>;
 
   // Generate font imports
   const fontImports = generateFontImports(fonts);
 
   // Generate inline styles based on theme
+  const getColor = (path: string[], fallback: string): string => {
+    let value: unknown = colors;
+    for (const key of path) {
+      if (typeof value === "object" && value !== null && key in value) {
+        value = (value as Record<string, unknown>)[key];
+      } else {
+        return fallback;
+      }
+    }
+    return typeof value === "string" ? value : fallback;
+  };
+
   const themeStyles = `
     :root {
-      --ee-color-bg: ${colors.background?.page || colors.background || "#FAF9F7"};
-      --ee-color-text: ${colors.text?.primary || colors.text || "#1C1C1C"};
-      --ee-color-secondary: ${colors.secondary || "#6B6B6B"};
-      --ee-color-accent: ${colors.primary || "#C6A15B"};
-      --ee-color-divider: ${colors.divider || "#E6E6E6"};
-      --font-heading: ${fonts.heading || "Playfair Display"}, serif;
-      --font-body: ${fonts.body || "Inter"}, sans-serif;
-      --font-script: ${fonts.script || "Playfair Display"}, serif;
+      --ee-color-bg: ${getColor(["background", "page"], getColor(["background"], "#FAF9F7"))};
+      --ee-color-text: ${getColor(["text", "primary"], getColor(["text"], "#1C1C1C"))};
+      --ee-color-secondary: ${getColor(["secondary"], "#6B6B6B")};
+      --ee-color-accent: ${getColor(["primary"], "#C6A15B")};
+      --ee-color-divider: ${getColor(["divider"], "#E6E6E6")};
+      --font-heading: ${(fonts.heading as string) || "Playfair Display"}, serif;
+      --font-body: ${(fonts.body as string) || "Inter"}, sans-serif;
+      --font-script: ${(fonts.script as string) || "Playfair Display"}, serif;
     }
   `;
 
@@ -175,6 +191,64 @@ function generateBodyHTML(
     </section>
   `;
 
+  // Countdown Section
+  const countdownTarget = wedding.countdownTarget as string | undefined;
+  if (countdownTarget) {
+    try {
+      const target = new Date(countdownTarget);
+      if (!isNaN(target.getTime())) {
+        const now = new Date();
+        const diff = target.getTime() - now.getTime();
+        if (diff > 0) {
+          const totalSeconds = Math.floor(diff / 1000);
+          const days = Math.floor(totalSeconds / (3600 * 24));
+          const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
+          const minutes = Math.floor((totalSeconds % 3600) / 60);
+          const seconds = totalSeconds % 60;
+          const countdown = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+          html += `
+            <section class="ee-section ee-countdown-section">
+              <div class="ee-countdown-container">
+                <p class="ee-meta-text">THE BIG DAY</p>
+                <div class="ee-countdown-values">${countdown}</div>
+              </div>
+            </section>
+          `;
+        } else {
+          html += `
+            <section class="ee-section ee-countdown-section">
+              <div class="ee-countdown-container">
+                <p class="ee-meta-text">THE BIG DAY</p>
+                <div class="ee-countdown-values">Today</div>
+              </div>
+            </section>
+          `;
+        }
+      }
+    } catch {
+      // Invalid date, skip countdown
+    }
+  }
+
+  // Quote Section
+  const quote = (data as Record<string, unknown>)?.quote as
+    | { text?: string; attribution?: string }
+    | undefined;
+  if (quote?.text) {
+    let attribution = quote.attribution || "";
+    if (!attribution || attribution.toLowerCase() === "rumi" || attribution === "RUMI") {
+      attribution = groomName;
+    }
+    html += `
+      <section class="ee-section ee-quote-section">
+        <div class="ee-quote-container">
+          <blockquote class="ee-quote-text">${quote.text}</blockquote>
+          ${attribution ? `<cite class="ee-quote-attribution">— ${attribution}</cite>` : ""}
+        </div>
+      </section>
+    `;
+  }
+
   // Editorial Intro
   if (editorialIntro.text) {
     html += `
@@ -186,6 +260,138 @@ function generateBodyHTML(
           <div class="ee-intro-image-container">
             ${editorialIntro.image ? `<img src="${editorialIntro.image}" alt="Couple portrait" class="ee-intro-image" />` : ""}
           </div>
+        </div>
+      </section>
+    `;
+  }
+
+  // Couple Section
+  const brideImage = bride.image as string | undefined;
+  const groomImage = groom.image as string | undefined;
+  const brideMother = ((bride.parents as Record<string, unknown>)?.mother as string) || "";
+  const brideFather = ((bride.parents as Record<string, unknown>)?.father as string) || "";
+  const groomMother = ((groom.parents as Record<string, unknown>)?.mother as string) || "";
+  const groomFather = ((groom.parents as Record<string, unknown>)?.father as string) || "";
+  if (brideImage || groomImage || brideName || groomName) {
+    html += `
+      <section class="ee-section ee-couple-section">
+        <div class="ee-section-header">
+          <h2 class="ee-section-heading">The Couple</h2>
+          <div class="ee-divider" />
+        </div>
+        <div class="ee-couple-grid">
+          <div class="ee-couple-member">
+            ${
+              brideImage
+                ? `
+            <div class="ee-couple-image-wrapper">
+              <img src="${brideImage}" alt="${brideName}" class="ee-couple-image" />
+            </div>
+            `
+                : ""
+            }
+            <p class="ee-meta-text ee-couple-label">THE BRIDE</p>
+            <h3 class="ee-couple-name">${brideName}</h3>
+            ${
+              brideMother || brideFather
+                ? `
+            <div class="ee-couple-parents">
+              <p class="ee-couple-parents-label">Daughter of</p>
+              ${brideMother ? `<p class="ee-couple-parent-name">${brideMother}</p>` : ""}
+              ${brideFather ? `<p class="ee-couple-parent-name">${brideFather}</p>` : ""}
+            </div>
+            `
+                : ""
+            }
+          </div>
+          <div class="ee-couple-member">
+            ${
+              groomImage
+                ? `
+            <div class="ee-couple-image-wrapper">
+              <img src="${groomImage}" alt="${groomName}" class="ee-couple-image" />
+            </div>
+            `
+                : ""
+            }
+            <p class="ee-meta-text ee-couple-label">THE GROOM</p>
+            <h3 class="ee-couple-name">${groomName}</h3>
+            ${
+              groomMother || groomFather
+                ? `
+            <div class="ee-couple-parents">
+              <p class="ee-couple-parents-label">Son of</p>
+              ${groomMother ? `<p class="ee-couple-parent-name">${groomMother}</p>` : ""}
+              ${groomFather ? `<p class="ee-couple-parent-name">${groomFather}</p>` : ""}
+            </div>
+            `
+                : ""
+            }
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
+  // Love Story Section
+  const story = (data as Record<string, unknown>)?.story as
+    | {
+        text?: string;
+        chapters?: Array<{ title?: string; text?: string }>;
+        pullQuotes?: Array<{ text?: string; attribution?: string }>;
+      }
+    | undefined;
+  if (story?.text || (story?.chapters && story.chapters.length > 0)) {
+    html += `
+      <section class="ee-section ee-story-section">
+        <div class="ee-story-container">
+          <h2 class="ee-section-heading">Our Story</h2>
+          <div class="ee-divider" />
+          ${
+            story.text
+              ? `
+          <div class="ee-story-main">
+            <p class="ee-story-text ee-drop-cap">${story.text}</p>
+          </div>
+          `
+              : ""
+          }
+          ${
+            story.chapters && story.chapters.length > 0
+              ? `
+          <div class="ee-story-chapters">
+            ${story.chapters
+              .map(
+                (chapter, index) => `
+              <div class="ee-story-chapter">
+                <h3 class="ee-story-chapter-title">${chapter.title || `Chapter ${index + 1}`}</h3>
+                ${chapter.text ? `<p class="ee-story-chapter-text">${chapter.text}</p>` : ""}
+              </div>
+            `
+              )
+              .join("")}
+          </div>
+          `
+              : ""
+          }
+          ${
+            story.pullQuotes && story.pullQuotes.length > 0
+              ? `
+          <div class="ee-story-pull-quotes">
+            ${story.pullQuotes
+              .map(
+                (quote) => `
+              <blockquote class="ee-pull-quote">
+                ${quote.text || ""}
+                ${quote.attribution ? `<cite class="ee-pull-quote-attribution">— ${quote.attribution}</cite>` : ""}
+              </blockquote>
+            `
+              )
+              .join("")}
+          </div>
+          `
+              : ""
+          }
         </div>
       </section>
     `;
@@ -221,6 +427,43 @@ function generateBodyHTML(
     `;
   }
 
+  // Wedding Party Section
+  const weddingParty = (data as Record<string, unknown>)?.weddingParty as
+    | { members?: Array<{ name?: string; title?: string; image?: string; bio?: string }> }
+    | undefined;
+  if (weddingParty?.members && weddingParty.members.length > 0) {
+    html += `
+      <section class="ee-section ee-wedding-party-section">
+        <div class="ee-section-header">
+          <h2 class="ee-section-heading">Wedding Party</h2>
+          <div class="ee-divider" />
+        </div>
+        <div class="ee-party-grid">
+          ${weddingParty.members
+            .map(
+              (member) => `
+            <div class="ee-party-member">
+              ${
+                member.image
+                  ? `
+              <div class="ee-party-image-wrapper">
+                <img src="${member.image}" alt="${member.name || ""}" class="ee-party-image" />
+              </div>
+              `
+                  : ""
+              }
+              ${member.title ? `<p class="ee-meta-text ee-party-title">${member.title}</p>` : ""}
+              ${member.name ? `<h3 class="ee-party-name">${member.name}</h3>` : ""}
+              ${member.bio ? `<p class="ee-party-bio">${member.bio}</p>` : ""}
+            </div>
+          `
+            )
+            .join("")}
+        </div>
+      </section>
+    `;
+  }
+
   // Gallery
   if (galleryImages.length > 0) {
     html += `
@@ -236,6 +479,248 @@ function generateBodyHTML(
           `
             )
             .join("")}
+        </div>
+      </section>
+    `;
+  }
+
+  // Dress Code Section
+  const dressCode = (data as Record<string, unknown>)?.dressCode as
+    | {
+        colors?: Array<{ value?: string; label?: string } | string>;
+        styleText?: string;
+        inspirationImages?: Array<{ src?: string; alt?: string } | string>;
+      }
+    | undefined;
+  if (dressCode?.styleText || (dressCode?.colors && dressCode.colors.length > 0)) {
+    html += `
+      <section class="ee-section ee-dress-code-section">
+        <div class="ee-dress-code-container">
+          <h2 class="ee-section-heading">Dress Code</h2>
+          <div class="ee-divider" />
+          ${dressCode.styleText ? `<p class="ee-dress-code-text">${dressCode.styleText}</p>` : ""}
+          ${
+            dressCode.colors && dressCode.colors.length > 0
+              ? `
+          <div class="ee-dress-code-colors">
+            ${dressCode.colors
+              .map((color, index) => {
+                const colorValue = typeof color === "string" ? color : color.value || "";
+                const colorLabel = typeof color === "object" ? color.label : "";
+                return `
+                <div class="ee-color-swatch">
+                  <div class="ee-color-swatch-circle" style="background-color: ${colorValue}"></div>
+                  ${colorLabel ? `<span class="ee-color-swatch-label">${colorLabel}</span>` : ""}
+                </div>
+              `;
+              })
+              .join("")}
+          </div>
+          `
+              : ""
+          }
+          ${
+            dressCode.inspirationImages && dressCode.inspirationImages.length > 0
+              ? `
+          <div class="ee-dress-code-inspiration">
+            ${dressCode.inspirationImages
+              .map((image, index) => {
+                const imgSrc = typeof image === "string" ? image : image.src || "";
+                const imgAlt =
+                  typeof image === "object"
+                    ? image.alt || `Inspiration ${index + 1}`
+                    : `Inspiration ${index + 1}`;
+                return `
+                <div class="ee-inspiration-image">
+                  <img src="${imgSrc}" alt="${imgAlt}" />
+                </div>
+              `;
+              })
+              .join("")}
+          </div>
+          `
+              : ""
+          }
+        </div>
+      </section>
+    `;
+  }
+
+  // Registry Section
+  const registry = (data as Record<string, unknown>)?.registry as
+    | { introText?: string; links?: Array<{ label?: string; url?: string }> }
+    | undefined;
+  if (registry?.introText || (registry?.links && registry.links.length > 0)) {
+    html += `
+      <section class="ee-section ee-registry-section">
+        <div class="ee-registry-container">
+          <h2 class="ee-section-heading">Registry</h2>
+          <div class="ee-divider" />
+          ${registry.introText ? `<p class="ee-registry-intro">${registry.introText}</p>` : ""}
+          ${
+            registry.links && registry.links.length > 0
+              ? `
+          <div class="ee-registry-links">
+            ${registry.links
+              .map(
+                (link) => `
+              <a href="${link.url || "#"}" target="_blank" rel="noopener noreferrer" class="ee-link ee-registry-link">
+                ${link.label || link.url || ""}
+              </a>
+            `
+              )
+              .join("")}
+          </div>
+          `
+              : ""
+          }
+        </div>
+      </section>
+    `;
+  }
+
+  // Guest Notes Section
+  const guestNotes = (data as Record<string, unknown>)?.guestNotes as
+    | { messages?: Array<{ text?: string; author?: string }> }
+    | undefined;
+  if (guestNotes?.messages && guestNotes.messages.length > 0) {
+    html += `
+      <section class="ee-section ee-guest-notes-section">
+        <div class="ee-guest-notes-container">
+          <h2 class="ee-section-heading">Messages from Our Guests</h2>
+          <div class="ee-divider" />
+          <div class="ee-guest-notes-grid">
+            ${guestNotes.messages
+              .map(
+                (message) => `
+              <div class="ee-guest-note-card">
+                <p class="ee-guest-note-text">${message.text || ""}</p>
+                ${message.author ? `<p class="ee-guest-note-author">— ${message.author}</p>` : ""}
+              </div>
+            `
+              )
+              .join("")}
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
+  // RSVP Section
+  const rsvp = (data as Record<string, unknown>)?.rsvp as Record<string, unknown> | undefined;
+  if (rsvp) {
+    html += `
+      <section class="ee-section ee-rsvp-section">
+        <div class="ee-rsvp-container">
+          <h2 class="ee-section-heading">RSVP</h2>
+          <div class="ee-divider" />
+          <form class="ee-rsvp-form">
+            <div class="ee-form-field">
+              <input type="text" placeholder="Your Name" required class="ee-input" />
+            </div>
+            <div class="ee-form-field">
+              <select required class="ee-input">
+                <option value="">Will you attend?</option>
+                <option value="yes">Yes, I'll be there</option>
+                <option value="no">Regretfully, I cannot attend</option>
+              </select>
+            </div>
+            <div class="ee-form-field">
+              <input type="number" min="1" placeholder="Number of guests" class="ee-input" />
+            </div>
+            <div class="ee-form-field">
+              <textarea placeholder="Message (optional)" rows="3" class="ee-input ee-textarea"></textarea>
+            </div>
+            <button type="submit" class="ee-submit-button">Submit Response</button>
+          </form>
+        </div>
+      </section>
+    `;
+  }
+
+  // FAQ Section
+  const faq = (data as Record<string, unknown>)?.faq as
+    | { questions?: Array<{ question: string; answer: string }> }
+    | undefined;
+  if (faq?.questions && faq.questions.length > 0) {
+    html += `
+      <section class="ee-section ee-faq-section">
+        <div class="ee-faq-container">
+          <h2 class="ee-section-heading">FAQ</h2>
+          <div class="ee-divider" />
+          <div class="ee-faq-list">
+            ${faq.questions
+              .map(
+                (item, index) => `
+              <div class="ee-faq-item">
+                <button type="button" class="ee-faq-question" aria-expanded="false">
+                  ${item.question || ""}
+                  <span class="ee-faq-toggle">+</span>
+                </button>
+                <div class="ee-faq-answer" style="display: none;">
+                  <p>${item.answer || ""}</p>
+                </div>
+              </div>
+            `
+              )
+              .join("")}
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
+  // Contact Section
+  const contact = (data as Record<string, unknown>)?.contact as
+    | {
+        title?: string;
+        contacts?: Array<{ name?: string; role?: string; email?: string; phone?: string }>;
+        email?: string;
+        phone?: string;
+      }
+    | undefined;
+  if (
+    contact?.title ||
+    (contact?.contacts && contact.contacts.length > 0) ||
+    contact?.email ||
+    contact?.phone
+  ) {
+    html += `
+      <section class="ee-section ee-contact-section">
+        <div class="ee-contact-container">
+          <h2 class="ee-section-heading">Contact</h2>
+          <div class="ee-divider" />
+          ${contact.title ? `<p class="ee-contact-intro">${contact.title}</p>` : ""}
+          ${
+            contact.contacts && contact.contacts.length > 0
+              ? `
+          <div class="ee-contact-list">
+            ${contact.contacts
+              .map(
+                (contactItem) => `
+              <div class="ee-contact-item">
+                ${contactItem.name ? `<h3 class="ee-contact-name">${contactItem.name}</h3>` : ""}
+                ${contactItem.role ? `<p class="ee-contact-role">${contactItem.role}</p>` : ""}
+                ${contactItem.email ? `<a href="mailto:${contactItem.email}" class="ee-link">${contactItem.email}</a>` : ""}
+                ${contactItem.phone ? `<a href="tel:${contactItem.phone}" class="ee-link">${contactItem.phone}</a>` : ""}
+              </div>
+            `
+              )
+              .join("")}
+          </div>
+          `
+              : ""
+          }
+          ${
+            contact.email || contact.phone
+              ? `
+          <div class="ee-contact-direct">
+            ${contact.email ? `<a href="mailto:${contact.email}" class="ee-link">${contact.email}</a>` : ""}
+            ${contact.phone ? `<a href="tel:${contact.phone}" class="ee-link">${contact.phone}</a>` : ""}
+          </div>
+          `
+              : ""
+          }
         </div>
       </section>
     `;
@@ -264,7 +749,90 @@ function generateBodyHTML(
     `;
   }
 
-  // Footer
+  // Travel Section
+  const travel = (data as Record<string, unknown>)?.travel as
+    | {
+        cityIntro?: string;
+        hotels?: Array<{ name?: string; description?: string; address?: string; website?: string }>;
+      }
+    | undefined;
+  if (travel?.cityIntro || (travel?.hotels && travel.hotels.length > 0)) {
+    html += `
+      <section class="ee-section ee-travel-section">
+        <div class="ee-travel-container">
+          <h2 class="ee-section-heading">Travel & Stay</h2>
+          <div class="ee-divider" />
+          ${travel.cityIntro ? `<p class="ee-travel-intro">${travel.cityIntro}</p>` : ""}
+          ${
+            travel.hotels && travel.hotels.length > 0
+              ? `
+          <div class="ee-travel-hotels">
+            ${travel.hotels
+              .map(
+                (hotel) => `
+              <div class="ee-hotel-card">
+                ${hotel.name ? `<h3 class="ee-hotel-name">${hotel.name}</h3>` : ""}
+                ${hotel.description ? `<p class="ee-hotel-description">${hotel.description}</p>` : ""}
+                ${hotel.address ? `<p class="ee-hotel-address">${hotel.address}</p>` : ""}
+                ${hotel.website ? `<a href="${hotel.website}" target="_blank" rel="noopener noreferrer" class="ee-link">Visit Website →</a>` : ""}
+              </div>
+            `
+              )
+              .join("")}
+          </div>
+          `
+              : ""
+          }
+        </div>
+      </section>
+    `;
+  }
+
+  // Things to Do Section
+  const thingsToDo = (data as Record<string, unknown>)?.thingsToDo as
+    | {
+        intro?: string;
+        activities?: Array<{
+          name?: string;
+          category?: string;
+          description?: string;
+          address?: string;
+        }>;
+      }
+    | undefined;
+  if (thingsToDo?.intro || (thingsToDo?.activities && thingsToDo.activities.length > 0)) {
+    html += `
+      <section class="ee-section ee-things-to-do-section">
+        <div class="ee-things-to-do-container">
+          <h2 class="ee-section-heading">Things to Do</h2>
+          <div class="ee-divider" />
+          ${thingsToDo.intro ? `<p class="ee-things-to-do-intro">${thingsToDo.intro}</p>` : ""}
+          ${
+            thingsToDo.activities && thingsToDo.activities.length > 0
+              ? `
+          <div class="ee-things-to-do-activities">
+            ${thingsToDo.activities
+              .map(
+                (activity) => `
+              <div class="ee-activity-item">
+                ${activity.name ? `<h3 class="ee-activity-name">${activity.name}</h3>` : ""}
+                ${activity.category ? `<span class="ee-activity-category">${activity.category}</span>` : ""}
+                ${activity.description ? `<p class="ee-activity-description">${activity.description}</p>` : ""}
+                ${activity.address ? `<p class="ee-activity-address">${activity.address}</p>` : ""}
+              </div>
+            `
+              )
+              .join("")}
+          </div>
+          `
+              : ""
+          }
+        </div>
+      </section>
+    `;
+  }
+
+  // Gallery
   html += `
     <footer class="ee-section ee-footer-section">
       <div class="ee-footer-container" style="text-align: center;">

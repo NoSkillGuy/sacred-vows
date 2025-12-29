@@ -404,6 +404,725 @@ export async function generateCSS(invitation: InvitationData): Promise<string> {
         column-count: 1;
       }
     }
+
+    /* Countdown Section */
+    .ee-countdown-section {
+      text-align: center;
+    }
+
+    .ee-countdown-container {
+      max-width: var(--ee-max-width-text);
+      margin: 0 auto;
+    }
+
+    .ee-countdown-values {
+      font-family: var(--font-heading);
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: var(--ee-weight-regular);
+      letter-spacing: var(--ee-spacing-heading);
+      color: var(--ee-color-text);
+      margin-top: var(--ee-space-sm);
+    }
+
+    /* Editorial Quote Section */
+    .ee-quote-section {
+      text-align: center;
+      padding: var(--ee-space-xl) var(--ee-space-sm);
+    }
+
+    .ee-quote-container {
+      max-width: var(--ee-max-width-text);
+      margin: 0 auto;
+    }
+
+    .ee-quote-text {
+      font-family: var(--font-heading);
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1.4;
+      font-weight: var(--ee-weight-light);
+      font-style: italic;
+      color: var(--ee-color-text);
+      margin: 0;
+      padding: 0;
+      border: none;
+      quotes: none;
+    }
+
+    .ee-quote-attribution {
+      display: block;
+      margin-top: var(--ee-space-md);
+      font-family: var(--font-body);
+      font-size: var(--ee-text-meta);
+      font-style: normal;
+      color: var(--ee-color-secondary);
+      text-transform: uppercase;
+      letter-spacing: var(--ee-spacing-meta);
+    }
+
+    /* Couple Section */
+    .ee-couple-section {
+      max-width: var(--ee-max-width-card);
+      margin: 0 auto;
+    }
+
+    .ee-couple-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--ee-space-lg);
+      margin-top: var(--ee-space-lg);
+    }
+
+    .ee-couple-member {
+      text-align: center;
+    }
+
+    .ee-couple-image-wrapper {
+      width: 100%;
+      max-width: 300px;
+      margin: 0 auto var(--ee-space-md);
+      aspect-ratio: 3 / 4;
+      overflow: hidden;
+    }
+
+    .ee-couple-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .ee-couple-label {
+      margin-bottom: var(--ee-space-xs);
+    }
+
+    .ee-couple-name {
+      font-family: var(--font-heading);
+      font-size: var(--ee-text-subheading);
+      font-weight: var(--ee-weight-regular);
+      margin-bottom: var(--ee-space-sm);
+      color: var(--ee-color-text);
+    }
+
+    .ee-couple-parents {
+      margin-top: var(--ee-space-sm);
+    }
+
+    .ee-couple-parents-label {
+      font-family: var(--font-body);
+      font-size: var(--ee-text-meta);
+      color: var(--ee-color-secondary);
+      margin-bottom: var(--ee-space-xs);
+    }
+
+    .ee-couple-parent-name {
+      font-family: var(--font-body);
+      font-size: var(--ee-text-body);
+      color: var(--ee-color-text);
+      margin: var(--ee-space-xs) 0;
+    }
+
+    /* Love Story Section */
+    .ee-story-section {
+      max-width: var(--ee-max-width-text);
+      margin: 0 auto;
+    }
+
+    .ee-story-container {
+      padding: 0 var(--ee-space-sm);
+    }
+
+    .ee-story-main {
+      margin: var(--ee-space-lg) 0;
+    }
+
+    .ee-story-text {
+      font-family: var(--font-body);
+      font-size: var(--ee-text-body);
+      line-height: var(--ee-line-editorial);
+      color: var(--ee-color-text);
+      margin: 0;
+    }
+
+    .ee-drop-cap::first-letter {
+      float: left;
+      font-family: var(--font-heading);
+      font-size: 4.5em;
+      line-height: 0.8;
+      padding-right: 8px;
+      padding-top: 4px;
+      color: var(--ee-color-text);
+    }
+
+    .ee-story-chapters {
+      margin: var(--ee-space-lg) 0;
+    }
+
+    .ee-story-chapter {
+      margin: var(--ee-space-md) 0;
+    }
+
+    .ee-story-chapter-title {
+      font-family: var(--font-heading);
+      font-size: var(--ee-text-subheading);
+      font-weight: var(--ee-weight-regular);
+      color: var(--ee-color-text);
+      margin: 0 0 var(--ee-space-sm) 0;
+    }
+
+    .ee-story-chapter-text {
+      font-family: var(--font-body);
+      font-size: var(--ee-text-body);
+      line-height: var(--ee-line-editorial);
+      color: var(--ee-color-text);
+      margin: 0;
+    }
+
+    .ee-story-pull-quotes {
+      margin: var(--ee-space-lg) 0;
+    }
+
+    .ee-pull-quote {
+      font-family: var(--font-heading);
+      font-size: clamp(24px, 3vw, 32px);
+      line-height: 1.5;
+      font-style: italic;
+      color: var(--ee-color-text);
+      margin: var(--ee-space-md) 0;
+      padding: var(--ee-space-md) 0;
+      border-left: 2px solid var(--ee-color-accent);
+      padding-left: var(--ee-space-md);
+      quotes: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--ee-space-sm);
+    }
+
+    .ee-pull-quote-attribution {
+      display: block;
+      margin-top: var(--ee-space-sm);
+      font-family: var(--font-body);
+      font-size: var(--ee-text-meta);
+      font-style: normal;
+      color: var(--ee-color-secondary);
+      text-transform: uppercase;
+      letter-spacing: var(--ee-spacing-meta);
+    }
+
+    /* Wedding Party Section */
+    .ee-wedding-party-section {
+      max-width: var(--ee-max-width-card);
+      margin: 0 auto;
+    }
+
+    .ee-party-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: var(--ee-space-md);
+      margin-top: var(--ee-space-lg);
+    }
+
+    .ee-party-member {
+      text-align: center;
+    }
+
+    .ee-party-image-wrapper {
+      width: 100%;
+      aspect-ratio: 1;
+      overflow: hidden;
+      margin-bottom: var(--ee-space-sm);
+    }
+
+    .ee-party-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .ee-filter-bw {
+      filter: grayscale(100%);
+    }
+
+    .ee-party-title {
+      margin-bottom: var(--ee-space-xs);
+    }
+
+    .ee-party-name {
+      font-family: var(--font-heading);
+      font-size: var(--ee-text-subheading);
+      font-weight: var(--ee-weight-regular);
+      margin-bottom: var(--ee-space-xs);
+      color: var(--ee-color-text);
+    }
+
+    .ee-party-bio {
+      font-family: var(--font-body);
+      font-size: var(--ee-text-body);
+      line-height: var(--ee-line-editorial);
+      color: var(--ee-color-text);
+      margin-top: var(--ee-space-xs);
+    }
+
+    /* Travel Section */
+    .ee-travel-section {
+      max-width: var(--ee-max-width-text);
+      margin: 0 auto;
+    }
+
+    .ee-travel-container {
+      padding: 0 var(--ee-space-sm);
+    }
+
+    .ee-travel-intro {
+      font-family: var(--font-body);
+      font-size: var(--ee-text-body);
+      line-height: var(--ee-line-editorial);
+      color: var(--ee-color-text);
+      margin: var(--ee-space-md) 0;
+    }
+
+    .ee-travel-hotels {
+      margin: var(--ee-space-lg) 0;
+    }
+
+    .ee-hotel-card {
+      margin: var(--ee-space-md) 0;
+      padding: var(--ee-space-md) 0;
+      border-bottom: 1px solid var(--ee-color-divider);
+    }
+
+    .ee-hotel-card:last-child {
+      border-bottom: none;
+    }
+
+    .ee-hotel-name {
+      font-family: var(--font-heading);
+      font-size: var(--ee-text-subheading);
+      font-weight: var(--ee-weight-regular);
+      margin-bottom: var(--ee-space-xs);
+      color: var(--ee-color-text);
+    }
+
+    .ee-hotel-description {
+      font-family: var(--font-body);
+      font-size: var(--ee-text-body);
+      line-height: var(--ee-line-editorial);
+      color: var(--ee-color-text);
+      margin: var(--ee-space-xs) 0;
+    }
+
+    .ee-hotel-address {
+      font-family: var(--font-body);
+      font-size: var(--ee-text-meta);
+      color: var(--ee-color-secondary);
+      margin: var(--ee-space-xs) 0;
+    }
+
+    /* Things to Do Section */
+    .ee-things-to-do-section {
+      max-width: var(--ee-max-width-text);
+      margin: 0 auto;
+    }
+
+    .ee-things-to-do-container {
+      padding: 0 var(--ee-space-sm);
+    }
+
+    .ee-things-to-do-intro {
+      font-family: var(--font-body);
+      font-size: var(--ee-text-body);
+      line-height: var(--ee-line-editorial);
+      color: var(--ee-color-text);
+      margin: var(--ee-space-md) 0;
+      font-style: italic;
+    }
+
+    .ee-things-to-do-activities {
+      margin: var(--ee-space-lg) 0;
+    }
+
+    .ee-activity-item {
+      margin: var(--ee-space-md) 0;
+      padding: var(--ee-space-md) 0;
+      border-bottom: 1px solid var(--ee-color-divider);
+    }
+
+    .ee-activity-item:last-child {
+      border-bottom: none;
+    }
+
+    .ee-activity-name {
+      font-family: var(--font-heading);
+      font-size: var(--ee-text-subheading);
+      font-weight: var(--ee-weight-regular);
+      margin-bottom: var(--ee-space-xs);
+      color: var(--ee-color-text);
+    }
+
+    .ee-activity-category {
+      display: inline-block;
+      font-family: var(--font-body);
+      font-size: var(--ee-text-meta);
+      color: var(--ee-color-secondary);
+      text-transform: uppercase;
+      letter-spacing: var(--ee-spacing-meta);
+      margin-bottom: var(--ee-space-xs);
+    }
+
+    .ee-activity-description {
+      font-family: var(--font-body);
+      font-size: var(--ee-text-body);
+      line-height: var(--ee-line-editorial);
+      color: var(--ee-color-text);
+      margin: var(--ee-space-xs) 0;
+    }
+
+    .ee-activity-address {
+      font-family: var(--font-body);
+      font-size: var(--ee-text-meta);
+      color: var(--ee-color-secondary);
+      margin: var(--ee-space-xs) 0;
+    }
+
+    /* Dress Code Section */
+    .ee-dress-code-section {
+      text-align: center;
+    }
+
+    .ee-dress-code-container {
+      max-width: var(--ee-max-width-text);
+      margin: 0 auto;
+    }
+
+    .ee-dress-code-text {
+      font-family: var(--font-body);
+      font-size: var(--ee-text-body);
+      line-height: var(--ee-line-editorial);
+      color: var(--ee-color-text);
+      margin: var(--ee-space-md) 0;
+    }
+
+    .ee-dress-code-colors {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: var(--ee-space-md);
+      margin: var(--ee-space-lg) 0;
+    }
+
+    .ee-color-swatch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--ee-space-xs);
+    }
+
+    .ee-color-swatch-circle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: 1px solid var(--ee-color-divider);
+    }
+
+    .ee-color-swatch-label {
+      font-family: var(--font-body);
+      font-size: var(--ee-text-meta);
+      color: var(--ee-color-secondary);
+      text-transform: uppercase;
+      letter-spacing: var(--ee-spacing-meta);
+    }
+
+    .ee-dress-code-inspiration {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--ee-space-sm);
+      margin: var(--ee-space-lg) 0;
+    }
+
+    .ee-inspiration-image {
+      aspect-ratio: 1;
+      overflow: hidden;
+    }
+
+    .ee-inspiration-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Registry Section */
+    .ee-registry-section {
+      text-align: center;
+    }
+
+    .ee-registry-container {
+      max-width: var(--ee-max-width-text);
+      margin: 0 auto;
+    }
+
+    .ee-registry-intro {
+      font-family: var(--font-body);
+      font-size: var(--ee-text-body);
+      line-height: var(--ee-line-editorial);
+      color: var(--ee-color-text);
+      margin: var(--ee-space-md) 0;
+      font-style: italic;
+    }
+
+    .ee-registry-links {
+      margin: var(--ee-space-lg) 0;
+    }
+
+    .ee-registry-link {
+      display: inline-block;
+      margin: var(--ee-space-xs);
+      font-family: var(--font-body);
+      font-size: var(--ee-text-body);
+    }
+
+    /* Guest Notes Section */
+    .ee-guest-notes-section {
+      max-width: var(--ee-max-width-card);
+      margin: 0 auto;
+    }
+
+    .ee-guest-notes-container {
+      padding: 0 var(--ee-space-sm);
+    }
+
+    .ee-guest-notes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--ee-space-md);
+      margin: var(--ee-space-lg) 0;
+    }
+
+    .ee-guest-note-card {
+      background: rgba(255, 255, 255, 0.6);
+      border: 1px solid var(--ee-color-divider);
+      padding: var(--ee-space-md);
+      transform: rotate(-1deg);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .ee-guest-note-card:nth-child(even) {
+      transform: rotate(1deg);
+    }
+
+    .ee-guest-note-text {
+      font-family: var(--font-body);
+      font-size: var(--ee-text-body);
+      line-height: var(--ee-line-editorial);
+      color: var(--ee-color-text);
+      margin: 0 0 var(--ee-space-xs) 0;
+    }
+
+    .ee-guest-note-author {
+      font-family: var(--font-body);
+      font-size: var(--ee-text-meta);
+      color: var(--ee-color-secondary);
+      margin: var(--ee-space-xs) 0 0 0;
+      font-style: italic;
+    }
+
+    /* RSVP Section */
+    .ee-rsvp-section {
+      max-width: var(--ee-max-width-text);
+      margin: 0 auto;
+    }
+
+    .ee-rsvp-container {
+      padding: 0 var(--ee-space-sm);
+    }
+
+    .ee-rsvp-form {
+      margin: var(--ee-space-lg) 0;
+    }
+
+    .ee-form-field {
+      margin-bottom: var(--ee-space-md);
+    }
+
+    .ee-input {
+      width: 100%;
+      padding: var(--ee-space-sm) 0;
+      border: none;
+      border-bottom: 1px solid var(--ee-color-divider);
+      background: transparent;
+      font-family: var(--font-body);
+      font-size: var(--ee-text-body);
+      color: var(--ee-color-text);
+      transition: border-color 0.2s ease;
+    }
+
+    .ee-input:focus {
+      outline: none;
+      border-bottom-color: var(--ee-color-accent);
+    }
+
+    .ee-input::placeholder {
+      color: var(--ee-color-secondary);
+    }
+
+    .ee-textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .ee-submit-button {
+      margin-top: var(--ee-space-md);
+      padding: var(--ee-space-sm) var(--ee-space-md);
+      border: 1px solid var(--ee-color-text);
+      background: transparent;
+      font-family: var(--font-body);
+      font-size: var(--ee-text-body);
+      color: var(--ee-color-text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: var(--ee-spacing-meta);
+    }
+
+    .ee-submit-button:hover {
+      background: var(--ee-color-text);
+      color: var(--ee-color-bg);
+    }
+
+    /* FAQ Section */
+    .ee-faq-section {
+      max-width: var(--ee-max-width-text);
+      margin: 0 auto;
+    }
+
+    .ee-faq-container {
+      padding: 0 var(--ee-space-sm);
+    }
+
+    .ee-faq-list {
+      margin: var(--ee-space-lg) 0;
+    }
+
+    .ee-faq-item {
+      margin: var(--ee-space-md) 0;
+      border-bottom: 1px solid var(--ee-color-divider);
+    }
+
+    .ee-faq-item:last-child {
+      border-bottom: none;
+    }
+
+    .ee-faq-question {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--ee-space-md) 0;
+      background: none;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+      font-family: var(--font-heading);
+      font-size: var(--ee-text-subheading);
+      font-weight: var(--ee-weight-regular);
+      color: var(--ee-color-text);
+      transition: color 0.2s ease;
+    }
+
+    .ee-faq-question:hover {
+      color: var(--ee-color-accent);
+    }
+
+    .ee-faq-toggle {
+      font-size: 24px;
+      color: var(--ee-color-secondary);
+      margin-left: var(--ee-space-sm);
+      transition: transform 0.2s ease;
+    }
+
+    .ee-faq-answer {
+      padding: 0 0 var(--ee-space-md) 0;
+    }
+
+    .ee-faq-answer p {
+      font-family: var(--font-body);
+      font-size: var(--ee-text-body);
+      line-height: var(--ee-line-editorial);
+      color: var(--ee-color-text);
+      margin: 0;
+    }
+
+    /* Contact Section */
+    .ee-contact-section {
+      max-width: var(--ee-max-width-text);
+      margin: 0 auto;
+    }
+
+    .ee-contact-container {
+      padding: 0 var(--ee-space-sm);
+    }
+
+    .ee-contact-intro {
+      font-family: var(--font-body);
+      font-size: var(--ee-text-body);
+      line-height: var(--ee-line-editorial);
+      color: var(--ee-color-text);
+      margin: var(--ee-space-md) 0;
+      text-align: center;
+    }
+
+    .ee-contact-list {
+      margin: var(--ee-space-lg) 0;
+    }
+
+    .ee-contact-item {
+      margin: var(--ee-space-md) 0;
+      padding: var(--ee-space-md) 0;
+      border-bottom: 1px solid var(--ee-color-divider);
+      text-align: center;
+    }
+
+    .ee-contact-item:last-child {
+      border-bottom: none;
+    }
+
+    .ee-contact-name {
+      font-family: var(--font-heading);
+      font-size: var(--ee-text-subheading);
+      font-weight: var(--ee-weight-regular);
+      margin-bottom: var(--ee-space-xs);
+      color: var(--ee-color-text);
+    }
+
+    .ee-contact-role {
+      font-family: var(--font-body);
+      font-size: var(--ee-text-meta);
+      color: var(--ee-color-secondary);
+      text-transform: uppercase;
+      letter-spacing: var(--ee-spacing-meta);
+      margin-bottom: var(--ee-space-xs);
+    }
+
+    .ee-contact-direct {
+      text-align: center;
+      margin: var(--ee-space-lg) 0;
+    }
+
+    /* Mobile Responsive for New Sections */
+    @media (max-width: 768px) {
+      .ee-couple-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .ee-party-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      }
+
+      .ee-guest-notes-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .ee-dress-code-colors {
+        gap: var(--ee-space-sm);
+      }
+    }
   `;
 
   return css;
