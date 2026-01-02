@@ -15,22 +15,6 @@ import (
 	"github.com/sacred-vows/api-go/internal/usecase/publish"
 )
 
-// Helper function to safely get sections count from layoutConfig
-func getSectionsCount(layoutConfig any) []interface{} {
-	if layoutConfig == nil {
-		return nil
-	}
-	configMap, ok := layoutConfig.(map[string]interface{})
-	if !ok {
-		return nil
-	}
-	sections, ok := configMap["sections"].([]interface{})
-	if !ok {
-		return nil
-	}
-	return sections
-}
-
 type NodeSnapshotGenerator struct {
 	invitationRepo repository.InvitationRepository
 	nodeBinary     string
@@ -172,7 +156,7 @@ func (g *NodeSnapshotGenerator) GenerateBundle(ctx context.Context, invitationID
 
 	// Keep invitation payload close to what the builder expects.
 	payload := map[string]any{
-		"invitation": invitationPayload,
+		"invitation":   invitationPayload,
 		"translations": map[string]any{},
 	}
 

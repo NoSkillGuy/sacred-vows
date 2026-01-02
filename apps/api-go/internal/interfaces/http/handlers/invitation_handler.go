@@ -122,11 +122,11 @@ type CreateInvitationRequest struct {
 }
 
 type UpdateInvitationRequest struct {
-	Data        *JSONData                `json:"data" swagtype:"string" example:"{\"bride\":\"Jane\",\"groom\":\"John\"}"`
-	LayoutID    *string                  `json:"layoutId" example:"classic-scroll"`
+	Data         *JSONData               `json:"data" swagtype:"string" example:"{\"bride\":\"Jane\",\"groom\":\"John\"}"`
+	LayoutID     *string                 `json:"layoutId" example:"classic-scroll"`
 	LayoutConfig *map[string]interface{} `json:"layoutConfig,omitempty"`
-	Title       *string                  `json:"title" example:"Our Wedding"`
-	Status      *string                  `json:"status" example:"published"`
+	Title        *string                 `json:"title" example:"Our Wedding"`
+	Status       *string                 `json:"status" example:"published"`
 }
 
 type InvitationDTO struct {

@@ -28,7 +28,12 @@ async function main(): Promise<void> {
     throw new Error("No input provided");
   }
 
-  const payload: Payload = JSON.parse(input);
+  let payload: Payload;
+  try {
+    payload = JSON.parse(input);
+  } catch (err) {
+    throw new Error(`Invalid JSON input: ${err instanceof Error ? err.message : String(err)}`);
+  }
   const invitation = payload.invitation || ({} as InvitationData);
   const translations = payload.translations || {};
 

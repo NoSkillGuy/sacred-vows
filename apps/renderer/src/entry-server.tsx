@@ -13,6 +13,120 @@ import { getLayout } from "@shared/layouts";
 import "@shared/layouts/classic-scroll";
 import "@shared/layouts/editorial-elegance";
 
+/**
+ * Allowed image domains for security (SSRF protection)
+ */
+const ALLOWED_IMAGE_DOMAINS = ['minio:9000', 'localhost:9000'];
+
+/**
+ * Maximum image size in bytes (5MB)
+ */
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+
+/**
+ * Fetch timeout in milliseconds (5 seconds)
+ */
+const FETCH_TIMEOUT = 5000;
+
+/**
+ * Simple logger that can be configured
+ */
+const logger = {
+  warn: (message: string, ...args: any[]) => {
+    // In production, this could send to monitoring service
+    // For now, only log in non-production or when explicitly enabled
+    if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'true') {
+      console.warn(message, ...args);
+    }
+  },
+};
+
+/**
+ * Validate if an image URL is allowed (SSRF protection)
+ */
+function isValidImageUrl(url: string): boolean {
+  try {
+    // Handle relative URLs - skip validation for now (they're handled separately)
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      return false;
+    }
+
+    const urlObj = new URL(url, 'http://localhost');
+    return ALLOWED_IMAGE_DOMAINS.some(domain => urlObj.hostname.includes(domain));
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Fetch image with timeout and size limits
+ */
+async function fetchImageWithLimits(url: string): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
+
+  try {
+    const response = await fetch(url, {
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    // Check content-length header if available
+    const contentLength = response.headers.get('content-length');
+    if (contentLength && parseInt(contentLength, 10) > MAX_IMAGE_SIZE) {
+      throw new Error(`Image size (${contentLength} bytes) exceeds maximum (${MAX_IMAGE_SIZE} bytes)`);
+    }
+
+    return response;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error(`Image fetch timeout after ${FETCH_TIMEOUT}ms`);
+    }
+    throw error;
+  }
+}
+
+/**
+ * Read response body with size limit
+ */
+async function readResponseWithLimit(response: Response): Promise<ArrayBuffer> {
+  const reader = response.body?.getReader();
+  if (!reader) {
+    throw new Error('Response body is not readable');
+  }
+
+  const chunks: Uint8Array[] = [];
+  let totalSize = 0;
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      totalSize += value.length;
+      if (totalSize > MAX_IMAGE_SIZE) {
+        throw new Error(`Image size (${totalSize} bytes) exceeds maximum (${MAX_IMAGE_SIZE} bytes)`);
+      }
+
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  // Combine chunks into single buffer
+  const buffer = new Uint8Array(totalSize);
+  let offset = 0;
+  for (const chunk of chunks) {
+    buffer.set(chunk, offset);
+    offset += chunk.length;
+  }
+
+  return buffer.buffer;
+}
+
 export interface RenderOptions {
   invitation: InvitationData;
   translations?: Record<string, unknown>;
@@ -101,14 +215,20 @@ async function bundleAssets(html: string): Promise<{
         continue;
       }
 
-      // Download the image
-      const response = await fetch(fetchUrl);
-      if (!response.ok) {
-        console.warn(`Failed to fetch image: ${imageUrl} (tried ${fetchUrl}, status: ${response.status})`);
+      // Validate URL against allowlist (SSRF protection)
+      if (!isValidImageUrl(fetchUrl)) {
+        logger.warn(`Skipping disallowed image URL: ${imageUrl}`);
         continue;
       }
 
-      const buffer = await response.arrayBuffer();
+      // Download the image with timeout and size limits
+      const response = await fetchImageWithLimits(fetchUrl);
+      if (!response.ok) {
+        logger.warn(`Failed to fetch image: ${imageUrl} (tried ${fetchUrl}, status: ${response.status})`);
+        continue;
+      }
+
+      const buffer = await readResponseWithLimit(response);
       const base64 = Buffer.from(buffer).toString('base64');
 
       // Determine content type
@@ -133,7 +253,7 @@ async function bundleAssets(html: string): Promise<{
         `./${keySuffix}`
       );
     } catch (error) {
-      console.warn(`Error processing image ${imageUrl}:`, error);
+      logger.warn(`Error processing image ${imageUrl}:`, error);
     }
   }
 
@@ -165,13 +285,20 @@ async function bundleAssets(html: string): Promise<{
         continue;
       }
 
-      const response = await fetch(fetchUrl);
-      if (!response.ok) {
-        console.warn(`Failed to fetch background image: ${imageUrl} (tried ${fetchUrl}, status: ${response.status})`);
+      // Validate URL against allowlist (SSRF protection)
+      if (!isValidImageUrl(fetchUrl)) {
+        logger.warn(`Skipping disallowed background image URL: ${imageUrl}`);
         continue;
       }
 
-      const buffer = await response.arrayBuffer();
+      // Download the image with timeout and size limits
+      const response = await fetchImageWithLimits(fetchUrl);
+      if (!response.ok) {
+        logger.warn(`Failed to fetch background image: ${imageUrl} (tried ${fetchUrl}, status: ${response.status})`);
+        continue;
+      }
+
+      const buffer = await readResponseWithLimit(response);
       const base64 = Buffer.from(buffer).toString('base64');
       const contentType = response.headers.get('content-type') || 'image/jpeg';
 
@@ -191,7 +318,7 @@ async function bundleAssets(html: string): Promise<{
         `./${keySuffix}`
       );
     } catch (error) {
-      console.warn(`Error processing background image ${imageUrl}:`, error);
+      logger.warn(`Error processing background image ${imageUrl}:`, error);
     }
   }
 
@@ -221,7 +348,9 @@ export async function render(options: RenderOptions): Promise<RenderResult> {
   try {
     bodyContent = renderToStaticMarkup(element);
   } catch (error) {
-    throw new Error(`Failed to render invitation: ${error}`);
+    const errorDetails = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    throw new Error(`Failed to render invitation: ${errorDetails}${errorStack ? '\n' + errorStack : ''}`);
   }
 
   // Get layout export module for CSS generation
