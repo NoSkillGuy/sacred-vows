@@ -44,6 +44,8 @@ const selectivePublicCopyPlugin = () => {
   };
 };
 
+const isProduction = process.env.NODE_ENV === "production" || env.MODE === "production";
+
 export default defineConfig({
   plugins: [react(), selectivePublicCopyPlugin()],
   resolve: {
@@ -58,6 +60,31 @@ export default defineConfig({
   },
   // Only use publicDir in local development (when CDN is not configured)
   publicDir: isCDNConfigured ? false : "public",
+  build: {
+    // Remove source maps in production for code protection
+    sourcemap: !isProduction,
+    minify: isProduction ? "terser" : false,
+    terserOptions: isProduction
+      ? {
+          compress: {
+            drop_console: false, // Keep console for protection warnings
+            drop_debugger: true,
+            passes: 2,
+          },
+          mangle: {
+            toplevel: true,
+            properties: {
+              regex: /^_/,
+            },
+          },
+          format: {
+            comments: false,
+          },
+        }
+      : undefined,
+    // Additional obfuscation can be added via vite-plugin-obfuscator if needed
+    // See: https://github.com/feat-agency/vite-plugin-obfuscator
+  },
   server: {
     host: "0.0.0.0", // Bind to all interfaces for Docker
     port: 5173,

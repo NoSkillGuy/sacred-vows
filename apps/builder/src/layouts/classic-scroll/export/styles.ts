@@ -1,4 +1,17 @@
 /**
+ * Copyright (c) 2024 Sacred Vows. All Rights Reserved.
+ *
+ * PROPRIETARY AND CONFIDENTIAL
+ *
+ * This file and its contents are proprietary to Sacred Vows and protected by
+ * copyright law. Unauthorized copying, reproduction, distribution, or use of
+ * this file, via any medium, is strictly prohibited and may result in severe
+ * civil and criminal penalties.
+ *
+ * For licensing inquiries, contact: legal@sacredvows.com
+ */
+
+/**
  * Classic Scroll Layout Export Styles
  *
  * Generates CSS for exporting the classic-scroll layout.
