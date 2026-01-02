@@ -190,8 +190,38 @@ Perform a thorough review covering:
 - ✅ Follows existing state management patterns
 - ✅ Uses existing hooks patterns
 - ✅ Layout changes include corresponding export functionality updates (CSV, PDF, Excel, etc.)
+- ✅ Layout component updates maintain consistency between viewable and editable variants (see Layout Component Consistency section)
 
-#### 8. Breaking Changes
+#### 8. Layout Component Consistency
+
+**Critical for Layout Components**: When reviewing changes to layout components, verify that corresponding components are updated consistently:
+
+- ✅ **Viewable ↔ Editable Component Pairing**: Layout components typically exist in two variants:
+  - **Viewable components**: Display-only versions used in published sites (e.g., `LayoutViewable.tsx`)
+  - **Editable components**: Interactive versions used in the builder (e.g., `LayoutEditable.tsx`)
+
+- ✅ **Required Consistency Checks**:
+  - If a viewable component is updated, check if the corresponding editable component needs similar updates
+  - If an editable component is updated, check if the corresponding viewable component needs similar updates
+  - Verify that both components handle the same data structure/props
+  - Ensure visual consistency between viewable and editable modes (styling, layout, structure)
+  - Check that any new fields/properties are supported in both variants
+  - Verify that data transformations are consistent between both components
+
+- ✅ **Common Patterns to Check**:
+  - New fields added to one component should be reflected in the other
+  - Styling changes should maintain visual parity between modes
+  - Data validation/formatting should be consistent
+  - Conditional rendering logic should be aligned
+  - TypeScript types/interfaces should be shared or compatible
+
+- ✅ **Example Scenarios**:
+  - Adding a new text field to an editable layout → ensure viewable layout can display it
+  - Changing column layout in viewable component → ensure editable component matches
+  - Adding validation to editable component → ensure viewable component handles the data correctly
+  - Updating styling/spacing → apply consistently to both variants
+
+#### 9. Breaking Changes
 
 - ✅ Check if changes break existing APIs
 - ✅ Check if database schema changes need migrations
@@ -378,6 +408,11 @@ if err != nil {
 7. **Business logic in components**: Should be in hooks/services
 8. **Missing loading states**: Async operations need loading indicators
 9. **Layout and export consistency**: When layout changes are made (e.g., table columns, form fields, display order), ensure corresponding changes are made to export functionality (CSV, PDF, Excel, etc.) to maintain consistency between what users see and what they can export
+10. **Layout component inconsistency**: When a layout component (viewable or editable) is updated, verify that its corresponding counterpart component is also updated appropriately:
+   - Changes to viewable components may require updates to editable components
+   - Changes to editable components may require updates to viewable components
+   - Check for missing field support, styling inconsistencies, or data handling differences
+   - Verify that both components handle the same data structure and props consistently
 
 ## Examples
 
@@ -530,6 +565,65 @@ if err := validator.Validate(req); err != nil {
     c.JSON(400, gin.H{"error": err.Error()})
     return
 }
+\`\`\`
+```
+
+### Example 5: Layout Component Inconsistency
+
+```markdown
+**Issue Type**: ARCHITECTURE
+**Severity**: MAJOR
+
+**Issue**: The editable layout component was updated to support a new `subtitle` field, but the corresponding viewable layout component was not updated. This will cause the subtitle to not appear in published sites.
+
+**Location**: `apps/builder/src/components/layouts/HeroLayoutEditable.tsx:67`
+
+**Suggestion**: Update the corresponding viewable component to support the new field. Layout components must maintain consistency between their viewable and editable variants.
+
+**Required changes**:
+
+1. **Update the viewable component** (`HeroLayoutViewable.tsx`):
+   - Add subtitle field to the component props/data structure
+   - Add rendering logic for the subtitle
+   - Apply consistent styling to match the editable version
+
+2. **Verify data structure consistency**:
+   - Ensure both components expect the same data shape
+   - Update TypeScript interfaces if needed
+   - Check that data transformations are aligned
+
+3. **Test both variants**:
+   - Verify subtitle appears correctly in builder (editable mode)
+   - Verify subtitle appears correctly in published site (viewable mode)
+   - Ensure styling and layout are consistent between both modes
+
+**Example**:
+\`\`\`tsx
+// HeroLayoutViewable.tsx - Add subtitle support
+interface HeroLayoutProps {
+  title: string;
+  subtitle?: string; // Add this field
+  backgroundImage?: string;
+}
+
+export const HeroLayoutViewable: React.FC<HeroLayoutProps> = ({
+  title,
+  subtitle, // Add this prop
+  backgroundImage
+}) => {
+  return (
+    <div className="hero-layout">
+      <h1>{title}</h1>
+      {subtitle && <p className="subtitle">{subtitle}</p>} {/* Add this rendering */}
+      {backgroundImage && <img src={backgroundImage} alt="" />}
+    </div>
+  );
+};
+\`\`\`
+
+**Files to check**:
+- `apps/builder/src/components/layouts/HeroLayoutViewable.tsx` (needs update)
+- `apps/shared/src/types/layouts.ts` (verify type definitions)
 \`\`\`
 ```
 
