@@ -11,7 +11,11 @@
     "build": "pnpm run build:ssr && pnpm run build:client",
     "type-check": "tsc --noEmit",
     "render": "node dist-ssr/render.js",
-    "watch": "vite build --watch --mode development"
+    "watch": "vite build --watch --mode development",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "test:run": "vitest --run"
   },
   "dependencies": {
     "@wedding-builder/shared": "workspace:*",
@@ -27,3 +31,4 @@
     "vite": "^7.3.0"
   }
 }
+

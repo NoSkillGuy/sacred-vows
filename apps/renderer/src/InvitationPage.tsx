@@ -25,20 +25,10 @@ interface InvitationPageProps {
 
 export function InvitationPage({ invitation, translations = {} }: InvitationPageProps) {
   const layoutId = invitation.layoutId || "classic-scroll";
-  let layout = getLayout(layoutId);
+  const layout = getLayout(layoutId);
 
-  // Fallback to classic-scroll if layout not found
   if (!layout) {
-    const fallbackLayoutId = "classic-scroll";
-    layout = getLayout(fallbackLayoutId);
-    if (!layout) {
-      // Last resort: render error message
-      return (
-        <div className="error-message" style={{ padding: "2rem", textAlign: "center" }}>
-          <p>Layout "{layoutId}" not found. Please contact support.</p>
-        </div>
-      );
-    }
+    throw new Error(`Layout "${layoutId}" not found`);
   }
 
   const viewComponents = getViewComponents(layoutId);
@@ -66,8 +56,7 @@ export function InvitationPage({ invitation, translations = {} }: InvitationPage
 
   // Only fallback to manifest defaults if sections haven't been configured yet
   // This matches the builder's logic: only fallback if enabledSections.length === 0 && !hasConfiguredSections
-  const hasConfiguredSections =
-    invitation.layoutConfig?.sections && invitation.layoutConfig.sections.length > 0;
+  const hasConfiguredSections = invitation.layoutConfig?.sections && invitation.layoutConfig.sections.length > 0;
 
   if (enabledSections.length === 0 && !hasConfiguredSections) {
     // No sections configured at all - use manifest defaults (first time loading layout)
@@ -123,7 +112,9 @@ export function InvitationPage({ invitation, translations = {} }: InvitationPage
   };
 
   // Get sections without header/footer for main content
-  const mainSections = enabledSections.filter((s) => s.id !== "header" && s.id !== "footer");
+  const mainSections = enabledSections.filter(
+    (s) => s.id !== "header" && s.id !== "footer"
+  );
 
   // Check if footer is enabled
   const isFooterEnabled = enabledSections.some((s) => s.id === "footer");
@@ -144,3 +135,4 @@ export function InvitationPage({ invitation, translations = {} }: InvitationPage
     </>
   );
 }
+
