@@ -23,7 +23,9 @@
     "deps:check:edge-worker": "cd apps/edge-worker && pnpm audit --production --audit-level=moderate || true",
     "pre-commit": "./scripts/pre-commit-checks.sh",
     "validate:markdown": "node scripts/validate-markdown.js",
-    "prepare": "husky"
+    "prepare": "husky",
+    "dev:setup": "pnpm install",
+    "dev": "docker-compose up"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.2.0",

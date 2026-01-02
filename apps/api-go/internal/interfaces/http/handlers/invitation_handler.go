@@ -122,10 +122,11 @@ type CreateInvitationRequest struct {
 }
 
 type UpdateInvitationRequest struct {
-	Data     *JSONData `json:"data" swagtype:"string" example:"{\"bride\":\"Jane\",\"groom\":\"John\"}"`
-	LayoutID *string   `json:"layoutId" example:"classic-scroll"`
-	Title    *string   `json:"title" example:"Our Wedding"`
-	Status   *string   `json:"status" example:"published"`
+	Data        *JSONData                `json:"data" swagtype:"string" example:"{\"bride\":\"Jane\",\"groom\":\"John\"}"`
+	LayoutID    *string                  `json:"layoutId" example:"classic-scroll"`
+	LayoutConfig *map[string]interface{} `json:"layoutConfig,omitempty"`
+	Title       *string                  `json:"title" example:"Our Wedding"`
+	Status      *string                  `json:"status" example:"published"`
 }
 
 type InvitationDTO struct {
@@ -384,12 +385,24 @@ func (h *InvitationHandler) Update(c *gin.Context) {
 		dataPtr = &raw
 	}
 
+	var layoutConfigPtr *json.RawMessage
+	if req.LayoutConfig != nil {
+		layoutConfigBytes, err := json.Marshal(*req.LayoutConfig)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid layoutConfig"})
+			return
+		}
+		layoutConfigRaw := json.RawMessage(layoutConfigBytes)
+		layoutConfigPtr = &layoutConfigRaw
+	}
+
 	output, err := h.updateUC.Execute(c.Request.Context(), invitation.UpdateInvitationInput{
-		ID:       id,
-		LayoutID: req.LayoutID,
-		Data:     dataPtr,
-		Title:    req.Title,
-		Status:   req.Status,
+		ID:           id,
+		LayoutID:     req.LayoutID,
+		Data:         dataPtr,
+		LayoutConfig: layoutConfigPtr,
+		Title:        req.Title,
+		Status:       req.Status,
 	})
 
 	if err != nil {

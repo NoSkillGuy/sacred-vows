@@ -46,17 +46,64 @@ const selectivePublicCopyPlugin = () => {
 
 const isProduction = process.env.NODE_ENV === "production" || env.MODE === "production";
 
+// Resolve @shared path - handle both local and docker environments
+// In docker: workspace root is mounted at /workspace, so shared is at /workspace/apps/shared/src
+// In local: shared is at ../shared/src from builder
+const resolveSharedPath = () => {
+  const relativePath = path.resolve(__dirname, "../shared/src");
+  const dockerWorkspacePath = "/workspace/apps/shared/src";
+  const dockerLegacyPath = "/shared/src"; // Legacy path for old docker setup
+
+  // Check if docker workspace path exists (new workspace root mount)
+  if (existsSync(dockerWorkspacePath)) {
+    return dockerWorkspacePath;
+  }
+  // Check if legacy docker path exists (old separate mount)
+  if (existsSync(dockerLegacyPath)) {
+    return dockerLegacyPath;
+  }
+  return relativePath;
+};
+
 export default defineConfig({
   plugins: [react(), selectivePublicCopyPlugin()],
   resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-      "@shared": path.resolve(__dirname, "./src/shared/src"),
-      "@template-engine": path.resolve(__dirname, "./src/template-engine/src"),
-    },
+    alias: [
+      {
+        find: "@shared/utils/assetService",
+        replacement: path.resolve(__dirname, "./src/services/defaultAssetService"),
+      },
+      // Alias for builder-specific services used by shared layouts
+      {
+        find: "@shared/services/assetService",
+        replacement: path.resolve(__dirname, "./src/services/assetService"),
+      },
+      {
+        find: "@shared/components/Toast/ToastProvider",
+        replacement: path.resolve(__dirname, "./src/components/Toast/ToastProvider"),
+      },
+      {
+        find: "@shared/store/builderStore",
+        replacement: path.resolve(__dirname, "./src/store/builderStore"),
+      },
+      {
+        find: /^@shared\/(.*)$/,
+        replacement: path.resolve(resolveSharedPath(), "$1"),
+      },
+      {
+        find: "@shared",
+        replacement: resolveSharedPath(),
+      },
+      {
+        find: "@",
+        replacement: path.resolve(__dirname, "./src"),
+      },
+    ],
+    // Ensure .ts and .tsx extensions are resolved
+    extensions: [".mjs", ".js", ".mts", ".ts", ".jsx", ".tsx", ".json"],
   },
   optimizeDeps: {
-    include: ["@opentelemetry/resources"],
+    include: ["@opentelemetry/resources", "@wedding-builder/shared"],
   },
   // Only use publicDir in local development (when CDN is not configured)
   publicDir: isCDNConfigured ? false : "public",

@@ -14,7 +14,7 @@ This document describes the build optimization initiative that moves default ass
    - Higher bandwidth costs
    - Poor user experience for users browsing templates before logging in
 
-2. **Inefficient Caching**: 
+2. **Inefficient Caching**:
    - Assets were served from the application bundle, limiting caching effectiveness
    - No CDN-level caching for static assets
    - Assets had to be re-downloaded on each deployment
@@ -128,7 +128,7 @@ VITE_ENABLE_ASSET_CACHING=true
 **URL Generation Logic**:
 ```javascript
 // If CDN is configured:
-// /assets/photos/couple2/bride/1.jpeg 
+// /assets/photos/couple2/bride/1.jpeg
 // → https://dev-pub.sacredvows.io/defaults/couple2/bride/1.jpeg
 
 // If CDN is not configured (fallback):
@@ -206,13 +206,13 @@ if (event.request.url.startsWith(CDN_BASE_URL)) {
 }
 ```
 
-**Cache TTL**: 
+**Cache TTL**:
 - Default assets: 1 year (`max-age=31536000, immutable`)
 - Manifest: 1 hour (`max-age=3600`)
 
 ### 6. Publishing Process Updates
 
-**Bundling Logic** (`apps/builder/src/template-engine/src/renderPublishedHTML.js`):
+**Bundling Logic** (`apps/renderer/dist-ssr/render.js`):
 
 The `bundleLocalAssets()` function now:
 1. Checks if an asset URL is already a CDN URL → leaves it as-is
@@ -261,7 +261,7 @@ npm run migrate-assets -- --env=dev --dry-run  # Test first
 
 ### 1. Reduced Initial Bundle Size
 
-**Before**: 
+**Before**:
 - All default assets bundled with application
 - Initial bundle: ~XX MB (estimated)
 
@@ -473,7 +473,7 @@ When properly configured, you should see:
    ```bash
    # Should return Cloudflare IP addresses
    dig pub-dev.sacredvows.io
-   
+
    # Check CNAME record
    dig +short pub-dev.sacredvows.io CNAME
    ```
@@ -482,10 +482,10 @@ When properly configured, you should see:
    ```bash
    # Test with HEAD request (dev)
    curl -I https://pub-dev.sacredvows.io/defaults/couple1/bride/1.jpeg
-   
+
    # Test with HEAD request (prod)
    curl -I https://pub.sacredvows.io/defaults/couple1/bride/1.jpeg
-   
+
    # Test with verbose output to see full response
    curl -v https://pub-dev.sacredvows.io/defaults/couple1/bride/1.jpeg 2>&1 | head -20
    ```
@@ -559,7 +559,7 @@ When properly configured, you should see:
    ```bash
    # Verify DNS is resolving
    dig pub-dev.sacredvows.io
-   
+
    # Should return Cloudflare IP addresses (104.21.x.x, 172.67.x.x)
    # If not resolving, check DNS record in Cloudflare Dashboard
    ```
@@ -573,7 +573,7 @@ When properly configured, you should see:
    ```bash
    # Test if asset is accessible
    curl -I https://pub-dev.sacredvows.io/defaults/couple1/bride/1.jpeg
-   
+
    # Check response headers
    curl -v https://pub-dev.sacredvows.io/defaults/couple1/bride/1.jpeg 2>&1 | grep -i "http\|content-type"
    ```
@@ -652,11 +652,11 @@ If CDN is not configured, the system automatically falls back to local assets:
 
 The build optimization initiative successfully:
 
-✅ **Reduced initial bundle size** by moving default assets to R2  
-✅ **Improved performance** through CDN delivery and lazy loading  
-✅ **Enhanced scalability** with shared asset storage  
-✅ **Better offline support** via PWA caching strategies  
-✅ **Maintained backward compatibility** with local asset fallback  
+✅ **Reduced initial bundle size** by moving default assets to R2
+✅ **Improved performance** through CDN delivery and lazy loading
+✅ **Enhanced scalability** with shared asset storage
+✅ **Better offline support** via PWA caching strategies
+✅ **Maintained backward compatibility** with local asset fallback
 
 The implementation is production-ready and provides a solid foundation for future optimizations.
 

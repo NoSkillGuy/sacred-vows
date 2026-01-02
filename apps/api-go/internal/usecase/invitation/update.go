@@ -21,11 +21,12 @@ func NewUpdateInvitationUseCase(invitationRepo repository.InvitationRepository, 
 }
 
 type UpdateInvitationInput struct {
-	ID       string
-	LayoutID *string
-	Data     *json.RawMessage
-	Title    *string
-	Status   *string
+	ID           string
+	LayoutID     *string
+	Data         *json.RawMessage
+	LayoutConfig *json.RawMessage
+	Title        *string
+	Status       *string
 }
 
 type UpdateInvitationOutput struct {
@@ -42,15 +43,36 @@ func (uc *UpdateInvitationUseCase) Execute(ctx context.Context, input UpdateInvi
 		invitation.LayoutID = *input.LayoutID
 	}
 
-	// Handle data update - merge with title/status if provided
-	if input.Data != nil || input.Title != nil || input.Status != nil {
+	// Handle data update - merge with title/status/layoutConfig if provided
+	if input.Data != nil || input.LayoutConfig != nil || input.Title != nil || input.Status != nil {
 		dataToUpdate := invitation.Data
 		if input.Data != nil {
 			dataToUpdate = *input.Data
 		}
 
+		// Parse data as map to merge layoutConfig
+		var dataMap map[string]interface{}
+		if err := json.Unmarshal(dataToUpdate, &dataMap); err != nil {
+			return nil, errors.Wrap(errors.ErrBadRequest.Code, "Invalid invitation data", err)
+		}
+
+		// Merge layoutConfig into data if provided
+		if input.LayoutConfig != nil {
+			var layoutConfigMap map[string]interface{}
+			if err := json.Unmarshal(*input.LayoutConfig, &layoutConfigMap); err != nil {
+				return nil, errors.Wrap(errors.ErrBadRequest.Code, "Invalid layoutConfig", err)
+			}
+			dataMap["layoutConfig"] = layoutConfigMap
+		}
+
+		// Re-marshal data with layoutConfig
+		mergedDataBytes, err := json.Marshal(dataMap)
+		if err != nil {
+			return nil, errors.Wrap(errors.ErrBadRequest.Code, "Failed to marshal invitation data", err)
+		}
+
 		// Merge title and status into data
-		mergedData, err := mergeMetadataIntoData(dataToUpdate, input.Title, input.Status)
+		mergedData, err := mergeMetadataIntoData(json.RawMessage(mergedDataBytes), input.Title, input.Status)
 		if err != nil {
 			return nil, errors.Wrap(errors.ErrBadRequest.Code, "Invalid invitation data", err)
 		}

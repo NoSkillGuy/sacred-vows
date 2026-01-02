@@ -23,7 +23,7 @@ System design, architecture decisions, and technical overview.
 
 - [System Overview](./architecture/system-overview.md) - High-level architecture
 - [Project Goals](./architecture/goal.md) - Vision and objectives
-- [Publishing Process](./architecture/publishing-process.md) - How publishing works
+- [Publish Architecture](./architecture/publish-architecture.md) - Comprehensive technical documentation of the invitation publishing system
 - [Authentication](./architecture/authentication.md) - Auth system design
 - [Builder Asset Architecture](./architecture/builder-asset-architecture.md) - Asset management
 
@@ -54,8 +54,6 @@ Troubleshooting, service configurations, and operations guides.
 
 ### [Guides](./guides/)
 Step-by-step tutorials and how-to guides.
-
-- [Publishing Guide](./guides/publishing.md) - How to publish invitations
 
 ## Contributing
 

@@ -72,23 +72,22 @@ COPY --from=builder /app/docs /app/docs
 # Copy config files (YAML configs for different environments)
 COPY --from=builder /app/config /app/config
 
-# Copy builder template engine files needed for snapshot generation
-# Build context is repo root, so we can access apps/builder
-COPY apps/builder/src/template-engine /app/builder/template-engine
-
-# Create layouts directory (layouts are mounted as volume in docker-compose.yml)
-# The renderer script imports from ../../layouts/ relative to template-engine/src/
-RUN mkdir -p /app/builder/layouts
-
-# Create public directory (PWA files like sw.js and manifest.json are optional)
-# Assets are served from R2 in dev/prod, so these PWA files are not required in the image
-RUN mkdir -p /app/builder/public
-
-# Install Node.js dependencies for the template engine
-# Use BuildKit cache mount to cache node_modules for faster rebuilds
-WORKDIR /app/builder/template-engine
+# Build renderer package
+# Build context is repo root, so we can access apps/renderer
+FROM node:20-alpine AS renderer-builder
+WORKDIR /app
+COPY apps/renderer/package.json apps/renderer/pnpm-lock.yaml* ./
+COPY apps/shared/package.json ../shared/
 RUN --mount=type=cache,target=/root/.npm \
-    npm install --production
+    npm install -g pnpm && \
+    pnpm install --frozen-lockfile
+COPY apps/renderer/ ./apps/renderer/
+COPY apps/shared/ ./apps/shared/
+WORKDIR /app/apps/renderer
+RUN pnpm run build:ssr
+
+# Copy renderer build artifacts from renderer-builder stage
+COPY --from=renderer-builder /app/apps/renderer/dist-ssr /app/renderer/dist-ssr
 
 # Return to app directory
 WORKDIR /app

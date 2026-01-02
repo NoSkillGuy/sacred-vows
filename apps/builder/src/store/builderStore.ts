@@ -6,11 +6,11 @@ import {
   getLayout,
   getLayoutManifest as getLayoutManifestFromRegistry,
   hasLayout,
-} from "../layouts/registry";
+} from "@shared/layouts";
 import {
   parseInvitationData,
   calculateSectionEnabled,
-} from "../layouts/editorial-elegance/utils/dataHelpers";
+} from "@shared/layouts/editorial-elegance/utils/dataHelpers";
 import type {
   InvitationData,
   SectionConfig,
@@ -19,8 +19,8 @@ import type {
 } from "@shared/types/wedding-data";
 import type { LayoutManifest } from "@shared/types/layout";
 // Import layouts to ensure they're registered
-import "../layouts/classic-scroll";
-import "../layouts/editorial-elegance";
+import "@shared/layouts/classic-scroll";
+import "@shared/layouts/editorial-elegance";
 
 /**
  * Builder Store
@@ -342,7 +342,8 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
 
         if (shouldMerge) {
           try {
-            const { mergeWithDefaults } = await import("../layouts/editorial-elegance/defaults");
+            const { mergeWithDefaults } =
+              await import("@shared/layouts/editorial-elegance/defaults");
             invitationData = mergeWithDefaults(invitationData) as UniversalWeddingData;
             console.log(
               "Merged editorial-elegance defaults. countdownTarget:",
@@ -974,7 +975,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
       // For editorial-elegance layout, merge defaults
       if (newLayoutId === "editorial-elegance") {
         try {
-          const { mergeWithDefaults } = await import("../layouts/editorial-elegance/defaults");
+          const { mergeWithDefaults } = await import("@shared/layouts/editorial-elegance/defaults");
           mergedData = mergeWithDefaults(existingData) as UniversalWeddingData;
         } catch (error) {
           console.warn("Failed to load editorial-elegance defaults:", error);
@@ -1172,7 +1173,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => {
       // Merge editorial-elegance defaults if needed
       if (layoutId === "editorial-elegance") {
         try {
-          const { mergeWithDefaults } = await import("../layouts/editorial-elegance/defaults");
+          const { mergeWithDefaults } = await import("@shared/layouts/editorial-elegance/defaults");
           invitationData = mergeWithDefaults(invitationData) as UniversalWeddingData;
         } catch (error) {
           console.warn("Failed to load editorial-elegance defaults in setInvitation:", error);

@@ -1,18 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useBuilderStore } from "../../store/builderStore";
-import { exportInvitationAsJSON } from "../../services/exportService";
 import {
   publishInvitation,
   validateSubdomain,
   listVersions,
   rollbackToVersion,
 } from "../../services/publishService";
-import "./ExportModal.css";
+import "./PublishModal.css";
 
 function PublishModal({ isOpen, onClose }) {
   const { currentInvitation } = useBuilderStore();
   const [publishing, setPublishing] = useState(false);
-  const [exportFormat, setExportFormat] = useState("publish");
   const [subdomain, setSubdomain] = useState("");
   const [normalized, setNormalized] = useState("");
   const [available, setAvailable] = useState(null); // null | boolean
@@ -46,7 +44,6 @@ function PublishModal({ isOpen, onClose }) {
   // Fetch versions when subdomain is available and site is published
   useEffect(() => {
     if (!isOpen) return;
-    if (exportFormat !== "publish") return;
     if (!normalized || !available) {
       setVersions([]);
       return;
@@ -66,11 +63,10 @@ function PublishModal({ isOpen, onClose }) {
     };
 
     fetchVersions();
-  }, [isOpen, exportFormat, normalized, available]);
+  }, [isOpen, normalized, available]);
 
   useEffect(() => {
     if (!isOpen) return;
-    if (exportFormat !== "publish") return;
     if (!canValidate) {
       setAvailable(null);
       setReason("");
@@ -100,19 +96,12 @@ function PublishModal({ isOpen, onClose }) {
       }
     }, 350);
     return () => clearTimeout(t);
-  }, [isOpen, exportFormat, canValidate, invitationId, subdomain]);
+  }, [isOpen, canValidate, invitationId, subdomain]);
 
   const handlePrimary = async () => {
     setPublishing(true);
     setErrorMsg("");
     try {
-      if (exportFormat === "json") {
-        // Export as JSON backup - pass full invitation object
-        exportInvitationAsJSON(currentInvitation);
-        onClose();
-        return;
-      }
-      // Publish
       if (!invitationId) throw new Error("Missing invitation");
       const res = await publishInvitation(invitationId, subdomain);
       setPublishedUrl(res.url || "");
@@ -158,172 +147,143 @@ function PublishModal({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   return (
-    <div className="export-modal-overlay" onClick={onClose}>
-      <div className="export-modal-content" onClick={(e) => e.stopPropagation()}>
-        <div className="export-modal-header">
+    <div className="publish-modal-overlay" onClick={onClose}>
+      <div className="publish-modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="publish-modal-header">
           <h3>Publish Invitation</h3>
-          <button className="export-modal-close" onClick={onClose}>
+          <button className="publish-modal-close" onClick={onClose}>
             ×
           </button>
         </div>
 
-        <div className="export-modal-body">
-          <div className="form-group">
-            <label className="form-label">Action</label>
-            <select
-              className="form-select"
-              value={exportFormat}
-              onChange={(e) => setExportFormat(e.target.value)}
-            >
-              <option value="publish">Publish to subdomain</option>
-              <option value="json">JSON Backup</option>
-            </select>
-          </div>
-
+        <div className="publish-modal-body">
           <div className="export-info">
-            {exportFormat === "publish" ? (
-              <>
-                <p>
-                  <strong>Choose a subdomain:</strong>
-                </p>
-                <div className="form-group">
-                  <label className="form-label">Subdomain</label>
-                  <input
-                    className="form-select"
-                    value={subdomain}
-                    onChange={(e) => setSubdomain(e.target.value)}
-                    placeholder="e.g. john-wedding"
-                  />
-                  <div style={{ marginTop: 8, fontSize: 13, color: "#666" }}>
-                    {available === null ? (
-                      <span>Enter a subdomain to check availability.</span>
-                    ) : available ? (
-                      <span style={{ color: "#1a7f37" }}>Available: {normalized}</span>
-                    ) : (
-                      <span style={{ color: "#b42318" }}>
-                        Not available{normalized ? `: ${normalized}` : ""}
-                        {reason ? ` (${reason})` : ""}
-                      </span>
-                    )}
-                  </div>
-                  {errorMsg ? (
-                    <div style={{ marginTop: 8, fontSize: 13, color: "#b42318" }}>{errorMsg}</div>
-                  ) : null}
-                </div>
-
-                {publishedUrl ? (
-                  <div style={{ marginTop: 12 }}>
-                    <p>
-                      <strong>Published URL</strong>
-                    </p>
-                    <div style={{ display: "flex", gap: 8 }}>
-                      <input className="form-select" readOnly value={publishedUrl} />
-                      <button
-                        className="btn btn-secondary"
-                        onClick={() => navigator.clipboard?.writeText?.(publishedUrl)}
-                      >
-                        Copy
-                      </button>
-                      <a
-                        className="btn btn-primary"
-                        href={publishedUrl}
-                        target="_blank"
-                        rel="noreferrer noopener"
-                      >
-                        Open
-                      </a>
-                    </div>
-                  </div>
-                ) : null}
-
-                {versions.length > 0 && (
-                  <div style={{ marginTop: 16 }}>
-                    <p>
-                      <strong>Version History</strong>
-                    </p>
-                    <div className="version-list">
-                      {versions.map((v) => (
-                        <div key={v.version} className="version-item">
-                          <span className="version-number">Version {v.version}</span>
-                          {v.isCurrent && <span className="version-badge current">Current</span>}
-                          {!v.isCurrent && (
-                            <button
-                              className="btn btn-secondary btn-sm"
-                              onClick={() => setRollbackTarget(v.version)}
-                              disabled={rollingBack}
-                            >
-                              Rollback
-                            </button>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+            <p>
+              <strong>Choose a subdomain:</strong>
+            </p>
+            <div className="form-group">
+              <label className="form-label">Subdomain</label>
+              <input
+                className="form-select"
+                value={subdomain}
+                onChange={(e) => setSubdomain(e.target.value)}
+                placeholder="e.g. john-wedding"
+              />
+              <div style={{ marginTop: 8, fontSize: 13, color: "#666" }}>
+                {available === null ? (
+                  <span>Enter a subdomain to check availability.</span>
+                ) : available ? (
+                  <span style={{ color: "#1a7f37" }}>Available: {normalized}</span>
+                ) : (
+                  <span style={{ color: "#b42318" }}>
+                    Not available{normalized ? `: ${normalized}` : ""}
+                    {reason ? ` (${reason})` : ""}
+                  </span>
                 )}
+              </div>
+              {errorMsg ? (
+                <div style={{ marginTop: 8, fontSize: 13, color: "#b42318" }}>{errorMsg}</div>
+              ) : null}
+            </div>
 
-                {rollbackTarget !== null && (
-                  <div
-                    className="rollback-confirmation"
-                    style={{
-                      marginTop: 16,
-                      padding: 12,
-                      backgroundColor: "#fff3cd",
-                      borderRadius: 4,
-                    }}
+            {publishedUrl ? (
+              <div style={{ marginTop: 12 }}>
+                <p>
+                  <strong>Published URL</strong>
+                </p>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <input className="form-select" readOnly value={publishedUrl} />
+                  <button
+                    className="btn btn-secondary"
+                    onClick={() => navigator.clipboard?.writeText?.(publishedUrl)}
                   >
-                    <p style={{ margin: "0 0 8px 0", fontWeight: "bold" }}>
-                      Rollback to Version {rollbackTarget}?
-                    </p>
-                    <p style={{ margin: "0 0 8px 0", fontSize: 13 }}>
-                      This will make Version {rollbackTarget} the active version. The current
-                      version will remain available for rollback.
-                    </p>
-                    <div style={{ display: "flex", gap: 8 }}>
-                      <button
-                        className="btn btn-primary btn-sm"
-                        onClick={() => handleRollback(rollbackTarget)}
-                        disabled={rollingBack}
-                      >
-                        {rollingBack ? "Rolling back..." : "Confirm Rollback"}
-                      </button>
-                      <button
-                        className="btn btn-secondary btn-sm"
-                        onClick={() => setRollbackTarget(null)}
-                        disabled={rollingBack}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </>
-            ) : (
-              <>
+                    Copy
+                  </button>
+                  <a
+                    className="btn btn-primary"
+                    href={publishedUrl}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                  >
+                    Open
+                  </a>
+                </div>
+              </div>
+            ) : null}
+
+            {versions.length > 0 && (
+              <div style={{ marginTop: 16 }}>
                 <p>
-                  <strong>JSON Backup</strong>
+                  <strong>Version History</strong>
                 </p>
-                <p style={{ marginTop: "8px", fontSize: "13px", color: "#666" }}>
-                  Download a portable backup of your invitation data for safekeeping.
+                <div className="version-list">
+                  {versions.map((v) => (
+                    <div key={v.version} className="version-item">
+                      <span className="version-number">Version {v.version}</span>
+                      {v.isCurrent && <span className="version-badge current">Current</span>}
+                      {!v.isCurrent && (
+                        <button
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => setRollbackTarget(v.version)}
+                          disabled={rollingBack}
+                        >
+                          Rollback
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {rollbackTarget !== null && (
+              <div
+                className="rollback-confirmation"
+                style={{
+                  marginTop: 16,
+                  padding: 12,
+                  backgroundColor: "#fff3cd",
+                  borderRadius: 4,
+                }}
+              >
+                <p style={{ margin: "0 0 8px 0", fontWeight: "bold" }}>
+                  Rollback to Version {rollbackTarget}?
                 </p>
-              </>
+                <p style={{ margin: "0 0 8px 0", fontSize: 13 }}>
+                  This will make Version {rollbackTarget} the active version. The current version
+                  will remain available for rollback.
+                </p>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={() => handleRollback(rollbackTarget)}
+                    disabled={rollingBack}
+                  >
+                    {rollingBack ? "Rolling back..." : "Confirm Rollback"}
+                  </button>
+                  <button
+                    className="btn btn-secondary btn-sm"
+                    onClick={() => setRollbackTarget(null)}
+                    disabled={rollingBack}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
             )}
           </div>
         </div>
 
-        <div className="export-modal-footer">
+        <div className="publish-modal-footer">
           <button className="btn btn-secondary" onClick={onClose} disabled={publishing}>
             Cancel
           </button>
           <button
             className="btn btn-primary"
             onClick={handlePrimary}
-            disabled={publishing || (exportFormat === "publish" && available !== true)}
+            disabled={publishing || available !== true}
           >
-            {publishing
-              ? "Publishing..."
-              : exportFormat === "publish"
-                ? "Publish"
-                : "Download JSON"}
+            {publishing ? "Publishing..." : "Publish"}
           </button>
         </div>
       </div>

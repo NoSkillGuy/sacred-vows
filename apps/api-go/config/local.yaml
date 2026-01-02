@@ -36,7 +36,7 @@ publishing:
   r2_bucket: "sacred-vows-published-local"
   r2_public_base: "http://localhost:9000/sacred-vows-published-local"  # MinIO public URL format
   version_retention_count: 3
-  snapshot_renderer_script: ""  # Set via env var if needed
+  snapshot_renderer_script: ""  # Set via env var: /renderer/dist-ssr/render.js
   snapshot_renderer_node: "node"
   published_artifacts_dir: "./published"
   published_artifacts_public_base: "http://localhost:3000"
