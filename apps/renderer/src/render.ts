@@ -28,12 +28,7 @@ async function main(): Promise<void> {
     throw new Error("No input provided");
   }
 
-  let payload: Payload;
-  try {
-    payload = JSON.parse(input);
-  } catch (err) {
-    throw new Error(`Invalid JSON input: ${err instanceof Error ? err.message : String(err)}`);
-  }
+  const payload: Payload = JSON.parse(input);
   const invitation = payload.invitation || ({} as InvitationData);
   const translations = payload.translations || {};
 
@@ -52,11 +47,19 @@ async function main(): Promise<void> {
   }
 }
 
-function readStdin(): Promise<string> {
+function readStdin(maxSize: number = 10 * 1024 * 1024): Promise<string> {
   return new Promise((resolve, reject) => {
     let data = "";
+    let totalSize = 0;
     process.stdin.setEncoding("utf8");
-    process.stdin.on("data", (chunk: string) => (data += chunk));
+    process.stdin.on("data", (chunk: string) => {
+      totalSize += Buffer.byteLength(chunk, "utf8");
+      if (totalSize > maxSize) {
+        reject(new Error(`Input exceeds maximum size of ${maxSize} bytes`));
+        return;
+      }
+      data += chunk;
+    });
     process.stdin.on("end", () => resolve(data));
     process.stdin.on("error", reject);
   });

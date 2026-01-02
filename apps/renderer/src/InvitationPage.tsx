@@ -24,24 +24,21 @@ interface InvitationPageProps {
 }
 
 export function InvitationPage({ invitation, translations = {} }: InvitationPageProps) {
-  let layoutId = invitation.layoutId || "classic-scroll";
+  const layoutId = invitation.layoutId || "classic-scroll";
   let layout = getLayout(layoutId);
 
-  // If layout not found, fallback to classic-scroll
+  // Fallback to classic-scroll if layout not found
   if (!layout) {
     const fallbackLayoutId = "classic-scroll";
-    const fallbackLayout = getLayout(fallbackLayoutId);
-    if (!fallbackLayout) {
-      // Even fallback is missing - render error message
+    layout = getLayout(fallbackLayoutId);
+    if (!layout) {
+      // Last resort: render error message
       return (
         <div className="error-message" style={{ padding: "2rem", textAlign: "center" }}>
-          <p>Layout "{layoutId}" not found. Default layout also unavailable.</p>
+          <p>Layout "{layoutId}" not found. Please contact support.</p>
         </div>
       );
     }
-    // Use fallback layout
-    layout = fallbackLayout;
-    layoutId = fallbackLayoutId;
   }
 
   const viewComponents = getViewComponents(layoutId);
