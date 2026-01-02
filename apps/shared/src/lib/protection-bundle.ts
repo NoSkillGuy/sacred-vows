@@ -121,4 +121,3 @@ export function getProtectionScriptTag(isProduction = true): string {
 ${bundle.protectionScript}
 </script>`;
 }
-

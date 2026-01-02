@@ -8,7 +8,7 @@ function Hero({ onRSVPClick, translations, _currentLang, config = {} }) {
   const wedding = config?.wedding || {};
   const countdownTarget = wedding?.countdownTarget;
   // Convert asset path if it's in builder format, otherwise use default
-  const heroImage = config?.hero?.mainImage 
+  const heroImage = config?.hero?.mainImage
     ? convertAssetPathToUrl(config.hero.mainImage)
     : getDefaultAssetUrl("couple1", "couple", "11.jpeg");
   const couple = config?.couple || {};
@@ -96,7 +96,9 @@ function Hero({ onRSVPClick, translations, _currentLang, config = {} }) {
       <div className="hero-inner">
         <div>
           <div className="hero-eyebrow">{getTranslation("hero.eyebrow") || "The Wedding Of"}</div>
-          <div className="hero-script">{getTranslation("hero.script") || "With the blessings of our families"}</div>
+          <div className="hero-script">
+            {getTranslation("hero.script") || "With the blessings of our families"}
+          </div>
 
           <div className="hero-names" dangerouslySetInnerHTML={{ __html: heroNames }} />
 
@@ -113,7 +115,9 @@ function Hero({ onRSVPClick, translations, _currentLang, config = {} }) {
 
           {countdownTarget && (
             <div className="hero-countdown">
-              <div className="hero-count-label">{getTranslation("hero.countdown") || "Countdown to Wedding"}</div>
+              <div className="hero-count-label">
+                {getTranslation("hero.countdown") || "Countdown to Wedding"}
+              </div>
               <div className="hero-countdown-values" id="countdown">
                 {countdown}
               </div>

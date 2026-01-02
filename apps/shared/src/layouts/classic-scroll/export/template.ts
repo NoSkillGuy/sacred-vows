@@ -44,8 +44,26 @@ export async function generateHTML(
     | undefined;
   const events = (data as Record<string, unknown>)?.events as
     | {
-        day1?: { date?: string; events?: Array<{ emoji?: string; image?: string; label?: string; tag?: string; time?: string }> };
-        day2?: { date?: string; events?: Array<{ emoji?: string; image?: string; label?: string; tag?: string; time?: string }> };
+        day1?: {
+          date?: string;
+          events?: Array<{
+            emoji?: string;
+            image?: string;
+            label?: string;
+            tag?: string;
+            time?: string;
+          }>;
+        };
+        day2?: {
+          date?: string;
+          events?: Array<{
+            emoji?: string;
+            image?: string;
+            label?: string;
+            tag?: string;
+            time?: string;
+          }>;
+        };
       }
     | undefined;
   const rsvp = (data as Record<string, unknown>)?.rsvp as
@@ -54,8 +72,12 @@ export async function generateHTML(
   const branding = (data as Record<string, unknown>)?.branding as
     | { monogram?: string; logo?: string; title?: string; subtitle?: string }
     | undefined;
-  const music = (data as Record<string, unknown>)?.music as { file?: string; volume?: number } | undefined;
-  const customTranslations = (data as Record<string, unknown>)?.customTranslations as Record<string, unknown> | undefined;
+  const music = (data as Record<string, unknown>)?.music as
+    | { file?: string; volume?: number }
+    | undefined;
+  const customTranslations = (data as Record<string, unknown>)?.customTranslations as
+    | Record<string, unknown>
+    | undefined;
 
   const brideName = bride.name || "Bride";
   const groomName = groom.name || "Groom";
@@ -229,7 +251,9 @@ function generateHeaderHTML(
         </nav>
 
         <div style="display: flex; align-items: center; gap: 10px;">
-          ${musicFile ? `
+          ${
+            musicFile
+              ? `
             <div class="music-toggle" id="musicToggle">
               <div class="music-dot" id="musicDot"></div>
               <span id="musicToggleText">${getTranslation("music.play") || "Play Music"}</span>
@@ -237,7 +261,9 @@ function generateHeaderHTML(
             <audio id="bg-music" loop>
               <source src="${musicFile}" type="audio/mpeg" />
             </audio>
-          ` : ""}
+          `
+              : ""
+          }
         </div>
       </div>
     </header>
@@ -256,10 +282,9 @@ function generateHeroHTML(
   translations: Record<string, unknown> | undefined,
   getTranslation: (key: string) => string
 ): string {
-  const namesText = getTranslation("hero.names") || (brideName || groomName ? `${brideName} & ${groomName}` : "");
-  const heroNames = namesText
-    ? namesText.replace(/&/g, '<span class="hero-amp">&amp;</span>')
-    : "";
+  const namesText =
+    getTranslation("hero.names") || (brideName || groomName ? `${brideName} & ${groomName}` : "");
+  const heroNames = namesText ? namesText.replace(/&/g, '<span class="hero-amp">&amp;</span>') : "";
 
   return `
     <section class="hero" id="top">
@@ -272,12 +297,16 @@ function generateHeroHTML(
           <div class="hero-date">${getTranslation("hero.date") || weddingDate || "Date TBD"}</div>
           <div class="hero-location">${getTranslation("hero.location") || ""}</div>
           <div class="hero-divider"></div>
-          ${countdownTarget ? `
+          ${
+            countdownTarget
+              ? `
             <div class="hero-countdown">
               <div class="hero-count-label">${getTranslation("hero.countdown") || "Countdown to Wedding"}</div>
               <div class="hero-countdown-values" id="countdown">Calculating...</div>
             </div>
-          ` : ""}
+          `
+              : ""
+          }
           <div class="hero-actions">
             <a href="#events" class="btn btn-primary">
               ${getTranslation("hero.actions.program") || "View Program Details"}
@@ -292,7 +321,9 @@ function generateHeroHTML(
             </a>
           </div>
         </div>
-        ${heroImage ? `
+        ${
+          heroImage
+            ? `
           <aside class="hero-photo-card">
             <div class="hero-photo-frame">
               <div class="hero-photo-inner">
@@ -301,7 +332,9 @@ function generateHeroHTML(
             </div>
             <div class="hero-photo-caption">${getTranslation("hero.caption") || ""}</div>
           </aside>
-        ` : ""}
+        `
+            : ""
+        }
       </div>
     </section>
   `;
@@ -311,7 +344,10 @@ function generateHeroHTML(
  * Generate couple section HTML
  */
 function generateCoupleHTML(
-  couple: { bride?: { name?: string; image?: string; parents?: { mother?: string; father?: string } }; groom?: { name?: string; image?: string; parents?: { mother?: string; father?: string } } },
+  couple: {
+    bride?: { name?: string; image?: string; parents?: { mother?: string; father?: string } };
+    groom?: { name?: string; image?: string; parents?: { mother?: string; father?: string } };
+  },
   translations: Record<string, unknown> | undefined,
   getTranslation: (key: string) => string
 ): string {
@@ -325,7 +361,9 @@ function generateCoupleHTML(
   const groomMother = groom.parents?.mother || "Mrs. Vibha Singh";
   const groomFather = groom.parents?.father || "Mr. Ashok Kumar Singh";
   const groomImage = groom.image || "";
-  const togetherText = getTranslation("couple.together") || `Together, ${brideName} and ${groomName} look forward to beginning this beautiful journey with your blessings and presence.`;
+  const togetherText =
+    getTranslation("couple.together") ||
+    `Together, ${brideName} and ${groomName} look forward to beginning this beautiful journey with your blessings and presence.`;
 
   return `
     <section id="couple">
@@ -352,13 +390,17 @@ function generateCoupleHTML(
                 <div class="person-role">${getTranslation("couple.father") || "Father"}</div>
                 <div class="person-name">${brideFather}</div>
               </div>
-              ${brideImage ? `
+              ${
+                brideImage
+                  ? `
                 <div class="portrait-frame">
                   <div class="portrait-inner">
                     <img src="${brideImage}" alt="Bride - ${brideName}" />
                   </div>
                 </div>
-              ` : ""}
+              `
+                  : ""
+              }
             </div>
             <div>
               <h3 class="headline">${getTranslation("couple.groom") || "The Groom"}</h3>
@@ -374,13 +416,17 @@ function generateCoupleHTML(
                 <div class="person-role">${getTranslation("couple.father") || "Father"}</div>
                 <div class="person-name">${groomFather}</div>
               </div>
-              ${groomImage ? `
+              ${
+                groomImage
+                  ? `
                 <div class="portrait-frame">
                   <div class="portrait-inner">
                     <img src="${groomImage}" alt="Groom - ${groomName}" />
                   </div>
                 </div>
-              ` : ""}
+              `
+                  : ""
+              }
             </div>
           </div>
         </div>
@@ -438,7 +484,8 @@ function generateGalleryHTML(
           <div class="gallery-grid">
             ${galleryImages
               .map((img) => {
-                const isPortrait = img.orientation === "portrait" || /portrait/i.test(img.alt || "");
+                const isPortrait =
+                  img.orientation === "portrait" || /portrait/i.test(img.alt || "");
                 return `
                   <div class="gallery-item">
                     <div class="gallery-inner${isPortrait ? " tall" : ""}">
@@ -459,10 +506,30 @@ function generateGalleryHTML(
  * Generate events section HTML
  */
 function generateEventsHTML(
-  events: {
-    day1?: { date?: string; events?: Array<{ emoji?: string; image?: string; label?: string; tag?: string; time?: string }> };
-    day2?: { date?: string; events?: Array<{ emoji?: string; image?: string; label?: string; tag?: string; time?: string }> };
-  } | undefined,
+  events:
+    | {
+        day1?: {
+          date?: string;
+          events?: Array<{
+            emoji?: string;
+            image?: string;
+            label?: string;
+            tag?: string;
+            time?: string;
+          }>;
+        };
+        day2?: {
+          date?: string;
+          events?: Array<{
+            emoji?: string;
+            image?: string;
+            label?: string;
+            tag?: string;
+            time?: string;
+          }>;
+        };
+      }
+    | undefined,
   translations: Record<string, unknown> | undefined,
   getTranslation: (key: string) => string
 ): string {
@@ -541,7 +608,13 @@ function generateEventsHTML(
  * Generate venue section HTML
  */
 function generateVenueHTML(
-  venue: { name?: string; address?: string; tags?: string[]; mapsUrl?: string; mapsEmbedUrl?: string },
+  venue: {
+    name?: string;
+    address?: string;
+    tags?: string[];
+    mapsUrl?: string;
+    mapsEmbedUrl?: string;
+  },
   translations: Record<string, unknown> | undefined,
   getTranslation: (key: string) => string
 ): string {
@@ -563,22 +636,32 @@ function generateVenueHTML(
           <div>
             <h3 class="headline">${venueName}</h3>
             <p class="venue-address" style="white-space: pre-line;">${venueAddress}</p>
-            ${venueTags.length > 0 ? `
+            ${
+              venueTags.length > 0
+                ? `
               <div class="chip-row">
                 ${venueTags.map((tag) => `<div class="chip">${tag}</div>`).join("")}
               </div>
-            ` : ""}
+            `
+                : ""
+            }
             <p class="muted" style="margin-bottom: 14px;">
               ${getTranslation("venue.arrive") || "Kindly arrive a little early to comfortably join us for the ceremonies. Our families eagerly await to welcome you with warmth and love."}
             </p>
-            ${mapsUrl ? `
+            ${
+              mapsUrl
+                ? `
               <a class="btn btn-primary" href="${mapsUrl}" target="_blank" rel="noopener noreferrer">
                 ${getTranslation("venue.maps") || "Open in Google Maps"}
                 <span class="btn-icon">➚</span>
               </a>
-            ` : ""}
+            `
+                : ""
+            }
           </div>
-          ${mapsEmbedUrl ? `
+          ${
+            mapsEmbedUrl
+              ? `
             <div class="map-card" aria-label="Venue map preview">
               <iframe class="map-embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="${mapsEmbedUrl}" title="Venue Location"></iframe>
               <div class="map-footer">
@@ -586,7 +669,9 @@ function generateVenueHTML(
                 ${mapsUrl ? `<a href="${mapsUrl}" target="_blank" rel="noopener noreferrer">View full map ↗</a>` : ""}
               </div>
             </div>
-          ` : ""}
+          `
+              : ""
+          }
         </div>
       </div>
     </section>
@@ -622,16 +707,24 @@ function generateRSVPHTML(
           <p class="rsvp-text">
             ${getTranslation("rsvp.text") || "On behalf of both families, you may contact the following for confirmations, travel details, or any other queries:"}
           </p>
-          ${contacts.length > 0 ? `
+          ${
+            contacts.length > 0
+              ? `
             <div class="rsvp-grid">
-              ${contacts.map((contact) => `
+              ${contacts
+                .map(
+                  (contact) => `
                 <div class="rsvp-pill">
                   <div class="rsvp-badge">${contact.badge || "RSVP"}</div>
                   <span>${contact.name || ""}</span>
                 </div>
-              `).join("")}
+              `
+                )
+                .join("")}
             </div>
-          ` : ""}
+          `
+              : ""
+          }
           <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 8px;">
             <a class="btn btn-primary" href="#rsvp">
               ${getTranslation("hero.actions.rsvp") || "RSVP Now"}
@@ -755,7 +848,9 @@ function generateCountdownScript(
 ): string {
   if (!countdownTarget) return "";
 
-  const todayText = (translations?.["countdown.today"] as string) || "Today we humbly celebrate this blessed union.";
+  const todayText =
+    (translations?.["countdown.today"] as string) ||
+    "Today we humbly celebrate this blessed union.";
 
   return `
     <script>

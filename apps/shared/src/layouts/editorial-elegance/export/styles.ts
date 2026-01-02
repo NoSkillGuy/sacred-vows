@@ -63,7 +63,12 @@ export async function generateCSS(invitation: InvitationData): Promise<string> {
     if (colorsAny.divider && typeof colorsAny.divider === "string") {
       return colorsAny.divider;
     }
-    if (colorsAny.borders && typeof colorsAny.borders === "object" && colorsAny.borders !== null && "divider" in colorsAny.borders) {
+    if (
+      colorsAny.borders &&
+      typeof colorsAny.borders === "object" &&
+      colorsAny.borders !== null &&
+      "divider" in colorsAny.borders
+    ) {
       const borders = colorsAny.borders as Record<string, unknown>;
       const divider = borders.divider;
       if (divider && typeof divider === "object" && divider !== null && "color" in divider) {

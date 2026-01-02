@@ -10,8 +10,7 @@ function EditableEditorialIntro({ _translations, _currentLang, config = {}, onUp
   const introText =
     editorialIntro.text ||
     "Two paths, one story.\nRooted in tradition, bound by love,\nwe invite you to celebrate the beginning of forever.";
-  const introImage =
-    editorialIntro.image || getDefaultAssetUrl("couple2", "couple", "2.jpeg");
+  const introImage = editorialIntro.image || getDefaultAssetUrl("couple2", "couple", "2.jpeg");
   const alignment = editorialIntro.alignment || "right";
 
   return (

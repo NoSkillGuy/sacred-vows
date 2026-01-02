@@ -25,8 +25,7 @@ function EditableEditorialHero({ _translations, _currentLang, config = {}, onUpd
 
   const alignment = hero.alignment || "center";
   const mediaType = hero.mediaType || "image";
-  const mainImage =
-    hero.mainImage || getDefaultAssetUrl("couple2", "couple", "1.jpeg");
+  const mainImage = hero.mainImage || getDefaultAssetUrl("couple2", "couple", "1.jpeg");
   const videoUrl = hero.videoUrl || "";
   const videoPoster = hero.videoPoster || mainImage;
 

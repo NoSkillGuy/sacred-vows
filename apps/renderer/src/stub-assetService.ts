@@ -17,8 +17,9 @@ export async function deleteImage(_imageUrl: string): Promise<void> {
   throw new Error("Image deletion is not available in renderer context");
 }
 
-export async function getAssets(): Promise<Array<{ id: string; url: string; [key: string]: unknown }>> {
+export async function getAssets(): Promise<
+  Array<{ id: string; url: string; [key: string]: unknown }>
+> {
   // No-op in renderer context
   return [];
 }
-

@@ -1,11 +1,13 @@
 function FathersLetter({ translations, currentLang, config = {} }) {
   // Check if localStorage is available (not available in SSR)
-  const storedName = typeof window !== "undefined" && window.localStorage
-    ? window.localStorage.getItem("wedding-guest-name")
-    : null;
-  const storedTitle = typeof window !== "undefined" && window.localStorage
-    ? window.localStorage.getItem("wedding-guest-title") || ""
-    : "";
+  const storedName =
+    typeof window !== "undefined" && window.localStorage
+      ? window.localStorage.getItem("wedding-guest-name")
+      : null;
+  const storedTitle =
+    typeof window !== "undefined" && window.localStorage
+      ? window.localStorage.getItem("wedding-guest-title") || ""
+      : "";
   const fallbackName =
     currentLang === "hi"
       ? "परिवार सदस्य और आदरणीय अतिथि"

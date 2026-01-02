@@ -3,7 +3,7 @@ import "./EditableImage.css";
 // Import from builder's assetService via alias (only available in builder context)
 // @ts-ignore - This import is resolved by vite alias in builder context
 import { uploadImage } from "@shared/services/assetService";
-// @ts-ignore - Toast is builder-specific, resolved via vite in builder context  
+// @ts-ignore - Toast is builder-specific, resolved via vite in builder context
 import { useToast } from "@shared/components/Toast/ToastProvider";
 
 /**

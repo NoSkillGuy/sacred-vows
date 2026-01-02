@@ -93,8 +93,7 @@ function EditableGallerySection({ translations, _currentLang, config = {}, onUpd
         <div className="card-inner">
           <div className="gallery-grid">
             {galleryImages.map((img, index) => {
-              const isPortrait =
-                img.orientation === "portrait" || /portrait/i.test(img.alt || "");
+              const isPortrait = img.orientation === "portrait" || /portrait/i.test(img.alt || "");
               return (
                 <div key={index} className="gallery-item">
                   <div className={`gallery-inner${isPortrait ? " tall" : ""}`}>

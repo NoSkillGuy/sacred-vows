@@ -6,4 +6,3 @@
 
 export * from "./layout";
 export * from "./wedding-data";
-

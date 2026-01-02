@@ -43,11 +43,6 @@ export default defineConfig({
     // Bundle all dependencies to avoid requiring node_modules at runtime
     // This is important for Docker deployments where we only copy dist-ssr
     // Use regex to match react and react-dom (including subpath exports like react-dom/server)
-    noExternal: [
-      "@wedding-builder/shared",
-      /^react/,
-      /^react-dom/,
-    ],
+    noExternal: ["@wedding-builder/shared", /^react/, /^react-dom/],
   },
 });
-

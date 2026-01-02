@@ -14,118 +14,18 @@ import "@shared/layouts/classic-scroll";
 import "@shared/layouts/editorial-elegance";
 
 /**
- * Allowed image domains for security (SSRF protection)
- */
-const ALLOWED_IMAGE_DOMAINS = ['minio:9000', 'localhost:9000'];
-
-/**
- * Maximum image size in bytes (5MB)
- */
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
-
-/**
- * Fetch timeout in milliseconds (5 seconds)
- */
-const FETCH_TIMEOUT = 5000;
-
-/**
- * Simple logger that can be configured
+ * Simple logger that respects NODE_ENV and ENABLE_LOGGING environment variables
  */
 const logger = {
   warn: (message: string, ...args: any[]) => {
-    // In production, this could send to monitoring service
-    // For now, only log in non-production or when explicitly enabled
-    if (process.env.NODE_ENV !== 'production' || process.env.ENABLE_LOGGING === 'true') {
+    const shouldLog =
+      process.env.NODE_ENV !== "production" || process.env.ENABLE_LOGGING === "true";
+    if (shouldLog) {
       console.warn(message, ...args);
     }
+    // In production, could send to monitoring service here
   },
 };
-
-/**
- * Validate if an image URL is allowed (SSRF protection)
- */
-function isValidImageUrl(url: string): boolean {
-  try {
-    // Handle relative URLs - skip validation for now (they're handled separately)
-    if (!url.startsWith('http://') && !url.startsWith('https://')) {
-      return false;
-    }
-
-    const urlObj = new URL(url, 'http://localhost');
-    return ALLOWED_IMAGE_DOMAINS.some(domain => urlObj.hostname.includes(domain));
-  } catch {
-    return false;
-  }
-}
-
-/**
- * Fetch image with timeout and size limits
- */
-async function fetchImageWithLimits(url: string): Promise<Response> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), FETCH_TIMEOUT);
-
-  try {
-    const response = await fetch(url, {
-      signal: controller.signal,
-    });
-
-    clearTimeout(timeoutId);
-
-    // Check content-length header if available
-    const contentLength = response.headers.get('content-length');
-    if (contentLength && parseInt(contentLength, 10) > MAX_IMAGE_SIZE) {
-      throw new Error(`Image size (${contentLength} bytes) exceeds maximum (${MAX_IMAGE_SIZE} bytes)`);
-    }
-
-    return response;
-  } catch (error) {
-    clearTimeout(timeoutId);
-    if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error(`Image fetch timeout after ${FETCH_TIMEOUT}ms`);
-    }
-    throw error;
-  }
-}
-
-/**
- * Read response body with size limit
- */
-async function readResponseWithLimit(response: Response): Promise<ArrayBuffer> {
-  const reader = response.body?.getReader();
-  if (!reader) {
-    throw new Error('Response body is not readable');
-  }
-
-  const chunks: Uint8Array[] = [];
-  let totalSize = 0;
-
-  try {
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      totalSize += value.length;
-      if (totalSize > MAX_IMAGE_SIZE) {
-        throw new Error(`Image size (${totalSize} bytes) exceeds maximum (${MAX_IMAGE_SIZE} bytes)`);
-      }
-
-      chunks.push(value);
-    }
-  } finally {
-    reader.releaseLock();
-  }
-
-  // Combine chunks into single buffer
-  const buffer = new Uint8Array(totalSize);
-  let offset = 0;
-  for (const chunk of chunks) {
-    buffer.set(chunk, offset);
-    offset += chunk.length;
-  }
-
-  return buffer.buffer;
-}
 
 export interface RenderOptions {
   invitation: InvitationData;
@@ -165,6 +65,83 @@ async function getLayoutExport(layoutId: string) {
 }
 
 /**
+ * Allowed image domains for SSRF protection
+ */
+const ALLOWED_IMAGE_DOMAINS = ["minio:9000", "localhost:9000"];
+
+/**
+ * Validate image URL against allowlist to prevent SSRF attacks
+ */
+function isValidImageUrl(url: string): boolean {
+  try {
+    const urlObj = new URL(url, "http://localhost");
+    return ALLOWED_IMAGE_DOMAINS.some((domain) => urlObj.hostname.includes(domain));
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Fetch image with timeout and size limits to prevent SSRF and resource exhaustion
+ */
+async function fetchImageWithLimits(
+  url: string,
+  maxSize: number = 5 * 1024 * 1024
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    return response;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+/**
+ * Read response with size limit to prevent memory exhaustion
+ */
+async function readResponseWithLimit(
+  response: Response,
+  maxSize: number = 5 * 1024 * 1024
+): Promise<ArrayBuffer> {
+  const reader = response.body?.getReader();
+  if (!reader) {
+    throw new Error("Response body is not readable");
+  }
+
+  const chunks: Uint8Array[] = [];
+  let totalSize = 0;
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    totalSize += value.length;
+    if (totalSize > maxSize) {
+      reader.cancel();
+      throw new Error(`Response exceeds maximum size of ${maxSize} bytes`);
+    }
+
+    chunks.push(value);
+  }
+
+  // Combine chunks into single buffer
+  const combined = new Uint8Array(totalSize);
+  let offset = 0;
+  for (const chunk of chunks) {
+    combined.set(chunk, offset);
+    offset += chunk.length;
+  }
+
+  return combined.buffer;
+}
+
+/**
  * Bundle local assets by downloading images and converting to base64 or assets
  */
 async function bundleAssets(html: string): Promise<{
@@ -191,7 +168,11 @@ async function bundleAssets(html: string): Promise<{
     const imageUrl = match[1];
 
     // Skip data URLs and external URLs (keep Google Fonts, etc.)
-    if (imageUrl.startsWith('data:') || imageUrl.startsWith('http://fonts') || imageUrl.startsWith('https://fonts')) {
+    if (
+      imageUrl.startsWith("data:") ||
+      imageUrl.startsWith("http://fonts") ||
+      imageUrl.startsWith("https://fonts")
+    ) {
       continue;
     }
 
@@ -205,17 +186,17 @@ async function bundleAssets(html: string): Promise<{
       // Replace localhost with minio for Docker network access
       // Also handle URLs that already use minio:9000 or other hosts
       let fetchUrl = imageUrl;
-      if (imageUrl.includes('localhost:9000')) {
-        fetchUrl = imageUrl.replace('localhost:9000', 'minio:9000');
-      } else if (imageUrl.includes('minio:9000')) {
+      if (imageUrl.includes("localhost:9000")) {
+        fetchUrl = imageUrl.replace("localhost:9000", "minio:9000");
+      } else if (imageUrl.includes("minio:9000")) {
         // Already using minio, use as-is
         fetchUrl = imageUrl;
-      } else if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+      } else if (!imageUrl.startsWith("http://") && !imageUrl.startsWith("https://")) {
         // Relative URL - might need base URL, skip for now
         continue;
       }
 
-      // Validate URL against allowlist (SSRF protection)
+      // SSRF protection: validate URL against allowlist
       if (!isValidImageUrl(fetchUrl)) {
         logger.warn(`Skipping disallowed image URL: ${imageUrl}`);
         continue;
@@ -223,21 +204,16 @@ async function bundleAssets(html: string): Promise<{
 
       // Download the image with timeout and size limits
       const response = await fetchImageWithLimits(fetchUrl);
-      if (!response.ok) {
-        logger.warn(`Failed to fetch image: ${imageUrl} (tried ${fetchUrl}, status: ${response.status})`);
-        continue;
-      }
-
       const buffer = await readResponseWithLimit(response);
-      const base64 = Buffer.from(buffer).toString('base64');
+      const base64 = Buffer.from(buffer).toString("base64");
 
-      // Determine content type
-      const contentType = response.headers.get('content-type') || 'image/jpeg';
+      // Determine content type from response
+      const contentType = response.headers.get("content-type") || "image/jpeg";
 
       // Generate asset key from URL
-      const urlObj = new URL(imageUrl, 'http://localhost');
+      const urlObj = new URL(imageUrl, "http://localhost");
       const pathname = urlObj.pathname;
-      const filename = pathname.split('/').pop() || 'image.jpg';
+      const filename = pathname.split("/").pop() || "image.jpg";
       const keySuffix = `assets/${filename}`;
 
       // Add to assets array
@@ -249,7 +225,7 @@ async function bundleAssets(html: string): Promise<{
 
       // Rewrite HTML to use relative path
       rewrittenHTML = rewrittenHTML.replace(
-        new RegExp(imageUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+        new RegExp(imageUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"),
         `./${keySuffix}`
       );
     } catch (error) {
@@ -260,9 +236,13 @@ async function bundleAssets(html: string): Promise<{
   // Also process background images in style attributes
   const bgImgRegex = /style="[^"]*background-image:\s*url\(([^)]+)\)/g;
   while ((match = bgImgRegex.exec(html)) !== null) {
-    const imageUrl = match[1].replace(/['"]/g, '');
+    const imageUrl = match[1].replace(/['"]/g, "");
 
-    if (imageUrl.startsWith('data:') || imageUrl.startsWith('http://fonts') || imageUrl.startsWith('https://fonts')) {
+    if (
+      imageUrl.startsWith("data:") ||
+      imageUrl.startsWith("http://fonts") ||
+      imageUrl.startsWith("https://fonts")
+    ) {
       continue;
     }
 
@@ -275,17 +255,17 @@ async function bundleAssets(html: string): Promise<{
       // Replace localhost with minio for Docker network access
       // Also handle URLs that already use minio:9000 or other hosts
       let fetchUrl = imageUrl;
-      if (imageUrl.includes('localhost:9000')) {
-        fetchUrl = imageUrl.replace('localhost:9000', 'minio:9000');
-      } else if (imageUrl.includes('minio:9000')) {
+      if (imageUrl.includes("localhost:9000")) {
+        fetchUrl = imageUrl.replace("localhost:9000", "minio:9000");
+      } else if (imageUrl.includes("minio:9000")) {
         // Already using minio, use as-is
         fetchUrl = imageUrl;
-      } else if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+      } else if (!imageUrl.startsWith("http://") && !imageUrl.startsWith("https://")) {
         // Relative URL - might need base URL, skip for now
         continue;
       }
 
-      // Validate URL against allowlist (SSRF protection)
+      // SSRF protection: validate URL against allowlist
       if (!isValidImageUrl(fetchUrl)) {
         logger.warn(`Skipping disallowed background image URL: ${imageUrl}`);
         continue;
@@ -293,18 +273,13 @@ async function bundleAssets(html: string): Promise<{
 
       // Download the image with timeout and size limits
       const response = await fetchImageWithLimits(fetchUrl);
-      if (!response.ok) {
-        logger.warn(`Failed to fetch background image: ${imageUrl} (tried ${fetchUrl}, status: ${response.status})`);
-        continue;
-      }
-
       const buffer = await readResponseWithLimit(response);
-      const base64 = Buffer.from(buffer).toString('base64');
-      const contentType = response.headers.get('content-type') || 'image/jpeg';
+      const base64 = Buffer.from(buffer).toString("base64");
+      const contentType = response.headers.get("content-type") || "image/jpeg";
 
-      const urlObj = new URL(imageUrl, 'http://localhost');
+      const urlObj = new URL(imageUrl, "http://localhost");
       const pathname = urlObj.pathname;
-      const filename = pathname.split('/').pop() || 'image.jpg';
+      const filename = pathname.split("/").pop() || "image.jpg";
       const keySuffix = `assets/${filename}`;
 
       assets.push({
@@ -314,7 +289,7 @@ async function bundleAssets(html: string): Promise<{
       });
 
       rewrittenHTML = rewrittenHTML.replace(
-        new RegExp(imageUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+        new RegExp(imageUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"),
         `./${keySuffix}`
       );
     } catch (error) {
@@ -350,16 +325,16 @@ export async function render(options: RenderOptions): Promise<RenderResult> {
   } catch (error) {
     const errorDetails = error instanceof Error ? error.message : String(error);
     const errorStack = error instanceof Error ? error.stack : undefined;
-    throw new Error(`Failed to render invitation: ${errorDetails}${errorStack ? '\n' + errorStack : ''}`);
+    throw new Error(
+      `Failed to render invitation: ${errorDetails}${errorStack ? "\n" + errorStack : ""}`
+    );
   }
 
   // Get layout export module for CSS generation
   const layoutExport = await getLayoutExport(layoutId);
 
   // Generate CSS using the same function (uses actual CSS files)
-  const css = layoutExport?.generateCSS
-    ? await layoutExport.generateCSS(invitation)
-    : "";
+  const css = layoutExport?.generateCSS ? await layoutExport.generateCSS(invitation) : "";
 
   // Generate complete HTML with proper head section
   const { data } = invitation;
@@ -444,7 +419,9 @@ ${protection.decoyComments}
 <body class="${layoutId === "editorial-elegance" ? "editorial-elegance" : ""}" data-js-enabled="false">
 ${bodyContent}
 ${protection.copyrightFooter}
-${layoutId === "editorial-elegance" ? `<script>
+${
+  layoutId === "editorial-elegance"
+    ? `<script>
   // Mark that JavaScript is enabled
   document.body.setAttribute("data-js-enabled", "true");
 
@@ -493,7 +470,9 @@ ${layoutId === "editorial-elegance" ? `<script>
       sections[0].classList.add("ee-visible");
     }
   })();
-</script>` : ""}
+</script>`
+    : ""
+}
 </body>
 </html>`;
 
@@ -536,4 +515,3 @@ function generateFontImports(fonts: { heading?: string; body?: string; script?: 
 
   return fontUrls;
 }
-

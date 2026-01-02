@@ -6,9 +6,10 @@ function GuestNameModal({ isOpen, onClose, translations, _currentLang }) {
 
   useEffect(() => {
     if (!isOpen) return;
-    const storedName = typeof window !== "undefined" && window.localStorage
-      ? window.localStorage.getItem("wedding-guest-name") || ""
-      : "";
+    const storedName =
+      typeof window !== "undefined" && window.localStorage
+        ? window.localStorage.getItem("wedding-guest-name") || ""
+        : "";
     const storedTitle = localStorage.getItem("wedding-guest-title") || "";
     // Initialize state from localStorage - this is acceptable for initialization
     // eslint-disable-next-line react-hooks/set-state-in-effect

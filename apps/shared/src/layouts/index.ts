@@ -11,4 +11,3 @@ export * from "./registry";
 // Import layouts to ensure they're registered
 import "./classic-scroll";
 import "./editorial-elegance";
-

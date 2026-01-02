@@ -15,4 +15,3 @@ export * from "./types/index";
 
 // Export theme
 export * from "./theme/index";
-

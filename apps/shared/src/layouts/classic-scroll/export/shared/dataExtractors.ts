@@ -248,4 +248,3 @@ export function extractRSVPData(config: Record<string, unknown>): {
     venueCity,
   };
 }
-

@@ -9,7 +9,7 @@ function Couple({ translations, _currentLang, config = {} }) {
   const brideMother = bride.parents?.mother || "Mrs. Geeta Singh";
   const brideFather = bride.parents?.father || "Mr. Sanjay Kumar Singh";
   // Convert asset path if it's in builder format, otherwise use default
-  const brideImage = bride.image 
+  const brideImage = bride.image
     ? convertAssetPathToUrl(bride.image)
     : getDefaultAssetUrl("couple1", "bride", "1.jpeg");
 
@@ -17,7 +17,7 @@ function Couple({ translations, _currentLang, config = {} }) {
   const groomMother = groom.parents?.mother || "Mrs. Vibha Singh";
   const groomFather = groom.parents?.father || "Mr. Ashok Kumar Singh";
   // Convert asset path if it's in builder format, otherwise use default
-  const groomImage = groom.image 
+  const groomImage = groom.image
     ? convertAssetPathToUrl(groom.image)
     : getDefaultAssetUrl("couple1", "groom", "1.jpeg");
 

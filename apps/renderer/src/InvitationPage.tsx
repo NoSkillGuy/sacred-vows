@@ -66,7 +66,8 @@ export function InvitationPage({ invitation, translations = {} }: InvitationPage
 
   // Only fallback to manifest defaults if sections haven't been configured yet
   // This matches the builder's logic: only fallback if enabledSections.length === 0 && !hasConfiguredSections
-  const hasConfiguredSections = invitation.layoutConfig?.sections && invitation.layoutConfig.sections.length > 0;
+  const hasConfiguredSections =
+    invitation.layoutConfig?.sections && invitation.layoutConfig.sections.length > 0;
 
   if (enabledSections.length === 0 && !hasConfiguredSections) {
     // No sections configured at all - use manifest defaults (first time loading layout)
@@ -122,9 +123,7 @@ export function InvitationPage({ invitation, translations = {} }: InvitationPage
   };
 
   // Get sections without header/footer for main content
-  const mainSections = enabledSections.filter(
-    (s) => s.id !== "header" && s.id !== "footer"
-  );
+  const mainSections = enabledSections.filter((s) => s.id !== "header" && s.id !== "footer");
 
   // Check if footer is enabled
   const isFooterEnabled = enabledSections.some((s) => s.id === "footer");
@@ -133,9 +132,11 @@ export function InvitationPage({ invitation, translations = {} }: InvitationPage
     <>
       {Header && <Header {...viewProps} />}
       {Blessings && <Blessings />}
-      {ScrollAnimationsInit && layoutId === "editorial-elegance" && <ScrollAnimationsInit />}
+      {ScrollAnimationsInit && actualLayoutId === "editorial-elegance" && <ScrollAnimationsInit />}
 
-      <main className={`page-shell ${layoutId === "editorial-elegance" ? "editorial-elegance" : ""}`}>
+      <main
+        className={`page-shell ${actualLayoutId === "editorial-elegance" ? "editorial-elegance" : ""}`}
+      >
         {mainSections.map((section) => renderSection(section))}
 
         {isFooterEnabled && Footer && <Footer {...viewProps} />}
@@ -143,4 +144,3 @@ export function InvitationPage({ invitation, translations = {} }: InvitationPage
     </>
   );
 }
-

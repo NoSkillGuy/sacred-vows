@@ -2,38 +2,40 @@ import { getDefaultAssetUrl, convertAssetPathToUrl } from "@shared/utils/assetSe
 
 function Gallery({ translations, _currentLang, config = {} }) {
   const gallery = config.gallery || {};
-  const galleryImages = (gallery.images || [
-    {
-      src: getDefaultAssetUrl("couple1", "couple", "21.jpeg"),
-      alt: "Couple photo 1",
-      orientation: "portrait",
-    },
-    {
-      src: getDefaultAssetUrl("couple1", "family", "22.jpeg"),
-      alt: "Couple photo 2 (portrait)",
-      orientation: "portrait",
-    },
-    {
-      src: getDefaultAssetUrl("couple1", "couple", "23.jpeg"),
-      alt: "Friends and candid moment",
-      orientation: "portrait",
-    },
-    {
-      src: getDefaultAssetUrl("couple1", "couple", "24.jpeg"),
-      alt: "Traditional attire",
-      orientation: "portrait",
-    },
-    {
-      src: getDefaultAssetUrl("couple1", "couple", "25.jpeg"),
-      alt: "Favourite memory together",
-      orientation: "portrait",
-    },
-    {
-      src: getDefaultAssetUrl("couple1", "couple", "26.jpeg"),
-      alt: "Special capture",
-      orientation: "portrait",
-    },
-  ]).map(img => ({
+  const galleryImages = (
+    gallery.images || [
+      {
+        src: getDefaultAssetUrl("couple1", "couple", "21.jpeg"),
+        alt: "Couple photo 1",
+        orientation: "portrait",
+      },
+      {
+        src: getDefaultAssetUrl("couple1", "family", "22.jpeg"),
+        alt: "Couple photo 2 (portrait)",
+        orientation: "portrait",
+      },
+      {
+        src: getDefaultAssetUrl("couple1", "couple", "23.jpeg"),
+        alt: "Friends and candid moment",
+        orientation: "portrait",
+      },
+      {
+        src: getDefaultAssetUrl("couple1", "couple", "24.jpeg"),
+        alt: "Traditional attire",
+        orientation: "portrait",
+      },
+      {
+        src: getDefaultAssetUrl("couple1", "couple", "25.jpeg"),
+        alt: "Favourite memory together",
+        orientation: "portrait",
+      },
+      {
+        src: getDefaultAssetUrl("couple1", "couple", "26.jpeg"),
+        alt: "Special capture",
+        orientation: "portrait",
+      },
+    ]
+  ).map((img) => ({
     ...img,
     src: img.src ? convertAssetPathToUrl(img.src) : img.src,
   }));

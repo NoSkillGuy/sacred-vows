@@ -59,7 +59,7 @@ function detectByWindowSize(): boolean {
   const threshold = 200; // Increased from 160 to reduce false positives
   const widthDiff = window.outerWidth - window.innerWidth;
   const heightDiff = window.outerHeight - window.innerHeight;
-  
+
   // Require both dimensions to exceed threshold (more reliable than OR)
   // This means devtools must be open in a way that affects both dimensions
   return widthDiff > threshold && heightDiff > threshold;
@@ -77,7 +77,7 @@ function detectByConsole(): boolean {
   // Skip console detection to reduce false positives
   // Window size detection is more reliable
   return false;
-  
+
   // Original implementation (disabled to reduce false positives):
   // let devtools = false;
   // const element = new Image();
@@ -284,7 +284,7 @@ export function getDevToolsDetectionScript(isProduction = true): string {
     const threshold = 200; // Increased from 160 to reduce false positives
     const widthDiff = window.outerWidth - window.innerWidth;
     const heightDiff = window.outerHeight - window.innerHeight;
-    
+
     // Require both dimensions to exceed threshold (more reliable than OR)
     return widthDiff > threshold && heightDiff > threshold;
   }

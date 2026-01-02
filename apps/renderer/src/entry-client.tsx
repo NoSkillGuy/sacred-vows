@@ -7,4 +7,3 @@
 
 // Placeholder for future client-side hydration
 console.log("Renderer client entry point - not currently used for static generation");
-

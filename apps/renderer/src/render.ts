@@ -70,4 +70,3 @@ main().catch((err) => {
   process.stderr.write(errorMessage + "\n");
   process.exit(1);
 });
-

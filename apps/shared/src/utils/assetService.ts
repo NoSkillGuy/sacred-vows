@@ -19,7 +19,9 @@ function getCdnBase(): string {
     }
     // Fallback for renderer context - use minio for Docker, localhost for local dev
     // In Docker, use minio service name; otherwise use localhost
-    const host = process.env.ASSETS_HOST || (process.env.NODE_ENV === "development" ? "minio:9000" : "localhost:9000");
+    const host =
+      process.env.ASSETS_HOST ||
+      (process.env.NODE_ENV === "development" ? "minio:9000" : "localhost:9000");
     return `http://${host}/sacred-vows-public-assets-local`;
   }
   // Try import.meta.env for Vite contexts
@@ -93,12 +95,12 @@ export function convertAssetPathToUrl(assetPath: string): string {
   if (!assetPath) return "";
 
   // If it's already a full URL, return as-is
-  if (assetPath.startsWith('http://') || assetPath.startsWith('https://')) {
+  if (assetPath.startsWith("http://") || assetPath.startsWith("https://")) {
     return assetPath;
   }
 
   // If it's a data URL, return as-is
-  if (assetPath.startsWith('data:')) {
+  if (assetPath.startsWith("data:")) {
     return assetPath;
   }
 
@@ -115,8 +117,8 @@ export function convertAssetPathToUrl(assetPath: string): string {
   }
 
   // If it's already in defaults/ format, just prepend CDN base
-  if (assetPath.startsWith('/defaults/') || assetPath.startsWith('defaults/')) {
-    const cleanPath = assetPath.replace(/^\/+/, '');
+  if (assetPath.startsWith("/defaults/") || assetPath.startsWith("defaults/")) {
+    const cleanPath = assetPath.replace(/^\/+/, "");
     const cdnBase = getCdnBase();
     if (cdnBase) {
       return `${cdnBase.replace(/\/+$/, "")}/${cleanPath}`;
@@ -125,11 +127,10 @@ export function convertAssetPathToUrl(assetPath: string): string {
   }
 
   // If it's a relative path starting with ./, return as-is (already bundled)
-  if (assetPath.startsWith('./')) {
+  if (assetPath.startsWith("./")) {
     return assetPath;
   }
 
   // Unknown format, return as-is (might be a custom URL)
   return assetPath;
 }
-
