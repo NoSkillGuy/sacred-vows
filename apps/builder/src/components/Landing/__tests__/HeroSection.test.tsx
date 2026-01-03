@@ -16,6 +16,7 @@ import { render, screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router-dom";
 import HeroSection from "../HeroSection";
+import * as authService from "../../../services/authService";
 
 // Mock useNavigate
 const mockNavigate = vi.fn();
@@ -50,9 +51,8 @@ vi.mock("../../../services/analyticsService", () => ({
 }));
 
 // Mock authService
-const mockLogout = vi.fn();
 vi.mock("../../../services/authService", () => ({
-  logout: mockLogout,
+  logout: vi.fn(),
 }));
 
 const renderHeroSection = (props = {}) => {
@@ -270,7 +270,7 @@ describe("HeroSection - Authenticated UI", () => {
     });
     localStorageMock.clear();
     mockNavigate.mockClear();
-    mockLogout.mockClear();
+    vi.mocked(authService.logout).mockClear();
   });
 
   afterEach(() => {
@@ -429,7 +429,7 @@ describe("HeroSection - Authenticated UI", () => {
     it("should call logout when Sign Out is clicked", async () => {
       const user = userEvent.setup();
       const mockUser = { id: "1", email: "test@example.com", name: "Test User" };
-      mockLogout.mockResolvedValue(undefined);
+      vi.mocked(authService.logout).mockResolvedValue(undefined);
 
       renderHeroSection({
         user: mockUser,
@@ -447,7 +447,7 @@ describe("HeroSection - Authenticated UI", () => {
 
       // Should call logout
       await waitFor(() => {
-        expect(mockLogout).toHaveBeenCalledTimes(1);
+        expect(vi.mocked(authService.logout)).toHaveBeenCalledTimes(1);
       });
     });
 

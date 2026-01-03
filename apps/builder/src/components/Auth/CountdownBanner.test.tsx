@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, act } from "@testing-library/react";
 import CountdownBanner from "./CountdownBanner";
 
 describe("CountdownBanner", () => {
@@ -17,19 +17,23 @@ describe("CountdownBanner", () => {
       const onComplete = vi.fn();
       render(<CountdownBanner countdown={3} onComplete={onComplete} />);
 
-      // Initial countdown should be 3
-      expect(screen.getByText(/redirecting to dashboard in 3/i)).toBeInTheDocument();
+      // Initial countdown should be 3 - text is split across elements, use getByRole
+      expect(screen.getByRole("alert")).toHaveTextContent(/redirecting to dashboard in 3/i);
 
       // Fast-forward 1 second
-      vi.advanceTimersByTime(1000);
+      await act(async () => {
+        vi.advanceTimersByTime(1000);
+      });
       await waitFor(() => {
-        expect(screen.getByText(/redirecting to dashboard in 2/i)).toBeInTheDocument();
+        expect(screen.getByRole("alert")).toHaveTextContent(/redirecting to dashboard in 2/i);
       });
 
       // Fast-forward another second
-      vi.advanceTimersByTime(1000);
+      await act(async () => {
+        vi.advanceTimersByTime(1000);
+      });
       await waitFor(() => {
-        expect(screen.getByText(/redirecting to dashboard in 1/i)).toBeInTheDocument();
+        expect(screen.getByRole("alert")).toHaveTextContent(/redirecting to dashboard in 1/i);
       });
 
       // Fast-forward final second
@@ -44,18 +48,22 @@ describe("CountdownBanner", () => {
       render(<CountdownBanner countdown={5} onComplete={onComplete} />);
 
       // Check initial state
-      expect(screen.getByText(/redirecting to dashboard in 5/i)).toBeInTheDocument();
+      expect(screen.getByRole("alert")).toHaveTextContent(/redirecting to dashboard in 5/i);
 
       // Advance by 1 second
-      vi.advanceTimersByTime(1000);
+      await act(async () => {
+        vi.advanceTimersByTime(1000);
+      });
       await waitFor(() => {
-        expect(screen.getByText(/redirecting to dashboard in 4/i)).toBeInTheDocument();
+        expect(screen.getByRole("alert")).toHaveTextContent(/redirecting to dashboard in 4/i);
       });
 
       // Advance by another second
-      vi.advanceTimersByTime(1000);
+      await act(async () => {
+        vi.advanceTimersByTime(1000);
+      });
       await waitFor(() => {
-        expect(screen.getByText(/redirecting to dashboard in 3/i)).toBeInTheDocument();
+        expect(screen.getByRole("alert")).toHaveTextContent(/redirecting to dashboard in 3/i);
       });
 
       // onComplete should not be called yet
@@ -66,14 +74,14 @@ describe("CountdownBanner", () => {
       const onComplete = vi.fn();
       render(<CountdownBanner onComplete={onComplete} />);
 
-      expect(screen.getByText(/redirecting to dashboard in 5/i)).toBeInTheDocument();
+      expect(screen.getByRole("alert")).toHaveTextContent(/redirecting to dashboard in 5/i);
     });
 
     it("should use custom countdown duration", () => {
       const onComplete = vi.fn();
       render(<CountdownBanner countdown={10} onComplete={onComplete} />);
 
-      expect(screen.getByText(/redirecting to dashboard in 10/i)).toBeInTheDocument();
+      expect(screen.getByRole("alert")).toHaveTextContent(/redirecting to dashboard in 10/i);
     });
   });
 
@@ -98,7 +106,8 @@ describe("CountdownBanner", () => {
       const onComplete = vi.fn();
       render(<CountdownBanner countdown={3} onComplete={onComplete} />);
 
-      expect(screen.getByText(/redirecting to dashboard in 3\.\.\./i)).toBeInTheDocument();
+      expect(screen.getByRole("alert")).toHaveTextContent(/redirecting to dashboard in 3/i);
+      expect(screen.getByRole("alert")).toHaveTextContent("...");
     });
 
     it("should not display ellipsis for countdown = 1", async () => {
@@ -106,11 +115,13 @@ describe("CountdownBanner", () => {
       render(<CountdownBanner countdown={2} onComplete={onComplete} />);
 
       // Advance to 1
-      vi.advanceTimersByTime(1000);
+      await act(async () => {
+        vi.advanceTimersByTime(1000);
+      });
       await waitFor(() => {
-        const text = screen.getByText(/redirecting to dashboard in 1/i);
-        expect(text).toBeInTheDocument();
-        expect(text.textContent).not.toContain("...");
+        const alert = screen.getByRole("alert");
+        expect(alert).toHaveTextContent(/redirecting to dashboard in 1/i);
+        expect(alert.textContent).not.toContain("...");
       });
     });
 
@@ -136,10 +147,12 @@ describe("CountdownBanner", () => {
       const onComplete = vi.fn();
       render(<CountdownBanner countdown={1} onComplete={onComplete} />);
 
-      expect(screen.getByText(/redirecting to dashboard in 1/i)).toBeInTheDocument();
+      expect(screen.getByRole("alert")).toHaveTextContent(/redirecting to dashboard in 1/i);
 
       // Advance by 1 second
-      vi.advanceTimersByTime(1000);
+      await act(async () => {
+        vi.advanceTimersByTime(1000);
+      });
       await waitFor(() => {
         expect(onComplete).toHaveBeenCalledTimes(1);
       });
@@ -149,9 +162,16 @@ describe("CountdownBanner", () => {
       const onComplete = vi.fn();
       render(<CountdownBanner countdown={0} onComplete={onComplete} />);
 
-      await waitFor(() => {
-        expect(onComplete).toHaveBeenCalledTimes(1);
+      await act(async () => {
+        // Process any pending state updates
+        await Promise.resolve();
       });
+      await waitFor(
+        () => {
+          expect(onComplete).toHaveBeenCalledTimes(1);
+        },
+        { timeout: 1000 }
+      );
     });
 
     it("should cleanup timer on unmount", () => {
@@ -180,7 +200,9 @@ describe("CountdownBanner", () => {
       rerender(<CountdownBanner countdown={1} onComplete={onComplete2} />);
 
       // Advance to trigger completion
-      vi.advanceTimersByTime(1000);
+      await act(async () => {
+        vi.advanceTimersByTime(1000);
+      });
 
       await waitFor(() => {
         // Should call the new callback, not the old one
