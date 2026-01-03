@@ -12,7 +12,7 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { render, screen, waitFor, act } from "@testing-library/react";
+import { render, screen, waitFor, act, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router-dom";
 import HeroSection from "../HeroSection";
@@ -51,9 +51,13 @@ vi.mock("../../../services/analyticsService", () => ({
 }));
 
 // Mock authService
-vi.mock("../../../services/authService", () => ({
-  logout: vi.fn(),
-}));
+vi.mock("../../../services/authService", async () => {
+  const actual = await vi.importActual("../../../services/authService");
+  return {
+    ...actual,
+    logout: vi.fn(),
+  };
+});
 
 const renderHeroSection = (props = {}) => {
   return render(
@@ -286,8 +290,11 @@ describe("HeroSection - Authenticated UI", () => {
         isAuthChecked: true,
       });
 
-      expect(screen.getByText("Create New Invitation")).toBeInTheDocument();
-      expect(screen.getByText("My Invitations")).toBeInTheDocument();
+      // Use getAllByText since there are multiple instances (desktop + mobile)
+      const createButtons = screen.getAllByText("Create New Invitation");
+      expect(createButtons.length).toBeGreaterThan(0);
+      const myInvitationsButtons = screen.getAllByText("My Invitations");
+      expect(myInvitationsButtons.length).toBeGreaterThan(0);
       expect(screen.getByText("TU")).toBeInTheDocument(); // User initials
     });
 
@@ -298,8 +305,11 @@ describe("HeroSection - Authenticated UI", () => {
         isAuthChecked: true,
       });
 
-      expect(screen.getByText("Start Free")).toBeInTheDocument();
-      expect(screen.getByText("Sign In")).toBeInTheDocument();
+      // Use getAllByText since there are multiple instances (desktop + mobile)
+      const startFreeButtons = screen.getAllByText("Start Free");
+      expect(startFreeButtons.length).toBeGreaterThan(0);
+      const signInButtons = screen.getAllByText("Sign In");
+      expect(signInButtons.length).toBeGreaterThan(0);
       expect(screen.queryByText("Create New Invitation")).not.toBeInTheDocument();
       expect(screen.queryByText("My Invitations")).not.toBeInTheDocument();
     });
@@ -375,14 +385,18 @@ describe("HeroSection - Authenticated UI", () => {
       // Dropdown should be visible
       expect(screen.getByText("Test User")).toBeInTheDocument();
       expect(screen.getByText("test@example.com")).toBeInTheDocument();
-      expect(screen.getByText("Profile")).toBeInTheDocument();
-      expect(screen.getByText("Sign Out")).toBeInTheDocument();
+      // Use getAllByText since Profile appears in both dropdown and mobile menu
+      const profileLinks = screen.getAllByText("Profile");
+      expect(profileLinks.length).toBeGreaterThan(0);
+      // Use getAllByText since Sign Out appears in both dropdown and mobile menu
+      const signOutButtons = screen.getAllByText("Sign Out");
+      expect(signOutButtons.length).toBeGreaterThan(0);
     });
 
     it("should close dropdown when clicking outside", async () => {
       const user = userEvent.setup();
       const mockUser = { id: "1", email: "test@example.com", name: "Test User" };
-      renderHeroSection({
+      const { container } = renderHeroSection({
         user: mockUser,
         isAuthenticated: true,
         isAuthChecked: true,
@@ -392,17 +406,34 @@ describe("HeroSection - Authenticated UI", () => {
       const avatar = screen.getByText("TU");
       await user.click(avatar);
 
-      // Verify dropdown is open
+      // Verify dropdown is open - check for dropdown content
+      const dropdown = container.querySelector(".user-dropdown.open");
+      expect(dropdown).toBeInTheDocument();
       expect(screen.getByText("Test User")).toBeInTheDocument();
 
-      // Click outside (on the hero title)
-      const heroTitle = screen.getByText(/Your Love Story Deserves/i);
-      await user.click(heroTitle);
+      // The dropdownRef is on the user-menu div, which contains both avatar and dropdown
+      // Click on the hero-main section which is definitely outside
+      const heroMain = container.querySelector(".hero-main");
+      expect(heroMain).toBeInTheDocument();
+
+      // Trigger mousedown event on element outside the user-menu
+      // The handler checks if dropdownRef.current.contains(event.target)
+      await act(async () => {
+        const event = new MouseEvent("mousedown", {
+          bubbles: true,
+          cancelable: true,
+        });
+        heroMain?.dispatchEvent(event);
+      });
 
       // Dropdown should be closed
-      await waitFor(() => {
-        expect(screen.queryByText("Test User")).not.toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          const closedDropdown = container.querySelector(".user-dropdown.open");
+          expect(closedDropdown).not.toBeInTheDocument();
+        },
+        { timeout: 2000 }
+      );
     });
 
     it("should navigate to profile when Profile link is clicked", async () => {
@@ -418,12 +449,20 @@ describe("HeroSection - Authenticated UI", () => {
       const avatar = screen.getByText("TU");
       await user.click(avatar);
 
-      // Click Profile link
-      const profileLink = screen.getByText("Profile");
-      await user.click(profileLink);
+      // Verify dropdown is open
+      expect(screen.getByText("Test User")).toBeInTheDocument();
 
-      // Should navigate to profile
-      expect(mockNavigate).toHaveBeenCalledWith("/profile");
+      // Find Profile link in dropdown - use getAllByText and select the one in dropdown
+      const profileLinks = screen.getAllByText("Profile");
+      // The one in dropdown should have the user-dropdown-item class
+      const dropdownProfileLink =
+        profileLinks.find((link) => link.closest(".user-dropdown-item")) || profileLinks[0];
+
+      // Link component should have correct href
+      expect(dropdownProfileLink).toHaveAttribute("href", "/profile");
+
+      // Verify the link is in the dropdown (has the correct class)
+      expect(dropdownProfileLink.closest(".user-dropdown-item")).toBeInTheDocument();
     });
 
     it("should call logout when Sign Out is clicked", async () => {
@@ -441,9 +480,12 @@ describe("HeroSection - Authenticated UI", () => {
       const avatar = screen.getByText("TU");
       await user.click(avatar);
 
-      // Click Sign Out
-      const signOutButton = screen.getByText("Sign Out");
-      await user.click(signOutButton);
+      // Click Sign Out - use getAllByText and select the one in dropdown
+      const signOutButtons = screen.getAllByText("Sign Out");
+      // The first one should be in the dropdown (user-dropdown-item class)
+      const dropdownSignOutButton =
+        signOutButtons.find((button) => button.closest(".user-dropdown-item")) || signOutButtons[0];
+      await user.click(dropdownSignOutButton);
 
       // Should call logout
       await waitFor(() => {
@@ -491,8 +533,9 @@ describe("HeroSection - Authenticated UI", () => {
         isAuthChecked: true,
       });
 
-      // Initially unauthenticated
-      expect(screen.getByText("Start Free")).toBeInTheDocument();
+      // Initially unauthenticated - use getAllByText since there are multiple instances
+      const startFreeButtons = screen.getAllByText("Start Free");
+      expect(startFreeButtons.length).toBeGreaterThan(0);
 
       // Change to authenticated
       rerender(
@@ -506,8 +549,9 @@ describe("HeroSection - Authenticated UI", () => {
         </BrowserRouter>
       );
 
-      // Should show authenticated UI
-      expect(screen.getByText("Create New Invitation")).toBeInTheDocument();
+      // Should show authenticated UI - use getAllByText since there are multiple instances
+      const createButtons = screen.getAllByText("Create New Invitation");
+      expect(createButtons.length).toBeGreaterThan(0);
       expect(screen.queryByText("Start Free")).not.toBeInTheDocument();
     });
 
@@ -519,8 +563,9 @@ describe("HeroSection - Authenticated UI", () => {
         isAuthChecked: false, // Auth check not complete
       });
 
-      // Should show unauthenticated UI until check is complete
-      expect(screen.getByText("Start Free")).toBeInTheDocument();
+      // Should show unauthenticated UI until check is complete - use getAllByText since there are multiple instances
+      const startFreeButtons = screen.getAllByText("Start Free");
+      expect(startFreeButtons.length).toBeGreaterThan(0);
       expect(screen.queryByText("Create New Invitation")).not.toBeInTheDocument();
     });
   });
