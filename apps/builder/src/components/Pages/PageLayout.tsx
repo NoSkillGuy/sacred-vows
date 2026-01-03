@@ -30,7 +30,13 @@ function PageLayout({ children, title, subtitle, breadcrumbs = [] }: PageLayoutP
   const [isAuth, setIsAuth] = useState(() => isAuthenticated());
 
   useEffect(() => {
-    setIsAuth(isAuthenticated());
+    // Check auth state asynchronously to avoid cascading renders
+    // Use requestAnimationFrame to defer the state update to the next frame
+    const frameId = requestAnimationFrame(() => {
+      const currentAuth = isAuthenticated();
+      setIsAuth((prevAuth) => (prevAuth !== currentAuth ? currentAuth : prevAuth));
+    });
+    return () => cancelAnimationFrame(frameId);
   }, []);
 
   return (

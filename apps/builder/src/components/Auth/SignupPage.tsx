@@ -87,8 +87,8 @@ function SignupPage(): JSX.Element {
       // Verify token is still valid
       try {
         await getCurrentUserFromAPI();
-        // If valid, redirect to app
-        navigate("/app", { replace: true });
+        // If valid, redirect to dashboard
+        navigate("/dashboard", { replace: true });
       } catch (error) {
         // Token is invalid, stay on signup page
         console.error("Token validation failed:", error);
@@ -139,7 +139,7 @@ function SignupPage(): JSX.Element {
         email: formData.email,
         password: formData.password,
       });
-      navigate("/app");
+      navigate("/dashboard");
     } catch (err) {
       setError((err as Error).message || "Registration failed. Please try again.");
     } finally {

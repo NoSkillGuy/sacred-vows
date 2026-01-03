@@ -391,7 +391,7 @@ function HeroSection({
     try {
       await logout();
       navigate("/");
-      window.location.reload(); // Reload to update auth state
+      // Parent component will re-check auth state and update props
     } catch (error) {
       console.error("Logout failed:", error);
     }
