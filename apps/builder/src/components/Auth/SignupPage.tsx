@@ -1,7 +1,12 @@
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import zxcvbn from "zxcvbn";
-import { register } from "../../services/authService";
+import {
+  register,
+  isAuthenticated,
+  getCurrentUserFromAPI,
+  refreshAccessToken,
+} from "../../services/authService";
 import { usePetals } from "./usePetals";
 import "./AuthPage.css";
 
@@ -64,6 +69,34 @@ function SignupPage(): JSX.Element {
 
   // Generate petals once per mount to avoid animation resets
   const petals = usePetals(10);
+
+  // Check if user is already authenticated on mount
+  useEffect(() => {
+    const checkAuth = async (): Promise<void> => {
+      // If no access token, try to refresh using refresh token from cookie
+      const authenticated = isAuthenticated();
+      if (!authenticated) {
+        try {
+          await refreshAccessToken();
+        } catch {
+          // No valid refresh token, stay on page
+          return;
+        }
+      }
+
+      // Verify token is still valid
+      try {
+        await getCurrentUserFromAPI();
+        // If valid, redirect to app
+        navigate("/app", { replace: true });
+      } catch (error) {
+        // Token is invalid, stay on signup page
+        console.error("Token validation failed:", error);
+      }
+    };
+
+    checkAuth();
+  }, [navigate]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
