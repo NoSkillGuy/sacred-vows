@@ -34,8 +34,8 @@ vi.mock("../../../hooks/useLanguage", () => ({
 }));
 
 // Mock layout registry
-vi.mock("../../../layouts/registry", async () => {
-  const actual = await vi.importActual("../../../layouts/registry");
+vi.mock("@shared/layouts", async () => {
+  const actual = await vi.importActual("@shared/layouts");
   return {
     ...actual,
     getLayout: vi.fn(),
@@ -49,6 +49,10 @@ vi.mock("../../../layouts/registry", async () => {
 // Mock default asset service
 vi.mock("../../../services/defaultAssetService", () => ({
   preloadDefaultAssets: vi.fn().mockResolvedValue(undefined),
+  getLayoutPreviewUrl: vi.fn(
+    (layoutId: string, filename: string = "preview.jpg") =>
+      `/defaults/layouts/${layoutId}/${filename}`
+  ),
 }));
 
 // Mock data helpers
@@ -158,7 +162,7 @@ describe("PreviewPane", () => {
     (useLanguage as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockUseLanguage);
 
     // Mock registry functions
-    const registry = await import("../../../layouts/registry");
+    const registry = await import("@shared/layouts");
     vi.mocked(registry.getLayout).mockReturnValue(mockLayout as never);
     vi.mocked(registry.getViewComponents).mockReturnValue(mockViewComponents as never);
     vi.mocked(registry.getEditableComponents).mockReturnValue(mockEditableComponents as never);
@@ -313,7 +317,7 @@ describe("PreviewPane", () => {
     });
 
     it("should handle layout not found gracefully", async () => {
-      const registry = await import("../../../layouts/registry");
+      const registry = await import("@shared/layouts");
       vi.mocked(registry.hasLayout).mockReturnValue(false);
       mockBuilderStore.currentInvitation.layoutId = "non-existent-layout";
 

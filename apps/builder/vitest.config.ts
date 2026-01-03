@@ -32,10 +32,35 @@ export default defineConfig({
     },
   },
   resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-      "@shared": path.resolve(__dirname, "./src/shared/src"),
-      "@template-engine": path.resolve(__dirname, "./src/template-engine/src"),
-    },
+    alias: [
+      {
+        find: "@shared/utils/assetService",
+        replacement: path.resolve(__dirname, "./src/services/defaultAssetService"),
+      },
+      {
+        find: "@shared/services/assetService",
+        replacement: path.resolve(__dirname, "./src/services/assetService"),
+      },
+      {
+        find: "@shared/components/Toast/ToastProvider",
+        replacement: path.resolve(__dirname, "./src/components/Toast/ToastProvider"),
+      },
+      {
+        find: "@shared/store/builderStore",
+        replacement: path.resolve(__dirname, "./src/store/builderStore"),
+      },
+      {
+        find: /^@shared\/(.*)$/,
+        replacement: path.resolve(__dirname, "../shared/src/$1"),
+      },
+      {
+        find: "@shared",
+        replacement: path.resolve(__dirname, "../shared/src"),
+      },
+      {
+        find: "@",
+        replacement: path.resolve(__dirname, "./src"),
+      },
+    ],
   },
 });

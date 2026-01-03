@@ -8,7 +8,7 @@ import { useCreateInvitationMutation } from "../../hooks/queries/useInvitations"
 import { presetToSectionConfigs } from "../../config/layout-presets";
 import type { LayoutPreset } from "@shared/types/layout";
 import type { UniversalWeddingData, LayoutConfig } from "@shared/types/wedding-data";
-import { getLayoutManifest, hasLayout } from "../../layouts/registry";
+import { getLayoutManifest, hasLayout } from "@shared/layouts";
 import "./Dashboard.css";
 
 // SVG Icons
@@ -210,7 +210,7 @@ function LayoutGallery(): JSX.Element {
     if ((!layout.presets || layout.presets.length === 0) && layout.id === "editorial-elegance") {
       try {
         const { editorialEleganceManifest } =
-          await import("../../layouts/editorial-elegance/manifest");
+          await import("@shared/layouts/editorial-elegance/manifest");
         if (editorialEleganceManifest.presets && editorialEleganceManifest.presets.length > 0) {
           layoutWithPresets = {
             ...layout,
@@ -253,7 +253,7 @@ function LayoutGallery(): JSX.Element {
       if (layoutToUse.id === "editorial-elegance") {
         try {
           const { editorialEleganceDefaults } =
-            await import("../../layouts/editorial-elegance/defaults");
+            await import("@shared/layouts/editorial-elegance/defaults");
           initialData = editorialEleganceDefaults as Partial<UniversalWeddingData>;
         } catch (error) {
           console.warn("Failed to load editorial-elegance defaults for new invitation:", error);

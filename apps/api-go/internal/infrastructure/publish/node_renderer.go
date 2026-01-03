@@ -23,7 +23,7 @@ type NodeSnapshotGenerator struct {
 
 func NewNodeSnapshotGenerator(invitationRepo repository.InvitationRepository, scriptPath string, nodeBinary string) (*NodeSnapshotGenerator, error) {
 	if scriptPath == "" {
-		return nil, errors.New("snapshot renderer script path is required (path to renderPublishedHTML.js)")
+		return nil, errors.New("snapshot renderer script path is required (path to apps/renderer/dist-ssr/render.js)")
 	}
 
 	// In Docker containers, ensure absolute paths starting with /app are used as-is
@@ -123,12 +123,40 @@ func (g *NodeSnapshotGenerator) GenerateBundle(ctx context.Context, invitationID
 		return nil, fmt.Errorf("invitation not found")
 	}
 
+	// Parse the data JSON to extract layoutConfig if it exists
+	var dataMap map[string]any
+	if err := json.Unmarshal(inv.Data, &dataMap); err != nil {
+		return nil, fmt.Errorf("failed to parse invitation data: %w", err)
+	}
+
+	// Extract layoutConfig from data if it exists
+	var layoutConfig any
+	if lc, ok := dataMap["layoutConfig"]; ok {
+		layoutConfig = lc
+		// Remove layoutConfig from data to avoid duplication
+		delete(dataMap, "layoutConfig")
+	}
+
+	// Re-marshal data without layoutConfig
+	dataWithoutLayoutConfig, err := json.Marshal(dataMap)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal invitation data: %w", err)
+	}
+
+	// Build invitation payload matching InvitationData structure
+	invitationPayload := map[string]any{
+		"layoutId": inv.LayoutID,
+		"data":     json.RawMessage(dataWithoutLayoutConfig),
+	}
+
+	// Include layoutConfig at top level if it was found
+	if layoutConfig != nil {
+		invitationPayload["layoutConfig"] = layoutConfig
+	}
+
 	// Keep invitation payload close to what the builder expects.
 	payload := map[string]any{
-		"invitation": map[string]any{
-			"layoutId": inv.LayoutID,
-			"data":     json.RawMessage(inv.Data),
-		},
+		"invitation":   invitationPayload,
 		"translations": map[string]any{},
 	}
 

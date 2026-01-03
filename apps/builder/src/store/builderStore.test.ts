@@ -13,7 +13,7 @@ vi.mock("../services/layoutService", () => ({
   getLayoutManifest: vi.fn(),
 }));
 
-vi.mock("../layouts/registry", () => ({
+vi.mock("@shared/layouts", () => ({
   getLayout: vi.fn(),
   getLayoutManifest: vi.fn(),
   hasLayout: vi.fn((id: string) => ["classic-scroll", "editorial-elegance"].includes(id)),

@@ -12,7 +12,7 @@
  */
 
 import React, { useEffect, useId } from "react";
-import { LEGAL_WARNINGS } from "../../lib/legal-warnings";
+import { LEGAL_WARNINGS } from "@shared/lib/legal-warnings";
 
 interface LegalWarningModalProps {
   title?: string;

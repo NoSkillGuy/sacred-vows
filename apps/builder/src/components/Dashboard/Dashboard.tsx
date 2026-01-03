@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, MouseEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { getCurrentUser, logout, type User } from "../../services/authService";
 import { useToast } from "../Toast/ToastProvider";
-import EditableText from "../../layouts/classic-scroll/components/shared/EditableText";
+import EditableText from "@shared/layouts/classic-scroll/components/shared/EditableText";
 import DeleteInvitationModal from "./DeleteInvitationModal";
 import {
   useInvitationsQuery,

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import ThemeModal from "../Toolbar/ThemeModal";
 import GalleryModal from "../Toolbar/GalleryModal";
 import LayoutSwitcher from "../Toolbar/LayoutSwitcher";
-import PublishModal from "../Export/ExportModal";
+import PublishModal from "../Export/PublishModal";
 import SectionManager from "../SectionManager/SectionManager";
 import PresetModal from "../Toolbar/PresetModal";
 import { useBuilderStore } from "../../store/builderStore";

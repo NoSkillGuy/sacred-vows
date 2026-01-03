@@ -7,12 +7,12 @@ import {
   getEditableComponents,
   getSharedComponents,
   hasLayout,
-} from "../../layouts/registry";
-import { parseInvitationData } from "../../layouts/editorial-elegance/utils/dataHelpers";
+} from "@shared/layouts";
+import { parseInvitationData } from "@shared/layouts/editorial-elegance/utils/dataHelpers";
 import { preloadDefaultAssets } from "../../services/defaultAssetService";
 // Import layouts to ensure they're registered
-import "../../layouts/classic-scroll";
-import "../../layouts/editorial-elegance";
+import "@shared/layouts/classic-scroll";
+import "@shared/layouts/editorial-elegance";
 import "./PreviewPane.css";
 
 function PreviewPane({ editMode = true, deviceMode = "desktop" }) {

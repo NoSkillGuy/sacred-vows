@@ -47,8 +47,8 @@ services:
       OTEL_SERVICE_NAME: ${OTEL_SERVICE_NAME:-sacred-vows-api}
       OTEL_RESOURCE_ATTRIBUTES: deployment.environment=${APP_ENV:-local}
       # Snapshot renderer configuration
-      SNAPSHOT_RENDERER_SCRIPT: ${SNAPSHOT_RENDERER_SCRIPT:-/app/builder/src/template-engine/src/renderPublishedHTML.ts}
-      SNAPSHOT_RENDERER_NODE: ${SNAPSHOT_RENDERER_NODE:-tsx}
+      SNAPSHOT_RENDERER_SCRIPT: ${SNAPSHOT_RENDERER_SCRIPT:-/renderer/dist-ssr/render.js}
+      SNAPSHOT_RENDERER_NODE: ${SNAPSHOT_RENDERER_NODE:-node}
     depends_on:
       firestore-emulator:
         condition: service_healthy
@@ -56,13 +56,17 @@ services:
         condition: service_healthy
       tempo:
         condition: service_started
+      renderer:
+        condition: service_healthy
     volumes:
       - ./apps/builder/layouts:/app/layouts
       - api_go_uploads:/app/uploads
+      # Mount renderer build to separate location to avoid /app mount conflict
+      - ./apps/renderer/dist-ssr:/renderer/dist-ssr:ro
+      # Mount shared package for renderer dependencies
+      - ./apps/shared:/app/shared:ro
       # Mount source code for hot reloading - Air will watch for changes
       - ./apps/api-go:/app:rw
-      # Mount builder code so api-go can access the snapshot renderer script
-      - ./apps/builder:/app/builder:ro
       # Exclude build directories from volume to avoid conflicts
       - /app/tmp
       - /app/bin
@@ -106,17 +110,51 @@ services:
       tempo:
         condition: service_started
     volumes:
-      # Mount source code for hot reloading - Vite will watch for changes
-      - ./apps/builder:/app:rw
-      # Exclude node_modules and dist from volume to avoid conflicts
-      # Use anonymous volume to preserve node_modules in container
-      - /app/node_modules
-      - /app/dist
+      # Mount entire workspace root to preserve pnpm workspace structure
+      # This allows pnpm to resolve workspace dependencies correctly
+      - .:/workspace:rw
+      # Preserve node_modules from build using named volume
+      # Mount at workspace root to match build-time structure
+      - builder_node_modules:/workspace/node_modules
+      # Exclude dist directories from volume
+      - /workspace/apps/builder/dist
+      - /workspace/apps/renderer/dist-ssr
+      - /workspace/apps/renderer/dist-client
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:5173"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 30s
+
+  renderer:
+    build:
+      context: .
+      dockerfile: ./apps/renderer/Dockerfile.dev
+    volumes:
+      # Mount source code for hot reloading
+      - ./apps/shared:/app/apps/shared:ro
+      - ./apps/renderer:/app/apps/renderer:rw
+      # Mount built output so api-go can access it
+      - ./apps/renderer/dist-ssr:/app/apps/renderer/dist-ssr:rw
+    command: >
+      sh -c "
+        echo 'Building renderer...' &&
+        cd /app/apps/renderer &&
+        pnpm run build:ssr &&
+        echo 'Renderer built successfully!' &&
+        echo 'Watching for file changes...' &&
+        pnpm run watch
+      "
+    environment:
+      - NODE_ENV=development
+      - VITE_PUBLIC_ASSETS_CDN_URL=${VITE_PUBLIC_ASSETS_CDN_URL:-http://minio:9000/sacred-vows-public-assets-local}
+      - ASSETS_HOST=minio:9000
+    healthcheck:
+      test: ["CMD", "test", "-f", "/app/apps/renderer/dist-ssr/render.js"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
       start_period: 30s
 
   firestore-emulator:
@@ -235,4 +273,5 @@ volumes:
   tempo_data:
   prometheus_data:
   grafana_data:
+  builder_node_modules:
 

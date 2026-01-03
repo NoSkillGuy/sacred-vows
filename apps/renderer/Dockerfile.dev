@@ -1,0 +1,37 @@
+# Development Dockerfile for renderer
+# Builds the renderer package for use by api-go service
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install build dependencies
+RUN apk add --no-cache git ca-certificates tzdata
+
+# Install pnpm
+RUN npm install -g pnpm@10.24.0
+
+# Copy workspace configuration
+COPY pnpm-workspace.yaml ./
+COPY pnpm-lock.yaml ./
+
+# Copy package files for dependency caching
+COPY apps/shared/package.json apps/shared/
+COPY apps/shared/pnpm-lock.yaml* apps/shared/
+COPY apps/renderer/package.json apps/renderer/
+COPY apps/renderer/pnpm-lock.yaml* apps/renderer/
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Copy source code (will be overridden by volume mount in docker-compose)
+COPY apps/shared/ ./apps/shared/
+COPY apps/renderer/ ./apps/renderer/
+
+# Build renderer
+WORKDIR /app/apps/renderer
+RUN pnpm run build:ssr
+
+# Default command - just keep container running
+# The built files are available via volume mount
+CMD ["sh", "-c", "echo 'Renderer built. Files available at /app/apps/renderer/dist-ssr' && tail -f /dev/null"]
+

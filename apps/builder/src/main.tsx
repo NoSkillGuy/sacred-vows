@@ -9,8 +9,8 @@ import { queryClient } from "./lib/queryClient";
 import { initObservability } from "./lib/observability";
 import { ObservabilityRouter } from "./lib/observabilityRouter";
 import { initMetricsAfterObservability } from "./lib/metrics";
-import { enableRightClickProtection } from "./lib/right-click-protection";
-import { startDevToolsDetection } from "./lib/devtools-detection";
+import { enableRightClickProtection } from "@shared/lib/right-click-protection";
+import { startDevToolsDetection } from "@shared/lib/devtools-detection";
 import "./styles/index.css";
 // Invitation styles are loaded in PreviewPane to avoid conflicts with builder UI
 

@@ -264,6 +264,56 @@ export function getLayoutAssetUrl(layoutId: string, assetPath: string): string {
 }
 
 /**
+ * Convert asset path from builder format (/assets/photos/...) to CDN URL
+ * Handles paths like:
+ * - /assets/photos/couple1/bride/1.jpeg -> http://cdn/defaults/couple1/bride/1.jpeg
+ * - /assets/photos/couple1/couple/11.jpeg -> http://cdn/defaults/couple1/couple/11.jpeg
+ * @param assetPath - Asset path to convert
+ * @returns Full URL to the asset
+ */
+export function convertAssetPathToUrl(assetPath: string): string {
+  if (!assetPath) return "";
+
+  // If it's already a full URL, return as-is
+  if (assetPath.startsWith("http://") || assetPath.startsWith("https://")) {
+    return assetPath;
+  }
+
+  // If it's a data URL, return as-is
+  if (assetPath.startsWith("data:")) {
+    return assetPath;
+  }
+
+  // Convert /assets/photos/couple1/bride/1.jpeg to defaults/couple1/bride/1.jpeg
+  const assetsPhotosMatch = assetPath.match(/^\/assets\/photos\/(.+)$/);
+  if (assetsPhotosMatch) {
+    const relativePath = assetsPhotosMatch[1];
+    if (CDN_BASE_URL) {
+      return normalizeUrl(CDN_BASE_URL, `/defaults/${relativePath}`);
+    }
+    // Fallback if no CDN base
+    return `/defaults/${relativePath}`;
+  }
+
+  // If it's already in defaults/ format, just prepend CDN base
+  if (assetPath.startsWith("/defaults/") || assetPath.startsWith("defaults/")) {
+    const cleanPath = assetPath.replace(/^\/+/, "");
+    if (CDN_BASE_URL) {
+      return normalizeUrl(CDN_BASE_URL, cleanPath);
+    }
+    return `/${cleanPath}`;
+  }
+
+  // If it's a relative path starting with ./, return as-is (already bundled)
+  if (assetPath.startsWith("./")) {
+    return assetPath;
+  }
+
+  // Unknown format, return as-is (might be a custom URL)
+  return assetPath;
+}
+
+/**
  * Clear the asset cache (useful for debugging or forced refresh)
  */
 export async function clearAssetCache(): Promise<void> {

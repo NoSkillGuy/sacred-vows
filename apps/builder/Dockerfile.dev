@@ -1,8 +1,9 @@
 # Development Dockerfile with hot reloading support
 # This image includes Node.js and pnpm for Vite development server
+# Workspace root is mounted at /workspace in docker-compose
 FROM node:20-alpine
 
-WORKDIR /app
+WORKDIR /workspace
 
 # Install build dependencies and wget for healthchecks
 RUN apk add --no-cache git ca-certificates tzdata wget
@@ -11,10 +12,19 @@ RUN apk add --no-cache git ca-certificates tzdata wget
 RUN npm install -g pnpm@10.24.0
 
 # Copy package files for dependency caching
-COPY apps/builder/package.json apps/builder/pnpm-lock.yaml ./
+# Build context is repo root, so we maintain workspace structure
+COPY pnpm-workspace.yaml ./
+# Copy root lock file if it exists (workspace lock file)
+COPY pnpm-lock.yaml* ./
+COPY apps/builder/package.json apps/builder/
+COPY apps/shared/package.json apps/shared/
 
-# Install dependencies
+# Install dependencies (will install workspace dependencies)
+# This installs both builder and shared packages at workspace root
 RUN pnpm install --frozen-lockfile
+
+# Copy node_modules to /tmp so we can restore to named volume on first startup
+RUN cp -r node_modules /tmp/ || true
 
 # Note: Source code is mounted as volume in docker-compose.yml, so we don't copy it here
 # This allows hot reloading without rebuilding the image
@@ -22,7 +32,8 @@ RUN pnpm install --frozen-lockfile
 # Expose Vite dev server port
 EXPOSE 5173
 
-# Default command runs Vite dev server
+# Default command: copy node_modules to volume if empty, then run Vite from builder directory
 # Host binding is configured in vite.config.ts (host: '0.0.0.0')
-CMD ["pnpm", "run", "dev"]
+# Named volume preserves node_modules at workspace root
+CMD ["sh", "-c", "if [ ! -f node_modules/.bin/vite ] && [ -d /tmp/node_modules ] && [ \"$(ls -A /tmp/node_modules 2>/dev/null)\" ]; then echo 'Copying node_modules to volume...' && cp -a /tmp/node_modules/. node_modules/; fi && if [ ! -f node_modules/.bin/vite ]; then echo 'Installing dependencies...' && CI=true pnpm install --frozen-lockfile; fi && cd apps/builder && pnpm run dev"]
 
