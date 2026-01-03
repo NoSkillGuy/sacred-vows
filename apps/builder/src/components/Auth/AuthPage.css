@@ -295,6 +295,7 @@
   color: var(--text-dark);
   transition: all 0.3s var(--ease-out-quart);
   background: var(--blush-light);
+  user-select: text;
 }
 
 .auth-input::placeholder {
