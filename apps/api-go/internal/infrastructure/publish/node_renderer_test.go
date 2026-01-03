@@ -221,7 +221,7 @@ func TestNodeSnapshotGenerator_GenerateBundle_ValidInvitation(t *testing.T) {
 	// The error could be either "snapshot renderer failed" or "invalid renderer output"
 	assert.True(t,
 		strings.Contains(err.Error(), "snapshot renderer failed") ||
-		strings.Contains(err.Error(), "invalid renderer output"),
+			strings.Contains(err.Error(), "invalid renderer output"),
 		"Error should indicate renderer failure: %s", err.Error())
 	// In a real scenario with a working renderer, bundle would be non-nil
 	mockRepo.AssertExpectations(t)
