@@ -346,8 +346,8 @@ function LayoutGallery(): JSX.Element {
     }
   }
 
-  function handleLogout(): void {
-    logout();
+  async function handleLogout(): Promise<void> {
+    await logout();
     navigate("/login");
   }
 

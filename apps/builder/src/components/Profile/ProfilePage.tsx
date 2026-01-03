@@ -289,8 +289,8 @@ function ProfilePage(): JSX.Element {
       .slice(0, 2);
   }
 
-  function handleLogout(): void {
-    logout();
+  async function handleLogout(): Promise<void> {
+    await logout();
     navigate("/login");
   }
 

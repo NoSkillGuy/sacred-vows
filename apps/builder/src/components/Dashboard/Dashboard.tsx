@@ -250,11 +250,11 @@ function Dashboard(): JSX.Element {
     return `${WELCOME_TOAST_KEY_PREFIX}_${identifier}`;
   }
 
-  function handleLogout(): void {
+  async function handleLogout(): Promise<void> {
     if (typeof sessionStorage !== "undefined") {
       sessionStorage.removeItem(getWelcomeToastKey(user));
     }
-    logout();
+    await logout();
     navigate("/login");
   }
 
