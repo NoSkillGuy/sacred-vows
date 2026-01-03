@@ -149,6 +149,20 @@ When the user invokes `/review-pr`, fetch the GitHub PR, perform a thorough code
        ```
        - Comment IDs from MCP/REST match the comment node IDs in GraphQL threads
        - Find the thread containing your comment ID, then use the thread's GraphQL ID to resolve it
+     - **Unresolve a thread** (if needed):
+       ```bash
+       gh api graphql -f query='
+       mutation UnresolveThread($threadId: ID!) {
+         unresolveReviewThread(input: {threadId: $threadId}) {
+           thread {
+             id
+             isResolved
+           }
+         }
+       }
+       ' -F threadId="THREAD_ID"
+       ```
+       - Use this to toggle a resolved thread back to unresolved state
      - **Note in your review summary** which comments have been resolved
      - Example: "✅ This issue has been resolved. The code now properly handles [the concern]."
    - If a comment's issue has been partially addressed:
@@ -772,7 +786,7 @@ Most GitHub operations should use these MCP functions:
   - The PR number must be included in the path
   - This creates proper threaded replies to existing comments
 
-**For resolving review comment threads**:
+**For resolving/unresolving review comment threads**:
 - **Use GraphQL API via `gh api graphql`**:
   ```bash
   # 1. Get review threads to find the thread containing your comment
@@ -808,9 +822,22 @@ Most GitHub operations should use these MCP functions:
     }
   }
   ' -F threadId="THREAD_ID"
+
+  # 3. To unresolve a thread (toggle back to unresolved)
+  gh api graphql -f query='
+  mutation UnresolveThread($threadId: ID!) {
+    unresolveReviewThread(input: {threadId: $threadId}) {
+      thread {
+        id
+        isResolved
+      }
+    }
+  }
+  ' -F threadId="THREAD_ID"
   ```
   - Comment IDs from MCP/REST match the comment node IDs in GraphQL threads
-  - Find the thread containing your comment ID, then use the thread's GraphQL ID to resolve it
+  - Find the thread containing your comment ID, then use the thread's GraphQL ID to resolve/unresolve it
+  - Use `unresolveReviewThread` to toggle a resolved thread back to unresolved state
 
 **Note**: The GitHub MCP server doesn't have direct functions to reply to existing inline comments or resolve threads. Use `gh api` for threaded replies and GraphQL for resolving threads.
 
