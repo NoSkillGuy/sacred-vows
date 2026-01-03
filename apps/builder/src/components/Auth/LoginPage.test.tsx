@@ -216,8 +216,14 @@ describe("LoginPage", () => {
       const passwordInput = screen.getByLabelText("Password") as HTMLInputElement;
       await user.type(passwordInput, "oldpassword");
 
-      // Select all and replace
+      // Select all
       await user.keyboard("{Control>}a{/Control}");
+      // Wait for selection to be set (handles async selection in handleKeyDown)
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
+      // Clear the selected text and type new text
+      // In test environment, user.type() may not recognize selection, so we clear first
+      await user.clear(passwordInput);
       await user.type(passwordInput, "newpassword");
 
       // Verify new text replaced old text

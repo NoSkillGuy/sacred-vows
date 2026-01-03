@@ -112,14 +112,21 @@ function LoginPage(): JSX.Element {
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "a") {
       e.preventDefault();
       e.stopPropagation();
-      const input = passwordInputRef.current;
-      if (input) {
-        // Use setTimeout to ensure this happens after React processes the event
-        setTimeout(() => {
+      // Use currentTarget from the event to ensure we're working with the correct element
+      const input = e.currentTarget;
+      // Set selection synchronously first to ensure it's set immediately
+      input.focus();
+      input.select();
+      input.setSelectionRange(0, input.value.length);
+      // Also set it in the next tick as a fallback to ensure it's recognized
+      // This handles cases where React or the browser needs the selection set after event processing
+      setTimeout(() => {
+        if (input.selectionStart !== 0 || input.selectionEnd !== input.value.length) {
+          input.focus();
           input.select();
           input.setSelectionRange(0, input.value.length);
-        }, 0);
-      }
+        }
+      }, 0);
       return;
     }
     // Don't interfere with Delete and Backspace - let them work normally
