@@ -253,6 +253,7 @@
 .user-dropdown-item {
   display: flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 0.75rem;
   width: 100%;
   padding: 0.875rem 1rem;
@@ -260,6 +261,7 @@
   background: none;
   font-family: inherit;
   font-size: 0.9rem;
+  line-height: 1.2;
   color: var(--text-medium);
   cursor: pointer;
   transition: all 0.2s ease;
@@ -275,6 +277,9 @@
   width: 1.125rem;
   height: 1.125rem;
   opacity: 0.7;
+  flex-shrink: 0;
+  display: block;
+  align-self: center;
 }
 
 .user-dropdown-item.logout {
