@@ -681,6 +681,20 @@ For EACH review comment (process them individually):
        ```
      - The comment ID from MCP/REST matches the comment node IDs in GraphQL threads
      - Find the thread containing your comment, then use its GraphQL ID to resolve it
+     - **Unresolve a thread** (if needed):
+       ```bash
+       gh api graphql -f query='
+       mutation UnresolveThread($threadId: ID!) {
+         unresolveReviewThread(input: {threadId: $threadId}) {
+           thread {
+             id
+             isResolved
+           }
+         }
+       }
+       ' -F threadId="THREAD_ID"
+       ```
+       - Use this to toggle a resolved thread back to unresolved state
    - **Verify**: Check your tracking list to ensure EVERY comment has been replied to
    - **Verify on GitHub**: Check the PR to confirm all replies are properly threaded and threads are resolved
 
