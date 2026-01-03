@@ -15,9 +15,9 @@ When the user invokes `/fix-pr`, fetch the GitHub PR, read **ALL** PR comments (
    - Use `mcp_github_list_pull_requests` with `head` filter to find PR for the branch
    - **If no PR found**: Do NOT make any changes - prompt user: "No pull request found for branch '<branch-name>'. Please create a PR first or specify a different branch."
 
-3. **Use GitHub MCP server ONLY**:
-   - **NEVER use `gh` CLI or `gh api` commands**
-   - All GitHub operations must use MCP functions
+3. **Use GitHub MCP server for most operations**:
+   - **Use GitHub MCP server for all GitHub operations** (PR reading, creating reviews, adding comments, etc.)
+   - **Exception**: For replying to existing inline review comments, use `gh api` (see Step 7.2 for details)
    - Repository detection: `git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/'`
 
 ## Context Understanding
@@ -61,12 +61,13 @@ Most GitHub operations should use these MCP functions:
 - **Add review comment**: `mcp_github_add_comment_to_pending_review`
 - **Create/update review**: `mcp_github_pull_request_review_write`
 
-**Note**: For replying to review comment threads, use GitHub MCP server functions:
-- **Add review comment to pending review**: `mcp_github_add_comment_to_pending_review` - Add a comment to your pending review
+**Note**: For replying to review comment threads:
+- **Reply to existing inline comments**: Use `gh api` with the endpoint `/repos/OWNER/REPO/pulls/PR_NUMBER/comments/COMMENT_ID/replies` (see Step 7.2 for details)
+- **Add new review comments**: Use `mcp_github_add_comment_to_pending_review` - Add a comment to your pending review
 - **Create or submit review**: `mcp_github_pull_request_review_write` with method `create` or `submit_pending` - Create a review with comments or submit a pending review
 - **Add general PR comment**: `mcp_github_add_issue_comment` - Add a comment to the PR (PRs are issues in GitHub)
 
-**Note**: Verify the current capabilities of the GitHub MCP server by checking the latest documentation, as functionality may have been updated.
+**Note**: The GitHub MCP server doesn't have a direct function to reply to existing inline comments. Use `gh api` for threaded replies to existing comments, as it creates proper reply threads in GitHub.
 
 ## Fix Process
 
@@ -576,7 +577,12 @@ For EACH actionable review comment (process them one by one, do not skip any):
 
 For EACH review comment (process them individually):
 
-1. **For inline review comments** (comments on specific lines in code):
+1. **Get the comment ID**:
+   - From the review comments data retrieved in Step 7.1, extract the `id` field for each comment
+   - The comment ID is a numeric value (e.g., `2659114434`)
+   - Store the comment ID along with the comment details in your tracking list
+
+2. **For inline review comments** (comments on specific lines in code):
    - **Read the original comment** to understand what was requested
    - **Check what changes were made** to address this specific comment
    - **Write a specific reply** for THIS comment explaining:
@@ -600,19 +606,29 @@ For EACH review comment (process them individually):
      The code now [describes improved state].
      ```
 
-   - Use `mcp_github_add_comment_to_pending_review` to add a reply comment to your pending review
-   - Parameters:
-     - `owner`: Repository owner
-     - `repo`: Repository name
-     - `pullNumber`: PR number
-     - `path`: File path from the original comment
-     - `body`: The specific reply text you prepared for THIS comment
-     - `line`: Line number from the original comment (if applicable)
-     - `side`: "RIGHT" (the new state) or "LEFT" (the previous state)
-   - **Note**: This adds a comment to your pending review. You may need to create or submit a review first.
+   - **Use `gh api` to reply to the inline comment** (creates proper threaded reply):
+     ```bash
+     gh api --method POST \
+       /repos/OWNER/REPO/pulls/PR_NUMBER/comments/COMMENT_ID/replies \
+       -f body="Your reply text here"
+     ```
+     - Replace `OWNER` with repository owner
+     - Replace `REPO` with repository name
+     - Replace `PR_NUMBER` with the PR number
+     - Replace `COMMENT_ID` with the numeric comment ID from step 1
+     - Replace `"Your reply text here"` with the specific reply you prepared
+     - **Important**: The PR number must be included in the path (`/pulls/PR_NUMBER/comments/...`)
+
+   - **Example command**:
+     ```bash
+     gh api --method POST \
+       /repos/NoSkillGuy/sacred-vows/pulls/87/comments/2659114434/replies \
+       -f body="✅ Fixed! I've updated the error handling as requested. The code now properly wraps errors with context."
+     ```
+
    - **Mark in tracking list**: This comment has been replied to
 
-2. **For comments that were already addressed** (in previous commits):
+3. **For comments that were already addressed** (in previous commits):
    - **Still reply to them** to acknowledge the fix
    - Reply format:
      ```
@@ -620,27 +636,67 @@ For EACH review comment (process them individually):
 
      **What was changed**: [Brief description of the fix that was made]
      ```
-   - Use the same MCP function to add the reply
-
-3. **Create or submit a review with ALL comments**:
-   - After replying to ALL comments individually, create or submit the review
-   - Use `mcp_github_pull_request_review_write` with method `create` to create a review with comments
-   - Or use method `submit_pending` to submit an existing pending review
-   - Parameters:
-     - `owner`: Repository owner
-     - `repo`: Repository name
-     - `pullNumber`: PR number
-     - `body`: Review body text (can include summary of fixes)
-     - `event`: "COMMENT" (for comments only) or "APPROVE" (if all issues are resolved)
-   - This will include all comments added via `add_comment_to_pending_review`
+   - Use the same `gh api` command to reply to the comment
 
 4. **Thread resolution**:
-   - Review comment threads are typically resolved when:
-     - A new commit addresses the comment
-     - The reviewer manually resolves the thread
-     - The comment author replies indicating the issue is fixed
+   - Review comment threads are automatically threaded when you reply using `gh api`
+   - The reply will appear as a threaded response to the original comment
    - Include "✅ Fixed" or "✅ Resolved" in your reply to indicate the issue has been addressed
+   - **Mark thread as resolved** (optional, after replying):
+     - Use GraphQL API to resolve the review thread:
+       ```bash
+       # Step 1: Get review threads to find the thread ID
+       gh api graphql -f query='
+       query ReviewThreads($owner: String!, $repo: String!, $prNumber: Int!) {
+         repository(owner: $owner, name: $repo) {
+           pullRequest(number: $prNumber) {
+             reviewThreads(first: 50) {
+               nodes {
+                 id
+                 isResolved
+                 comments(first: 10) {
+                   nodes {
+                     id
+                     body
+                   }
+                 }
+               }
+             }
+           }
+         }
+       }
+       ' -F owner="OWNER" -F repo="REPO" -F prNumber=PR_NUMBER
+
+       # Step 2: Find the thread containing your comment ID, then resolve it
+       gh api graphql -f query='
+       mutation ResolveThread($threadId: ID!) {
+         resolveReviewThread(input: {threadId: $threadId}) {
+           thread {
+             id
+             isResolved
+           }
+         }
+       }
+       ' -F threadId="THREAD_ID"
+       ```
+     - The comment ID from MCP/REST matches the comment node IDs in GraphQL threads
+     - Find the thread containing your comment, then use its GraphQL ID to resolve it
+     - **Unresolve a thread** (if needed):
+       ```bash
+       gh api graphql -f query='
+       mutation UnresolveThread($threadId: ID!) {
+         unresolveReviewThread(input: {threadId: $threadId}) {
+           thread {
+             id
+             isResolved
+           }
+         }
+       }
+       ' -F threadId="THREAD_ID"
+       ```
+       - Use this to toggle a resolved thread back to unresolved state
    - **Verify**: Check your tracking list to ensure EVERY comment has been replied to
+   - **Verify on GitHub**: Check the PR to confirm all replies are properly threaded and threads are resolved
 
 #### 7.3: Reply to General PR Comments
 
@@ -729,16 +785,17 @@ If multiple review comments were addressed, create a summary comment:
      - Explain how the changes address the feedback
      - Be specific and detailed
 
-4. **Add reply comments to pending review** (one by one):
-   - **For EACH comment** (even if already addressed), use `mcp_github_add_comment_to_pending_review`
-   - Parameters:
-     - `owner`: $OWNER
-     - `repo`: $REPO_NAME
-     - `pullNumber`: $PR_NUMBER
-     - `path`: File path from original comment
-     - `body`: The specific reply text you prepared for THIS comment
-     - `line`: Line number (if applicable)
-     - `side`: "RIGHT" (new state)
+4. **Reply to EACH comment using `gh api`** (one by one):
+   - **For EACH comment** (even if already addressed), use `gh api` to create a threaded reply:
+     ```bash
+     gh api --method POST \
+       /repos/$OWNER/$REPO_NAME/pulls/$PR_NUMBER/comments/$COMMENT_ID/replies \
+       -f body="Your specific reply text for THIS comment"
+     ```
+   - Extract `COMMENT_ID` from the review comments data (numeric ID field)
+   - Replace `$OWNER`, `$REPO_NAME`, `$PR_NUMBER`, and `$COMMENT_ID` with actual values
+   - Use the specific reply text you prepared for THIS comment
+   - **Important**: The PR number must be included in the path
    - **Mark in tracking list**: This comment has been replied to
    - **Continue until ALL comments have replies**
 
@@ -746,12 +803,12 @@ If multiple review comments were addressed, create a summary comment:
    - Check your tracking list: Every comment should have a reply
    - Count: Number of replies should match number of comments
    - If any comment is missing a reply, add it now
+   - **Verify on GitHub**: Check the PR to confirm all replies are properly threaded
 
-6. **Submit the review**:
-   - Use `mcp_github_pull_request_review_write` with method `submit_pending`
-   - Or use method `create` with `event: "COMMENT"` to create a new review with all comments
-   - This will include all the reply comments added in step 4
-   - **Verify**: All comments should now have replies visible on GitHub
+6. **No need to submit a review**:
+   - When using `gh api` to reply directly to comments, the replies are automatically posted
+   - No pending review submission is needed
+   - Replies appear immediately as threaded responses to the original comments
 
 #### 7.6: Track Comment Replies
 
@@ -898,11 +955,17 @@ This comprehensive tracking ensures all feedback is properly addressed and ackno
 8. **Address review comments** (CRITICAL - Reply to EVERY comment individually):
    - Get ALL review comment threads using `mcp_github_pull_request_read` with method `get_review_comments`
    - **Create a complete inventory** of ALL comments (count them)
-   - **For EACH comment** (process them one by one, do not skip any):
+   - **For EACH inline comment** (process them one by one, do not skip any):
      - Read and understand the comment
+     - Extract the comment ID (numeric `id` field from the review comments data)
      - Check what changes were made to address it
      - Prepare a specific reply explaining what changes were made for THIS comment
-     - Use `mcp_github_add_comment_to_pending_review` to add reply comments to your pending review
+     - Use `gh api` to reply to the comment:
+       ```bash
+       gh api --method POST \
+         /repos/OWNER/REPO/pulls/PR_NUMBER/comments/COMMENT_ID/replies \
+         -f body="Your specific reply text"
+       ```
      - Include in the reply:
        - What the original concern was
        - What specific changes were made
@@ -912,7 +975,7 @@ This comprehensive tracking ensures all feedback is properly addressed and ackno
    - **For general comments**: Use `mcp_github_add_issue_comment` (PR number as issue number)
      - Reply to EACH general comment individually with specific details
    - **Verify completeness**: Check that every comment has a reply
-   - Submit the review using `mcp_github_pull_request_review_write` with method `submit_pending` or `create`
+   - **Verify on GitHub**: Check the PR to confirm all replies are properly threaded
    - Create summary comment if multiple comments were addressed (in addition to individual replies)
 
 9. **Commit and push**:
@@ -968,17 +1031,23 @@ npm run format
   - Apply the fix (if needed)
   - Verify it addresses the comment
   - **Prepare a specific reply** explaining what changes were made for THIS comment
-- **Reply to EVERY comment thread individually** using GitHub MCP server:
-  - Use `mcp_github_add_comment_to_pending_review` to add a reply comment
-  - Include in EACH reply:
-    - What the original concern was
-    - What specific changes were made
-    - How the changes address the feedback
-    - File path and line number (if inline)
-  - Submit the review using `mcp_github_pull_request_review_write` with method `submit_pending` or `create`
-  - For general PR comments, use `mcp_github_add_issue_comment`
+- **Reply to EVERY comment thread individually**:
+  - **For inline comments**: Use `gh api` to create threaded replies:
+    ```bash
+    gh api --method POST \
+      /repos/OWNER/REPO/pulls/PR_NUMBER/comments/COMMENT_ID/replies \
+      -f body="Your specific reply text"
+    ```
+    - Extract comment ID from review comments data (numeric `id` field)
+    - Include in EACH reply:
+      - What the original concern was
+      - What specific changes were made
+      - How the changes address the feedback
+      - File path and line number (if inline)
+  - **For general PR comments**: Use `mcp_github_add_issue_comment` (PR number as issue number)
 - **Track which comments have been fixed, replied to, and resolved**
 - **Verify**: Every comment should have an individual reply
+- **Verify on GitHub**: Check the PR to confirm all replies are properly threaded
 
 ### Merge Conflicts
 - Identify conflicted files with `git status`
@@ -1035,11 +1104,18 @@ npm run format
 - **CRITICAL**: Reply to EVERY single inline comment individually with specific details:
   - Read and process EVERY comment - no comment should be skipped
   - For EACH comment, write a specific reply explaining what changes were made
-  - Use `mcp_github_add_comment_to_pending_review` to add reply comments
-  - Use `mcp_github_pull_request_review_write` to submit the review with comments
+  - Use `gh api` to reply to existing inline comments (creates proper threaded replies):
+    ```bash
+    gh api --method POST \
+      /repos/OWNER/REPO/pulls/PR_NUMBER/comments/COMMENT_ID/replies \
+      -f body="Your reply text"
+    ```
+  - Extract comment IDs from review comments data (numeric `id` field)
   - Track which comments have been fixed, replied to, and resolved
   - Verify: Every comment should have an individual reply before completing the fix
-- **Use GitHub MCP server for ALL GitHub operations** (never use `gh` CLI)
+  - Verify on GitHub: Check the PR to confirm all replies are properly threaded
+- **Use GitHub MCP server for most GitHub operations** (reading PRs, creating reviews, etc.)
+- **Exception**: Use `gh api` for replying to existing inline review comments (see Step 7.2)
 - Repository: Always detect dynamically from git remote using: `git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/'`
 - **CRITICAL**: Always validate branch name first - never make changes on default branch (main/master)
 - **CRITICAL**: Never make changes if no PR exists for the branch - prompt user to create PR first

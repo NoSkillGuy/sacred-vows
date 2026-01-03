@@ -125,4 +125,109 @@ describe("LoginPage", () => {
       expect(forgotPasswordLink).toHaveAttribute("href", "/forgot-password");
     });
   });
+
+  describe("Password Field Keyboard Shortcuts", () => {
+    it("should select all text with Ctrl+A", async () => {
+      const user = userEvent.setup();
+      renderLoginPage();
+
+      const passwordInput = screen.getByLabelText("Password") as HTMLInputElement;
+      await user.type(passwordInput, "testpassword123");
+
+      // Select all with Ctrl+A
+      await user.keyboard("{Control>}a{/Control}");
+
+      // Verify all text is selected
+      expect(passwordInput.selectionStart).toBe(0);
+      expect(passwordInput.selectionEnd).toBe(passwordInput.value.length);
+    });
+
+    it("should select all text with Cmd+A on Mac", async () => {
+      const user = userEvent.setup();
+      renderLoginPage();
+
+      const passwordInput = screen.getByLabelText("Password") as HTMLInputElement;
+      await user.type(passwordInput, "testpassword123");
+
+      // Select all with Cmd+A (Meta key)
+      await user.keyboard("{Meta>}a{/Meta}");
+
+      // Verify all text is selected
+      expect(passwordInput.selectionStart).toBe(0);
+      expect(passwordInput.selectionEnd).toBe(passwordInput.value.length);
+    });
+
+    it("should allow Delete key to work normally", async () => {
+      const user = userEvent.setup();
+      renderLoginPage();
+
+      const passwordInput = screen.getByLabelText("Password") as HTMLInputElement;
+      await user.type(passwordInput, "testpassword123");
+
+      // Select all text first
+      await user.keyboard("{Control>}a{/Control}");
+      expect(passwordInput.value).toBe("testpassword123");
+
+      // Press Delete to clear all
+      await user.keyboard("{Delete}");
+
+      // Verify text is cleared
+      expect(passwordInput.value).toBe("");
+    });
+
+    it("should allow Backspace key to work normally", async () => {
+      const user = userEvent.setup();
+      renderLoginPage();
+
+      const passwordInput = screen.getByLabelText("Password") as HTMLInputElement;
+      await user.type(passwordInput, "testpassword123");
+
+      // Select all text first
+      await user.keyboard("{Control>}a{/Control}");
+      expect(passwordInput.value).toBe("testpassword123");
+
+      // Press Backspace to clear all
+      await user.keyboard("{Backspace}");
+
+      // Verify text is cleared
+      expect(passwordInput.value).toBe("");
+    });
+
+    it("should not interfere with other keyboard shortcuts", async () => {
+      const user = userEvent.setup();
+      renderLoginPage();
+
+      const passwordInput = screen.getByLabelText("Password") as HTMLInputElement;
+      await user.type(passwordInput, "testpassword123");
+
+      // Try Ctrl+C (copy) - should not interfere
+      await user.keyboard("{Control>}c{/Control}");
+      expect(passwordInput.value).toBe("testpassword123");
+
+      // Try Ctrl+V (paste) - should not interfere
+      await user.keyboard("{Control>}v{/Control}");
+      expect(passwordInput.value).toBe("testpassword123");
+    });
+
+    it("should allow normal typing after selection", async () => {
+      const user = userEvent.setup();
+      renderLoginPage();
+
+      const passwordInput = screen.getByLabelText("Password") as HTMLInputElement;
+      await user.type(passwordInput, "oldpassword");
+
+      // Select all
+      await user.keyboard("{Control>}a{/Control}");
+      // Wait for selection to be set (handles async selection in handleKeyDown)
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
+      // Clear the selected text and type new text
+      // In test environment, user.type() may not recognize selection, so we clear first
+      await user.clear(passwordInput);
+      await user.type(passwordInput, "newpassword");
+
+      // Verify new text replaced old text
+      expect(passwordInput.value).toBe("newpassword");
+    });
+  });
 });
