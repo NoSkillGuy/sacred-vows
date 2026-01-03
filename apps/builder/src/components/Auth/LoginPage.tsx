@@ -116,11 +116,11 @@ function LoginPage(): JSX.Element {
     };
 
     checkAuth();
-  }, []);
+  }, [navigate]);
 
   // Handle countdown completion
   const handleCountdownComplete = (): void => {
-    navigate("/app", { replace: true });
+    navigate("/dashboard", { replace: true });
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
@@ -163,7 +163,7 @@ function LoginPage(): JSX.Element {
 
     try {
       await login(formData.email, formData.password);
-      navigate("/app");
+      navigate("/dashboard");
     } catch (err) {
       setError((err as Error).message || "Login failed. Please try again.");
     } finally {

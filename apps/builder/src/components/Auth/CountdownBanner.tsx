@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import "./CountdownBanner.css";
 
 interface CountdownBannerProps {
@@ -13,10 +13,16 @@ function CountdownBanner({
   onComplete,
 }: CountdownBannerProps): JSX.Element {
   const [remaining, setRemaining] = useState<number>(countdown);
+  const onCompleteRef = useRef(onComplete);
+
+  // Update ref when onComplete changes
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
   useEffect(() => {
     if (remaining <= 0) {
-      onComplete();
+      onCompleteRef.current();
       return;
     }
 
@@ -25,7 +31,7 @@ function CountdownBanner({
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [remaining, onComplete]);
+  }, [remaining]);
 
   return (
     <div className="countdown-banner" role="alert" aria-live="polite">
