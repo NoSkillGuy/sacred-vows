@@ -122,10 +122,10 @@ export function InvitationPage({ invitation, translations = {} }: InvitationPage
     <>
       {Header && <Header {...viewProps} />}
       {Blessings && <Blessings />}
-      {ScrollAnimationsInit && actualLayoutId === "editorial-elegance" && <ScrollAnimationsInit />}
+      {ScrollAnimationsInit && layoutId === "editorial-elegance" && <ScrollAnimationsInit />}
 
       <main
-        className={`page-shell ${actualLayoutId === "editorial-elegance" ? "editorial-elegance" : ""}`}
+        className={`page-shell ${layoutId === "editorial-elegance" ? "editorial-elegance" : ""}`}
       >
         {mainSections.map((section) => renderSection(section))}
 
