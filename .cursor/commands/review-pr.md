@@ -15,9 +15,9 @@ When the user invokes `/review-pr`, fetch the GitHub PR, perform a thorough code
    - Use `mcp_github_list_pull_requests` with `head` filter to find PR for the branch
    - **If no PR found**: Do NOT proceed - prompt user: "No pull request found for branch '<branch-name>'. Please create a PR first or specify a different branch."
 
-3. **Use GitHub MCP server ONLY**:
-   - **NEVER use `gh` CLI or `gh api` commands**
-   - All GitHub operations must use MCP functions
+3. **Use GitHub MCP server for most operations**:
+   - **Use GitHub MCP server for all GitHub operations** (PR reading, creating reviews, adding comments, etc.)
+   - **Exception**: For replying to existing inline review comments, use `gh api` (see Step 2 for details)
    - Repository detection: `git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/'`
 
 ## Context Understanding
@@ -102,18 +102,33 @@ When the user invokes `/review-pr`, fetch the GitHub PR, perform a thorough code
 
 2. **Mark resolved comments**:
    - If a comment's issue has been fully addressed by the code changes:
-     - **Mark the comment thread as resolved** (if the MCP server supports this functionality)
+     - **Reply to the comment** using `gh api` to acknowledge the fix:
+       ```bash
+       gh api --method POST \
+         /repos/OWNER/REPO/pulls/PR_NUMBER/comments/COMMENT_ID/replies \
+         -f body="✅ This issue has been resolved. The code now properly handles [the concern]."
+       ```
+       - Extract `COMMENT_ID` from the review comments data (numeric `id` field)
+       - Replace `OWNER`, `REPO`, `PR_NUMBER`, and `COMMENT_ID` with actual values
+       - **Important**: The PR number must be included in the path (`/pulls/PR_NUMBER/comments/...`)
      - **Note in your review summary** which comments have been resolved
-     - Acknowledge the fix in your review feedback with a positive comment
      - Example: "✅ This issue has been resolved. The code now properly handles [the concern]."
    - If a comment's issue has been partially addressed:
-     - Add a follow-up comment acknowledging the progress
+     - Reply to the comment using `gh api` to acknowledge the progress:
+       ```bash
+       gh api --method POST \
+         /repos/OWNER/REPO/pulls/PR_NUMBER/comments/COMMENT_ID/replies \
+         -f body="👍 Good progress on this. However, [specific remaining issue] still needs attention."
+       ```
      - Note what still needs to be addressed
-     - Example: "👍 Good progress on this. However, [specific remaining issue] still needs attention."
    - If a comment's issue has not been addressed:
-     - Note in your review that the issue still exists
+     - Reply to the comment using `gh api` to note it still needs attention:
+       ```bash
+       gh api --method POST \
+         /repos/OWNER/REPO/pulls/PR_NUMBER/comments/COMMENT_ID/replies \
+         -f body="⚠️ This issue still needs to be addressed: [specific concern]"
+       ```
      - Reference the original comment in your new review
-     - Example: "⚠️ This issue from the previous review still needs to be addressed: [reference original comment]"
 
 3. **Document resolution status**:
    - In your review summary, include a section listing:
@@ -122,7 +137,7 @@ When the user invokes `/review-pr`, fetch the GitHub PR, perform a thorough code
      - Comments that have been partially addressed
    - Be specific about which comments were resolved and how
 
-**Note**: If the GitHub MCP server doesn't have a direct function to mark comments as resolved, verify the resolution status by comparing the current code with the comment's concern, and clearly note the resolution status in your review comments and summary.
+**Note**: To reply to existing inline comments and create proper threaded replies, use `gh api` with the endpoint `/repos/OWNER/REPO/pulls/PR_NUMBER/comments/COMMENT_ID/replies`. The GitHub MCP server doesn't have a direct function to reply to existing inline comments - it can only add new comments to pending reviews. Using `gh api` creates proper threaded replies that are clearly associated with the original comment.
 
 ### Step 3: Comprehensive Code Review
 
@@ -704,12 +719,22 @@ Most GitHub operations should use these MCP functions:
 - **Get commit details**: `mcp_github_get_commit`
 - **List PRs**: `mcp_github_list_pull_requests` (to find PR by branch)
 - **Create pending review**: `mcp_github_pull_request_review_write` with method `create` (without `event`)
-- **Add comment to pending review**: `mcp_github_add_comment_to_pending_review`
+- **Add comment to pending review**: `mcp_github_add_comment_to_pending_review` (for adding new review comments)
 - **Submit review**: `mcp_github_pull_request_review_write` with method `submit_pending`
 - **Add general PR comment**: `mcp_github_add_issue_comment` (use PR number as issue number)
-- **Resolve comment threads**: Check MCP server documentation for available functions to mark comment threads as resolved (if available)
 
-**Note**: Verify the current capabilities of the GitHub MCP server by checking the latest documentation, as functionality may have been updated.
+**For replying to existing inline review comments**:
+- **Use `gh api`** (exception to MCP-only rule):
+  ```bash
+  gh api --method POST \
+    /repos/OWNER/REPO/pulls/PR_NUMBER/comments/COMMENT_ID/replies \
+    -f body="Your reply text"
+  ```
+  - Extract `COMMENT_ID` from review comments data (numeric `id` field)
+  - The PR number must be included in the path
+  - This creates proper threaded replies to existing comments
+
+**Note**: The GitHub MCP server doesn't have a direct function to reply to existing inline comments. Use `gh api` for threaded replies to existing comments, as it creates proper reply threads in GitHub.
 
 ## Notes
 
@@ -718,7 +743,8 @@ Most GitHub operations should use these MCP functions:
 - Reference repository patterns and examples
 - Acknowledge good work when appropriate
 - Focus on important issues first (blockers, critical, major)
-- **Use GitHub MCP server for ALL GitHub operations** (never use `gh` CLI)
+- **Use GitHub MCP server for most GitHub operations** (reading PRs, creating reviews, adding new comments)
+- **Exception**: Use `gh api` for replying to existing inline review comments (creates proper threaded replies)
 - Repository: Always detect dynamically from git remote using: `git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/'`
 - Group related comments when possible to avoid spam
 - Post a summary comment at the end with overall assessment
