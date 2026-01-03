@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { isAuthenticated } from "../../services/authService";
 import LandingFooter from "../Landing/LandingFooter";
 import "./PageLayout.css";
 
@@ -32,7 +33,7 @@ function PageLayout({ children, title, subtitle, breadcrumbs = [] }: PageLayoutP
       {/* Navigation Header */}
       <header className="page-header">
         <nav className="page-nav">
-          <Link to="/" className="nav-logo">
+          <Link to={isAuthenticated() ? "/dashboard" : "/"} className="nav-logo">
             <span className="logo-icon">
               <RingIcon />
             </span>
