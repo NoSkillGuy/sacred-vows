@@ -642,8 +642,47 @@ For EACH review comment (process them individually):
    - Review comment threads are automatically threaded when you reply using `gh api`
    - The reply will appear as a threaded response to the original comment
    - Include "✅ Fixed" or "✅ Resolved" in your reply to indicate the issue has been addressed
+   - **Mark thread as resolved** (optional, after replying):
+     - Use GraphQL API to resolve the review thread:
+       ```bash
+       # Step 1: Get review threads to find the thread ID
+       gh api graphql -f query='
+       query ReviewThreads($owner: String!, $repo: String!, $prNumber: Int!) {
+         repository(owner: $owner, name: $repo) {
+           pullRequest(number: $prNumber) {
+             reviewThreads(first: 50) {
+               nodes {
+                 id
+                 isResolved
+                 comments(first: 10) {
+                   nodes {
+                     id
+                     body
+                   }
+                 }
+               }
+             }
+           }
+         }
+       }
+       ' -F owner="OWNER" -F repo="REPO" -F prNumber=PR_NUMBER
+
+       # Step 2: Find the thread containing your comment ID, then resolve it
+       gh api graphql -f query='
+       mutation ResolveThread($threadId: ID!) {
+         resolveReviewThread(input: {threadId: $threadId}) {
+           thread {
+             id
+             isResolved
+           }
+         }
+       }
+       ' -F threadId="THREAD_ID"
+       ```
+     - The comment ID from MCP/REST matches the comment node IDs in GraphQL threads
+     - Find the thread containing your comment, then use its GraphQL ID to resolve it
    - **Verify**: Check your tracking list to ensure EVERY comment has been replied to
-   - **Verify on GitHub**: Check the PR to confirm all replies are properly threaded
+   - **Verify on GitHub**: Check the PR to confirm all replies are properly threaded and threads are resolved
 
 #### 7.3: Reply to General PR Comments
 

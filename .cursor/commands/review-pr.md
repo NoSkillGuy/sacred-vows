@@ -111,6 +111,44 @@ When the user invokes `/review-pr`, fetch the GitHub PR, perform a thorough code
        - Extract `COMMENT_ID` from the review comments data (numeric `id` field)
        - Replace `OWNER`, `REPO`, `PR_NUMBER`, and `COMMENT_ID` with actual values
        - **Important**: The PR number must be included in the path (`/pulls/PR_NUMBER/comments/...`)
+     - **Mark the thread as resolved** using GraphQL (optional, after replying):
+       ```bash
+       # 1. Get review threads to find the thread containing your comment
+       gh api graphql -f query='
+       query ReviewThreads($owner: String!, $repo: String!, $prNumber: Int!) {
+         repository(owner: $owner, name: $repo) {
+           pullRequest(number: $prNumber) {
+             reviewThreads(first: 50) {
+               nodes {
+                 id
+                 isResolved
+                 comments(first: 10) {
+                   nodes {
+                     id
+                     body
+                   }
+                 }
+               }
+             }
+           }
+         }
+       }
+       ' -F owner="OWNER" -F repo="REPO" -F prNumber=PR_NUMBER
+
+       # 2. Find the thread ID containing your comment, then resolve it
+       gh api graphql -f query='
+       mutation ResolveThread($threadId: ID!) {
+         resolveReviewThread(input: {threadId: $threadId}) {
+           thread {
+             id
+             isResolved
+           }
+         }
+       }
+       ' -F threadId="THREAD_ID"
+       ```
+       - Comment IDs from MCP/REST match the comment node IDs in GraphQL threads
+       - Find the thread containing your comment ID, then use the thread's GraphQL ID to resolve it
      - **Note in your review summary** which comments have been resolved
      - Example: "✅ This issue has been resolved. The code now properly handles [the concern]."
    - If a comment's issue has been partially addressed:
@@ -734,7 +772,47 @@ Most GitHub operations should use these MCP functions:
   - The PR number must be included in the path
   - This creates proper threaded replies to existing comments
 
-**Note**: The GitHub MCP server doesn't have a direct function to reply to existing inline comments. Use `gh api` for threaded replies to existing comments, as it creates proper reply threads in GitHub.
+**For resolving review comment threads**:
+- **Use GraphQL API via `gh api graphql`**:
+  ```bash
+  # 1. Get review threads to find the thread containing your comment
+  gh api graphql -f query='
+  query ReviewThreads($owner: String!, $repo: String!, $prNumber: Int!) {
+    repository(owner: $owner, name: $repo) {
+      pullRequest(number: $prNumber) {
+        reviewThreads(first: 50) {
+          nodes {
+            id
+            isResolved
+            comments(first: 10) {
+              nodes {
+                id
+                body
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  ' -F owner="OWNER" -F repo="REPO" -F prNumber=PR_NUMBER
+
+  # 2. Find the thread ID containing your comment, then resolve it
+  gh api graphql -f query='
+  mutation ResolveThread($threadId: ID!) {
+    resolveReviewThread(input: {threadId: $threadId}) {
+      thread {
+        id
+        isResolved
+      }
+    }
+  }
+  ' -F threadId="THREAD_ID"
+  ```
+  - Comment IDs from MCP/REST match the comment node IDs in GraphQL threads
+  - Find the thread containing your comment ID, then use the thread's GraphQL ID to resolve it
+
+**Note**: The GitHub MCP server doesn't have direct functions to reply to existing inline comments or resolve threads. Use `gh api` for threaded replies and GraphQL for resolving threads.
 
 ## Notes
 
