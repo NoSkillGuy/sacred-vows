@@ -77,7 +77,54 @@ When the user invokes `/review-pr`, fetch the GitHub PR, perform a thorough code
    - Repository: Detect from git remote (see Context Understanding section)
    - Extract: path, additions, deletions, status for each file
 
-### Step 2: Comprehensive Code Review
+6. **Get existing review comments**:
+   - Use `mcp_github_pull_request_read` with method `get_review_comments`
+   - Repository: Detect from git remote (see Context Understanding section)
+   - Extract: all existing review comments, their file paths, line numbers, and resolution status
+   - **CRITICAL**: Check each existing comment to see if the issue has been addressed in the current code changes
+
+### Step 2: Check and Resolve Existing Comments
+
+**BEFORE performing the new code review, you MUST:**
+
+1. **Review all existing inline comments**:
+   - For each existing review comment, check if the issue has been addressed:
+     - Read the file at the comment's location in the current PR diff
+     - Compare the current code with what the comment was addressing
+     - Verify if the code change addresses the comment's concern:
+       - If the comment was about a BUG: Check if the bug is fixed
+       - If the comment was about SECURITY: Check if the security issue is resolved
+       - If the comment was about ARCHITECTURE: Check if the architectural concern is addressed
+       - If the comment was about TESTING: Check if tests have been added/improved
+       - If the comment was about CODE QUALITY: Check if the code quality issue is fixed
+     - Check if the suggested fix has been implemented (if a suggestion was provided)
+     - Verify if the issue type (BUG, SECURITY, etc.) has been resolved
+
+2. **Mark resolved comments**:
+   - If a comment's issue has been fully addressed by the code changes:
+     - **Mark the comment thread as resolved** (if the MCP server supports this functionality)
+     - **Note in your review summary** which comments have been resolved
+     - Acknowledge the fix in your review feedback with a positive comment
+     - Example: "✅ This issue has been resolved. The code now properly handles [the concern]."
+   - If a comment's issue has been partially addressed:
+     - Add a follow-up comment acknowledging the progress
+     - Note what still needs to be addressed
+     - Example: "👍 Good progress on this. However, [specific remaining issue] still needs attention."
+   - If a comment's issue has not been addressed:
+     - Note in your review that the issue still exists
+     - Reference the original comment in your new review
+     - Example: "⚠️ This issue from the previous review still needs to be addressed: [reference original comment]"
+
+3. **Document resolution status**:
+   - In your review summary, include a section listing:
+     - Comments that have been resolved (with acknowledgment)
+     - Comments that still need attention
+     - Comments that have been partially addressed
+   - Be specific about which comments were resolved and how
+
+**Note**: If the GitHub MCP server doesn't have a direct function to mark comments as resolved, verify the resolution status by comparing the current code with the comment's concern, and clearly note the resolution status in your review comments and summary.
+
+### Step 3: Comprehensive Code Review
 
 Perform a thorough review covering:
 
@@ -228,7 +275,7 @@ Perform a thorough review covering:
 - ✅ Check if frontend changes break existing functionality
 - ✅ Document breaking changes if any
 
-### Step 3: Generate Review Comments
+### Step 4: Generate Review Comments
 
 For each issue found, create a review comment with:
 
@@ -238,7 +285,7 @@ For each issue found, create a review comment with:
 4. **Description**: Clear explanation of the issue
 5. **Suggestion**: Specific recommendation for improvement (with code examples if helpful)
 
-### Step 4: Post Review Comments
+### Step 5: Post Review Comments
 
 Use GitHub MCP server to post review comments. The recommended approach is to create a pending review and add comments to it, then submit the review.
 
@@ -270,7 +317,7 @@ Use GitHub MCP server to post review comments. The recommended approach is to cr
 - Multiple inline comments can be added to a single pending review before submitting
 - **MCP Functionality Note**: The `mcp_github_add_comment_to_pending_review` function adds comments to your pending review. Verify current MCP server capabilities by checking the latest GitHub MCP server documentation, as functionality may have been updated.
 
-### Step 5: Create Review Summary
+### Step 6: Create Review Summary
 
 Post a comprehensive review summary that includes:
 
@@ -279,16 +326,22 @@ Post a comprehensive review summary that includes:
    - Overall quality assessment
    - Approval status recommendation
 
-2. **Key findings**:
+2. **Existing comments resolution status**:
+   - **Resolved comments**: List comments that have been addressed, acknowledging the fixes
+   - **Unresolved comments**: List comments that still need attention, with references to original comments
+   - **Partially resolved comments**: List comments with partial fixes, noting what still needs work
+
+3. **Key findings**:
    - Critical issues (must fix)
    - Important issues (should fix)
    - Suggestions (nice to have)
 
-3. **Positive feedback**:
+4. **Positive feedback**:
    - What was done well
    - Good patterns followed
+   - Acknowledgment of fixes to previous review comments
 
-4. **Next steps**:
+5. **Next steps**:
    - What needs to be addressed before merge
    - Optional improvements
 
@@ -315,15 +368,28 @@ Post a comprehensive review summary that includes:
    - Use `mcp_github_pull_request_read` with method `get` to get PR details
    - Use `mcp_github_pull_request_read` with method `get_diff` to get PR diff
    - Use `mcp_github_pull_request_read` with method `get_files` to get changed files
+   - Use `mcp_github_pull_request_read` with method `get_review_comments` to get existing review comments
    - Repository: Detect from git remote (see Context Understanding section)
 
-4. **Analyze changes**:
+4. **Check and resolve existing comments**:
+   - For each existing review comment:
+     - Read the file at the comment's location in the current PR diff
+     - Verify if the code change addresses the comment's concern
+     - Check if the suggested fix has been implemented
+   - If a comment's issue has been fully addressed:
+     - Mark the comment thread as resolved (if MCP supports this)
+     - Note the resolution in your review summary
+   - If a comment's issue has not been addressed:
+     - Note in your review that the issue still exists
+     - Reference the original comment
+
+5. **Analyze changes**:
    - Read the diff file
    - Identify changed files
    - For each file, check against review criteria
    - Identify issues and create review comments
 
-5. **Post comments using GitHub MCP**:
+6. **Post comments using GitHub MCP**:
    - Collect all inline comments first
    - Create a pending review using `mcp_github_pull_request_review_write` with method `create` (without `event` parameter)
    - For each inline comment, use `mcp_github_add_comment_to_pending_review`:
@@ -338,7 +404,7 @@ Post a comprehensive review summary that includes:
      - Body: Overall review summary
    - For general comments (not inline), use `mcp_github_add_issue_comment` (PR number as issue number)
 
-6. **Provide feedback to user**:
+7. **Provide feedback to user**:
    - Show summary of review
    - List issues found
    - Confirm comments were posted
@@ -634,12 +700,14 @@ Most GitHub operations should use these MCP functions:
 - **Get PR details**: `mcp_github_pull_request_read` with method `get`
 - **Get PR diff**: `mcp_github_pull_request_read` with method `get_diff`
 - **Get PR files**: `mcp_github_pull_request_read` with method `get_files`
+- **Get review comments**: `mcp_github_pull_request_read` with method `get_review_comments` (to check existing comments and their resolution status)
 - **Get commit details**: `mcp_github_get_commit`
 - **List PRs**: `mcp_github_list_pull_requests` (to find PR by branch)
 - **Create pending review**: `mcp_github_pull_request_review_write` with method `create` (without `event`)
 - **Add comment to pending review**: `mcp_github_add_comment_to_pending_review`
 - **Submit review**: `mcp_github_pull_request_review_write` with method `submit_pending`
 - **Add general PR comment**: `mcp_github_add_issue_comment` (use PR number as issue number)
+- **Resolve comment threads**: Check MCP server documentation for available functions to mark comment threads as resolved (if available)
 
 **Note**: Verify the current capabilities of the GitHub MCP server by checking the latest documentation, as functionality may have been updated.
 
@@ -657,4 +725,5 @@ Most GitHub operations should use these MCP functions:
 - **Test quality is critical**: Reject tests that exist only for coverage metrics. Every test must validate meaningful business logic, user flows, or edge cases. Ensure proper test pyramid: unit tests for isolated logic, integration tests for component interactions, and e2e tests for critical user journeys.
 - **CRITICAL**: Always validate branch name first - never review PRs on default branch (main/master)
 - **CRITICAL**: Never proceed if no PR exists for the branch - prompt user to create PR first
+- **CRITICAL**: Always check existing review comments and mark them as resolved if the issues have been addressed by code changes
 

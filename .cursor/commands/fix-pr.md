@@ -1,6 +1,6 @@
 # Fix PR
 
-When the user invokes `/fix-pr`, fetch the GitHub PR, read all PR comments, check CI checks for failures, fix all issues found, and commit the fixes. If no fixes are required, inform the user.
+When the user invokes `/fix-pr`, fetch the GitHub PR, read **ALL** PR comments (including every single inline comment), check CI checks for failures, fix all issues found, and commit the fixes. **CRITICAL**: You MUST reply to EVERY single inline comment individually, explaining what specific changes were made to address each comment. If no fixes are required, inform the user.
 
 ## Critical Validation Rules
 
@@ -124,22 +124,48 @@ Most GitHub operations should use these MCP functions:
 
 ### Step 2: Fetch PR Comments
 
+**CRITICAL**: You MUST read and process EVERY single inline comment. No comment should be skipped.
+
 Use GitHub MCP server to fetch all comments:
 
 1. **Get all PR comments** (general comments):
    - Use `mcp_github_pull_request_read` with method `get_comments`
    - Repository: Detect from git remote (see Step 1.2)
-   - Extract: body, author, createdAt for each comment
+   - Extract: body, author, createdAt, id for each comment
+   - **Track each comment** for later response
 
 2. **Get all review comments** (inline comments and review threads):
    - Use `mcp_github_pull_request_read` with method `get_review_comments`
    - Repository: Detect from git remote (see Step 1.2)
-   - Extract: body, path, line, author, thread information
+   - Extract for EACH comment:
+     - `id` - Comment ID (needed for replies)
+     - `body` - Comment text (read carefully to understand the issue)
+     - `path` - File path where comment was made
+     - `line` - Line number (or startLine/endLine for multi-line)
+     - `author` - Who made the comment
+     - `thread_id` or `in_reply_to_id` - Thread information
+     - `is_resolved` - Whether already resolved
+     - `createdAt` - When comment was created
+   - **CRITICAL**: Process EVERY comment - do not skip any
+   - **Group comments by thread** to understand context
 
 3. **Get all reviews**:
    - Use `mcp_github_pull_request_read` with method `get_reviews`
    - Repository: Detect from git remote (see Step 1.2)
    - Extract: body, state, author, comments for each review
+   - Review bodies may contain additional feedback
+
+4. **Create a tracking list**:
+   - For each comment (both inline and general), create an entry tracking:
+     - Comment ID
+     - Comment text
+     - File path and line number (if inline)
+     - Author
+     - Whether it's actionable (requires code changes)
+     - Whether it's been fixed
+     - What changes were made to address it
+     - Whether a reply has been sent
+   - **This list ensures NO comment is missed**
 
 ### Step 3: Check CI Status
 
@@ -191,11 +217,15 @@ For each failing check or comment, identify:
    - Trailing whitespace
    - Missing EOF newlines
 
-5. **Review comments**:
-   - Parse comments for actionable feedback
-   - Identify code issues mentioned
-   - Extract file paths and line numbers
-   - Understand requested changes
+5. **Review comments** (CRITICAL - Process EVERY comment):
+   - **Read and understand EVERY single comment**:
+     - Parse each comment for actionable feedback
+     - Identify code issues mentioned in each comment
+     - Extract file paths and line numbers for each inline comment
+     - Understand the specific requested changes for each comment
+     - Categorize each comment (BUG, SECURITY, ARCHITECTURE, STYLE, TESTING, DOCUMENTATION, SUGGESTION)
+   - **Create a comprehensive list** of all comments that need to be addressed
+   - **No comment should be skipped** - even if it seems minor or already addressed
 
 ### Step 4.5: Resolve Merge Conflicts
 
@@ -380,29 +410,64 @@ find . -type f \( -name "*.go" -o -name "*.ts" -o -name "*.tsx" -o -name "*.js" 
 
 #### 5. Review Comment Issues
 
-For each actionable review comment, track what needs to be fixed:
+**CRITICAL**: You MUST address and reply to EVERY single inline comment individually. Each comment must receive a specific reply explaining what changes were made.
 
-1. **Parse the comment**:
+For EACH actionable review comment (process them one by one, do not skip any):
+
+1. **Parse EACH comment individually**:
    - Extract file path and line number (if inline comment)
-   - Understand the requested change
-   - Identify the issue type (bug, style, architecture, etc.)
-   - Store comment ID and details for later response
+   - Read the comment text carefully to fully understand the issue
+   - Understand the specific requested change
+   - Identify the issue type (BUG, SECURITY, ARCHITECTURE, STYLE, TESTING, DOCUMENTATION, SUGGESTION)
+   - Store comment ID, author, and all details for later response
+   - **Mark in tracking list**: comment needs to be addressed
 
-2. **Apply the fix**:
-   - Read the relevant file
-   - Make the necessary changes
-   - Ensure the fix addresses the comment
-   - Document how the fix addresses the comment (for response)
+2. **Apply the fix for THIS specific comment**:
+   - Read the relevant file at the comment's location
+   - Understand the current code and what the comment is asking for
+   - Make the necessary changes to address THIS specific comment
+   - Ensure the fix directly addresses what the comment requested
+   - **Document exactly how the fix addresses this comment** (for the individual reply)
 
-3. **Verify the fix**:
-   - Run relevant tests
-   - Check linting
-   - Ensure formatting is correct
+3. **Verify the fix for THIS comment**:
+   - Verify the change addresses the comment's concern
+   - Run relevant tests to ensure the fix doesn't break anything
+   - Check linting and formatting
+   - **Update tracking list**: mark comment as fixed, record what was changed
 
-4. **Track fixes for comments**:
-   - Maintain a list of comments addressed
-   - Record the fix applied for each comment
-   - Prepare response messages explaining the fixes
+4. **Prepare individual reply for THIS comment**:
+   - Write a specific reply explaining:
+     - What the original comment was about
+     - What specific changes were made to address it
+     - How the changes fix the issue
+     - Reference the file path and line number
+   - Example reply format:
+     ```
+     ✅ Fixed! Addressing your feedback on line 123:
+
+     **Original concern**: [Brief summary of what the comment said]
+
+     **Changes made**:
+     - [Specific change 1 that was made]
+     - [Specific change 2 that was made]
+
+     **How it addresses the feedback**: [Explanation of how the changes resolve the issue]
+
+     The code now [describes the improved state].
+     ```
+
+5. **Track fixes for ALL comments**:
+   - Maintain a comprehensive list of ALL comments (both addressed and not yet addressed)
+   - For each comment, record:
+     - Comment ID
+     - Comment text
+     - File path and line number
+     - Author
+     - Whether it's been fixed
+     - What specific changes were made
+     - The prepared reply text
+     - Whether reply has been sent
+   - **Ensure NO comment is left without a reply** - even if the comment was already addressed in a previous commit, you must acknowledge it
 
 ### Step 6: Run Thorough Test Suite
 
@@ -461,21 +526,32 @@ For each actionable review comment, track what needs to be fixed:
 
 ### Step 7: Address Review Comments
 
-After all fixes are complete and tests pass, respond to review comments explaining how issues were fixed. **Reply directly to review comment threads and resolve them** to show that feedback has been addressed.
+**CRITICAL**: After all fixes are complete and tests pass, you MUST reply to EVERY single inline comment individually. Each comment must receive a specific, detailed reply explaining what changes were made to address that particular comment.
+
+**Requirements**:
+- **Read EVERY comment** - no comment should be skipped
+- **Reply to EVERY comment individually** - each comment gets its own reply
+- **Be specific in each reply** - explain exactly what changes were made for that comment
+- **Reference the comment** - acknowledge what the original concern was
+- **Reply directly to review comment threads** to show that feedback has been addressed
 
 #### 7.1: Get Review Comment Threads
 
-1. **Get all review comments with thread information**:
+**CRITICAL**: You must process EVERY single comment. Create a complete inventory before proceeding.
+
+1. **Get ALL review comments with thread information**:
    - Use `mcp_github_pull_request_read` with method `get_review_comments`
    - Repository: Detect from git remote (see Step 1.2)
-   - Extract for each comment:
+   - Extract for EACH comment (do not skip any):
      - `id` - Comment ID (needed for replies)
-     - `body` - Comment text
+     - `body` - Comment text (read carefully)
      - `path` - File path
-     - `line` - Line number
+     - `line` - Line number (or startLine/endLine for multi-line)
      - `thread_id` or `in_reply_to_id` - Thread information
      - `is_resolved` - Whether thread is already resolved
      - `author` - Who made the comment
+     - `createdAt` - When comment was created
+   - **Count the total number of comments** to ensure you process all of them
 
 2. **Group comments by thread**:
    - Comments with the same `thread_id` or `in_reply_to_id` belong to the same thread
@@ -483,27 +559,71 @@ After all fixes are complete and tests pass, respond to review comments explaini
    - Track which comments have been fixed and need replies
    - **Important**: When replying, reply to the **root comment** of the thread (the original review comment), not to replies within the thread
 
+3. **Create a complete comment inventory**:
+   - List ALL comments (both resolved and unresolved)
+   - For each comment, mark:
+     - Whether it requires code changes
+     - Whether changes have been made
+     - Whether a reply has been prepared
+     - Whether a reply has been sent
+   - **This ensures NO comment is missed**
+
 #### 7.2: Reply to Review Comment Threads
 
-For each review comment that has been fixed, reply to the comment thread using GitHub MCP server:
+**CRITICAL**: You MUST reply to EVERY single review comment individually. Each comment must receive its own specific reply explaining what changes were made.
+
+**Process**: Go through your comment tracking list and reply to EACH comment one by one. Do not skip any comments.
+
+For EACH review comment (process them individually):
 
 1. **For inline review comments** (comments on specific lines in code):
+   - **Read the original comment** to understand what was requested
+   - **Check what changes were made** to address this specific comment
+   - **Write a specific reply** for THIS comment explaining:
+     - What the original concern was (brief summary)
+     - What specific changes were made to address it
+     - How the changes resolve the issue
+     - Reference the file path and line number
+
+   - **Example reply format**:
+     ```
+     ✅ Fixed! Addressing your feedback on `file/path.go:123`:
+
+     **Original concern**: [Brief summary of the comment]
+
+     **Changes made**:
+     - [Specific change 1]
+     - [Specific change 2]
+
+     **How it addresses the feedback**: [Explanation]
+
+     The code now [describes improved state].
+     ```
+
    - Use `mcp_github_add_comment_to_pending_review` to add a reply comment to your pending review
    - Parameters:
      - `owner`: Repository owner
      - `repo`: Repository name
      - `pullNumber`: PR number
      - `path`: File path from the original comment
-     - `body`: Reply text explaining the fix (e.g., "✅ Fixed! I've [description of fix]. The changes address your feedback by [explanation].")
+     - `body`: The specific reply text you prepared for THIS comment
      - `line`: Line number from the original comment (if applicable)
      - `side`: "RIGHT" (the new state) or "LEFT" (the previous state)
    - **Note**: This adds a comment to your pending review. You may need to create or submit a review first.
-   - **Best practices for replying to review comments**:
-     - Include a reference to the original comment in your reply body (e.g., "✅ Fixed! Addressing @reviewer's feedback on line X...")
-     - Use general PR comments (see Step 7.3) to acknowledge fixes when needed
-     - Verify the current capabilities of the GitHub MCP server by checking the latest documentation
+   - **Mark in tracking list**: This comment has been replied to
 
-2. **Create or submit a review with comments**:
+2. **For comments that were already addressed** (in previous commits):
+   - **Still reply to them** to acknowledge the fix
+   - Reply format:
+     ```
+     ✅ This was addressed in a previous commit. The code now [describes current state].
+
+     **What was changed**: [Brief description of the fix that was made]
+     ```
+   - Use the same MCP function to add the reply
+
+3. **Create or submit a review with ALL comments**:
+   - After replying to ALL comments individually, create or submit the review
    - Use `mcp_github_pull_request_review_write` with method `create` to create a review with comments
    - Or use method `submit_pending` to submit an existing pending review
    - Parameters:
@@ -514,25 +634,49 @@ For each review comment that has been fixed, reply to the comment thread using G
      - `event`: "COMMENT" (for comments only) or "APPROVE" (if all issues are resolved)
    - This will include all comments added via `add_comment_to_pending_review`
 
-3. **Thread resolution**:
+4. **Thread resolution**:
    - Review comment threads are typically resolved when:
      - A new commit addresses the comment
      - The reviewer manually resolves the thread
      - The comment author replies indicating the issue is fixed
    - Include "✅ Fixed" or "✅ Resolved" in your reply to indicate the issue has been addressed
+   - **Verify**: Check your tracking list to ensure EVERY comment has been replied to
 
 #### 7.3: Reply to General PR Comments
 
-For general PR comments (not inline code comments):
+**CRITICAL**: Reply to EVERY general PR comment individually with specific details about what was changed.
 
-1. **Use MCP to add a reply**:
+For EACH general PR comment (not inline code comments) - process them one by one:
+
+1. **Read the comment carefully**:
+   - Understand what the comment is asking for
+   - Check what changes were made to address it
+   - Prepare a specific reply for THIS comment
+
+2. **Use MCP to add a reply**:
    - Use `mcp_github_add_issue_comment` (PRs are issues in GitHub)
    - Repository: Detect from git remote (see Step 1.2)
    - Issue number: PR number
-   - Body: "✅ Fixed! [Description of how the comment was addressed]"
+   - Body: Write a specific reply for THIS comment:
+     ```
+     ✅ Fixed! @[original-comment-author]
 
-2. **Or reference the original comment**:
-   - If the comment has an ID, you can reference it: "✅ Fixed! @[original-comment-author] [Description]"
+     **Original concern**: [Brief summary of the comment]
+
+     **Changes made**:
+     - [Specific change 1]
+     - [Specific change 2]
+
+     **How it addresses the feedback**: [Explanation]
+     ```
+
+3. **Reference the original comment**:
+   - If the comment has an ID or author, reference them: "✅ Fixed! @[original-comment-author]"
+   - Make it clear which comment you're responding to
+
+4. **Track replies**:
+   - Mark in your tracking list that this comment has been replied to
+   - Ensure NO general comment is left without a reply
 
 #### 7.4: Create Summary Comment
 
@@ -557,6 +701,8 @@ If multiple review comments were addressed, create a summary comment:
 
 #### 7.5: Example Workflow for Replying to Review Comments
 
+**CRITICAL**: This workflow ensures EVERY comment gets an individual reply.
+
 1. **Get repository info**:
    ```bash
    REPO=$(git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/')
@@ -564,41 +710,86 @@ If multiple review comments were addressed, create a summary comment:
    REPO_NAME=$(echo $REPO | cut -d'/' -f2)
    ```
 
-2. **Get all review comments to identify threads**:
+2. **Get ALL review comments to identify threads**:
    - Use `mcp_github_pull_request_read` with method `get_review_comments`
+   - **Count total comments**: Ensure you know how many comments exist
    - For each comment, check:
      - `in_reply_to_id`: null or missing = root comment
      - `thread_id`: same ID = same thread
      - `is_resolved`: false = needs resolution
+   - **Create tracking list** with ALL comments
 
-3. **For each review comment that was fixed**:
-   - Extract: `path`, `line`, `body` from the original comment
-   - Prepare reply body explaining the fix
+3. **For EACH review comment** (process them one by one, do not skip any):
+   - **Read the original comment**: Understand what it's asking for
+   - **Check what changes were made**: Review the code changes to see if this comment was addressed
+   - **Extract details**: `path`, `line`, `body`, `author`, `id` from the original comment
+   - **Prepare specific reply body** for THIS comment:
+     - Explain what the original concern was
+     - List the specific changes made
+     - Explain how the changes address the feedback
+     - Be specific and detailed
 
-4. **Add reply comments to pending review**:
-   - Use `mcp_github_add_comment_to_pending_review` for each fixed comment
+4. **Add reply comments to pending review** (one by one):
+   - **For EACH comment** (even if already addressed), use `mcp_github_add_comment_to_pending_review`
    - Parameters:
      - `owner`: $OWNER
      - `repo`: $REPO_NAME
      - `pullNumber`: $PR_NUMBER
      - `path`: File path from original comment
-     - `body`: Reply text with fix explanation
+     - `body`: The specific reply text you prepared for THIS comment
      - `line`: Line number (if applicable)
      - `side`: "RIGHT" (new state)
+   - **Mark in tracking list**: This comment has been replied to
+   - **Continue until ALL comments have replies**
 
-5. **Submit the review**:
+5. **Verify completeness**:
+   - Check your tracking list: Every comment should have a reply
+   - Count: Number of replies should match number of comments
+   - If any comment is missing a reply, add it now
+
+6. **Submit the review**:
    - Use `mcp_github_pull_request_review_write` with method `submit_pending`
    - Or use method `create` with `event: "COMMENT"` to create a new review with all comments
    - This will include all the reply comments added in step 4
+   - **Verify**: All comments should now have replies visible on GitHub
 
 #### 7.6: Track Comment Replies
 
-Maintain a list of comments that have been:
-- ✅ Fixed in code
-- ✅ Replied to in the thread
-- ✅ Thread resolved (if applicable)
+**CRITICAL**: Maintain a comprehensive tracking list to ensure NO comment is missed.
 
-This helps ensure all feedback is properly addressed and acknowledged.
+For EACH comment (both inline and general), track:
+
+1. **Comment identification**:
+   - ✅ Comment ID
+   - ✅ Comment text (full text)
+   - ✅ Author
+   - ✅ File path and line number (if inline)
+   - ✅ Thread ID (if part of a thread)
+   - ✅ Created date
+
+2. **Status tracking**:
+   - ✅ Has been read and understood
+   - ✅ Requires code changes (yes/no)
+   - ✅ Has been fixed in code (yes/no)
+   - ✅ What specific changes were made
+   - ✅ Reply has been prepared (yes/no)
+   - ✅ Reply text (the actual reply content)
+   - ✅ Reply has been sent (yes/no)
+   - ✅ Thread resolved (if applicable)
+
+3. **Verification checklist**:
+   - ✅ Total number of comments: [count]
+   - ✅ Number of comments replied to: [count]
+   - ✅ Number of comments still needing replies: [count]
+   - **CRITICAL**: These numbers must match - if not, find the missing comments
+
+4. **Before completing Step 7, verify**:
+   - Every comment in your list has a reply
+   - Every reply is specific to that comment
+   - Every reply explains what changes were made
+   - No comment was skipped
+
+This comprehensive tracking ensures all feedback is properly addressed and acknowledged.
 
 ### Step 8: Commit Fixes
 
@@ -704,14 +895,25 @@ This helps ensure all feedback is properly addressed and acknowledged.
    - Verify no regressions
    - Do NOT commit until all tests pass
 
-8. **Address review comments**:
-   - Get all review comment threads using `mcp_github_pull_request_read` with method `get_review_comments`
-   - For each fixed comment, reply using GitHub MCP server:
+8. **Address review comments** (CRITICAL - Reply to EVERY comment individually):
+   - Get ALL review comment threads using `mcp_github_pull_request_read` with method `get_review_comments`
+   - **Create a complete inventory** of ALL comments (count them)
+   - **For EACH comment** (process them one by one, do not skip any):
+     - Read and understand the comment
+     - Check what changes were made to address it
+     - Prepare a specific reply explaining what changes were made for THIS comment
      - Use `mcp_github_add_comment_to_pending_review` to add reply comments to your pending review
-     - Include file path, line number, and explanation of the fix
-     - Submit the review using `mcp_github_pull_request_review_write` with method `submit_pending` or `create`
-   - For general comments: Use `mcp_github_add_issue_comment` (PR number as issue number)
-   - Create summary comment if multiple comments were addressed
+     - Include in the reply:
+       - What the original concern was
+       - What specific changes were made
+       - How the changes address the feedback
+       - File path and line number (if inline)
+     - Mark in tracking list that this comment has been replied to
+   - **For general comments**: Use `mcp_github_add_issue_comment` (PR number as issue number)
+     - Reply to EACH general comment individually with specific details
+   - **Verify completeness**: Check that every comment has a reply
+   - Submit the review using `mcp_github_pull_request_review_write` with method `submit_pending` or `create`
+   - Create summary comment if multiple comments were addressed (in addition to individual replies)
 
 9. **Commit and push**:
    - Stage changes
@@ -758,16 +960,25 @@ npm run format
 - Re-run tests to verify
 
 ### Review Comments
-- Read comment carefully
-- Understand the requested change
-- Apply the fix
-- Verify it addresses the comment
-- **Reply to the comment thread** using GitHub MCP server:
+**CRITICAL**: Process EVERY comment individually. No comment should be skipped.
+
+- **Read EVERY comment carefully** - create a complete inventory
+- **For EACH comment**:
+  - Understand the requested change
+  - Apply the fix (if needed)
+  - Verify it addresses the comment
+  - **Prepare a specific reply** explaining what changes were made for THIS comment
+- **Reply to EVERY comment thread individually** using GitHub MCP server:
   - Use `mcp_github_add_comment_to_pending_review` to add a reply comment
-  - Include the file path, line number, and explanation of the fix
+  - Include in EACH reply:
+    - What the original concern was
+    - What specific changes were made
+    - How the changes address the feedback
+    - File path and line number (if inline)
   - Submit the review using `mcp_github_pull_request_review_write` with method `submit_pending` or `create`
   - For general PR comments, use `mcp_github_add_issue_comment`
-- Track which comments have been fixed, replied to, and resolved
+- **Track which comments have been fixed, replied to, and resolved**
+- **Verify**: Every comment should have an individual reply
 
 ### Merge Conflicts
 - Identify conflicted files with `git status`
@@ -821,10 +1032,13 @@ npm run format
 - Be thorough but efficient - fix all issues in one go
 - After pushing, CI will automatically re-run
 - Monitor CI status after pushing fixes
-- **Reply to review comment threads** to show that feedback was addressed:
+- **CRITICAL**: Reply to EVERY single inline comment individually with specific details:
+  - Read and process EVERY comment - no comment should be skipped
+  - For EACH comment, write a specific reply explaining what changes were made
   - Use `mcp_github_add_comment_to_pending_review` to add reply comments
   - Use `mcp_github_pull_request_review_write` to submit the review with comments
   - Track which comments have been fixed, replied to, and resolved
+  - Verify: Every comment should have an individual reply before completing the fix
 - **Use GitHub MCP server for ALL GitHub operations** (never use `gh` CLI)
 - Repository: Always detect dynamically from git remote using: `git remote get-url origin | sed -E 's/.*[:/]([^/]+)\/([^/]+)(\.git)?$/\1\/\2/'`
 - **CRITICAL**: Always validate branch name first - never make changes on default branch (main/master)
