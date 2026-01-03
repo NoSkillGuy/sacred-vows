@@ -171,7 +171,7 @@ describe("SignupPage", () => {
       await user.click(submitButton);
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith("/app");
+        expect(mockNavigate).toHaveBeenCalledWith("/dashboard");
       });
     });
 

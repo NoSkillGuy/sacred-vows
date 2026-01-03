@@ -1,7 +1,13 @@
 import { useState, useEffect, useRef, ChangeEvent, FormEvent, KeyboardEvent } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
-import { login, isAuthenticated, getCurrentUserFromAPI } from "../../services/authService";
+import {
+  login,
+  isAuthenticated,
+  getCurrentUserFromAPI,
+  refreshAccessToken,
+} from "../../services/authService";
 import { usePetals } from "./usePetals";
+import CountdownBanner from "./CountdownBanner";
 import "./AuthPage.css";
 
 // SVG Icons
@@ -56,6 +62,7 @@ function LoginPage(): JSX.Element {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showCountdown, setShowCountdown] = useState(false);
   const passwordInputRef = useRef<HTMLInputElement>(null);
 
   // Generate petals once per mount to avoid animation resets
@@ -83,12 +90,24 @@ function LoginPage(): JSX.Element {
   // Check if user is already authenticated on mount
   useEffect(() => {
     const checkAuth = async (): Promise<void> => {
-      if (isAuthenticated()) {
+      // If no access token, try to refresh using refresh token from cookie
+      let authenticated = isAuthenticated();
+      if (!authenticated) {
         try {
-          // Verify token is still valid
+          await refreshAccessToken();
+          authenticated = isAuthenticated();
+        } catch {
+          // No valid refresh token, stay on login page
+          return;
+        }
+      }
+
+      // Verify token is still valid
+      if (authenticated) {
+        try {
           await getCurrentUserFromAPI();
-          // If valid, redirect to app
-          navigate("/app", { replace: true });
+          // If valid, show countdown banner
+          setShowCountdown(true);
         } catch (error) {
           // Token is invalid, stay on login page
           console.error("Token validation failed:", error);
@@ -98,6 +117,11 @@ function LoginPage(): JSX.Element {
 
     checkAuth();
   }, [navigate]);
+
+  // Handle countdown completion
+  const handleCountdownComplete = (): void => {
+    navigate("/dashboard", { replace: true });
+  };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setFormData((prev) => ({
@@ -139,7 +163,7 @@ function LoginPage(): JSX.Element {
 
     try {
       await login(formData.email, formData.password);
-      navigate("/app");
+      navigate("/dashboard");
     } catch (err) {
       setError((err as Error).message || "Login failed. Please try again.");
     } finally {
@@ -154,6 +178,15 @@ function LoginPage(): JSX.Element {
 
   return (
     <div className="auth-page">
+      {/* Countdown Banner */}
+      {showCountdown && (
+        <CountdownBanner
+          message="You are already logged in"
+          countdown={5}
+          onComplete={handleCountdownComplete}
+        />
+      )}
+
       {/* Background */}
       <div className="auth-bg" />
       <div className="auth-grain" />

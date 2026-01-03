@@ -250,11 +250,11 @@ function Dashboard(): JSX.Element {
     return `${WELCOME_TOAST_KEY_PREFIX}_${identifier}`;
   }
 
-  function handleLogout(): void {
+  async function handleLogout(): Promise<void> {
     if (typeof sessionStorage !== "undefined") {
       sessionStorage.removeItem(getWelcomeToastKey(user));
     }
-    logout();
+    await logout();
     navigate("/login");
   }
 
@@ -370,7 +370,7 @@ function Dashboard(): JSX.Element {
         {/* Header */}
         <header className="dashboard-header">
           <div className="header-left">
-            <Link to="/" className="header-logo">
+            <Link to="/dashboard" className="header-logo">
               <div className="header-logo-icon">
                 <RingsIcon />
               </div>

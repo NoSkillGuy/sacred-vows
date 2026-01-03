@@ -1,0 +1,71 @@
+.countdown-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, var(--gold-light, #f5e6c8) 0%, var(--champagne, #f5e6d3) 100%);
+  border-bottom: 2px solid var(--gold, #d4af37);
+  box-shadow: var(--shadow-md, 0 4px 20px rgba(0, 0, 0, 0.08));
+  z-index: 1000;
+  animation: slideDown 0.3s var(--ease-out-quart, cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.countdown-banner-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  text-align: center;
+}
+
+.countdown-banner-message {
+  font-family: "Quicksand", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-dark, #2d2d2d);
+  display: inline-block;
+}
+
+.countdown-banner-number {
+  font-weight: 700;
+  color: var(--burgundy, #8b2942);
+  font-size: 1.1rem;
+  min-width: 1.5ch;
+  display: inline-block;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@media (max-width: 768px) {
+  .countdown-banner-content {
+    padding: 0.875rem 1.5rem;
+  }
+
+  .countdown-banner-message {
+    font-size: 0.875rem;
+  }
+
+  .countdown-banner-number {
+    font-size: 1rem;
+  }
+}
+

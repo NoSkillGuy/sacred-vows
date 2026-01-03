@@ -1,5 +1,6 @@
-import { ReactNode } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { isAuthenticated } from "../../services/authService";
 import LandingFooter from "../Landing/LandingFooter";
 import "./PageLayout.css";
 
@@ -26,13 +27,24 @@ interface PageLayoutProps {
 
 function PageLayout({ children, title, subtitle, breadcrumbs = [] }: PageLayoutProps): JSX.Element {
   const navigate = useNavigate();
+  const [isAuth, setIsAuth] = useState(() => isAuthenticated());
+
+  useEffect(() => {
+    // Check auth state asynchronously to avoid cascading renders
+    // Use requestAnimationFrame to defer the state update to the next frame
+    const frameId = requestAnimationFrame(() => {
+      const currentAuth = isAuthenticated();
+      setIsAuth((prevAuth) => (prevAuth !== currentAuth ? currentAuth : prevAuth));
+    });
+    return () => cancelAnimationFrame(frameId);
+  }, []);
 
   return (
     <div className="page-layout">
       {/* Navigation Header */}
       <header className="page-header">
         <nav className="page-nav">
-          <Link to="/" className="nav-logo">
+          <Link to={isAuth ? "/dashboard" : "/"} className="nav-logo">
             <span className="logo-icon">
               <RingIcon />
             </span>

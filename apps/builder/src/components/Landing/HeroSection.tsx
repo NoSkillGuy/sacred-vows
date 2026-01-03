@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   useEffect,
   useState,
@@ -9,7 +9,7 @@ import {
   MouseEvent,
 } from "react";
 import { trackCTA } from "../../services/analyticsService";
-import { isAuthenticated, getCurrentUserFromAPI } from "../../services/authService";
+import { logout, type User } from "../../services/authService";
 import PersonalizationModal from "./PersonalizationModal";
 
 // SVG Components for premium look
@@ -109,6 +109,45 @@ const OrnamentSVG = (): ReactElement => (
   </svg>
 );
 
+const ProfileIcon = (): ReactElement => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+    <circle cx="12" cy="7" r="4" />
+  </svg>
+);
+
+const LogoutIcon = (): ReactElement => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+    <polyline points="16 17 21 12 16 7" />
+    <line x1="21" y1="12" x2="9" y2="12" />
+  </svg>
+);
+
+function getInitials(name?: string): string {
+  if (!name) return "?";
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+}
+
 // Petal colors for variety
 const petalColors = ["#f5d0d3", "#e8b4b8", "#fce4e2", "#d4969c", "#c9a1a6"];
 
@@ -161,9 +200,17 @@ function formatDate(dateStr: string | undefined): string | null {
 
 interface HeroSectionProps {
   onSectionView?: (sectionId: string) => void;
+  user?: User | null;
+  isAuthenticated?: boolean;
+  isAuthChecked?: boolean;
 }
 
-function HeroSection({ onSectionView }: HeroSectionProps): ReactElement {
+function HeroSection({
+  onSectionView,
+  user,
+  isAuthenticated = false,
+  isAuthChecked = false,
+}: HeroSectionProps): ReactElement {
   const navigate = useNavigate();
   const [mounted, setMounted] = useState<boolean>(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
@@ -171,7 +218,9 @@ function HeroSection({ onSectionView }: HeroSectionProps): ReactElement {
   const [personalizationData, setPersonalizationData] = useState<PersonalizationData | null>(null);
   const [editingField, setEditingField] = useState<EditingField>(null);
   const [editValue, setEditValue] = useState<string>("");
+  const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const sectionRef = useRef<HTMLElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Refs for input fields
   const brideInputRef = useRef<HTMLInputElement>(null);
@@ -330,27 +379,40 @@ function HeroSection({ onSectionView }: HeroSectionProps): ReactElement {
     setMobileMenuOpen(false);
   };
 
-  // Handle sign in button click with authentication check
-  const handleSignIn = async (): Promise<void> => {
+  // Handle sign in button click
+  const handleSignIn = (): void => {
     trackCTA("nav_sign_in");
-
-    // Check if user is already authenticated
-    if (isAuthenticated()) {
-      try {
-        // Verify token is still valid
-        await getCurrentUserFromAPI();
-        // If valid, redirect to app
-        navigate("/app");
-        return;
-      } catch (error) {
-        // Token is invalid, proceed to login page
-        console.error("Token validation failed:", error);
-      }
-    }
-
-    // Not authenticated or token invalid, go to login page
     navigate("/login");
   };
+
+  // Handle logout
+  const handleLogout = async (): Promise<void> => {
+    setDropdownOpen(false);
+    try {
+      await logout();
+      navigate("/");
+      // Parent component will re-check auth state and update props
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: Event): void => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    if (dropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownOpen]);
 
   return (
     <section ref={sectionRef} className="hero-section">
@@ -417,18 +479,66 @@ function HeroSection({ onSectionView }: HeroSectionProps): ReactElement {
         <div className="nav-links">
           <a href="#layouts">Layouts</a>
           <a href="#how-it-works">How It Works</a>
-          <button
-            className="nav-cta"
-            onClick={() => {
-              trackCTA("nav_start_free");
-              navigate("/signup");
-            }}
-          >
-            <span>Start Free</span>
-          </button>
-          <button className="nav-login" onClick={handleSignIn}>
-            <span>Sign In</span>
-          </button>
+          {isAuthenticated && isAuthChecked ? (
+            <>
+              <button
+                className="nav-cta"
+                onClick={() => {
+                  trackCTA("nav_create_new");
+                  navigate("/layouts");
+                }}
+              >
+                <span>Create New Invitation</span>
+              </button>
+              <button
+                className="nav-login"
+                onClick={() => {
+                  trackCTA("nav_dashboard");
+                  navigate("/dashboard");
+                }}
+              >
+                <span>My Invitations</span>
+              </button>
+              <div className="user-menu" ref={dropdownRef}>
+                <div className="user-avatar" onClick={() => setDropdownOpen(!dropdownOpen)}>
+                  {getInitials(user?.name)}
+                </div>
+                <div className={`user-dropdown ${dropdownOpen ? "open" : ""}`}>
+                  <div className="user-dropdown-header">
+                    <div className="user-dropdown-name">{user?.name || "Guest"}</div>
+                    <div className="user-dropdown-email">{user?.email || ""}</div>
+                  </div>
+                  <Link
+                    to="/profile"
+                    className="user-dropdown-item"
+                    onClick={() => setDropdownOpen(false)}
+                  >
+                    <ProfileIcon />
+                    Profile
+                  </Link>
+                  <button className="user-dropdown-item logout" onClick={handleLogout}>
+                    <LogoutIcon />
+                    Sign Out
+                  </button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <button
+                className="nav-cta"
+                onClick={() => {
+                  trackCTA("nav_start_free");
+                  navigate("/signup");
+                }}
+              >
+                <span>Start Free</span>
+              </button>
+              <button className="nav-login" onClick={handleSignIn}>
+                <span>Sign In</span>
+              </button>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -463,25 +573,70 @@ function HeroSection({ onSectionView }: HeroSectionProps): ReactElement {
         >
           How It Works
         </a>
-        <button
-          className="nav-cta"
-          onClick={() => {
-            closeMobileMenu();
-            trackCTA("mobile_nav_start_free");
-            navigate("/signup");
-          }}
-        >
-          <span>Start Free</span>
-        </button>
-        <button
-          className="nav-login"
-          onClick={() => {
-            closeMobileMenu();
-            handleSignIn();
-          }}
-        >
-          <span>Sign In</span>
-        </button>
+        {isAuthenticated && isAuthChecked ? (
+          <>
+            <button
+              className="nav-cta"
+              onClick={() => {
+                closeMobileMenu();
+                trackCTA("mobile_nav_create_new");
+                navigate("/layouts");
+              }}
+            >
+              <span>Create New Invitation</span>
+            </button>
+            <button
+              className="nav-login"
+              onClick={() => {
+                closeMobileMenu();
+                trackCTA("mobile_nav_dashboard");
+                navigate("/dashboard");
+              }}
+            >
+              <span>My Invitations</span>
+            </button>
+            <Link
+              to="/profile"
+              className="mobile-nav-item"
+              onClick={() => {
+                closeMobileMenu();
+              }}
+            >
+              Profile
+            </Link>
+            <button
+              className="mobile-nav-item logout"
+              onClick={() => {
+                closeMobileMenu();
+                handleLogout();
+              }}
+            >
+              Sign Out
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              className="nav-cta"
+              onClick={() => {
+                closeMobileMenu();
+                trackCTA("mobile_nav_start_free");
+                navigate("/signup");
+              }}
+            >
+              <span>Start Free</span>
+            </button>
+            <button
+              className="nav-login"
+              onClick={() => {
+                closeMobileMenu();
+                handleSignIn();
+              }}
+            >
+              <span>Sign In</span>
+            </button>
+          </>
+        )}
       </div>
 
       {/* Main Hero Content */}
@@ -498,16 +653,29 @@ function HeroSection({ onSectionView }: HeroSectionProps): ReactElement {
             they&apos;ll treasure forever.
           </p>
           <div className="hero-cta">
-            <button
-              className="cta-primary"
-              onClick={() => {
-                trackCTA("hero_start_free");
-                navigate("/signup");
-              }}
-            >
-              <span>Start Creating Free</span>
-              <span className="cta-arrow">→</span>
-            </button>
+            {isAuthenticated && isAuthChecked ? (
+              <button
+                className="cta-primary"
+                onClick={() => {
+                  trackCTA("hero_create_new");
+                  navigate("/layouts");
+                }}
+              >
+                <span>Create New Invitation</span>
+                <span className="cta-arrow">→</span>
+              </button>
+            ) : (
+              <button
+                className="cta-primary"
+                onClick={() => {
+                  trackCTA("hero_start_free");
+                  navigate("/signup");
+                }}
+              >
+                <span>Start Creating Free</span>
+                <span className="cta-arrow">→</span>
+              </button>
+            )}
             <button className="cta-secondary" onClick={scrollToLayouts}>
               View Layouts
             </button>

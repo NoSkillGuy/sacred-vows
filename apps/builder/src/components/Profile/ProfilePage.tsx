@@ -289,8 +289,8 @@ function ProfilePage(): JSX.Element {
       .slice(0, 2);
   }
 
-  function handleLogout(): void {
-    logout();
+  async function handleLogout(): Promise<void> {
+    await logout();
     navigate("/login");
   }
 
@@ -312,7 +312,7 @@ function ProfilePage(): JSX.Element {
         {/* Header - Same as Dashboard */}
         <header className="dashboard-header">
           <div className="header-left">
-            <Link to="/" className="header-logo">
+            <Link to="/dashboard" className="header-logo">
               <div className="header-logo-icon">
                 <RingsIcon />
               </div>

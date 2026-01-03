@@ -346,8 +346,8 @@ function LayoutGallery(): JSX.Element {
     }
   }
 
-  function handleLogout(): void {
-    logout();
+  async function handleLogout(): Promise<void> {
+    await logout();
     navigate("/login");
   }
 
@@ -382,7 +382,7 @@ function LayoutGallery(): JSX.Element {
         {/* Header */}
         <header className="gallery-header">
           <div className="header-left">
-            <Link to="/" className="header-logo">
+            <Link to="/dashboard" className="header-logo">
               <div className="header-logo-icon">
                 <RingsIcon />
               </div>

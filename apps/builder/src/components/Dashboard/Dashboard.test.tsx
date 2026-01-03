@@ -230,6 +230,17 @@ describe("Dashboard", () => {
         expect(mockNavigate).toHaveBeenCalledWith("/builder/inv-1");
       });
     });
+
+    it("should have logo link that navigates to dashboard", async () => {
+      renderDashboard();
+
+      await waitFor(() => {
+        // Find the logo link by the "Sacred Vows" text
+        const logoLink = screen.getByRole("link", { name: /sacred vows/i });
+        expect(logoLink).toBeInTheDocument();
+        expect(logoLink).toHaveAttribute("href", "/dashboard");
+      });
+    });
   });
 
   describe("Loading State", () => {
