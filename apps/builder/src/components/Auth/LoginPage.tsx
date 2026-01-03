@@ -1,4 +1,4 @@
-import { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import { useState, useEffect, useRef, ChangeEvent, FormEvent, KeyboardEvent } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { login, isAuthenticated, getCurrentUserFromAPI } from "../../services/authService";
 import { usePetals } from "./usePetals";
@@ -56,6 +56,7 @@ function LoginPage(): JSX.Element {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const passwordInputRef = useRef<HTMLInputElement>(null);
 
   // Generate petals once per mount to avoid animation resets
   const petals = usePetals(10);
@@ -98,12 +99,58 @@ function LoginPage(): JSX.Element {
     checkAuth();
   }, [navigate]);
 
+  // Set up keyboard handler for password field to ensure Ctrl+A and Delete work
+  useEffect(() => {
+    const input = passwordInputRef.current;
+    if (!input) return;
+
+    const handleKeyDownCapture = (e: Event): void => {
+      const ke = e as KeyboardEvent;
+      // Handle Ctrl+A / Cmd+A to select all
+      if ((ke.ctrlKey || ke.metaKey) && ke.key.toLowerCase() === "a") {
+        ke.preventDefault();
+        ke.stopPropagation();
+        // Use setTimeout to ensure this happens after any other handlers
+        setTimeout(() => {
+          input.select();
+          input.setSelectionRange(0, input.value.length);
+        }, 0);
+      }
+      // Don't interfere with Delete and Backspace - let them work normally
+    };
+
+    // Use capture phase to intercept before other handlers
+    input.addEventListener("keydown", handleKeyDownCapture, true);
+
+    return () => {
+      input.removeEventListener("keydown", handleKeyDownCapture, true);
+    };
+  }, []);
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
     }));
     setError("");
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>): void => {
+    // Allow Ctrl+A (or Cmd+A on Mac) to select all text
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "a") {
+      e.preventDefault();
+      e.stopPropagation();
+      const input = passwordInputRef.current;
+      if (input) {
+        // Use setTimeout to ensure this happens after React processes the event
+        setTimeout(() => {
+          input.select();
+          input.setSelectionRange(0, input.value.length);
+        }, 0);
+      }
+      return;
+    }
+    // Don't interfere with Delete and Backspace - let them work normally
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
@@ -204,11 +251,13 @@ function LoginPage(): JSX.Element {
                 Password
               </label>
               <input
+                ref={passwordInputRef}
                 type="password"
                 id="password"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
+                onKeyDown={handleKeyDown}
                 placeholder="Enter your password"
                 className="auth-input"
                 required
