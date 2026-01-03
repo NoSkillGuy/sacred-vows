@@ -99,34 +99,6 @@ function LoginPage(): JSX.Element {
     checkAuth();
   }, [navigate]);
 
-  // Set up keyboard handler for password field to ensure Ctrl+A and Delete work
-  useEffect(() => {
-    const input = passwordInputRef.current;
-    if (!input) return;
-
-    const handleKeyDownCapture = (e: Event): void => {
-      const ke = e as KeyboardEvent;
-      // Handle Ctrl+A / Cmd+A to select all
-      if ((ke.ctrlKey || ke.metaKey) && ke.key.toLowerCase() === "a") {
-        ke.preventDefault();
-        ke.stopPropagation();
-        // Use setTimeout to ensure this happens after any other handlers
-        setTimeout(() => {
-          input.select();
-          input.setSelectionRange(0, input.value.length);
-        }, 0);
-      }
-      // Don't interfere with Delete and Backspace - let them work normally
-    };
-
-    // Use capture phase to intercept before other handlers
-    input.addEventListener("keydown", handleKeyDownCapture, true);
-
-    return () => {
-      input.removeEventListener("keydown", handleKeyDownCapture, true);
-    };
-  }, []);
-
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setFormData((prev) => ({
       ...prev,

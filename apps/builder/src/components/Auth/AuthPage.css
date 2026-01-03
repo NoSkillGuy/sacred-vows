@@ -296,9 +296,6 @@
   transition: all 0.3s var(--ease-out-quart);
   background: var(--blush-light);
   user-select: text;
-  -webkit-user-select: text;
-  -moz-user-select: text;
-  -ms-user-select: text;
 }
 
 .auth-input::placeholder {
