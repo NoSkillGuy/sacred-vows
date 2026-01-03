@@ -1,7 +1,7 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
-import { copyFileSync, mkdirSync, existsSync } from "fs";
+import { copyFileSync, mkdirSync, existsSync, readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, resolve } from "path";
 
@@ -44,6 +44,32 @@ const selectivePublicCopyPlugin = () => {
   };
 };
 
+// Plugin to ensure manifest.json is served with correct Content-Type and content
+const manifestMimeTypePlugin = () => {
+  return {
+    name: "manifest-mime-type",
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        if (req.url === "/manifest.json") {
+          const manifestPath = resolve(__dirname, "public/manifest.json");
+          if (existsSync(manifestPath)) {
+            try {
+              const manifestContent = readFileSync(manifestPath, "utf-8");
+              res.setHeader("Content-Type", "application/manifest+json");
+              res.setHeader("Cache-Control", "public, max-age=3600");
+              res.end(manifestContent);
+              return;
+            } catch (error) {
+              console.error("[Vite] Failed to read manifest.json:", error);
+            }
+          }
+        }
+        next();
+      });
+    },
+  };
+};
+
 const isProduction = process.env.NODE_ENV === "production" || env.MODE === "production";
 
 // Resolve @shared path - handle both local and docker environments
@@ -66,7 +92,7 @@ const resolveSharedPath = () => {
 };
 
 export default defineConfig({
-  plugins: [react(), selectivePublicCopyPlugin()],
+  plugins: [react(), selectivePublicCopyPlugin(), manifestMimeTypePlugin()],
   resolve: {
     alias: [
       {

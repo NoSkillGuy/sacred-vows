@@ -65,10 +65,8 @@ export function initObservability(): Promise<void> {
     // See: https://github.com/open-telemetry/opentelemetry-js/issues/4642
     tracerProvider = new WebTracerProvider({
       sampler: new TraceIdRatioBasedSampler(samplingRatio),
+      spanProcessors: [new BatchSpanProcessor(exporter)],
     });
-
-    // Add OTLP exporter
-    tracerProvider.addSpanProcessor(new BatchSpanProcessor(exporter));
 
     // Register instrumentations
     registerInstrumentations({
