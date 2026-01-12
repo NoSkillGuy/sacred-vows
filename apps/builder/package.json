@@ -60,7 +60,7 @@
     "@testing-library/user-event": "^14.5.1",
     "@types/jszip": "^3.4.1",
     "@types/node": "^25.0.3",
-    "@types/react": "^19.2.7",
+    "@types/react": "^19.2.8",
     "@types/react-dom": "^18.2.17",
     "@types/zxcvbn": "^4.4.0",
     "@vitejs/plugin-react": "^5.1.2",
