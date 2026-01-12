@@ -22,7 +22,7 @@
   "dependencies": {
     "@wedding-builder/shared": "workspace:*",
     "@opentelemetry/api": "^1.8.0",
-    "@opentelemetry/context-zone-peer-dep": "^2.2.0",
+    "@opentelemetry/context-zone-peer-dep": "^2.3.0",
     "@opentelemetry/exporter-metrics-otlp-http": "^0.208.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.208.0",
     "@opentelemetry/instrumentation": "^0.208.0",
